@@ -37,7 +37,6 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({
-            Exception.class,
             NullPointerException.class,
             IllegalArgumentException.class,
             IllegalStateException.class,
@@ -60,12 +59,16 @@ public class GlobalExceptionHandler {
             JsonProcessingException.class,
             BeanCreationException.class
     })
-
     public ResponseEntity<String> handleAll(Exception e) {
         String msg = getRootCauseMessage(e);
         log.error("예외 발생: {}", Optional.ofNullable(e.getMessage()).orElse(e.toString()));
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(msg);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleUnknown(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("일시적인 오류가 발생했습니다.");
     }
 }

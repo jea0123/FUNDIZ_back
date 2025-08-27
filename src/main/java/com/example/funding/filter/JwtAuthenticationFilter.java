@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDao userDao;
 
     private static final String[] WHITELIST = {
-            "/api/v1/user/signIn", "/api/v1/user/signUp",        // 로그인/회원가입
+            "/api/v1/auth/signIn", "/api/v1/auth/signUp",        // 로그인/회원가입
             "/public/**", "/swagger-ui/**", "/v3/api-docs/**",
             "/error", "/favicon.ico"
     };
@@ -76,7 +76,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String role = claims.get("role", String.class);
             GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.toUpperCase());
             Long userId = ((Number) claims.get("userId")).longValue();
-            log.info("userId:{}", userId);
 
             CustomUserPrincipal principal = new CustomUserPrincipal(userId, email, List.of(authority));
             Authentication auth =
@@ -87,20 +86,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (ExpiredJwtException e) {
             request.setAttribute("authError", "TOKEN_EXPIRED");
             entryPoint.commence(request, response, null);
-            return;
         } catch (JwtException | IllegalArgumentException e) {
             request.setAttribute("authError", "TOKEN_INVALID");
             entryPoint.commence(request, response, null);
-            return;
         } catch (SecurityException e) {
             request.setAttribute("authError", "ACCESS_DENIED");
             entryPoint.commence(request, response, null);
-            return;
         } catch (Exception e) {
             log.error("JWT 인증 필터 오류: {}", e.getMessage());
             request.setAttribute("authError", "AUTHENTICATION_FAILED");
             entryPoint.commence(request, response, null);
-            return;
         }
     }
 

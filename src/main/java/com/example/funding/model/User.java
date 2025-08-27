@@ -23,7 +23,7 @@ public class User {
     private Date lastLoginAt;
     private char isDeleted;
     private Date deletedAt;
-    private int followingCnt;
+    private int followCnt;
     private String reason;
     private Date suspendedAt;
     private Date releasedAt;

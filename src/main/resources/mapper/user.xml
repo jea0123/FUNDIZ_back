@@ -9,6 +9,12 @@
         VALUES
         (USERS_SEQ.NEXTVAL, #{email}, #{password}, #{nickname})
     </insert>
+    
+    <update id="updateLastLogin" parameterType="Long">
+        UPDATE USERS
+        SET LASTLOGINAT = SYSDATE
+        WHERE USERID = #{userId}
+    </update>
 
     <select id="findByEmail" parameterType="String" resultType="user">
         SELECT * FROM USERS WHERE EMAIL = #{email}

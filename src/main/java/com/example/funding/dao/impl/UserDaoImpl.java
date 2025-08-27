@@ -26,4 +26,9 @@ public class UserDaoImpl implements UserDao {
     public void signUp(User user) {
         session.insert("user.signUp", user);
     }
+
+    @Override
+    public void updateLastLogin(Long userId) {
+        session.update("user.updateLastLogin", userId);
+    }
 }

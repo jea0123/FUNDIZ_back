@@ -15,10 +15,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AuthServiceImpl implements AuthService {
 
     private final UserDao userDao;
@@ -47,8 +49,8 @@ public class AuthServiceImpl implements AuthService {
         if (user == null || passwordEncoder.matches(encodedPassword, user.getPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDto.fail(400,"이메일 또는 비밀번호가 일치하지 않습니다."));
         }
-
         String token = jwtProvider.createAccessToken(user.getUserId(), user.getEmail(), user.getRole().toString());
+        userDao.updateLastLogin(user.getUserId());
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200,"로그인 성공", token));
     }
 

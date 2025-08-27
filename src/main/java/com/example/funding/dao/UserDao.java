@@ -8,4 +8,6 @@ public interface UserDao {
     User findByNickname(String nickname);
 
     void signUp(User dto);
+
+    void updateLastLogin(Long userId);
 }

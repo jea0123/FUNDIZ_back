@@ -42,13 +42,12 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseEntity<ResponseDto<String>> signIn(SignInRequestDto dto) {
         User user = userDao.findByEmail(dto.getEmail());
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResponseDto.fail(204,"존재하지 않는 이메일입니다."));
-        }
         String encodedPassword = passwordEncoder.encode(dto.getPassword());
-        if (passwordEncoder.matches(encodedPassword, user.getPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDto.fail(400,"비밀번호가 일치하지 않습니다."));
+
+        if (user == null || passwordEncoder.matches(encodedPassword, user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDto.fail(400,"이메일 또는 비밀번호가 일치하지 않습니다."));
         }
+
         String token = jwtProvider.createAccessToken(user.getUserId(), user.getEmail(), user.getRole().toString());
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200,"로그인 성공", token));
     }

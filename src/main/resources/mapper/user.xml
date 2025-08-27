@@ -14,4 +14,8 @@
         SELECT * FROM USERS WHERE EMAIL = #{email}
     </select>
 
+    <select id="findByNickname" parameterType="String" resultType="user">
+        SELECT * FROM USERS WHERE NICKNAME = #{nickname}
+    </select>
+
 </mapper>

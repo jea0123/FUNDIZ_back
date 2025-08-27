@@ -2,6 +2,7 @@ package com.example.funding.controller;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.user.CheckEmailRequestDto;
+import com.example.funding.dto.request.user.CheckNicknameRequestDto;
 import com.example.funding.dto.request.user.SignInRequestDto;
 import com.example.funding.dto.request.user.SignUpRequestDto;
 import com.example.funding.service.AuthService;
@@ -31,5 +32,10 @@ public class AuthController {
     @PostMapping("/checkEmail")
     public ResponseEntity<ResponseDto<String>> checkEmail(@RequestBody CheckEmailRequestDto dto) {
         return authService.checkEmail(dto);
+    }
+
+    @PostMapping("/checkNickname")
+    public ResponseEntity<ResponseDto<String>> checkNickname(@RequestBody CheckNicknameRequestDto dto) {
+        return authService.checkNickname(dto);
     }
 }

@@ -2,6 +2,8 @@ package com.example.funding.service.impl;
 
 import com.example.funding.dao.UserDao;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.user.CheckEmailRequestDto;
+import com.example.funding.dto.request.user.CheckNicknameRequestDto;
 import com.example.funding.dto.request.user.SignInRequestDto;
 import com.example.funding.dto.request.user.SignUpRequestDto;
 import com.example.funding.model.User;
@@ -49,5 +51,23 @@ public class AuthServiceImpl implements AuthService {
         }
         String token = jwtProvider.createAccessToken(user.getUserId(), user.getEmail(), user.getRole().toString());
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200,"로그인 성공", token));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<String>> checkEmail(CheckEmailRequestDto dto) {
+        User existingUser = userDao.findByEmail(dto.getEmail());
+        if (existingUser != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseDto.fail(409,"이미 사용중인 이메일입니다."));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200,"사용 가능한 이메일입니다.", dto.getEmail()));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<String>> checkNickname(CheckNicknameRequestDto dto) {
+        User existingUser = userDao.findByNickname(dto.getNickname());
+        if (existingUser != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseDto.fail(409,"이미 사용중인 닉네임입니다."));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200,"사용 가능한 닉네임입니다.", dto.getNickname()));
     }
 }

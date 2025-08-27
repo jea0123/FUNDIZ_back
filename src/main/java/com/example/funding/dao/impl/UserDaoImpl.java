@@ -18,6 +18,11 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    public User findByNickname(String nickname) {
+        return session.selectOne("user.findByNickname", nickname);
+    }
+
+    @Override
     public void signUp(User user) {
         session.insert("user.signUp", user);
     }

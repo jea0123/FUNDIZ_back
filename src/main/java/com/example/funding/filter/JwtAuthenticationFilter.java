@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDao userDao;
 
     private static final String[] WHITELIST = {
-            "/api/v1/auth/signIn", "/api/v1/auth/signUp",        // 로그인/회원가입
+            "/api/v1/auth/**",
             "/public/**", "/swagger-ui/**", "/v3/api-docs/**",
             "/error", "/favicon.ico"
     };

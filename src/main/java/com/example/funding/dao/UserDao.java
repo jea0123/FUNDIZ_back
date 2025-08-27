@@ -5,5 +5,7 @@ import com.example.funding.model.User;
 public interface UserDao {
     User findByEmail(String email);
 
+    User findByNickname(String nickname);
+
     void signUp(User dto);
 }

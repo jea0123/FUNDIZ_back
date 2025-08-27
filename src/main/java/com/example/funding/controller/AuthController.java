@@ -1,10 +1,10 @@
 package com.example.funding.controller;
 
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.request.user.CheckEmailRequestDto;
-import com.example.funding.dto.request.user.CheckNicknameRequestDto;
-import com.example.funding.dto.request.user.SignInRequestDto;
-import com.example.funding.dto.request.user.SignUpRequestDto;
+import com.example.funding.dto.request.auth.CheckEmailRequestDto;
+import com.example.funding.dto.request.auth.CheckNicknameRequestDto;
+import com.example.funding.dto.request.auth.SignInRequestDto;
+import com.example.funding.dto.request.auth.SignUpRequestDto;
 import com.example.funding.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

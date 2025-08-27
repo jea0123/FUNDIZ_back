@@ -1,4 +1,4 @@
-package com.example.funding.dto.request.user;
+package com.example.funding.dto.request.auth;
 
 import lombok.Getter;
 import lombok.Setter;

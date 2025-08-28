@@ -1,7 +1,7 @@
 package com.example.funding.filter;
 
 import com.example.funding.common.CustomUserPrincipal;
-import com.example.funding.dao.UserDao;
+import com.example.funding.mapper.UserMapper;
 import com.example.funding.provider.JwtProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
 
-    private final UserDao userDao;
+    private final UserMapper userMapper;
 
     private static final String[] WHITELIST = {
             "/api/v1/auth/**",
@@ -68,7 +68,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             Claims claims = jwtProvider.validateAndGetClaims(token);
             String email = claims.get("email", String.class);
-            if (email == null || userDao.findByEmail(email) == null) {
+            if (email == null || userMapper.findByEmail(email) == null) {
                 request.setAttribute("authError", "TOKEN_INVALID");
                 entryPoint.commence(request, response, null);
                 return;

@@ -21,8 +21,6 @@ public class User {
     private char isSuspended;
     private Date joinedAt;
     private Date lastLoginAt;
-    private char isDeleted;
-    private Date deletedAt;
     private int followCnt;
     private String reason;
     private Date suspendedAt;

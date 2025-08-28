@@ -1,8 +1,8 @@
 package com.example.funding.service.impl;
 
-import com.example.funding.dao.UserDao;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.response.user.LoginUserDto;
+import com.example.funding.mapper.UserMapper;
 import com.example.funding.model.User;
 import com.example.funding.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class UserServiceImpl implements UserService {
 
-    private final UserDao userDao;
+    private final UserMapper userMapper;
 
     @Override
     public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(Long userId) {
-        User user = userDao.getUserById(userId);
+        User user = userMapper.getUserById(userId);
         if (user == null) {
             return ResponseEntity.status(404).body(ResponseDto.fail(404, "사용자를 찾을 수 없습니다."));
         }

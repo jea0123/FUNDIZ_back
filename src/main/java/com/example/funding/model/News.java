@@ -11,8 +11,9 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @Builder
-public class Liked {
-    private Long userId;
+public class News {
+    private Long newsId;
     private Long projectId;
+    private String content;
     private Date createdAt;
 }

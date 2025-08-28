@@ -5,14 +5,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @Builder
-public class Liked {
-    private Long userId;
+public class Tag {
+    private Long tagId;
     private Long projectId;
-    private Date createdAt;
+    private String tagName;
 }

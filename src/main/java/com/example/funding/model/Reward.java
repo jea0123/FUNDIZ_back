@@ -11,8 +11,15 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @Builder
-public class Liked {
-    private Long userId;
+public class Reward {
+    private Long rewardId;
     private Long projectId;
+    private String rewardName;
+    private int price;
+    private String rewardContent;
+    private Date deliveryDate;
+    private int rewardCnt;
     private Date createdAt;
+    private char isPosting;
+    private int remain;
 }

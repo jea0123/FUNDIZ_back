@@ -11,8 +11,12 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @Builder
-public class Liked {
+public class Qna {
+    private Long qnaId;
+    private Long itemId;
     private Long userId;
-    private Long projectId;
+    private Long creatorId;
+    private String title;
+    private String content;
     private Date createdAt;
 }

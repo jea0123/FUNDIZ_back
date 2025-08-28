@@ -11,8 +11,12 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @Builder
-public class Liked {
+public class Community {
+    private Long cmId;
     private Long userId;
     private Long projectId;
+    private String content;
+    private int rating;
     private Date createdAt;
+    private char code;
 }

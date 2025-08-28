@@ -1,6 +1,5 @@
-package com.example.funding.model;
+package com.example.funding.dto.response.user;
 
-import com.example.funding.common.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,21 +11,13 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @Builder
-public class User {
+public class LoginUserDto {
     private Long userId;
     private String email;
-    private String password;
     private String nickname;
     private String profileImg;
-    private char isSuspended;
     private Date joinedAt;
-    private Date lastLoginAt;
-    private char isDeleted;
-    private Date deletedAt;
     private int followCnt;
-    private String reason;
-    private Date suspendedAt;
-    private Date releasedAt;
     private char isCreator;
-    private Role role;
+    private String role;
 }

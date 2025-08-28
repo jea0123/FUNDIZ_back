@@ -27,6 +27,14 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
+    /**
+     * 회원가입
+     * @param dto
+     * @Writes 이미 존재하는 이메일인지 확인, 비밀번호 암호화, 회원 정보 저장
+     * @return : 성공 시 200 OK, 실패 시 409 CONFLICT
+     * @author by: 장민규
+     * @update description: 최초 생성
+     */
     @Override
     public ResponseEntity<ResponseDto<String>> signUp(SignUpRequestDto dto) {
         User existingUser = userMapper.findByEmail(dto.getEmail());

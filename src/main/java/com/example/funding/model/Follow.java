@@ -15,3 +15,4 @@ public class Follow {
     private long creatorId;
     private long userId;
     private Date followDate;
+}

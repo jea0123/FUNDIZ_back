@@ -10,4 +10,6 @@ public interface UserDao {
     void signUp(User dto);
 
     void updateLastLogin(Long userId);
+
+    User getUserById(Long userId);
 }

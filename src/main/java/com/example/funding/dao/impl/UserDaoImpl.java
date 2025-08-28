@@ -31,4 +31,9 @@ public class UserDaoImpl implements UserDao {
     public void updateLastLogin(Long userId) {
         session.update("user.updateLastLogin", userId);
     }
+
+    @Override
+    public User getUserById(Long userId) {
+        return session.selectOne("user.getUserById", userId);
+    }
 }

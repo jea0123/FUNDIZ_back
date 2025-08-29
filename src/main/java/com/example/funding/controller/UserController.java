@@ -19,6 +19,12 @@ public class UserController {
 
     private final UserService userService;
 
+    /**
+     * <p>로그인 사용자 정보 조회</p>
+     * @param userId 인증된 사용자의 ID
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author by: 장민규
+     */
     @GetMapping("/loginUser")
     public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(@AuthenticationPrincipal(expression = "userId") Long userId) {
         return userService.getLoginUser(userId);

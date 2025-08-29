@@ -11,9 +11,26 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 
+/**
+ * <p>JWT 인증 실패 핸들러</p>
+ * <p>- 인증이 필요한 리소스에 인증 없이 접근할 경우 401 Unauthorized 응답을 반환</p>
+ * @since 2025-08-26
+ * @author 장민규
+ */
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
+    /**
+     * <p>인증 실패 시 호출되는 메서드</p>
+     * <p>- response에 401 상태 코드와 에러 메시지를 JSON 형식으로 작성</p>
+     * @param request  HTTP 요청
+     * @param response HTTP 응답
+     * @param authException 발생한 인증 예외
+     * @throws IOException      입출력 예외
+     * @throws ServletException 서블릿 예외
+     * @since 2025-08-26
+     * @author 장민규
+     */
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {

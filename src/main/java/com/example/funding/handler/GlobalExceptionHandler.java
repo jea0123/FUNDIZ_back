@@ -24,6 +24,12 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.Optional;
 
+/**
+ * <p>글로벌 예외 처리 핸들러</p>
+ * <p>- 애플리케이션 전역에서 발생하는 다양한 예외를 처리하고 적절한 HTTP 응답을 반환</p>
+ * @since 2025-08-26
+ * @author 장민규
+ */
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -36,6 +42,14 @@ public class GlobalExceptionHandler {
         return Optional.ofNullable(cause.getMessage()).orElse(cause.toString());
     }
 
+    /**
+     * <p>일반적인 예외 처리 메서드</p>
+     * <p>- 다양한 예외를 포괄적으로 처리하고, 400 Bad Request 응답을 반환</p>
+     * @param e 발생한 예외
+     * @return 400 Bad Request 응답과 예외 메시지
+     * @since 2025-08-26
+     * @author 장민규
+     */
     @ExceptionHandler({
             NullPointerException.class,
             IllegalArgumentException.class,
@@ -67,6 +81,14 @@ public class GlobalExceptionHandler {
                 .body(msg);
     }
 
+    /**
+     * <p>알 수 없는 예외 처리 메서드</p>
+     * <p>- 처리되지 않은 예외를 포괄적으로 처리하고, 500 Internal Server Error 응답을 반환</p>
+     * @param e 발생한 예외
+     * @return 500 Internal Server Error 응답과 일반적인 오류 메시지
+     * @since 2025-08-27
+     * @author 장민규
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleUnknown(Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("일시적인 오류가 발생했습니다.");

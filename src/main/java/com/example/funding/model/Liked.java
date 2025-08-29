@@ -12,7 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class Liked {
-    private long userId;
-    private long projectId;
+    private Long userId;
+    private Long projectId;
     private Date createdAt;
 }

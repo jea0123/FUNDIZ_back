@@ -2,6 +2,7 @@ package com.example.funding.dto.response.project;
 
 import com.example.funding.model.News;
 import com.example.funding.model.Reward;
+import com.example.funding.model.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,11 +29,14 @@ public class ProjectDetailDto {
     private int viewCnt;
 
     private Long creatorId;
+
+    private Long ctrgId;
     private String ctrgName;
+
     private Long subctrgId;
     private String subctrgName;
 
-    private List<String> tagList;
+    private List<Tag> tagList;
 
     private List<Reward> rewardList;
 

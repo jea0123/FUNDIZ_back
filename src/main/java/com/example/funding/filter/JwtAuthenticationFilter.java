@@ -1,7 +1,7 @@
 package com.example.funding.filter;
 
 import com.example.funding.common.CustomUserPrincipal;
-import com.example.funding.dao.UserDao;
+import com.example.funding.mapper.UserMapper;
 import com.example.funding.provider.JwtProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -25,6 +25,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * <p>JWT 인증 필터</p>
+ * <p>- 매 요청마다 JWT 토큰의 유효성을 검사하고, 유효한 경우 SecurityContext에 인증 정보를 저장</p>
+ * @since 2028-08-26
+ * @author 장민규
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -36,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
 
-    private final UserDao userDao;
+    private final UserMapper userMapper;
 
     private static final String[] WHITELIST = {
             "/api/v1/auth/**",
@@ -44,6 +50,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/error", "/favicon.ico"
     };
 
+    /**
+     * <p>필터를 적용하지 않을 경로 설정</p>
+     * <p>- OPTIONS 메서드 요청과 WHITELIST에 포함된 경로는 필터를 적용하지 않음</p>
+     */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest req) {
         if ("OPTIONS".equalsIgnoreCase(req.getMethod()))
@@ -55,6 +65,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return false;
     }
 
+    /**
+     * <p>JWT 토큰 검증 및 인증 정보 설정</p>
+     * <p>- 요청 헤더에서 JWT 토큰을 추출하고, 유효성을 검사</p>
+     * <p>- 토큰이 유효한 경우, 토큰에서 사용자 정보를 추출하여 SecurityContext에 인증 정보 설정</p>
+     * <p>- 토큰이 없거나 유효하지 않은 경우, 인증 실패 처리</p>
+     */
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
@@ -68,7 +84,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             Claims claims = jwtProvider.validateAndGetClaims(token);
             String email = claims.get("email", String.class);
-            if (email == null || userDao.findByEmail(email) == null) {
+            if (email == null || userMapper.findByEmail(email) == null) {
                 request.setAttribute("authError", "TOKEN_INVALID");
                 entryPoint.commence(request, response, null);
                 return;
@@ -99,6 +115,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * <p>HTTP 요청에서 JWT 토큰 추출</p>
+     * <p>- Authorization 헤더에서 "Bearer " 접두사를 제거한 토큰 반환</p>
+     * @param req HTTP 요청
+     * @return JWT 토큰 또는 null
+     */
     private String resolveToken(HttpServletRequest req) {
         String header = req.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer "))

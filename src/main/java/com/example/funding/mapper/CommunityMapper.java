@@ -1,5 +1,6 @@
 package com.example.funding.mapper;
 
+import com.example.funding.dto.response.project.CommunityDto;
 import com.example.funding.model.Community;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

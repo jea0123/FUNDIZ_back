@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.funding.mapper.ProjectMapper">
+    <update id="updateViewCnt">
+        UPDATE PROJECT
+        SET VIEWCNT = VIEWCNT + 1
+        WHERE PROJECTID = #{projectId}
+    </update>
+
+    <select id="getProjectById" resultType="project">
+        SELECT * FROM PROJECT
+        WHERE PROJECTID = #{projectId}
+    </select>
+</mapper>

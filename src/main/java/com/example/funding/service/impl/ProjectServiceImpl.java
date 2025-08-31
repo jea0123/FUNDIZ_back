@@ -1,14 +1,16 @@
-package com.example.funding.service;
+package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.response.project.CommunityDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.mapper.*;
 import com.example.funding.model.*;
+import com.example.funding.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,15 +24,47 @@ public class ProjectServiceImpl implements ProjectService {
     private final RewardMapper rewardMapper;
     private final NewsMapper newsMapper;
     private final CommunityMapper communityMapper;
+    private final UserMapper userMapper;
+    private final ReplyMapper replyMapper;
 
+    /**
+     * <p>프로젝트 상세 페이지 조회</p>
+     * <p>조회수 +1</p>
+     * @param projectId
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @since 2025-08-31
+     * @author by: 조은애
+    */
     @Override
+    @Transactional
     public ResponseEntity<ResponseDto<ProjectDetailDto>> getProjectDetail(Long projectId) {
+        projectMapper.updateViewCnt(projectId);
         Project project = projectMapper.getProjectById(projectId);
+        if (project == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트를 찾을 수 없습니다."));
+        }
         Subcategory subcategory = subcategoryMapper.getSubcategoryById(project.getSubctrgId());
         List<Tag> tagList = tagMapper.getTagListById(projectId);
         List<Reward> rewardList = rewardMapper.getRewardListById(projectId);
         List<News> newsList = newsMapper.getNewsListById(projectId);
         List<Community> communityList = communityMapper.getCommunityListById(projectId);
+
+        List<CommunityDto> communityDtoList = communityList.stream()
+                .map(c -> {
+                    User user = userMapper.getUserById(c.getUserId());
+                    List<Reply> replies = replyMapper.getReplyListById(c.getCmId());
+                    return CommunityDto.builder()
+                        .cmId(c.getCmId())
+                        .nickname(user.getNickname())
+                        .profileImg(user.getProfileImg())
+                        .content(c.getContent())
+                        .rating(c.getRating())
+                        .createdAt(c.getCreatedAt())
+                        .code(c.getCode())
+                        .replyList(replies)
+                        .build();
+                })
+                .toList();
 
         ProjectDetailDto projectDetailDto = ProjectDetailDto.builder()
                 .projectId(project.getProjectId())
@@ -50,8 +84,11 @@ public class ProjectServiceImpl implements ProjectService {
                 .ctrgId(subcategory.getCtrgId())
                 .ctrgName(subcategory.getSubctrgName())
                 .tagList(tagList)
+                .rewardList(rewardList)
+                .newsList(newsList)
+                .communityList(communityDtoList)
                 .build();
 
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "프로젝트 상세페이지 조회 성공", projectDetailDto));
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "프로젝트 상세 조회 성공", projectDetailDto));
     }
 }

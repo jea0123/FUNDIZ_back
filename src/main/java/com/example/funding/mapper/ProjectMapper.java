@@ -8,4 +8,5 @@ import org.apache.ibatis.annotations.Param;
 public interface ProjectMapper {
     Project getProjectById(@Param("projectId") Long projectId);
 
+    void updateViewCnt(@Param("projectId") Long projectId);
 }

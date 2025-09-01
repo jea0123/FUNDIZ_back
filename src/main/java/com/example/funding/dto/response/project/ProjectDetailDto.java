@@ -1,7 +1,9 @@
 package com.example.funding.dto.response.project;
 
 import com.example.funding.model.News;
+import com.example.funding.model.Reply;
 import com.example.funding.model.Reward;
+import com.example.funding.model.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +18,7 @@ import java.util.List;
 @Builder
 public class ProjectDetailDto {
     private Long projectId;
+    private Long creatorId;
     private String title;
     private int goalAmount;
     private int currAmount;
@@ -27,16 +30,14 @@ public class ProjectDetailDto {
     private int backerCnt;
     private int viewCnt;
 
-    private Long creatorId;
+    private Long ctrgId;
     private String ctrgName;
     private Long subctrgId;
     private String subctrgName;
 
-    private List<String> tagList;
-
+    private List<Tag> tagList;
     private List<Reward> rewardList;
-
     private List<News> newsList;
-
     private List<CommunityDto> communityList;
+    //후기
 }

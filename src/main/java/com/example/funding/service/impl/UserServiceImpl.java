@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * <p>로그인 사용자 정보 조회</p>
-     * @param userId
+     * @param userId 인증된 사용자의 ID
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @since 2025-08-28
      * @author by: 장민규

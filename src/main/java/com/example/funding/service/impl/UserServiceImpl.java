@@ -2,8 +2,13 @@ package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.response.user.LoginUserDto;
+import com.example.funding.dto.response.user.MyPageBackingListDto;
+import com.example.funding.dto.response.user.MyPageBackingProjectDto;
 import com.example.funding.dto.response.user.MyPageUserDto;
+import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.UserMapper;
+import com.example.funding.mapper.backingMapper;
+import com.example.funding.model.Project;
 import com.example.funding.model.User;
 import com.example.funding.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
+    private final ProjectMapper projectMapper;
+    private final backingMapper backingMapper;
 
     /**
      * <p>로그인 사용자 정보 조회</p>
@@ -60,6 +67,30 @@ public class UserServiceImpl implements UserService {
                 .profileImg(user.getProfileImg())
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "유저 정보 불러오기 성공", mypageUserDto));
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ResponseDto<MyPageBackingListDto>> getMyPageBackingList(Long userId) {
+        /*
+        Project project = projectMapper.getProjectById(userId);
+        Project
+        if(project==null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트 후원 목록을 찾을 수 없습니다"));
+        }
+
+        MyPageBackingProjectDto myPageBackingProject = backingMapper.getMyPageBackingProjectId(project.getProjectId());
+
+        MyPageBackingListDto myPageBackingListDto = MyPageBackingListDto.builder()
+                .backingId()
+                .backingStatus()
+                .rewardId()
+                .build();
+
+
+
+        */
+        return null;
     }
 
 }

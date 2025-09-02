@@ -29,8 +29,5 @@
         SELECT * FROM USERS WHERE NICKNAME = #{nickname}
     </select>
 
-    <select id="">
-
-    </select>
 
 </mapper>

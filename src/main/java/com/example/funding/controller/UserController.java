@@ -1,7 +1,7 @@
 package com.example.funding.controller;
 
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.response.user.MyPageBackingDto;
+import com.example.funding.dto.response.user.MyPageBackingListDto;
 import com.example.funding.dto.response.user.MyPageUserDto;
 import com.example.funding.dto.response.user.LoginUserDto;
 import com.example.funding.service.ProjectService;
@@ -37,7 +37,7 @@ public class UserController {
 
     /**
      * <p>마이페이지 구현</p>
-     * @param userId 에 따른 MyPage 불러오기
+     * @param userId 에 따른 MyPage 프로필 조회
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @since 2025-09-02
      * @author by: 이윤기
@@ -48,13 +48,20 @@ public class UserController {
         return userService.getMyPageUser(userId);
     }
 
-    /*@GetMapping("/me/backingPage/{id}")
-    public ResponseEntity<ResponseDto<MyPageBackingDto>> getMyPageBacking(@PathVariable("id") Long userId) {
-
+    /**
+     * <p>마이페이지 구현</p>
+     * @param userId 에 따른 MyPage 후원한 프로젝트 목록 조히
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @since 2025-09-02
+     * @author by: 이윤기
+     */
+    @GetMapping("/me/backingPage/{userId}")
+    public ResponseEntity<ResponseDto<MyPageBackingListDto>> getMyPageBackingList(@PathVariable Long userId) {
+        return userService.getMyPageBackingList(userId);
     }
 
 
-
+    /*
     @GetMapping("/me/creatorPage")
     public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageCreator() {
 

@@ -12,9 +12,9 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class Shipping {
-    private long shippingId;
-    private long backingId;
-    private long addrId;
+    private Long shippingId;
+    private Long backingId;
+    private Long addrId;
     private String shippingStatus;
     private String trackingNum;
     private Date shippedAt;

@@ -1,15 +1,17 @@
 package com.example.funding.service;
 
+import com.example.funding.dto.ResponseDto;
 import com.example.funding.model.Notice;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface NoticeService {
-    List<Notice> list();
+    ResponseEntity<ResponseDto<List<Notice>>> list();
 
-    void add(Notice item);
+    ResponseEntity<ResponseDto<Notice>> add(Notice item);
 
-    void update(Notice item);
+    ResponseEntity<ResponseDto<Notice>> update(Notice item);
 
-    void delete(long noticeId);
+    void delete(Long noticeId);
 }

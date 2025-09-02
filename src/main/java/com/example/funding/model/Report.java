@@ -12,9 +12,9 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class Report {
-    private long reportId;
-    private long userId;
-    private long target;
+    private Long reportId;
+    private Long userId;
+    private Long target;
     private String reason;
     private Date reportDate;
     private String reportStatus;

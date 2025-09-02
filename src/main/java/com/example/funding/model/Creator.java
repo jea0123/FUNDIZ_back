@@ -10,11 +10,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Creator {
-    private long creatorId;
-    private long userId;
+    private Long creatorId;
+    private Long userId;
     private String creatorName;
     private String creatorType;
-    private long followerCnt;
+    private Long followerCnt;
     private String businessNum;
     private String profileImg;
     private String email;

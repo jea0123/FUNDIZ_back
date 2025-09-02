@@ -10,9 +10,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class BackingDetail {
-    private long backingId;
-    private long rewardId;
-    private long price;
-    private long quantity;
+    private Long backingId;
+    private Long rewardId;
+    private Long price;
+    private Long quantity;
 }
 

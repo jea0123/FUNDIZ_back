@@ -10,8 +10,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Address {
-    private long userId;
-    private long addrName;
+    private Long userId;
+    private Long addrName;
     private String recipient;
     private String postalCode;
     private String roadAddr;

@@ -14,7 +14,7 @@ import java.util.Date;
 public class Project {
     private Long projectId;
     private Long creatorId;
-    private Long subctrgId;
+    private Long subctgrId;
     private String title;
     private int goalAmount;
     private int currAmount;

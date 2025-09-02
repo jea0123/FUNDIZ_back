@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @Builder
-public class backingDetail {
+public class BackingDetail {
     private long backingId;
     private long rewardId;
     private long price;

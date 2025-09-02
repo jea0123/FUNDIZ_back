@@ -1,14 +1,17 @@
 package com.example.funding.controller;
 
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.response.user.LoginUserDto;
+import com.example.funding.dto.response.user.MyPageBackingDto;
 import com.example.funding.dto.response.user.MyPageUserDto;
+import com.example.funding.dto.response.user.LoginUserDto;
+import com.example.funding.service.ProjectService;
 import com.example.funding.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
+    private final ProjectService projectService;
 
     /**
      * <p>로그인 사용자 정보 조회</p>
@@ -31,9 +35,28 @@ public class UserController {
         return userService.getLoginUser(userId);
     }
 
-    //user 마다 mypage를 => /me/{id} 로받아야될지 생각좀해봐야될듯?
-    /*@GetMapping("/me")
-    public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageUser(Long userId) {
+    /**
+     * <p>마이페이지 구현</p>
+     * @param userId 에 따른 MyPage 불러오기
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @since 2025-09-02
+     * @author by: 이윤기
+     */
+
+    @GetMapping("/me/userPage/{userId}")
+    public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageUser(@PathVariable Long userId) {
+        return userService.getMyPageUser(userId);
+    }
+
+    /*@GetMapping("/me/backingPage/{id}")
+    public ResponseEntity<ResponseDto<MyPageBackingDto>> getMyPageBacking(@PathVariable("id") Long userId) {
+
+    }
+
+
+
+    @GetMapping("/me/creatorPage")
+    public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageCreator() {
 
     }*/
 }

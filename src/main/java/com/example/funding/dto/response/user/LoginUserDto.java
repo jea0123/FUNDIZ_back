@@ -20,4 +20,6 @@ public class LoginUserDto {
     private int followCnt;
     private char isCreator;
     private String role;
+
+
 }

@@ -2,6 +2,7 @@ package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.response.user.LoginUserDto;
+import com.example.funding.dto.response.user.MyPageUserDto;
 import com.example.funding.mapper.UserMapper;
 import com.example.funding.model.User;
 import com.example.funding.service.UserService;
@@ -45,4 +46,20 @@ public class UserServiceImpl implements UserService {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "사용자 정보 조회 성공", loginUserDto));
     }
+
+    @Override
+    public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageUser(Long userId) {
+        User user = userMapper.getUserById(userId);
+        if(user == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "유저 정보를 불러올 수 없습니다."));
+        }
+        MyPageUserDto mypageUserDto = MyPageUserDto.builder()
+                .userId(user.getUserId())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .profileImg(user.getProfileImg())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "유저 정보 불러오기 성공", mypageUserDto));
+    }
+
 }

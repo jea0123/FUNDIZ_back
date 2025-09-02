@@ -9,11 +9,5 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @Builder
-public class MyPageUserDto {
-    // 유저 테이블에서 가져올 정보
-    private Long userId;
-    private String email;
-    private String nickname;
-    private String profileImg;
-
+public class MyPageQnADto {
 }

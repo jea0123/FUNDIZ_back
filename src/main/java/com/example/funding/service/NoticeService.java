@@ -15,7 +15,7 @@ public interface NoticeService {
 
     ResponseEntity<ResponseDto<Notice>> update(Notice item);
 
-    void delete(Long noticeId);
+    ResponseEntity<ResponseDto<Notice>> delete(Long noticeId);
 
 
 }

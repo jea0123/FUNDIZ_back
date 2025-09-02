@@ -1,7 +1,6 @@
 package com.example.funding.controller;
 
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.model.Notice;
 import com.example.funding.service.NoticeService;
 import lombok.RequiredArgsConstructor;

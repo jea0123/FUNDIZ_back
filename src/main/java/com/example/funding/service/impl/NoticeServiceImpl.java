@@ -2,11 +2,8 @@ package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.response.notice.NoticeDto;
-import com.example.funding.dto.response.user.LoginUserDto;
 import com.example.funding.mapper.NoticeMapper;
 import com.example.funding.model.Notice;
-import com.example.funding.model.Project;
-import com.example.funding.model.User;
 import com.example.funding.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

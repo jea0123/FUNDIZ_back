@@ -4,4 +4,9 @@
 
 <mapper namespace="com.example.funding.mapper.NewsMapper">
 
+    <select id="getNewsListById" resultType="news">
+        SELECT * FROM NEWS
+        WHERE PROJECTID = #{projectId}
+    </select>
+
 </mapper>

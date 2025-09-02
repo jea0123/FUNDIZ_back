@@ -4,4 +4,10 @@
 
 <mapper namespace="com.example.funding.mapper.CommunityMapper">
 
+    <select id="getCommunityListById" resultType="community">
+        SELECT * FROM COMMUNITY
+        WHERE PROJECTID = #{projectId}
+          AND CODE = #{code}
+    </select>
+
 </mapper>

@@ -20,7 +20,7 @@ public class CommunityDto {
     private String content;
     private int rating;
     private Date createdAt;
-    private char code;
+    private String code;
 
     private List<Reply> replyList;
 }

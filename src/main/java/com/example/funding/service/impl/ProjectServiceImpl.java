@@ -3,6 +3,7 @@ package com.example.funding.service.impl;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.response.project.CommunityDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
+import com.example.funding.dto.response.project.SubcategoryDto;
 import com.example.funding.mapper.*;
 import com.example.funding.model.*;
 import com.example.funding.service.ProjectService;
@@ -31,24 +32,26 @@ public class ProjectServiceImpl implements ProjectService {
      * <p>프로젝트 상세 페이지 조회</p>
      * <p>조회수 +1</p>
      * @param projectId
+     * @param code
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-     * @since 2025-08-31
      * @author by: 조은애
-    */
+     * @since 2025-08-31
+     */
     @Override
     @Transactional
-    public ResponseEntity<ResponseDto<ProjectDetailDto>> getProjectDetail(Long projectId) {
+    public ResponseEntity<ResponseDto<ProjectDetailDto>> getProjectDetail(Long projectId, String code) {
         projectMapper.updateViewCnt(projectId);
         Project project = projectMapper.getProjectById(projectId);
         if (project == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트를 찾을 수 없습니다."));
         }
-        Subcategory subcategory = subcategoryMapper.getSubcategoryById(project.getSubctrgId());
+        SubcategoryDto subcategory = subcategoryMapper.getSubcategoryById(project.getSubctgrId());
+
         List<Tag> tagList = tagMapper.getTagListById(projectId);
         List<Reward> rewardList = rewardMapper.getRewardListById(projectId);
         List<News> newsList = newsMapper.getNewsListById(projectId);
-        List<Community> communityList = communityMapper.getCommunityListById(projectId);
 
+        List<Community> communityList = communityMapper.getCommunityListById(projectId, code);
         List<CommunityDto> communityDtoList = communityList.stream()
                 .map(c -> {
                     User user = userMapper.getUserById(c.getUserId());
@@ -79,10 +82,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .backerCnt(project.getBackerCnt())
                 .viewCnt(project.getViewCnt())
                 .creatorId(project.getCreatorId())
-                .subctrgId(subcategory.getSubctrgId())
-                .subctrgName(subcategory.getSubctrgName())
-                .ctrgId(subcategory.getCtrgId())
-                .ctrgName(subcategory.getSubctrgName())
+                .subcategory(subcategory)
                 .tagList(tagList)
                 .rewardList(rewardList)
                 .newsList(newsList)

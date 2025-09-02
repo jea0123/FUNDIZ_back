@@ -30,14 +30,10 @@ public class ProjectDetailDto {
     private int backerCnt;
     private int viewCnt;
 
-    private Long ctrgId;
-    private String ctrgName;
-    private Long subctrgId;
-    private String subctrgName;
+    private SubcategoryDto subcategory;
 
     private List<Tag> tagList;
     private List<Reward> rewardList;
     private List<News> newsList;
     private List<CommunityDto> communityList;
-    //후기
 }

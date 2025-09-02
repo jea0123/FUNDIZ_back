@@ -4,4 +4,9 @@
 
 <mapper namespace="com.example.funding.mapper.TagMapper">
 
+    <select id="getTagListById" resultType="tag">
+        SELECT * FROM TAG
+        WHERE PROJECTID = #{projectId}
+    </select>
+
 </mapper>

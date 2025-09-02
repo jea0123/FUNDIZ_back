@@ -18,5 +18,5 @@ public class Community {
     private String content;
     private int rating;
     private Date createdAt;
-    private char code;
+    private String code;
 }

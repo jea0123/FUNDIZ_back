@@ -4,4 +4,9 @@
 
 <mapper namespace="com.example.funding.mapper.RewardMapper">
 
+    <select id="getRewardListById" resultType="reward">
+        SELECT * FROM reward
+        WHERE PROJECTID = #{projectId}
+    </select>
+
 </mapper>

@@ -7,7 +7,6 @@
     <select id="getCommunityListById" resultType="community">
         SELECT * FROM COMMUNITY
         WHERE PROJECTID = #{projectId}
-          AND CODE = #{code}
     </select>
 
 </mapper>

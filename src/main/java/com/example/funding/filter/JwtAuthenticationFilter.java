@@ -45,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserMapper userMapper;
 
     private static final String[] WHITELIST = {
-            "/api/v1/auth/**", "/project/**",
+            "/api/v1/auth/**", "/api/v1//project",
             "/public/**", "/swagger-ui/**", "/v3/api-docs/**",
             "/error", "/favicon.ico"
     };

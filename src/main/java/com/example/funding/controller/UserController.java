@@ -2,6 +2,7 @@ package com.example.funding.controller;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.response.user.LoginUserDto;
+import com.example.funding.dto.response.user.MyPageUserDto;
 import com.example.funding.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,4 +30,10 @@ public class UserController {
     public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(@AuthenticationPrincipal(expression = "userId") Long userId) {
         return userService.getLoginUser(userId);
     }
+
+    //user 마다 mypage를 => /me/{id} 로받아야될지 생각좀해봐야될듯?
+    /*@GetMapping("/me")
+    public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageUser(Long userId) {
+
+    }*/
 }

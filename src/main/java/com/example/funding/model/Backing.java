@@ -12,9 +12,9 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class Backing {
-    private long backingId;
-    private long userId;
-    private long amount;
+    private Long backingId;
+    private Long userId;
+    private Long amount;
     private Date createdAt;
     private String backingStatus;
 }

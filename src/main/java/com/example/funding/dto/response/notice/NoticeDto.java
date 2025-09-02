@@ -1,24 +1,25 @@
-package com.example.funding.model;
+package com.example.funding.dto.response.notice;
 
+import com.example.funding.model.Files;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @Builder
-public class Inquiry {
-    private Long inqId;
-    private Long userId;
+public class NoticeDto {
+    private Long noticeId;
     private Long adId;
     private String title;
     private String content;
+    private Long viewCnt;
     private Date createdAt;
-    private char isCanceled;
-    private String ctgr;
-    private char isAnswer;
+
+    private List<Files> filesList;
 }

@@ -12,12 +12,12 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class Payment {
-    private long paymentId;
-    private long backingId;
+    private Long paymentId;
+    private Long backingId;
     private String orderId;
     private String method;
     private String status;
-    private long amount;
+    private Long amount;
     private String cardCompany;
     private Date createdAt;
 }

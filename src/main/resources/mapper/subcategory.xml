@@ -4,7 +4,7 @@
 
 <mapper namespace="com.example.funding.mapper.SubcategoryMapper">
 
-    <resultMap id="ctgrMap" type="com.example.funding.dto.SubcategoryDto" autoMapping="true">
+    <resultMap id="ctgrMap" type="com.example.funding.dto.response.project.SubcategoryDto" autoMapping="true">
         <id property="subctgrId" column="SUBCTGRID"/>
     </resultMap>
 

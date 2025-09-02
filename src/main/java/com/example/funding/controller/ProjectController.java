@@ -18,8 +18,14 @@ public class ProjectController {
 
     private final ProjectService projectService;
 
+    /**
+     * <p>프로젝트 상세 페이지 조회</p>
+     * @param projectId
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @since 2025-08-31
+     */
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseDto<ProjectDetailDto>> getProjectDetail(@PathVariable("id") Long projectId, @RequestParam("code") String code) {
-        return projectService.getProjectDetail(projectId, code);
+    public ResponseEntity<ResponseDto<ProjectDetailDto>> getProjectDetail(@PathVariable("id") Long projectId) {
+        return projectService.getProjectDetail(projectId);
     }
 }

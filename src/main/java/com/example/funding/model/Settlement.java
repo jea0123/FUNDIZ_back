@@ -12,10 +12,10 @@ import java.util.Date;
 @Setter
 @Builder
 public class Settlement {
-    private long settlementId;
-    private long projectId;
-    private long totalAmount;
-    private long fee;
-    private long settlementAmount;
+    private Long settlementId;
+    private Long projectId;
+    private Long totalAmount;
+    private Long fee;
+    private Long settlementAmount;
     private Date settlementDate;
 }

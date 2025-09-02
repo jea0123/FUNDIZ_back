@@ -12,7 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class Follow {
-    private long creatorId;
-    private long userId;
+    private Long creatorId;
+    private Long userId;
     private Date followDate;
 }

@@ -12,8 +12,8 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class Reply {
-    private long replyId;
-    private long userId;
+    private Long replyId;
+    private Long userId;
     private String content;
     private char isSecret;
     private Date createdAt;

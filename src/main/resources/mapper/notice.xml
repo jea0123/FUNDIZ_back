@@ -4,7 +4,7 @@
 
 <mapper namespace="com.example.funding.mapper.NoticeMapper">
 
-    <select id="list" resultType="Notice">
+    <select id="list" resultType="notice">
         SELECT * FROM
         (SELECT sub.*, ROWNUM rnum FROM (
         SELECT * FROM notice order by NOTICEID desc
@@ -17,12 +17,12 @@
         WHERE NOTICEID = #{noticeId}
     </update>
 
-    <select id="noticeDetail" resultType="Notice">
+    <select id="noticeDetail" resultType="notice">
         SELECT * FROM notice
         WHERE NOTICEID = #{noticeId}
     </select>
 
-    <select id="item" resultType="Notice">
+    <select id="item" resultType="notice">
         SELECT * FROM notice
         WHERE NOTICEID=#{noticeId}
     </select>

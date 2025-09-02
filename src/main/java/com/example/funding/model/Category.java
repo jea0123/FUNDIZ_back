@@ -10,6 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Category {
-    private Long ctrgId;
-    private String ctrgName;
+    private Long ctgrId;
+    private String ctgrName;
 }

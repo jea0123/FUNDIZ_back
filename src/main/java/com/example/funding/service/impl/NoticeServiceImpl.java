@@ -33,6 +33,7 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     public ResponseEntity<ResponseDto<Notice>> noticeDetail(Long noticeId) {
+        noticeMapper.updateViewCnt(noticeId);
         Notice noticeDetail = noticeMapper.noticeDetail(noticeId);
         if (noticeDetail != null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseDto.fail(409,"공지사항 목록 조회 불가"));

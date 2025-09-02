@@ -29,4 +29,5 @@
         SELECT * FROM USERS WHERE NICKNAME = #{nickname}
     </select>
 
+
 </mapper>

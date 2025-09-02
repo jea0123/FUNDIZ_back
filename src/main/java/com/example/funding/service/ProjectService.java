@@ -7,4 +7,6 @@ import org.springframework.http.ResponseEntity;
 public interface ProjectService {
 
     ResponseEntity<ResponseDto<ProjectDetailDto>> getProjectDetail(Long projectId);
+
+
 }

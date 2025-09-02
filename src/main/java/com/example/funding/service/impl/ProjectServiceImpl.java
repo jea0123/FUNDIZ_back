@@ -24,9 +24,9 @@ public class ProjectServiceImpl implements ProjectService {
     private final TagMapper tagMapper;
     private final RewardMapper rewardMapper;
     private final NewsMapper newsMapper;
-    private final CommunityMapper communityMapper;
-    private final UserMapper userMapper;
-    private final ReplyMapper replyMapper;
+//    private final CommunityMapper communityMapper;
+//    private final UserMapper userMapper;
+//    private final ReplyMapper replyMapper;
 
     /**
      * <p>프로젝트 상세 페이지 조회</p>
@@ -50,8 +50,8 @@ public class ProjectServiceImpl implements ProjectService {
         List<Tag> tagList = tagMapper.getTagListById(projectId);
         List<Reward> rewardList = rewardMapper.getRewardListById(projectId);
         List<News> newsList = newsMapper.getNewsListById(projectId);
-
-        List<Community> communityList = communityMapper.getCommunityListById(projectId, code);
+/*
+        List<Community> communityList = communityMapper.getCommunityListById(projectId);
         List<CommunityDto> communityDtoList = communityList.stream()
                 .map(c -> {
                     User user = userMapper.getUserById(c.getUserId());
@@ -68,6 +68,7 @@ public class ProjectServiceImpl implements ProjectService {
                         .build();
                 })
                 .toList();
+*/
 
         ProjectDetailDto projectDetailDto = ProjectDetailDto.builder()
                 .projectId(project.getProjectId())
@@ -86,7 +87,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .tagList(tagList)
                 .rewardList(rewardList)
                 .newsList(newsList)
-                .communityList(communityDtoList)
+//                .communityList(communityDtoList)
                 .build();
 
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "프로젝트 상세 조회 성공", projectDetailDto));

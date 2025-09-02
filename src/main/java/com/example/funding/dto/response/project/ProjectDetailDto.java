@@ -35,5 +35,5 @@ public class ProjectDetailDto {
     private List<Tag> tagList;
     private List<Reward> rewardList;
     private List<News> newsList;
-    private List<CommunityDto> communityList;
+//    private List<CommunityDto> communityList;
 }

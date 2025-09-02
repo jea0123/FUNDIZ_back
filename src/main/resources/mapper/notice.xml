@@ -4,4 +4,43 @@
 
 <mapper namespace="com.example.funding.mapper.NoticeMapper">
 
+    <select id="list" resultType="Notice">
+        SELECT * FROM
+        (SELECT sub.*, ROWNUM rnum FROM (
+        SELECT * FROM notice order by NOTICEID desc
+        ) sub)
+    </select>
+
+    <update id="updateViewCnt">
+        UPDATE notice
+        SET VIEWCNT = VIEWCNT + 1
+        WHERE NOTICEID = #{noticeId}
+    </update>
+
+    <select id="noticeDetail" resultType="Notice">
+        SELECT * FROM notice
+        WHERE NOTICEID = #{noticeId}
+    </select>
+
+    <select id="item" resultType="Notice">
+        SELECT * FROM notice
+        WHERE NOTICEID=#{noticeId}
+    </select>
+
+    <insert id="add">
+        INSERT INTO notice
+        VALUES (notice_seq.NEXTVAL, #{adId}, #{title}, #{content}, #{viewCnt}, #{createdAt})
+    </insert>
+
+    <update id="update">
+        UPDATE notice
+        SET TITLE=#{title}, CONTENT=#{content}
+        WHERE NOTICEID=#{noticeId}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM notice
+        WHERE NOTICEID=#{noticeId}
+    </delete>
+
 </mapper>

@@ -10,7 +10,9 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 @Mapper
 public interface NoticeMapper {
-    Notice getNoticeById(@Param("noticeId") Long noticeId);
+    List<Notice> list();
+
+    Notice noticeDetail(@Param("noticeId") Long noticeId);
 
     void updateViewCnt(@Param("noticeId") Long noticeId);
 
@@ -19,4 +21,8 @@ public interface NoticeMapper {
     ResponseEntity<ResponseDto<Notice>> update(@Param("noticeId") Notice item);
 
     void delete(@Param("noticeId") Long noticeId);
+
+    Notice item(@Param("noticeId") Long noticeId);
+
+
 }

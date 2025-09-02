@@ -9,9 +9,13 @@ import java.util.List;
 public interface NoticeService {
     ResponseEntity<ResponseDto<List<Notice>>> list();
 
+    ResponseEntity<ResponseDto<Notice>> getNoticeDetail(Long noticeId);
+
     ResponseEntity<ResponseDto<Notice>> add(Notice item);
 
     ResponseEntity<ResponseDto<Notice>> update(Notice item);
 
     void delete(Long noticeId);
+
+
 }

@@ -5,6 +5,8 @@ import com.example.funding.dto.response.notice.NoticeDto;
 import com.example.funding.dto.response.user.LoginUserDto;
 import com.example.funding.mapper.NoticeMapper;
 import com.example.funding.model.Notice;
+import com.example.funding.model.Project;
+import com.example.funding.model.User;
 import com.example.funding.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,39 @@ public class NoticeServiceImpl implements NoticeService {
 
     private final NoticeMapper noticeMapper;
 
+    @Override
+    public ResponseEntity<ResponseDto<List<Notice>>> list() {
+        List<Notice> noticeList =  noticeMapper.list();
+        if (noticeList != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseDto.fail(409,"공지사항 목록 조회 불가"));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200,"공지사항 목록 조회 성공", noticeList));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<Notice>> noticeDetail(Long noticeId) {
+        Notice noticeDetail = noticeMapper.noticeDetail(noticeId);
+        if (noticeDetail != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseDto.fail(409,"공지사항 목록 조회 불가"));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200,"공지사항 목록 조회 성공", noticeDetail));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<Notice>> add(Notice item) {
+        Notice add = noticeMapper.add(item);
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<Notice>> update(Notice item) {
+        return noticeMapper.update(item);
+    }
+
+    @Override
+    public void delete(Long noticeId) {
+        return noticeMapper.delete(noticeId);
+    }
+
     /*
      *
      * <p>공지사항 게시판</p>
@@ -33,39 +68,5 @@ public class NoticeServiceImpl implements NoticeService {
      * @author by: 이동혁
      */
 
-    @Override
-    @Transactional
-    public ResponseEntity<ResponseDto<NoticeDto>> getNoticeList(Long noticeId) {
-        noticeMapper.updateViewCnt(noticeId);
-        Notice notice = noticeMapper.getNoticeById(noticeId);
-        if (notice == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트를 찾을 수 없습니다."));
-        }
 
-        NoticeDto noticeDto = NoticeDto.builder()
-                .noticeId(notice.getNoticeId())
-                .adId(notice.getAdId())
-                .title(notice.getTitle())
-                .content(notice.getContent())
-                .viewCnt(notice.getViewCnt())
-                .createdAt(notice.getCreatedAt())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "프로젝트 상세 조회 성공", notice));
-    }
-
-    @Override
-    public ResponseEntity<ResponseDto<Notice>> add(Notice item) {
-        return noticeMapper.add(item);
-    }
-
-    @Override
-    public ResponseEntity<ResponseDto<Notice>> update(Notice item) {
-        return noticeMapper.update(item);
-    }
-
-    @Override
-    public void delete(Long noticeId) {
-        noticeMapper.delete(noticeId);
-    }
 }

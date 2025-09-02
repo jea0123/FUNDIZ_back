@@ -9,5 +9,5 @@ import java.util.List;
 
 @Mapper
 public interface CommunityMapper {
-    List<Community> getCommunityListById(@Param("projectId") Long projectId);
+    List<Community> getCommunityListById(@Param("projectId") Long projectId, @Param("code") String code);
 }

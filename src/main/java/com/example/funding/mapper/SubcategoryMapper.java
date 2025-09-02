@@ -1,10 +1,10 @@
 package com.example.funding.mapper;
 
-import com.example.funding.model.Subcategory;
+import com.example.funding.dto.response.project.SubcategoryDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface SubcategoryMapper {
-    Subcategory getSubcategoryById(@Param("projectId") Long projectId);
+    SubcategoryDto getSubcategoryById(@Param("subctgrId") Long subctgrId);
 }

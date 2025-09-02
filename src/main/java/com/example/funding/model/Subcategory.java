@@ -10,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Subcategory {
-    private Long subctrgId;
-    private Long ctrgId;
-    private String subctrgName;
+    private Long subctgrId;
+    private Long ctgrId;
+    private String subctgrName;
 }

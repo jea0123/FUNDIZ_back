@@ -11,7 +11,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
-public class settlement {
+public class Settlement {
     private long settlementId;
     private long projectId;
     private long totalAmount;

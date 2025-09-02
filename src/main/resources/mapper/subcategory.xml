@@ -4,4 +4,14 @@
 
 <mapper namespace="com.example.funding.mapper.SubcategoryMapper">
 
+    <resultMap id="ctgrMap" type="com.example.funding.dto.SubcategoryDto" autoMapping="true">
+        <id property="subctgrId" column="SUBCTGRID"/>
+    </resultMap>
+
+    <select id="getSubcategoryById" resultMap="ctgrMap">
+        SELECT * FROM SUBCATEGORY S
+            JOIN CATEGORY C ON C.CTGRID = S.CTGRID
+        WHERE S.SUBCTGRID = #{subctgrId}
+    </select>
+
 </mapper>

@@ -1,4 +1,4 @@
-package com.example.funding.model;
+package com.example.funding.dto.response.project;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @Builder
-public class Category {
+public class SubcategoryDto {
     private Long ctgrId;
     private String ctgrName;
+    private Long subctgrId;
+    private String subctgrName;
 }

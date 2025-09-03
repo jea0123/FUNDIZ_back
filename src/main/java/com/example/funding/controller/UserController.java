@@ -1,7 +1,8 @@
 package com.example.funding.controller;
 
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.response.user.MyPageBackingListDto;
+import com.example.funding.dto.response.user.BackingDetailDto;
+import com.example.funding.dto.response.user.BackingListDto;
 import com.example.funding.dto.response.user.MyPageUserDto;
 import com.example.funding.dto.response.user.LoginUserDto;
 import com.example.funding.service.ProjectService;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -56,8 +59,13 @@ public class UserController {
      * @author by: 이윤기
      */
     @GetMapping("/me/backingPage/{userId}")
-    public ResponseEntity<ResponseDto<MyPageBackingListDto>> getMyPageBackingList(@PathVariable Long userId) {
-        return userService.getMyPageBackingList(userId);
+    public ResponseEntity<ResponseDto<List<BackingDetailDto>>>getBackingList(@PathVariable Long userId) {
+        return userService.getBackingList(userId);
+    }
+
+    @GetMapping("/me/backingPage/{userId}/project/{projectId}")
+    public ResponseEntity<ResponseDto<BackingDetailDto>> getBackingDetail(@PathVariable Long userId, @PathVariable Long projectId){
+        return userService.getBackingDetail(userId,projectId);
     }
 
 

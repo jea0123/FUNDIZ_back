@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @Builder
-public class MyPageBackingProjectDto {
+public class BackingProjectDto {
     private Long projectId;
     private String creatorid;
     private String thumbnail;

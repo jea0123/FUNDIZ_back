@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequestMapping("/api/v1//project")
+@RequestMapping("/api/v1/project")
 @RequiredArgsConstructor
 public class ProjectController {
 
@@ -22,10 +22,11 @@ public class ProjectController {
      * <p>프로젝트 상세 페이지 조회</p>
      * @param projectId
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author by: 조은애
      * @since 2025-08-31
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<ResponseDto<ProjectDetailDto>> getProjectDetail(@PathVariable("id") Long projectId) {
+    @GetMapping("/{projectId}")
+    public ResponseEntity<ResponseDto<ProjectDetailDto>> getProjectDetail(@PathVariable Long projectId) {
         return projectService.getProjectDetail(projectId);
     }
 }

@@ -12,11 +12,14 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class Reply {
-    private long replyId;
-    private long userId;
+    private Long replyId;
+    private Long userId;
+    private Long qnaId;
+    private Long cmId;
+    private Long inqId;
     private String content;
     private char isSecret;
     private Date createdAt;
     private Date deletedAt;
-    private char code;
+    private String code;
 }

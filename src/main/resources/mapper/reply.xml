@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="com.example.funding.mapper.ReplyMapper">
 
     <select id="getReplyListById" resultType="reply">
-        SELECT * FROM reply
+        SELECT
+            REPLYID,
+            USERID,
+            QNAID,
+            CMID,
+            INQID,
+            CONTENT,
+            ISSECRET,
+            CREATEDAT,
+            DELETEDAT,
+            CODE
+        FROM REPLY
         WHERE CMID = #{cmId}
+           AND TRIM(CODE) = #{code}
     </select>
 
 </mapper>

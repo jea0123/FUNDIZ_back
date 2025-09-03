@@ -2,9 +2,11 @@ package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.response.user.*;
+import com.example.funding.dto.response.user.LoginUserDto;
+import com.example.funding.dto.response.user.MyPageUserDto;
+import com.example.funding.mapper.BackingMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.UserMapper;
-import com.example.funding.mapper.backingMapper;
 import com.example.funding.model.Project;
 import com.example.funding.model.User;
 import com.example.funding.service.UserService;
@@ -25,7 +27,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
     private final ProjectMapper projectMapper;
-    private final backingMapper backingMapper;
+    //대문자로 고치기
+    private final BackingMapper backingMapper;
 
     /**
      * <p>로그인 사용자 정보 조회</p>
@@ -54,7 +57,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageUser(Long userId) {
         User user = userMapper.getUserById(userId);
         if(user == null){
@@ -70,7 +72,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public ResponseEntity<ResponseDto<List<BackingDetailDto>>> getBackingList(Long userId) {
 
         User user = userMapper.getUserById(userId);

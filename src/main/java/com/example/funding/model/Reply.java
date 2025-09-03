@@ -14,9 +14,13 @@ import java.util.Date;
 public class Reply {
     private Long replyId;
     private Long userId;
+    private Long qnaId;
+    private Long cmId;
+    private Long inqId;
+
     private String content;
     private char isSecret;
     private Date createdAt;
     private Date deletedAt;
-    private char code;
+    private String code;
 }

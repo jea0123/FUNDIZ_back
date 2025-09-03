@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="com.example.funding.mapper.SubcategoryMapper">
 
     <select id="getSubcategoryById" resultType="com.example.funding.dto.response.project.SubcategoryDto">
             SELECT
-                S.SUBCTGRID AS subctgrId,
-                S.SUBCTGRNAME AS subctgrName,
-                S.CTGRID AS ctgrId,
-                C.CTGRNAME AS ctgrName
+                S.SUBCTGRID,
+                S.SUBCTGRNAME,
+                S.CTGRID,
+                C.CTGRNAME
             FROM SUBCATEGORY S
                 JOIN CATEGORY C ON C.CTGRID = S.CTGRID
             WHERE S.SUBCTGRID = #{subctgrId}

@@ -5,7 +5,6 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.repository.query.Param;
 
 @Mapper
-public interface backingMapper {
+public interface BackingMapper {
     BackingProjectDto getMyPageBackingProjectId(@Param("projectId")Long projectId);
-
 }

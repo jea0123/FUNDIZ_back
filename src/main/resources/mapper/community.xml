@@ -2,9 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.funding.mapper.CommunityMapper">
 
-    <select id="getCommunityListById" resultType="community">
-        SELECT * FROM COMMUNITY
+    <select id="countTotal" resultType="Integer">
+        SELECT COUNT(*) FROM COMMUNITY
         WHERE PROJECTID = #{projectId}
+          AND CODE = #{code}
+    </select>
+
+    <select id="getCommunityById" resultType="community">
+        SELECT T1.*
+        FROM (
+            SELECT
+                CMID,
+                USERID,
+                PROJECTID,
+                CONTENT,
+                NVL(RATING, 0) AS rating,
+                CREATEDAT,
+                CODE
+            FROM COMMUNITY
+            WHERE PROJECTID = #{projectId}
+              AND TRIM(CODE) = #{code}
+            ORDER BY CREATEDAT DESC
+            ) T1
+        WHERE ROWNUM BETWEEN (#{pager.page} - 1) * #{pager.size} + 1 AND (#{pager.page} * #{pager.size})
     </select>
 
 </mapper>

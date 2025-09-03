@@ -3,8 +3,20 @@
 <mapper namespace="com.example.funding.mapper.ReplyMapper">
 
     <select id="getReplyListById" resultType="reply">
-        SELECT * FROM reply
+        SELECT
+            REPLYID,
+            USERID,
+            QNAID,
+            CMID,
+            INQID,
+            CONTENT,
+            ISSECRET,
+            CREATEDAT,
+            DELETEDAT,
+            CODE
+        FROM REPLY
         WHERE CMID = #{cmId}
+           AND TRIM(CODE) = #{code}
     </select>
 
 </mapper>

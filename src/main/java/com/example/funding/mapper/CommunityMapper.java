@@ -1,5 +1,6 @@
 package com.example.funding.mapper;
 
+import com.example.funding.common.Pager;
 import com.example.funding.dto.response.project.CommunityDto;
 import com.example.funding.model.Community;
 import org.apache.ibatis.annotations.Mapper;
@@ -9,5 +10,7 @@ import java.util.List;
 
 @Mapper
 public interface CommunityMapper {
-    List<Community> getCommunityListById(@Param("projectId") Long projectId);
+    int countTotal(Long projectId, String code);
+
+    List<Community> getCommunityById(@Param("projectId") Long projectId, @Param("code") String code, Pager pager);
 }

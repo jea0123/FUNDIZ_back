@@ -16,7 +16,7 @@ public class Community {
     private Long userId;
     private Long projectId;
     private String content;
-    private int rating;
+    private Integer rating;
     private Date createdAt;
     private String code;
 }

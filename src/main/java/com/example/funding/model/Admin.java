@@ -10,9 +10,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Admin {
-    private long adId;
+    private Long adId;
     private String adminId;
     private String adminPwd;
-    private long author;
+    private Long author;
     private String role;
 }

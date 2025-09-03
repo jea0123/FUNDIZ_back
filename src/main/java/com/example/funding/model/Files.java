@@ -10,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Files {
-    private long fileId;
+    private Long fileId;
     private String fileName;
     private String filePath;
     private String fileSize;

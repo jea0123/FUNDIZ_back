@@ -12,10 +12,12 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class Notice {
-    private long noticeId;
-    private long adId;
+    private Long noticeId;
+    private Long adId;
     private String title;
     private String content;
-    private long viewCnt;
+    private Long viewCnt;
     private Date createdAt;
+
+
 }

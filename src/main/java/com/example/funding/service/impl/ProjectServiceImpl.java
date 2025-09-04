@@ -1,6 +1,7 @@
 package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
 import com.example.funding.dto.response.project.SubcategoryDto;
@@ -196,5 +197,64 @@ public class ProjectServiceImpl implements ProjectService {
                 .toList();
 
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "최근 24시간 내 결제된 프로젝트 TOP10 조회 성공", ranked));
+    }
+
+    /**
+     * <p>추천 프로젝트 조회</p>
+     * <p>추천 알고리즘 점수 산정 기준 (가중치)</p>
+     * <ul>
+     *     <li>달성률: 50%</li>
+     *     <li>후원자 수: 20%</li>
+     *     <li>좋아요 수: 20%</li>
+     *     <li>조회수: 10%</li>
+     * </ul>
+     * <p>조건</p>
+     * <ul>
+     *     <li>프로젝트 상태: OPEN</li>
+     *     <li>프로젝트 시작일: 최근 N일 이내</li>
+     * </ul>
+     *
+     * @param days  최근 N일 이내 시작한 프로젝트
+     * @param limit 최대 조회 개수
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author by: 장민규
+     * @since 2025-09-04
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<List<FeaturedProjectDto>>> getFeatured(int days, int limit) {
+        List<Project> featured = projectMapper.findFeatured(days, limit);
+        if (featured.size() > limit) {
+            featured = featured.subList(0, limit);
+        }
+        // 부족하면 추가 조회
+        if (featured.size() < limit) {
+            List<Long> existingIds = featured.stream().map(Project::getProjectId).toList();
+            List<Project> supplement = projectMapper.findFeaturedExcluding(limit - featured.size(), existingIds);
+            featured.addAll(supplement);
+        }
+        if (featured.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "추천 프로젝트가 없습니다."));
+        }
+        List<Long> creatorIds = featured.stream().map(Project::getCreatorId).distinct().toList();
+        Map<Long, String> creatorNameById = creatorMapper.findByIds(creatorIds).stream()
+                .collect(Collectors.toMap(Creator::getCreatorId, Creator::getCreatorName));
+        List<FeaturedProjectDto> result = featured.stream().map(p -> {
+            int percentNow = getPercentNow(p.getCurrAmount(), p.getGoalAmount());
+            double score = 0.0;
+            if (p.getGoalAmount() > 0) {
+                score = (percentNow * 0.5) + ((p.getBackerCnt() / 50.0) * 0.2) + ((p.getLikeCnt() / 20.0) * 0.2) + ((p.getViewCnt() / 500.0) * 0.1);
+            }
+            return FeaturedProjectDto.builder()
+                    .projectId(p.getProjectId())
+                    .title(p.getTitle())
+                    .creatorName(creatorNameById.getOrDefault(p.getCreatorId(), "크리에이터"))
+                    .thumbnail(p.getThumbnail())
+                    .percentNow(percentNow)
+                    .goalAmount(p.getGoalAmount())
+                    .score(score)
+                    .build();
+        }).sorted(Comparator.comparingDouble(FeaturedProjectDto::getScore).reversed()).collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "추천 프로젝트 조회 성공", result));
     }
 }

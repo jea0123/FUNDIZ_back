@@ -11,4 +11,10 @@
         </foreach>
     </select>
 
+    <select id="findById" parameterType="int" resultType="creator">
+        SELECT *
+        FROM creator
+        WHERE creatorId = #{creatorId}
+    </select>
+
 </mapper>

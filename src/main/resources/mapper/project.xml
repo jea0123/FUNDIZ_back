@@ -21,4 +21,40 @@
         </foreach>
     </select>
 
+    <select id="findFeatured" resultType="project">
+        SELECT *
+        FROM (
+        SELECT *
+        FROM project
+        WHERE PROJECTSTATUS = 'OPEN'
+        AND STARTDATE BETWEEN TRUNC(SYSDATE) - #{days}
+        AND TRUNC(SYSDATE)
+        )
+        <![CDATA[
+            WHERE ROWNUM <= #{limit, jdbcType=INTEGER}
+        ]]>
+    </select>
+
+    <select id="findFeaturedExcluding" resultType="project">
+        SELECT *
+        FROM (
+        SELECT *
+        FROM project
+        WHERE PROJECTSTATUS = 'OPEN'
+        <if test="excludeIds != null and excludeIds.size() > 0">
+            AND PROJECTID NOT IN
+            <foreach collection="excludeIds" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+        )
+        <![CDATA[
+            WHERE ROWNUM <= #{limit,jdbcType=INTEGER}
+        ]]>
+        ORDER BY ((CURRAMOUNT / NULLIF(GOALAMOUNT,0)) * 100) * 0.5
+        + (NVL(BACKERCNT,0) / 50)  * 0.2
+        + (NVL(LIKECNT,0)  / 20)  * 0.2
+        + (NVL(VIEWCNT,0)  / 500) * 0.1
+    </select>
+
 </mapper>

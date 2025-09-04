@@ -16,8 +16,8 @@ public class BackingProjectDto {
     private Long projectId;
     private String thumbnail;
     private String title;
-    private String goalAmount;
-    private String currAmount;
+    private Long goalAmount;
+    private Long currAmount;
     private Date endDate;
     private String projectStatus;
 }

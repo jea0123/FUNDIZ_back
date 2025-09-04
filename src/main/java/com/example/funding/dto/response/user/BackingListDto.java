@@ -6,23 +6,25 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.util.Date;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @Builder
 public class BackingListDto {
-    //후원한 프로젝트 목록
-    
-    //후원에서 가져올 데이터
-    private long backingId;
-    private BackingStatus backingStatus;
-    private String rewardId;
 
-    //후원상세 에서 가져올 데이터
-    private long price;
-    private long amount;
+    private Long projectId;
+    private String title;
+    private String thumbnail;
+    private Date endDate;
+    private String projectStatus;
 
-    //프로젝트에서 가져올 데이터
-    BackingProjectDto project;
-
+    private String rewardName;
+    private Long backingId;
+    private String backingStatus;
+    private Long amount;
+    private Date createAt;
+    private int quantity;
 }

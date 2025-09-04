@@ -1,7 +1,6 @@
 package com.example.funding.dto.response.project;
 
 import com.example.funding.model.News;
-import com.example.funding.model.Reply;
 import com.example.funding.model.Reward;
 import com.example.funding.model.Tag;
 import lombok.AllArgsConstructor;
@@ -9,9 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Calendar;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 
@@ -33,7 +30,7 @@ public class ProjectDetailDto {
     private int backerCnt;
     private int viewCnt;
     //결제일
-    private LocalDate paymentDate;
+    private Date paymentDate;
 
     private SubcategoryDto subcategory;
 
@@ -42,8 +39,8 @@ public class ProjectDetailDto {
     private List<News> newsList;
 
     //결제일 = 종료날짜 + 1
-    public LocalDate getPaymentDate() {
+    public Date getPaymentDate() {
         if (endDate == null) return null;
-        return endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().plusDays(1);
+        return Date.from(endDate.toInstant().plus(1, ChronoUnit.DAYS));
     }
 }

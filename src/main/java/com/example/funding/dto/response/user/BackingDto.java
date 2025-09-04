@@ -13,9 +13,23 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class BackingDto {
-    private long backingId;
+    //프로젝트 테이블
+    private Long projectId;
+    private String title;
+    private String thumbnail;
+    private Date endDate;
+    private String projectStatus;
+
+    //리워드 테이블
+    private String rewardName;
+
+    //후원 테이블
+    private Long backingId;
     private String backingStatus;
-    private long amount;
-    private Date createdAt;
+
+    //후원 상세
+    private Long price;
+    private Long quantity;
+
 
 }

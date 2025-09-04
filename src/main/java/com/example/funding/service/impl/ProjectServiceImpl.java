@@ -30,6 +30,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final TagMapper tagMapper;
     private final RewardMapper rewardMapper;
     private final NewsMapper newsMapper;
+
     private final PaymentMapper paymentMapper;
     private final BackingDetailMapper backingDetailMapper;
     private final CreatorMapper creatorMapper;

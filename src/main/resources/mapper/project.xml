@@ -21,6 +21,16 @@
         </foreach>
     </select>
 
+    <select id="findByIdsAndStatus" resultType="project">
+        SELECT *
+        FROM project
+        WHERE projectId IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND PROJECTSTATUS = #{status}
+    </select>
+
     <select id="findFeatured" resultType="project">
         SELECT *
         FROM (

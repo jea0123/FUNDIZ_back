@@ -153,15 +153,15 @@ public class ProjectServiceImpl implements ProjectService {
         if (amount24hByProject.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(200, "최근 24시간 내 결제된 프로젝트가 없습니다."));
 
-        // 5) 프로젝트/크리에이터 기본정보 일괄 조회
+        // 5) 프로젝트 기본정보 일괄 조회
         List<Long> projectIds = new ArrayList<>(amount24hByProject.keySet());
-        List<Project> projects = projectMapper.findByIds(projectIds);
+        List<Project> projects = projectMapper.findByIdsAndStatus(projectIds, "OPEN");
 
-        // 상태/최근성 필터: FUNDING & 최근 30일 시작
+        // 상태/최근성 필터: 최근 30일 시작
 //        Instant cutoff = Instant.now().minus(30, ChronoUnit.DAYS);
         Instant cutoff = Instant.now().minus(8760, ChronoUnit.DAYS);
         projects.removeIf(p ->
-                !"OPEN".equalsIgnoreCase(p.getProjectStatus()) || (p.getStartDate() != null && p.getStartDate().toInstant().isBefore(cutoff)));
+               (p.getStartDate() != null && p.getStartDate().toInstant().isBefore(cutoff)));
 
         // creatorIds
         List<Long> creatorIds = projects.stream().map(Project::getCreatorId).distinct().toList();

@@ -14,6 +14,8 @@ public interface ProjectMapper {
 
     List<Project> findByIds(@Param("ids") List<Long> ids);
 
+    List<Project> findByIdsAndStatus(@Param("ids") List<Long> ids,@Param("status") String status);
+
     // 최근 N일 이내 시작 & FUNDING 상태에서 알고리즘 점수로 상위 limit
     List<Project> findFeatured(
             @Param("days") int days,

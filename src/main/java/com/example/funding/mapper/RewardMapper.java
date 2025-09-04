@@ -9,4 +9,5 @@ import java.util.List;
 @Mapper
 public interface RewardMapper {
     List<Reward> getRewardListById(@Param("projectId") Long projectId);
+    List<Reward> findProjectIdsByRewardIds(@Param("ids") List<Long> rewardIds);
 }

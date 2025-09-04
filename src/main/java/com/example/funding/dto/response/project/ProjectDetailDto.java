@@ -9,6 +9,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -29,11 +32,18 @@ public class ProjectDetailDto {
     private String projectStatus;
     private int backerCnt;
     private int viewCnt;
+    //결제일
+    private LocalDate paymentDate;
 
     private SubcategoryDto subcategory;
 
     private List<Tag> tagList;
     private List<Reward> rewardList;
     private List<News> newsList;
-//    private List<CommunityDto> communityList;
+
+    //결제일 = 종료날짜 + 1
+    public LocalDate getPaymentDate() {
+        if (endDate == null) return null;
+        return endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().plusDays(1);
+    }
 }

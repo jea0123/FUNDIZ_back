@@ -159,7 +159,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         // 상태/최근성 필터: 최근 30일 시작
 //        Instant cutoff = Instant.now().minus(30, ChronoUnit.DAYS);
-        Instant cutoff = Instant.now().minus(8760, ChronoUnit.DAYS);
+        Instant cutoff = Instant.now().minus(400, ChronoUnit.DAYS);
         projects.removeIf(p ->
                (p.getStartDate() != null && p.getStartDate().toInstant().isBefore(cutoff)));
 
@@ -179,7 +179,6 @@ public class ProjectServiceImpl implements ProjectService {
                     double trendScore =
                             // 24h 증가/목표 비중(70%)
                             ((p.getGoalAmount() > 0) ? ((double) amount24h / p.getGoalAmount() * 100.0) : 0.0) * 0.7
-                                    // 좋아요(20%), 조회수(10%) 정규화 (분모는 데이터 분포 보며 튜닝)
                                     + (like / 50.0) * 0.2
                                     + (view / 500.0) * 0.1;
 
@@ -189,6 +188,7 @@ public class ProjectServiceImpl implements ProjectService {
                             .creatorName(creatorNameById.getOrDefault(p.getCreatorId(), "크리에이터"))
                             .thumbnail(p.getThumbnail())
                             .currAmount(p.getCurrAmount())
+                            .endDate(p.getEndDate())
                             .percentNow(percentNow)
                             .trendScore(trendScore)
                             .build();

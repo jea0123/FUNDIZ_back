@@ -3,6 +3,8 @@ package com.example.funding.dto.response.project;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 @Builder
 public class RecentTop10ProjectDto {
@@ -11,6 +13,7 @@ public class RecentTop10ProjectDto {
     String creatorName;
     String thumbnail;
     Integer currAmount;
+    Date endDate;
     Integer percentNow;
     Double trendScore;
 }

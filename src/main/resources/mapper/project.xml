@@ -21,4 +21,118 @@
         </foreach>
     </select>
 
+    <select id="findByIdsAndStatus" resultType="project">
+        SELECT *
+        FROM project
+        WHERE projectId IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND PROJECTSTATUS = #{status}
+    </select>
+
+    <select id="findFeatured" resultType="project">
+        SELECT *
+        FROM (
+        SELECT *
+        FROM project
+        WHERE PROJECTSTATUS = 'OPEN'
+        AND STARTDATE BETWEEN TRUNC(SYSDATE) - #{days}
+        AND TRUNC(SYSDATE)
+        )
+        <![CDATA[
+            WHERE ROWNUM <= #{limit, jdbcType=INTEGER}
+        ]]>
+    </select>
+
+    <select id="findFeaturedExcluding" resultType="project">
+        SELECT *
+        FROM (
+        SELECT *
+        FROM project
+        WHERE PROJECTSTATUS = 'OPEN'
+        <if test="excludeIds != null and excludeIds.size() > 0">
+            AND PROJECTID NOT IN
+            <foreach collection="excludeIds" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+        )
+        <![CDATA[
+            WHERE ROWNUM <= #{limit,jdbcType=INTEGER}
+        ]]>
+        ORDER BY ((CURRAMOUNT / NULLIF(GOALAMOUNT,0)) * 100) * 0.5
+        + (NVL(BACKERCNT,0) / 50)  * 0.2
+        + (NVL(LIKECNT,0)  / 20)  * 0.2
+        + (NVL(VIEWCNT,0)  / 500) * 0.1
+    </select>
+
+    <select id="findRecentTopProjectsJoined" parameterType="map" resultType="recentTop10ProjectDto">
+        <![CDATA[
+          SELECT *
+          FROM (
+            SELECT
+              pr.PROJECTID          AS projectId,
+              pr.TITLE              AS title,
+              pr.THUMBNAIL          AS thumbnail,
+              pr.CREATORID          AS creatorId,
+              c.CREATORNAME         AS creatorName,
+              NVL(pr.CURRAMOUNT,0)  AS currAmount,
+              NVL(pr.GOALAMOUNT,0)  AS goalAmount,
+              pr.ENDDATE            AS endDate,
+              NVL(pr.LIKECNT,0)     AS likeCnt,
+              NVL(pr.VIEWCNT,0)     AS viewCnt,
+
+              /* 결제 기준 지표 */
+              SUM(p.AMOUNT)                         AS totalPaidAmount,
+              COUNT(DISTINCT b.USERID)              AS backerCnt,
+              MAX(p.CREATEDAT)                      AS lastPaidAt,
+
+              /* 진행률(%) */
+              CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
+                   THEN ROUND(NVL(pr.CURRAMOUNT,0) / NULLIF(pr.GOALAMOUNT,0) * 100)
+                   ELSE 0 END                       AS percentNow,
+
+              (
+                (CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
+                      THEN (SUM(p.AMOUNT) / NULLIF(pr.GOALAMOUNT,0)) * 100
+                      ELSE 0 END) * 0.7
+                + (NVL(pr.LIKECNT,0) / 50.0)  * 0.2
+                + (NVL(pr.VIEWCNT,0) / 500.0) * 0.1
+              )                                     AS trendScore
+            FROM PAYMENT p
+              JOIN BACKING b ON b.BACKINGID = p.BACKINGID
+              /* BACKINGID -> PROJECTID 매핑(중복 제거) */
+              JOIN (
+                SELECT bd.BACKINGID, r.PROJECTID
+                FROM BACKINGDETAIL bd
+                JOIN REWARD r ON r.REWARDID = bd.REWARDID
+                GROUP BY bd.BACKINGID, r.PROJECTID
+              ) bp ON bp.BACKINGID = b.BACKINGID
+              JOIN PROJECT pr ON pr.PROJECTID = bp.PROJECTID
+              JOIN CREATOR c  ON c.CREATORID  = pr.CREATORID
+            WHERE p.STATUS = 'PAID'
+              AND p.CREATEDAT >= #{since}
+              AND pr.PROJECTSTATUS = 'OPEN'
+              /* startDays가 NULL이면 필터 무시 */
+              AND ( #{startDays,jdbcType=NUMERIC} IS NULL
+                    OR pr.STARTDATE >= TRUNC(SYSDATE) - #{startDays,jdbcType=NUMERIC} )
+            GROUP BY
+              pr.PROJECTID, pr.TITLE, pr.THUMBNAIL, pr.CREATORID, c.CREATORNAME,
+              pr.CURRAMOUNT, pr.GOALAMOUNT, pr.ENDDATE, pr.LIKECNT, pr.VIEWCNT
+            ORDER BY
+              (
+                (CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
+                      THEN (SUM(p.AMOUNT) / NULLIF(pr.GOALAMOUNT,0)) * 100
+                      ELSE 0 END) * 0.7
+                + (NVL(pr.LIKECNT,0) / 50.0)  * 0.2
+                + (NVL(pr.VIEWCNT,0) / 500.0) * 0.1
+              ) DESC
+          ) t
+          WHERE ROWNUM <= #{limit,jdbcType=NUMERIC}
+        ]]>
+    </select>
+
+
+
 </mapper>

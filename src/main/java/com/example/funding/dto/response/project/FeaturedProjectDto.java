@@ -7,15 +7,14 @@ import java.util.Date;
 
 @Data
 @Builder
-public class RecentTop10ProjectDto {
+public class FeaturedProjectDto {
     Long projectId;
     String title;
-    String thumbnail;
-    Long creatorId;
     String creatorName;
-    Integer currAmount;
-    Integer goalAmount;
+    String thumbnail;
     Date endDate;
     Integer percentNow;
-    Double trendScore;
+    Integer goalAmount;
+
+    Double score;
 }

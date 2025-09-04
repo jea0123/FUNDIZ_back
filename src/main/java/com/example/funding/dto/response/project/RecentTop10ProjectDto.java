@@ -10,9 +10,11 @@ import java.util.Date;
 public class RecentTop10ProjectDto {
     Long projectId;
     String title;
-    String creatorName;
     String thumbnail;
+    Long creatorId;
+    String creatorName;
     Integer currAmount;
+    Integer goalAmount;
     Date endDate;
     Integer percentNow;
     Double trendScore;

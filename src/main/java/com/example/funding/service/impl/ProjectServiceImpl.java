@@ -105,98 +105,17 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<RecentTop10ProjectDto>>> getRecentTop10() {
-        // 1) 최근 24시간 결제
 //        Date since = Date.from(Instant.now().minus(24, ChronoUnit.HOURS));
         Date since = Date.from(Instant.now().minus(8760, ChronoUnit.HOURS));
-        List<Payment> pays = paymentMapper.findRecentSuccessful(since);
-        if (pays.isEmpty())
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(200, "최근 24시간 내 결제된 프로젝트가 없습니다."));
+        int startDays = 30;  // 프로젝트 시작일 최근 30일
+        int limit = 10;
 
-        // backingId -> 결제금액 합계
-        Map<Long, Long> payByBacking = pays.stream()
-                .collect(Collectors.groupingBy(
-                        Payment::getBackingId,
-                        Collectors.summingLong(Payment::getAmount)));
+        List<RecentTop10ProjectDto> ranked = projectMapper.findRecentTopProjectsJoined(since, startDays, limit);
 
-        // 2) 백킹 → 리워드
-        List<Long> backingIds = new ArrayList<>(payByBacking.keySet());
-        List<BackingDetail> bds = backingDetailMapper.findByBackingIds(backingIds);
-        if (bds.isEmpty())
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(200, "최근 24시간 내 결제된 프로젝트가 없습니다."));
-
-        // 3) 리워드 → 프로젝트
-        List<Long> rewardIds = bds.stream().map(BackingDetail::getRewardId).distinct().toList();
-        Map<Long, Long> projectIdByRewardId = rewardMapper.findProjectIdsByRewardIds(rewardIds)
-                .stream().collect(Collectors.toMap(Reward::getRewardId, Reward::getProjectId));
-
-        // 4) 프로젝트별 24시간 증가액 집계
-        Map<Long, Long> amount24hByProject = new HashMap<>();
-
-        // 가정: 한 backingId의 리워드들은 모두 같은 projectId (다르면 균등 분배 등 정책 필요)
-        Map<Long, List<Long>> rewardIdsByBacking = bds.stream()
-                .collect(Collectors.groupingBy(BackingDetail::getBackingId,
-                        Collectors.mapping(BackingDetail::getRewardId, Collectors.toList())));
-
-        for (Map.Entry<Long, Long> e : payByBacking.entrySet()) {
-            Long backingId = e.getKey();
-            long payAmount = e.getValue();
-
-            List<Long> rewardsOfBacking = rewardIdsByBacking.getOrDefault(backingId, Collections.emptyList());
-            if (rewardsOfBacking.isEmpty()) continue;
-
-            Long projectId = projectIdByRewardId.get(rewardsOfBacking.getFirst());
-            if (projectId == null) continue;
-
-            amount24hByProject.merge(projectId, payAmount, Long::sum);
+        if (ranked == null || ranked.isEmpty()) {
+            return ResponseEntity.ok(ResponseDto.fail(200, "최근 24시간 내 결제된 프로젝트가 없습니다."));
         }
-
-        if (amount24hByProject.isEmpty())
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(200, "최근 24시간 내 결제된 프로젝트가 없습니다."));
-
-        // 5) 프로젝트 기본정보 일괄 조회
-        List<Long> projectIds = new ArrayList<>(amount24hByProject.keySet());
-        List<Project> projects = projectMapper.findByIdsAndStatus(projectIds, "OPEN");
-
-        // 상태/최근성 필터: 최근 30일 시작
-//        Instant cutoff = Instant.now().minus(30, ChronoUnit.DAYS);
-        Instant cutoff = Instant.now().minus(400, ChronoUnit.DAYS);
-        projects.removeIf(p ->
-               (p.getStartDate() != null && p.getStartDate().toInstant().isBefore(cutoff)));
-
-        // creatorIds
-        List<Long> creatorIds = projects.stream().map(Project::getCreatorId).distinct().toList();
-        Map<Long, String> creatorNameById = creatorMapper.findByIds(creatorIds).stream()
-                .collect(Collectors.toMap(Creator::getCreatorId, Creator::getCreatorName));
-
-        // 6) 점수 계산 및 DTO 조립
-        List<RecentTop10ProjectDto> ranked = projects.stream().map(p -> {
-                    long amount24h = amount24hByProject.getOrDefault(p.getProjectId(), 0L);
-                    int like = Optional.of(p.getLikeCnt()).orElse(0);
-                    int view = Optional.of(p.getViewCnt()).orElse(0);
-
-                    int percentNow = getPercentNow(p.getCurrAmount(), p.getGoalAmount());
-
-                    double trendScore =
-                            // 24h 증가/목표 비중(70%)
-                            ((p.getGoalAmount() > 0) ? ((double) amount24h / p.getGoalAmount() * 100.0) : 0.0) * 0.7
-                                    + (like / 50.0) * 0.2
-                                    + (view / 500.0) * 0.1;
-
-                    return RecentTop10ProjectDto.builder()
-                            .projectId(p.getProjectId())
-                            .title(p.getTitle())
-                            .creatorName(creatorNameById.getOrDefault(p.getCreatorId(), "크리에이터"))
-                            .thumbnail(p.getThumbnail())
-                            .currAmount(p.getCurrAmount())
-                            .endDate(p.getEndDate())
-                            .percentNow(percentNow)
-                            .trendScore(trendScore)
-                            .build();
-                }).sorted(Comparator.comparingDouble(RecentTop10ProjectDto::getTrendScore).reversed())
-                .limit(10)
-                .toList();
-
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "최근 24시간 내 결제된 프로젝트 TOP10 조회 성공", ranked));
+        return ResponseEntity.ok(ResponseDto.success(200, "최근 24시간 내 결제된 프로젝트 TOP10 조회 성공", ranked));
     }
 
     /**
@@ -250,6 +169,7 @@ public class ProjectServiceImpl implements ProjectService {
                     .title(p.getTitle())
                     .creatorName(creatorNameById.getOrDefault(p.getCreatorId(), "크리에이터"))
                     .thumbnail(p.getThumbnail())
+                    .endDate(p.getEndDate())
                     .percentNow(percentNow)
                     .goalAmount(p.getGoalAmount())
                     .score(score)

@@ -47,6 +47,15 @@ public class ProjectController {
         return projectService.getRecentTop10();
     }
 
+    /**
+     * <p>추천 프로젝트 조회</p>
+     *
+     * @param days  최근 N일 이내 시작된 프로젝트
+     * @param limit 최대 조회 개수
+     * @return 성공 시 200 OK
+     * @author by: 장민규
+     * @since 2025-09-04
+     */
     @GetMapping("/featured")
     public ResponseEntity<ResponseDto<List<FeaturedProjectDto>>> getFeatured(@RequestParam(defaultValue = "30") int days,
                                                                              @RequestParam(defaultValue = "8") int limit) {

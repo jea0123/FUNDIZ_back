@@ -29,6 +29,8 @@ public class ProjectDetailDto {
     private String projectStatus;
     private int backerCnt;
     private int viewCnt;
+    //달성률
+    private Integer percentNow;
     //결제일
     private Date paymentDate;
 

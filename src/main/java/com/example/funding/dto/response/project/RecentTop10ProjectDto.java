@@ -10,13 +10,7 @@ public class RecentTop10ProjectDto {
     String title;
     String creatorName;
     String thumbnail;
-
-    Integer percentNow;
     Integer currAmount;
-    Integer goalAmount;
-    Long amount24h;
-
-    Integer likeCnt;
-    Integer viewCnt;
+    Integer percentNow;
     Double trendScore;
 }

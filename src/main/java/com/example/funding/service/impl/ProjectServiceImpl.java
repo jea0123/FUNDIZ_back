@@ -186,12 +186,8 @@ public class ProjectServiceImpl implements ProjectService {
                             .title(p.getTitle())
                             .creatorName(creatorNameById.getOrDefault(p.getCreatorId(), "크리에이터"))
                             .thumbnail(p.getThumbnail())
-                            .percentNow(percentNow)
                             .currAmount(p.getCurrAmount())
-                            .goalAmount(p.getGoalAmount())
-                            .amount24h(amount24h)
-                            .likeCnt(like)
-                            .viewCnt(view)
+                            .percentNow(percentNow)
                             .trendScore(trendScore)
                             .build();
                 }).sorted(Comparator.comparingDouble(RecentTop10ProjectDto::getTrendScore).reversed())

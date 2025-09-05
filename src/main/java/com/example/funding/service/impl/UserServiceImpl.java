@@ -4,6 +4,8 @@ import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.response.user.*;
 import com.example.funding.dto.response.user.LoginUserDto;
 import com.example.funding.dto.response.user.MyPageUserDto;
+import com.example.funding.dto.response.user.BackingDto;
+import com.example.funding.mapper.BackingDetailMapper;
 import com.example.funding.mapper.BackingMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.UserMapper;
@@ -27,8 +29,9 @@ public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
     private final ProjectMapper projectMapper;
-    //대문자로 고치기
     private final BackingMapper backingMapper;
+    private final  BackingDetailMapper backingDetailMapper;
+
 
     /**
      * <p>로그인 사용자 정보 조회</p>
@@ -56,6 +59,14 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "사용자 정보 조회 성공", loginUserDto));
     }
 
+    /**
+     * <p>로그인 사용자 개인정보</p>
+     * @param userId 사용자 후원리스트
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @since 2025-09-03
+     * @author by: 이윤기
+     */
+
     @Override
     public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageUser(Long userId) {
         User user = userMapper.getUserById(userId);
@@ -71,46 +82,49 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "유저 정보 불러오기 성공", mypageUserDto));
     }
 
+    /**
+     * <p>로그인 사용자 후원 리스트</p>
+     * @param userId 사용자
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @since 2025-09-05
+     * @author by: 이윤기
+     */
     @Override
-    public ResponseEntity<ResponseDto<List<BackingDetailDto>>> getBackingList(Long userId) {
+    public ResponseEntity<ResponseDto<List<BackingDto>>> getBackingList(Long userId) {
 
         User user = userMapper.getUserById(userId);
+
         if(user == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"후원한 프로젝트 목록을 찾을 수 없습니다."));
         }
-/*
-        List<BackingDetailDto> backingList = backingMapper.get*/
+        List<BackingDto> backingList = backingMapper.getBackingListUserId(userId);
 
-        /*Project project = projectMapper.getProjectById(project)
-        BackingProjectDto myPageBackingProject = backingMapper.getMyPageBackingProjectId*/
-        /*
-        Project project = projectMapper.getProjectById(userId);
-        Project
-        if(project==null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트 후원 목록을 찾을 수 없습니다"));
-        }
-
-        MyPageBackingProjectDto myPageBackingProject = backingMapper.getMyPageBackingProjectId(project.getProjectId());
-
-        MyPageBackingListDto myPageBackingListDto = MyPageBackingListDto.builder()
-                .backingId()
-                .backingStatus()
-                .rewardId()
-                .build();
-        */
-        return null;
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "후원한 프로젝트 리스트 조회 성공",backingList));
     }
 
+    /**
+     * <p>로그인 사용자 후원 리스트 상세</p>
+     * @param userId 사용자
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @since 2025-09-05
+     * @author by: 이윤기
+     */
     @Override
-    @Transactional
     public ResponseEntity<ResponseDto<BackingDetailDto>> getBackingDetail(Long userId, Long projectId){
         User user = userMapper.getUserById(userId);
-        Project project =projectMapper.getProjectById(projectId);
+        Project project = projectMapper.getProjectById(projectId);
 
-        if(user == null && project == null){
+        if(user == null || project == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"후원한 해당 프로젝트를 찾을 수 없습니다."));
         }
-        return null;
+
+        //
+        //BackingDetailDto backingDetailDto = backingDetailMapper.getBackingProjectAndUserId(userId, projectId);
+
+        BackingDetailDto backingDetailDto = BackingDetailDto.builder().build();
+
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "후원한 프로젝트 리스트 상세 조회성공", backingDetailDto));
     }
 
 }

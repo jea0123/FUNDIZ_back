@@ -1,5 +1,6 @@
 package com.example.funding.dto.response.user;
 
+import com.example.funding.model.Backing;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,9 +11,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class BackingDetailDto {
-    BackingDto backing;
     BackingRewardDto backingReward;
-    long price;
-    long amount;
+    private long price;
+    private long quantity;
+    Backing backing;
 
 }

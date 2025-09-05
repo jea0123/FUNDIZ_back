@@ -38,7 +38,6 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * <p>프로젝트 상세 페이지 조회</p>
      * <p>조회수 +1</p>
-     *
      * @param projectId
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author by: 조은애
@@ -55,6 +54,8 @@ public class ProjectServiceImpl implements ProjectService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트를 찾을 수 없습니다."));
         }
 
+        int percentNow = getPercentNow(project.getCurrAmount(), project.getGoalAmount());
+
         SubcategoryDto subcategory = subcategoryMapper.getSubcategoryById(project.getSubctgrId());
 
         List<Tag> tagList = tagMapper.getTagListById(projectId);
@@ -63,6 +64,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         ProjectDetailDto projectDetailDto = ProjectDetailDto.builder()
                 .projectId(project.getProjectId())
+                .creatorId(project.getCreatorId())
                 .title(project.getTitle())
                 .goalAmount(project.getGoalAmount())
                 .currAmount(project.getCurrAmount())
@@ -73,7 +75,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .projectStatus(project.getProjectStatus())
                 .backerCnt(project.getBackerCnt())
                 .viewCnt(project.getViewCnt())
-                .creatorId(project.getCreatorId())
+                .percentNow(percentNow)
                 .subcategory(subcategory)
                 .tagList(tagList)
                 .rewardList(rewardList)

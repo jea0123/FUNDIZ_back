@@ -22,6 +22,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 
+import static com.example.funding.common.Utils.getPercentNow;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -38,7 +40,7 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * <p>프로젝트 상세 페이지 조회</p>
      * <p>조회수 +1</p>
-     * @param projectId
+     * @param projectId 프로젝트 ID
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author by: 조은애
      * @since 2025-08-31

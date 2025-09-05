@@ -6,7 +6,10 @@ import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
 import com.example.funding.dto.response.project.SubcategoryDto;
 import com.example.funding.mapper.*;
-import com.example.funding.model.*;
+import com.example.funding.model.News;
+import com.example.funding.model.Project;
+import com.example.funding.model.Reward;
+import com.example.funding.model.Tag;
 import com.example.funding.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,10 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.example.funding.common.Utils.getPercentNow;
+import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +33,6 @@ public class ProjectServiceImpl implements ProjectService {
     private final RewardMapper rewardMapper;
     private final NewsMapper newsMapper;
 
-    private final PaymentMapper paymentMapper;
-    private final BackingDetailMapper backingDetailMapper;
     private final CreatorMapper creatorMapper;
 
     /**
@@ -144,39 +143,11 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<FeaturedProjectDto>>> getFeatured(int days, int limit) {
-        List<Project> featured = projectMapper.findFeatured(days, limit);
-        if (featured.size() > limit) {
-            featured = featured.subList(0, limit);
+        List<FeaturedProjectDto> result = projectMapper.findFeaturedJoinedWithRecent(days, limit);
+        if (result == null || result.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ResponseDto.fail(404, "추천 프로젝트가 없습니다."));
         }
-        // 부족하면 추가 조회
-        if (featured.size() < limit) {
-            List<Long> existingIds = featured.stream().map(Project::getProjectId).toList();
-            List<Project> supplement = projectMapper.findFeaturedExcluding(limit - featured.size(), existingIds);
-            featured.addAll(supplement);
-        }
-        if (featured.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "추천 프로젝트가 없습니다."));
-        }
-        List<Long> creatorIds = featured.stream().map(Project::getCreatorId).distinct().toList();
-        Map<Long, String> creatorNameById = creatorMapper.findByIds(creatorIds).stream()
-                .collect(Collectors.toMap(Creator::getCreatorId, Creator::getCreatorName));
-        List<FeaturedProjectDto> result = featured.stream().map(p -> {
-            int percentNow = getPercentNow(p.getCurrAmount(), p.getGoalAmount());
-            double score = 0.0;
-            if (p.getGoalAmount() > 0) {
-                score = (percentNow * 0.5) + ((p.getBackerCnt() / 50.0) * 0.2) + ((p.getLikeCnt() / 20.0) * 0.2) + ((p.getViewCnt() / 500.0) * 0.1);
-            }
-            return FeaturedProjectDto.builder()
-                    .projectId(p.getProjectId())
-                    .title(p.getTitle())
-                    .creatorName(creatorNameById.getOrDefault(p.getCreatorId(), "크리에이터"))
-                    .thumbnail(p.getThumbnail())
-                    .endDate(p.getEndDate())
-                    .percentNow(percentNow)
-                    .goalAmount(p.getGoalAmount())
-                    .score(score)
-                    .build();
-        }).sorted(Comparator.comparingDouble(FeaturedProjectDto::getScore).reversed()).collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "추천 프로젝트 조회 성공", result));
+        return ResponseEntity.ok(ResponseDto.success(200, "추천 프로젝트 조회 성공", result));
     }
 }

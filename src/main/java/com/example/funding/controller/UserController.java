@@ -78,6 +78,16 @@ public class UserController {
     }
 
 
+    @GetMapping("/me/likedList/{userId}")
+    public ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(@PathVariable Long userId) {
+        return userService.getLikedList(userId);
+    }
+
+    @GetMapping("/me/QnAList/{userId}")
+    public ResponseEntity<ResponseDto<List<MyPageQnADto>>> getQnAList(@PathVariable Long userId) {
+        return userService.getQnAList(userId);
+    }
+
     /*
     @GetMapping("/me/creatorPage")
     public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageCreator() {

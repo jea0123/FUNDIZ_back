@@ -32,7 +32,6 @@ public class UserServiceImpl implements UserService {
     private final BackingMapper backingMapper;
     private final  BackingDetailMapper backingDetailMapper;
 
-
     /**
      * <p>로그인 사용자 정보 조회</p>
      * @param userId 인증된 사용자의 ID
@@ -127,4 +126,20 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "후원한 프로젝트 리스트 상세 조회성공", backingDetailDto));
     }
 
+    /**
+     * <p>최근 본 프로젝트 목록 조회</p>
+     * @param userId 인증된 사용자의 ID
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @since 2025-09-05
+     * @author by: 장민규
+     */
+    @Override
+    public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(Long userId) {
+        User user = userMapper.getUserById(userId);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "사용자를 찾을 수 없습니다."));
+        }
+        List<RecentViewProject> recentViewProjects = userMapper.getRecentViewProjects(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "최근 본 프로젝트 조회 성공", recentViewProjects));
+    }
 }

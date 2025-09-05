@@ -27,5 +27,29 @@
         SELECT * FROM USERS WHERE NICKNAME = #{nickname}
     </select>
 
+    <select id="getRecentViewProjects" resultType="recentViewProject">
+        SELECT *
+        FROM (
+            SELECT
+            pr.projectId,
+            NVL2(TRIM(c.creatorName), c.creatorName, 'Unknown Creator') AS creatorName,
+            pr.Title,
+            pr.Thumbnail,
+            CASE WHEN NVL(pr.goalAmount,0) > 0
+                THEN ROUND(NVL(pr.currAmount,0) / NULLIF(pr.goalAmount,0) * 100)
+                ELSE 0 END AS percentNow,
+            pr.currAmount,
+            pr.endDate,
+            rv.viewedAt
+        FROM recentview rv
+        JOIN project pr ON rv.projectId = pr.projectId
+        JOIN creator c ON pr.creatorId = c.creatorId
+        WHERE rv.userId = #{userId}
+        ORDER BY rv.viewedAt DESC
+        )
+        <![CDATA[
+            WHERE ROWNUM <= 10
+        ]]>
+    </select>
 
 </mapper>

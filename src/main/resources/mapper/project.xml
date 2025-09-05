@@ -38,8 +38,7 @@
             SELECT
               pr.PROJECTID AS projectId,
               pr.TITLE AS title,
-              CASE WHEN c.CREATORNAME IS NOT NULL AND c.CREATORNAME != '' THEN c.CREATORNAME
-                ELSE 'Unknown Creator' END AS creatorName,
+              NVL2(TRIM(c.CREATORNAME), c.CREATORNAME, 'Unknown Creator') AS creatorName,
               pr.THUMBNAIL AS thumbnail,
               pr.ENDDATE AS endDate,
               /* 진행률(%) */
@@ -114,8 +113,7 @@
               pr.TITLE AS title,
               pr.THUMBNAIL AS thumbnail,
               pr.CREATORID AS creatorId,
-              CASE WHEN c.CREATORNAME IS NOT NULL AND c.CREATORNAME != '' THEN c.CREATORNAME
-                   ELSE 'Unknown Creator' END AS creatorName,
+              NVL2(TRIM(c.CREATORNAME), c.CREATORNAME, 'Unknown Creator') AS creatorName,
               NVL(pr.CURRAMOUNT,0) AS currAmount,
               NVL(pr.GOALAMOUNT,0) AS goalAmount,
               pr.ENDDATE AS endDate,

@@ -11,7 +11,7 @@
         </foreach>
     </select>
 
-    <select id="findById" parameterType="int" resultType="creator">
+    <select id="findById" parameterType="Long" resultType="creator">
         SELECT *
         FROM creator
         WHERE creatorId = #{creatorId}

@@ -15,11 +15,11 @@ public class Reward {
     private Long rewardId;
     private Long projectId;
     private String rewardName;
-    private int price;
+    private Integer price;
     private String rewardContent;
     private Date deliveryDate;
-    private int rewardCnt;
+    private Integer rewardCnt;
     private Date createdAt;
-    private char isPosting;
-    private int remain;
+    private Character isPosting;
+    private Integer remain;
 }

@@ -20,19 +20,25 @@ public class ProjectDetailDto {
     private Long projectId;
     private Long creatorId;
     private String title;
-    private int goalAmount;
-    private int currAmount;
+    private Integer goalAmount;
+    private Integer currAmount;
     private Date startDate;
     private Date endDate;
     private String content;
     private String thumbnail;
     private String projectStatus;
-    private int backerCnt;
-    private int viewCnt;
+    private Integer backerCnt;
+    private Integer viewCnt;
     //달성률
     private Integer percentNow;
     //결제일
     private Date paymentDate;
+
+    //창작자 관련
+    private String creatorName;
+    private Long followerCnt;
+    private String profileImg;
+    private Integer projectCnt;
 
     private SubcategoryDto subcategory;
 

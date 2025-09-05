@@ -63,6 +63,10 @@ public class ProjectServiceImpl implements ProjectService {
         List<Reward> rewardList = rewardMapper.getRewardListById(projectId);
         List<News> newsList = newsMapper.getNewsListById(projectId);
 
+        Creator creator = creatorMapper.findById(project.getCreatorId());
+
+        int projectCnt = projectMapper.getProjectCnt(project.getCreatorId());
+
         ProjectDetailDto projectDetailDto = ProjectDetailDto.builder()
                 .projectId(project.getProjectId())
                 .creatorId(project.getCreatorId())
@@ -77,6 +81,10 @@ public class ProjectServiceImpl implements ProjectService {
                 .backerCnt(project.getBackerCnt())
                 .viewCnt(project.getViewCnt())
                 .percentNow(percentNow)
+                .creatorName(creator.getCreatorName())
+                .followerCnt(creator.getFollowerCnt())
+                .profileImg(creator.getProfileImg())
+                .projectCnt(projectCnt)
                 .subcategory(subcategory)
                 .tagList(tagList)
                 .rewardList(rewardList)

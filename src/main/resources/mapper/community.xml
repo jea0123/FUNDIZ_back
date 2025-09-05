@@ -3,28 +3,35 @@
 <mapper namespace="com.example.funding.mapper.CommunityMapper">
 
     <select id="countTotal" resultType="Integer">
-        SELECT COUNT(*) FROM COMMUNITY
+        SELECT COUNT(*)
+        FROM COMMUNITY
         WHERE PROJECTID = #{projectId}
           AND CODE = #{code}
     </select>
 
     <select id="getCommunityById" resultType="community">
-        SELECT T1.*
-        FROM (
-            SELECT
-                CMID,
-                USERID,
-                PROJECTID,
-                CONTENT,
-                NVL(RATING, 0) AS rating,
-                CREATEDAT,
-                CODE
-            FROM COMMUNITY
-            WHERE PROJECTID = #{projectId}
-              AND TRIM(CODE) = #{code}
-            ORDER BY CREATEDAT DESC
-            ) T1
-        WHERE ROWNUM BETWEEN (#{pager.page} - 1) * #{pager.size} + 1 AND (#{pager.page} * #{pager.size})
+        SELECT *
+        FROM
+        (
+            SELECT ROWNUM rnum, T.*
+            FROM
+            (
+                SELECT
+                    CMID,
+                    USERID,
+                    PROJECTID,
+                    CONTENT AS content,
+                    NVL(RATING, 0) AS rating,
+                    CREATEDAT,
+                    CODE
+                FROM COMMUNITY
+                WHERE PROJECTID = 222
+                  AND TRIM(CODE) = 'CM'
+                ORDER BY CREATEDAT
+            ) T
+        )
+        WHERE rnum BETWEEN (#{pager.page} - 1) * #{pager.size} + 1 AND (#{pager.page} * #{pager.size})
+        ORDER BY rnum DESC
     </select>
 
 </mapper>

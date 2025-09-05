@@ -8,7 +8,26 @@
     </update>
 
     <select id="getProjectById" resultType="project">
-        SELECT * FROM PROJECT
+        SELECT
+            PROJECTID,
+            CREATORID,
+            SUBCTGRID,
+            TITLE,
+            GOALAMOUNT,
+            CURRAMOUNT,
+            STARTDATE,
+            ENDDATE,
+            CONTENT,
+            THUMBNAIL,
+            CREATEDAT,
+            UPDATEDAT,
+            PROJECTSTATUS,
+            BACKERCNT,
+            LIKECNT,
+            VIEWCNT,
+            ISREQREVIEW,
+            REJECTEDREASON
+        FROM PROJECT
         WHERE PROJECTID = #{projectId}
     </select>
 
@@ -133,6 +152,10 @@
         ]]>
     </select>
 
-
+    <select id="getProjectCnt" resultType="Integer">
+        SELECT COUNT(*)
+        FROM PROJECT
+        WHERE CREATORID = #{creatorId}
+    </select>
 
 </mapper>

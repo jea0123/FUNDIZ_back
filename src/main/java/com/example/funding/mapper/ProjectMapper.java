@@ -28,4 +28,7 @@ public interface ProjectMapper {
             @Param("limit") int limit,
             @Param("excludeIds") List<Long> excludeIds
     );
+
+    //창작자, 프로젝트 전체 개수
+    int getProjectCnt(@Param("creatorId") Long creatorId);
 }

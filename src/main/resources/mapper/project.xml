@@ -31,40 +31,77 @@
         AND PROJECTSTATUS = #{status}
     </select>
 
-    <select id="findFeatured" resultType="project">
-        SELECT *
-        FROM (
-        SELECT *
-        FROM project
-        WHERE PROJECTSTATUS = 'OPEN'
-        AND STARTDATE BETWEEN TRUNC(SYSDATE) - #{days}
-        AND TRUNC(SYSDATE)
-        )
+    <select id="findFeaturedJoinedWithRecent" parameterType="map" resultType="featuredProjectDto">
         <![CDATA[
-            WHERE ROWNUM <= #{limit, jdbcType=INTEGER}
-        ]]>
-    </select>
+            SELECT projectId, title, creatorName, thumbnail, endDate, percentNow, goalAmount, score
+            FROM (
+            SELECT
+              pr.PROJECTID AS projectId,
+              pr.TITLE AS title,
+              NVL2(TRIM(c.CREATORNAME), c.CREATORNAME, 'Unknown Creator') AS creatorName,
+              pr.THUMBNAIL AS thumbnail,
+              pr.ENDDATE AS endDate,
+              /* 진행률(%) */
+              CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
+                   THEN ROUND(NVL(pr.CURRAMOUNT,0) / NULLIF(pr.GOALAMOUNT,0) * 100)
+                   ELSE 0
+              END AS percentNow,
+              NVL(pr.GOALAMOUNT,0) AS goalAmount,
 
-    <select id="findFeaturedExcluding" resultType="project">
-        SELECT *
-        FROM (
-        SELECT *
-        FROM project
-        WHERE PROJECTSTATUS = 'OPEN'
-        <if test="excludeIds != null and excludeIds.size() > 0">
-            AND PROJECTID NOT IN
-            <foreach collection="excludeIds" item="id" open="(" close=")" separator=",">
-                #{id}
-            </foreach>
-        </if>
-        )
-        <![CDATA[
-            WHERE ROWNUM <= #{limit,jdbcType=INTEGER}
-        ]]>
-        ORDER BY ((CURRAMOUNT / NULLIF(GOALAMOUNT,0)) * 100) * 0.5
-        + (NVL(BACKERCNT,0) / 50)  * 0.2
-        + (NVL(LIKECNT,0)  / 20)  * 0.2
-        + (NVL(VIEWCNT,0)  / 500) * 0.1
+              /* 점수: 진행률 35% + 최근결제/목표 15% + 백커/좋아요/조회 */
+              (
+                (CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
+                      THEN ROUND(NVL(pr.CURRAMOUNT,0) / NULLIF(pr.GOALAMOUNT,0) * 100)
+                      ELSE 0 END) * 0.35
+                + (CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
+                      THEN (NVL(rp.recentPaidAmount,0) / NULLIF(pr.GOALAMOUNT,0) * 100)
+                      ELSE 0 END) * 0.15
+                + (NVL(pr.BACKERCNT,0) / 50.0)  * 0.20
+                + (NVL(pr.LIKECNT,0)   / 20.0)  * 0.20
+                + (NVL(pr.VIEWCNT,0)   / 500.0) * 0.10
+              ) AS score,
+
+              ROW_NUMBER() OVER (
+                ORDER BY
+                  CASE
+                    WHEN pr.STARTDATE >= TRUNC(SYSDATE) - #{days,jdbcType=NUMERIC} THEN 1
+                    ELSE 2
+                  END ASC,
+                  (
+                    (CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
+                          THEN ROUND(NVL(pr.CURRAMOUNT,0) / NULLIF(pr.GOALAMOUNT,0) * 100)
+                          ELSE 0 END) * 0.35
+                    + (CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
+                          THEN (NVL(rp.recentPaidAmount,0) / NULLIF(pr.GOALAMOUNT,0) * 100)
+                          ELSE 0 END) * 0.15
+                    + (NVL(pr.BACKERCNT, 0) / 50.0) * 0.20
+                    + (NVL(pr.LIKECNT, 0) / 20.0) * 0.20
+                    + (NVL(pr.VIEWCNT, 0) / 500.0) * 0.10
+                  ) DESC
+              ) rn
+            FROM PROJECT pr
+            JOIN CREATOR c ON c.CREATORID = pr.CREATORID
+
+            /* 최근 결제액 집계: 프로젝트별 recentPaidAmount */
+            LEFT JOIN (
+              SELECT bp.PROJECTID,
+                     SUM(p.AMOUNT) AS recentPaidAmount
+              FROM PAYMENT p
+              JOIN BACKING b ON b.BACKINGID = p.BACKINGID
+              JOIN (
+                SELECT DISTINCT bd.BACKINGID, r.PROJECTID
+                FROM BACKINGDETAIL bd
+                JOIN REWARD r ON r.REWARDID = bd.REWARDID
+              ) bp ON bp.BACKINGID = b.BACKINGID
+              WHERE p.STATUS = 'PAID'
+                AND p.CREATEDAT >= TRUNC(SYSDATE) - #{days,jdbcType=NUMERIC}
+              GROUP BY bp.PROJECTID
+            ) rp ON rp.PROJECTID = pr.PROJECTID
+
+            WHERE pr.PROJECTSTATUS = 'OPEN'
+          )
+          WHERE rn <= #{limit,jdbcType=NUMERIC}
+          ]]>
     </select>
 
     <select id="findRecentTopProjectsJoined" parameterType="map" resultType="recentTop10ProjectDto">
@@ -72,26 +109,26 @@
           SELECT *
           FROM (
             SELECT
-              pr.PROJECTID          AS projectId,
-              pr.TITLE              AS title,
-              pr.THUMBNAIL          AS thumbnail,
-              pr.CREATORID          AS creatorId,
-              c.CREATORNAME         AS creatorName,
-              NVL(pr.CURRAMOUNT,0)  AS currAmount,
-              NVL(pr.GOALAMOUNT,0)  AS goalAmount,
-              pr.ENDDATE            AS endDate,
-              NVL(pr.LIKECNT,0)     AS likeCnt,
-              NVL(pr.VIEWCNT,0)     AS viewCnt,
+              pr.PROJECTID AS projectId,
+              pr.TITLE AS title,
+              pr.THUMBNAIL AS thumbnail,
+              pr.CREATORID AS creatorId,
+              NVL2(TRIM(c.CREATORNAME), c.CREATORNAME, 'Unknown Creator') AS creatorName,
+              NVL(pr.CURRAMOUNT,0) AS currAmount,
+              NVL(pr.GOALAMOUNT,0) AS goalAmount,
+              pr.ENDDATE AS endDate,
+              NVL(pr.LIKECNT,0) AS likeCnt,
+              NVL(pr.VIEWCNT,0) AS viewCnt,
 
               /* 결제 기준 지표 */
-              SUM(p.AMOUNT)                         AS totalPaidAmount,
-              COUNT(DISTINCT b.USERID)              AS backerCnt,
-              MAX(p.CREATEDAT)                      AS lastPaidAt,
+              SUM(p.AMOUNT) AS totalPaidAmount,
+              COUNT(DISTINCT b.USERID) AS backerCnt,
+              MAX(p.CREATEDAT) AS lastPaidAt,
 
               /* 진행률(%) */
               CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
                    THEN ROUND(NVL(pr.CURRAMOUNT,0) / NULLIF(pr.GOALAMOUNT,0) * 100)
-                   ELSE 0 END                       AS percentNow,
+                   ELSE 0 END AS percentNow,
 
               (
                 (CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
@@ -99,7 +136,7 @@
                       ELSE 0 END) * 0.7
                 + (NVL(pr.LIKECNT,0) / 50.0)  * 0.2
                 + (NVL(pr.VIEWCNT,0) / 500.0) * 0.1
-              )                                     AS trendScore
+              )  AS trendScore
             FROM PAYMENT p
               JOIN BACKING b ON b.BACKINGID = p.BACKINGID
               /* BACKINGID -> PROJECTID 매핑(중복 제거) */
@@ -132,7 +169,6 @@
           WHERE ROWNUM <= #{limit,jdbcType=NUMERIC}
         ]]>
     </select>
-
 
 
 </mapper>

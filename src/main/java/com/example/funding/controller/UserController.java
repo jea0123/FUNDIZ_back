@@ -36,6 +36,18 @@ public class UserController {
     }
 
     /**
+     * <p>최근 본 프로젝트 목록 조회</p>
+     * @param userId 인증된 사용자의 ID
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @since 2025-09-05
+     * @author by: 장민규
+     */
+    @GetMapping("/recentViewProjects/{userId}")
+    public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(@PathVariable Long userId) {
+        return userService.getRecentViewProjects(userId);
+    }
+
+    /**
      * <p>마이페이지 구현</p>
      * @param userId 에 따른 MyPage 프로필 조회
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND

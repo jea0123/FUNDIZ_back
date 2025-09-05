@@ -14,7 +14,7 @@ public class FeaturedProjectDto {
     String thumbnail;
     Date endDate;
     Integer percentNow;
-    Integer goalAmount;
+    Integer currAmount;
 
     Double score;
 }

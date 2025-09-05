@@ -9,4 +9,6 @@ import java.util.List;
 @Mapper
 public interface CreatorMapper {
     List<Creator> findByIds(@Param("ids") List<Long> ids);
+
+    Creator findById(@Param("creatorId") Long creatorId);
 }

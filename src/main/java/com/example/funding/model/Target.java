@@ -10,6 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Target {
-    private char code;
+    private Character code;
     private String targetTable;
 }

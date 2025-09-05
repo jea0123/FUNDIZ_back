@@ -16,5 +16,5 @@ public class Files {
     private String fileSize;
     private String fileType;
     private String fileExt;
-    private char code;
+    private Character code;
 }

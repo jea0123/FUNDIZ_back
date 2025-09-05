@@ -3,7 +3,12 @@
 <mapper namespace="com.example.funding.mapper.NewsMapper">
 
     <select id="getNewsListById" resultType="news">
-        SELECT * FROM NEWS
+        SELECT
+            NEWSID,
+            PROJECTID,
+            CONTENT,
+            CREATEDAT
+        FROM NEWS
         WHERE PROJECTID = #{projectId}
     </select>
 

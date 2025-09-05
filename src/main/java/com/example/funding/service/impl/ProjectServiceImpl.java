@@ -6,10 +6,7 @@ import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
 import com.example.funding.dto.response.project.SubcategoryDto;
 import com.example.funding.mapper.*;
-import com.example.funding.model.News;
-import com.example.funding.model.Project;
-import com.example.funding.model.Reward;
-import com.example.funding.model.Tag;
+import com.example.funding.model.*;
 import com.example.funding.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -64,6 +61,10 @@ public class ProjectServiceImpl implements ProjectService {
         List<Reward> rewardList = rewardMapper.getRewardListById(projectId);
         List<News> newsList = newsMapper.getNewsListById(projectId);
 
+        Creator creator = creatorMapper.findById(project.getCreatorId());
+
+        int projectCnt = projectMapper.getProjectCnt(project.getCreatorId());
+
         ProjectDetailDto projectDetailDto = ProjectDetailDto.builder()
                 .projectId(project.getProjectId())
                 .creatorId(project.getCreatorId())
@@ -78,6 +79,10 @@ public class ProjectServiceImpl implements ProjectService {
                 .backerCnt(project.getBackerCnt())
                 .viewCnt(project.getViewCnt())
                 .percentNow(percentNow)
+                .creatorName(creator.getCreatorName())
+                .followerCnt(creator.getFollowerCnt())
+                .profileImg(creator.getProfileImg())
+                .projectCnt(projectCnt)
                 .subcategory(subcategory)
                 .tagList(tagList)
                 .rewardList(rewardList)

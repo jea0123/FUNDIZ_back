@@ -18,7 +18,7 @@ public class Inquiry {
     private String title;
     private String content;
     private Date createdAt;
-    private char isCanceled;
+    private Character isCanceled;
     private String ctgr;
-    private char isAnswer;
+    private Character isAnswer;
 }

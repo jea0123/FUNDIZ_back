@@ -17,6 +17,6 @@ public class Address {
     private String roadAddr;
     private String detailAddr;
     private String recipientPhone;
-    private char isDefault;
+    private Character isDefault;
 }
 

@@ -16,8 +16,8 @@ public class Project {
     private Long creatorId;
     private Long subctgrId;
     private String title;
-    private int goalAmount;
-    private int currAmount;
+    private Integer goalAmount;
+    private Integer currAmount;
     private Date startDate;
     private Date endDate;
     private String content;
@@ -25,9 +25,9 @@ public class Project {
     private Date createdAt;
     private Date updatedAt;
     private String projectStatus;
-    private int backerCnt;
-    private int likeCnt;
-    private int viewCnt;
-    private char isReqReview;
+    private Integer backerCnt;
+    private Integer likeCnt;
+    private Integer viewCnt;
+    private Character isReqReview;
     private String rejectedReason;
 }

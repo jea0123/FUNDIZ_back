@@ -17,9 +17,8 @@ public class Reply {
     private Long qnaId;
     private Long cmId;
     private Long inqId;
-
     private String content;
-    private char isSecret;
+    private Character isSecret;
     private Date createdAt;
     private Date deletedAt;
     private String code;

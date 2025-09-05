@@ -18,13 +18,13 @@ public class User {
     private String password;
     private String nickname;
     private String profileImg;
-    private char isSuspended;
+    private Character isSuspended;
     private Date joinedAt;
     private Date lastLoginAt;
-    private int followCnt;
+    private Integer followCnt;
     private String reason;
     private Date suspendedAt;
     private Date releasedAt;
-    private char isCreator;
+    private Character isCreator;
     private Role role;
 }

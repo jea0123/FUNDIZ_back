@@ -5,10 +5,7 @@ import com.example.funding.dto.response.user.*;
 import com.example.funding.dto.response.user.LoginUserDto;
 import com.example.funding.dto.response.user.MyPageUserDto;
 import com.example.funding.dto.response.user.BackingDto;
-import com.example.funding.mapper.BackingDetailMapper;
-import com.example.funding.mapper.BackingMapper;
-import com.example.funding.mapper.ProjectMapper;
-import com.example.funding.mapper.UserMapper;
+import com.example.funding.mapper.*;
 import com.example.funding.model.Project;
 import com.example.funding.model.User;
 import com.example.funding.service.UserService;
@@ -118,13 +115,35 @@ public class UserServiceImpl implements UserService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"후원한 해당 프로젝트를 찾을 수 없습니다."));
         }
 
-        //
-        //BackingDetailDto backingDetailDto = backingDetailMapper.getBackingProjectAndUserId(userId, projectId);
-
-        BackingDetailDto backingDetailDto = BackingDetailDto.builder().build();
-
+        BackingDetailDto backingDetailDto = backingDetailMapper.getBackingProjectAndUserId(userId, projectId);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "후원한 프로젝트 리스트 상세 조회성공", backingDetailDto));
     }
+
+    @Override
+    public ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(Long userId) {
+        User user = userMapper.getUserById(userId);
+
+        if(user == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"좋아요한 프로젝트 목록을 찾을 수없습니다."));
+        }
+        List<MyPageLikedDto> LikedList = userMapper.getLikedList(userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "좋아요한 프로젝트 리스트 조회 성공" ,LikedList));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<List<MyPageQnADto>>> getQnAList(Long userId) {
+        User user = userMapper.getUserById(userId);
+
+        if(user == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "QnA 리스트가 보이지 않습니다."));
+        }
+
+        List<MyPageQnADto> QnAList = userMapper.getQnAList(userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200,"QnA 리스트 조회 성공",QnAList));
+    }
+
 
 }

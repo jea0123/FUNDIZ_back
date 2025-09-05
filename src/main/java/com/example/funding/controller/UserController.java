@@ -1,10 +1,7 @@
 package com.example.funding.controller;
 
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.response.user.BackingDetailDto;
-import com.example.funding.dto.response.user.BackingDto;
-import com.example.funding.dto.response.user.MyPageUserDto;
-import com.example.funding.dto.response.user.LoginUserDto;
+import com.example.funding.dto.response.user.*;
 import com.example.funding.service.ProjectService;
 import com.example.funding.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -68,6 +65,16 @@ public class UserController {
         return userService.getBackingDetail(userId,projectId);
     }
 
+
+    @GetMapping("/me/likedList/{userId}")
+    public ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(@PathVariable Long userId) {
+        return userService.getLikedList(userId);
+    }
+
+    @GetMapping("/me/QnAList/{userId}")
+    public ResponseEntity<ResponseDto<List<MyPageQnADto>>> getQnAList(@PathVariable Long userId) {
+        return userService.getQnAList(userId);
+    }
 
     /*
     @GetMapping("/me/creatorPage")

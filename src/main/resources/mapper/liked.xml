@@ -1,5 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.example.funding.mapper.Liked">
+<mapper namespace="com.example.funding.mapper.UserMapper">
 
+    <select id="getLikedList" parameterType ="long" resultType="com.example.funding.dto.response.user.MyPageLikedDto">
+        SELECT
+        <!--  좋아요 테이블에서 가져올내용-->
+        l.projectId,
+        l.createdAt,
+
+        <!--창작자 테이블에서 가져올내용-->
+        c.creatorName,
+
+        <!-- 프로젝트 테이블에서 가져올 내용-->
+        p.title,
+        p.goalAmount,
+        p.currAmount,
+        p.thumbnail,
+        p.endDate
+
+        FROM Liked l
+        <!-- 테이블 조인 -->
+        JOIN project p ON p.projectId = l.projectId
+        JOIN users u ON u.userId = l.userId
+        JOIN creator c ON c.userId = u.userId
+
+        WHERE l.userId=#{userId}
+        ORDER BY l.createdAt DESC
+
+
+    </select>
 </mapper>

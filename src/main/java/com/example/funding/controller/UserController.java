@@ -1,10 +1,7 @@
 package com.example.funding.controller;
 
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.response.user.BackingDetailDto;
-import com.example.funding.dto.response.user.BackingListDto;
-import com.example.funding.dto.response.user.MyPageUserDto;
-import com.example.funding.dto.response.user.LoginUserDto;
+import com.example.funding.dto.response.user.*;
 import com.example.funding.service.ProjectService;
 import com.example.funding.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +36,18 @@ public class UserController {
     }
 
     /**
+     * <p>최근 본 프로젝트 목록 조회</p>
+     * @param userId 인증된 사용자의 ID
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @since 2025-09-05
+     * @author by: 장민규
+     */
+    @GetMapping("/recentViewProjects/{userId}")
+    public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(@PathVariable Long userId) {
+        return userService.getRecentViewProjects(userId);
+    }
+
+    /**
      * <p>마이페이지 구현</p>
      * @param userId 에 따른 MyPage 프로필 조회
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
@@ -53,13 +62,13 @@ public class UserController {
 
     /**
      * <p>마이페이지 구현</p>
-     * @param userId 에 따른 MyPage 후원한 프로젝트 목록 조히
+     * @param userId 에 따른 MyPage 후원한 프로젝트 목록 조회
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @since 2025-09-02
      * @author by: 이윤기
      */
     @GetMapping("/me/backingPage/{userId}")
-    public ResponseEntity<ResponseDto<List<BackingDetailDto>>>getBackingList(@PathVariable Long userId) {
+    public ResponseEntity<ResponseDto<List<BackingDto>>>getBackingList(@PathVariable Long userId) {
         return userService.getBackingList(userId);
     }
 
@@ -68,6 +77,16 @@ public class UserController {
         return userService.getBackingDetail(userId,projectId);
     }
 
+
+    @GetMapping("/me/likedList/{userId}")
+    public ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(@PathVariable Long userId) {
+        return userService.getLikedList(userId);
+    }
+
+    @GetMapping("/me/QnAList/{userId}")
+    public ResponseEntity<ResponseDto<List<MyPageQnADto>>> getQnAList(@PathVariable Long userId) {
+        return userService.getQnAList(userId);
+    }
 
     /*
     @GetMapping("/me/creatorPage")

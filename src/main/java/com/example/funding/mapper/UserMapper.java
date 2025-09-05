@@ -1,8 +1,13 @@
 package com.example.funding.mapper;
 
+import com.example.funding.dto.response.user.MyPageLikedDto;
+import com.example.funding.dto.response.user.MyPageQnADto;
+import com.example.funding.dto.response.user.RecentViewProject;
 import com.example.funding.model.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 @Mapper
 public interface UserMapper {
@@ -15,4 +20,12 @@ public interface UserMapper {
     void updateLastLogin(@Param("userId") Long userId);
 
     User getUserById(@Param("userId") Long userId);
+
+    List<MyPageLikedDto> getLikedList(@Param("userId") Long userId);
+
+    List<MyPageQnADto> getQnAList(@Param("userId") Long userId);
+
+
+    List<RecentViewProject> getRecentViewProjects(@Param("userId") Long userId);
+
 }

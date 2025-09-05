@@ -24,8 +24,8 @@ public class CommunityController {
 
     /**
      * <p>프로젝트 상세 페이지 내 커뮤니티 목록 조회/p>
-     * @param projectId
-     * @param pager
+     * @param projectId 프로젝트 ID
+     * @param pager 페이징 정보
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author by: 조은애
      * @since 2025-09-02
@@ -37,8 +37,8 @@ public class CommunityController {
 
     /**
      * <p>프로젝트 상세 페이지 내 후기 목록 조회/p>
-     * @param projectId
-     * @param pager
+     * @param projectId 프로젝트 ID
+     * @param pager 페이징 정보
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author by: 조은애
      * @since 2025-09-02

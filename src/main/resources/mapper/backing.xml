@@ -1,42 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.funding.mapper.BackingMapper">
-
-    <resultMap id="BackingDetailResultMap" type="com.example.funding.dto.response.user.BackingDetailDto">
-        <result property="price" column="price"/>
-        <result property="quantity" column="quantity"/>
-
-        <!-- backing 객체 매핑 -->
-        <association property="backing" javaType="com.example.funding.model.Backing">
-            <id property="backingId" column="backingId"/>
-            <result property="backingStatus" column="backingStatus"/>
-            <result property="createdAt" column="createdAt"/>
-            <result property="amount" column="amount"/>
-        </association>
-        <!-- backingReward 객체 매핑 -->
-        <association property="backingReward" javaType="com.example.funding.dto.response.user.BackingRewardDto">
-            <result property="rewardName" column="rewardName"/>
-
-            <!-- backingReward => backingProject 매핑-->
-            <association property="backingProject" javaType="com.example.funding.dto.response.user.BackingProjectDto">
-                <id property="projectId" column="projectId"/>
-                <result property="title" column="title"/>
-                <result property="thumbnail" column="thumbnail"/>
-                <result property="endDate" column="endDate"/>
-                <result property="projectStatus" column="projectStatus"/>
-            </association>
-        </association>
-    </resultMap>
-
     <!-- 전체 후원 리스트 -->
-    <select id = "getBackingListUserId" parameterType="long" resultMap="BackingDetailResultMap">
+    <select id = "getBackingListUserId" parameterType="long" resultType="com.example.funding.dto.response.user.BackingDto">
         SELECT
         <!-- 프로젝트테이블에서 가져올 내용-->
         p.projectId AS projectId,
-        p.endDate AS endDate,
-        p.projectStatus AS projectStatus,
         p.title AS title,
         p.thumbnail AS thumbnail,
+        p.endDate AS endDate,
+        p.projectStatus AS projectStatus,
+
 
         <!-- 리워드 테이블에서 가져올 내용 -->
         r.rewardName AS rewardName,
@@ -44,8 +18,6 @@
         <!-- 후원 테이블에서 가져올 내용 -->
         b.backingId AS backingId,
         b.backingStatus AS backingStatus,
-        b.amount AS amount,
-        b.createdAt AS createdAt,
 
         <!-- 후원 상세에서 가져올 내용 -->
         bd.quantity AS quantity,
@@ -60,7 +32,5 @@
         WHERE b.userId =#{userId}
         ORDER BY b.createdAt DESC
     </select>
-
-
 </mapper>
 

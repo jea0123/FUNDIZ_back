@@ -1,13 +1,11 @@
 package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.user.*;
 import com.example.funding.dto.response.user.LoginUserDto;
 import com.example.funding.dto.response.user.MyPageUserDto;
-import com.example.funding.mapper.BackingMapper;
-import com.example.funding.mapper.ProjectMapper;
-import com.example.funding.mapper.UserMapper;
+import com.example.funding.dto.response.user.BackingDto;
+import com.example.funding.mapper.*;
 import com.example.funding.model.Project;
 import com.example.funding.model.User;
 import com.example.funding.service.UserService;
@@ -28,8 +26,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
     private final ProjectMapper projectMapper;
-    //대문자로 고치기
     private final BackingMapper backingMapper;
+    private final  BackingDetailMapper backingDetailMapper;
 
     /**
      * <p>로그인 사용자 정보 조회</p>
@@ -80,48 +78,87 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "유저 정보 불러오기 성공", mypageUserDto));
     }
 
-    // 화면에 출력 혹은 받아와야 하는 정보
-    /*
-     * 프로젝트 이름
-     * 프로젝트 번호(?)
-     * 유저 번호
-     * 리워드 종류
-     * 후원 금액
-     * 진행 상황
-     * 종료 날짜
-     * 상품 이미지
-     */
-
     /**
      * <p>로그인 사용자 후원 리스트</p>
      * @param userId 사용자
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-     * @since 2025-09-04
+     * @since 2025-09-05
      * @author by: 이윤기
      */
     @Override
-    public ResponseEntity<ResponseDto<List<BackingDetailDto>>> getBackingList(Long userId) {
+    public ResponseEntity<ResponseDto<List<BackingDto>>> getBackingList(Long userId) {
 
         User user = userMapper.getUserById(userId);
 
         if(user == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"후원한 프로젝트 목록을 찾을 수 없습니다."));
         }
-        List<BackingDetailDto> backingList = backingMapper.getBackingListUserId(userId);
+        List<BackingDto> backingList = backingMapper.getBackingListUserId(userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "후원한 프로젝트 리스트 조회 성공",backingList));
     }
 
+    /**
+     * <p>로그인 사용자 후원 리스트 상세</p>
+     * @param userId 사용자
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @since 2025-09-05
+     * @author by: 이윤기
+     */
     @Override
-    @Transactional
     public ResponseEntity<ResponseDto<BackingDetailDto>> getBackingDetail(Long userId, Long projectId){
         User user = userMapper.getUserById(userId);
-        Project project =projectMapper.getProjectById(projectId);
+        Project project = projectMapper.getProjectById(projectId);
 
-        if(user == null && project == null){
+        if(user == null || project == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"후원한 해당 프로젝트를 찾을 수 없습니다."));
         }
-        return null;
+
+        BackingDetailDto backingDetailDto = backingDetailMapper.getBackingProjectAndUserId(userId, projectId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "후원한 프로젝트 리스트 상세 조회성공", backingDetailDto));
     }
 
+    @Override
+    public ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(Long userId) {
+        User user = userMapper.getUserById(userId);
+
+        if(user == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"좋아요한 프로젝트 목록을 찾을 수없습니다."));
+        }
+        List<MyPageLikedDto> LikedList = userMapper.getLikedList(userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "좋아요한 프로젝트 리스트 조회 성공" ,LikedList));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<List<MyPageQnADto>>> getQnAList(Long userId) {
+        User user = userMapper.getUserById(userId);
+
+        if(user == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "QnA 리스트가 보이지 않습니다."));
+        }
+
+        List<MyPageQnADto> QnAList = userMapper.getQnAList(userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200,"QnA 리스트 조회 성공",QnAList));
+    }
+
+
+    /**
+     * <p>최근 본 프로젝트 목록 조회</p>
+     * @param userId 인증된 사용자의 ID
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @since 2025-09-05
+     * @author by: 장민규
+     */
+    @Override
+    public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(Long userId) {
+        User user = userMapper.getUserById(userId);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "사용자를 찾을 수 없습니다."));
+        }
+        List<RecentViewProject> recentViewProjects = userMapper.getRecentViewProjects(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "최근 본 프로젝트 조회 성공", recentViewProjects));
+    }
 }

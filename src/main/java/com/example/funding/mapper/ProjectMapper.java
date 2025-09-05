@@ -1,5 +1,6 @@
 package com.example.funding.mapper;
 
+import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
 import com.example.funding.model.Project;
 import org.apache.ibatis.annotations.Mapper;
@@ -15,14 +16,11 @@ public interface ProjectMapper {
     void updateViewCnt(@Param("projectId") Long projectId);
 
     List<RecentTop10ProjectDto> findRecentTopProjectsJoined(@Param("since") Date since,
-                                                      @Param("startDays") int startDays,
-                                                      @Param("limit") int limit);
+                                                            @Param("startDays") int startDays,
+                                                            @Param("limit") int limit);
 
-    // 최근 N일 이내 시작 & FUNDING 상태에서 알고리즘 점수로 상위 limit
-    List<Project> findFeatured(
-            @Param("days") int days,
-            @Param("limit") int limit
-    );
+    List<FeaturedProjectDto> findFeaturedJoinedWithRecent(@Param("days") int days,
+                                                          @Param("limit") int limit);
 
     List<Project> findFeaturedExcluding(
             @Param("limit") int limit,
@@ -31,4 +29,5 @@ public interface ProjectMapper {
 
     //창작자, 프로젝트 전체 개수
     int getProjectCnt(@Param("creatorId") Long creatorId);
+
 }

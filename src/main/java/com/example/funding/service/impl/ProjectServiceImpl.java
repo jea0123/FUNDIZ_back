@@ -53,6 +53,7 @@ public class ProjectServiceImpl implements ProjectService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트를 찾을 수 없습니다."));
         }
 
+        //진행상황 확인(퍼센트)
         int percentNow = getPercentNow(project.getCurrAmount(), project.getGoalAmount());
 
         SubcategoryDto subcategory = subcategoryMapper.getSubcategoryById(project.getSubctgrId());

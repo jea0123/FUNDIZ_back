@@ -20,7 +20,7 @@
                     CMID,
                     USERID,
                     PROJECTID,
-                    CONTENT AS content,
+                    CMCONTENT,
                     NVL(RATING, 0) AS rating,
                     CREATEDAT,
                     CODE

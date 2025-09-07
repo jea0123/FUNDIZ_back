@@ -51,7 +51,7 @@ public class CommunityServiceImpl implements CommunityService {
                             .cmId(cm.getCmId())
                             .nickname(user.getNickname())
                             .profileImg(user.getProfileImg())
-                            .content(cm.getContent())
+                            .cmContent(cm.getCmContent())
                             .rating(cm.getRating())
                             .createdAt(cm.getCreatedAt())
                             .code(cm.getCode())

@@ -13,7 +13,7 @@ import java.util.Date;
 @Builder
 public class Qna {
     private Long qnaId;
-    private Long itemId;
+    private Long projectId;
     private Long userId;
     private Long creatorId;
     private String title;

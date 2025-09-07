@@ -2,14 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.funding.mapper.UserMapper">
 
-    <select id="getQnAList" parameterType="long" resultType="com.example.funding.dto.response.user.MyPageQnADto">
+    <select id="getQnAList" parameterType="long" resultType="Qna">
         SELECT
         <!-- QnA 테이블-->
         q.qnaId,
         q.projectId,
         q.userId,
         q.creatorId,
-        q.projectId,
+        q.title,
         q.createdAt,
         <!-- 창작자 테이블 -->
         c.creatorName
@@ -23,6 +23,8 @@
         ORDER BY createdAt
 
     </select>
+
+
 
 
 </mapper>

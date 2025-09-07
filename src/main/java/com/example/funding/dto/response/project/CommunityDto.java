@@ -17,7 +17,7 @@ public class CommunityDto {
     private Long cmId;
     private String nickname;
     private String profileImg;
-    private String content;
+    private String cmContent;
     private Integer rating;
     private Date createdAt;
     private String code;

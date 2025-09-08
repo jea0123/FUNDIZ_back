@@ -78,6 +78,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .thumbnail(project.getThumbnail())
                 .projectStatus(project.getProjectStatus())
                 .backerCnt(project.getBackerCnt())
+                .likeCnt(project.getLikeCnt())
                 .viewCnt(project.getViewCnt())
                 .percentNow(percentNow)
                 .creatorName(creator.getCreatorName())

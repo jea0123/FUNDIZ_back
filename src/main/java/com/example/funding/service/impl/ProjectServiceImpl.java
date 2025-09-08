@@ -117,7 +117,7 @@ public class ProjectServiceImpl implements ProjectService {
     public ResponseEntity<ResponseDto<List<RecentTop10ProjectDto>>> getRecentTop10() {
 //        Date since = Date.from(Instant.now().minus(24, ChronoUnit.HOURS));
         Date since = Date.from(Instant.now().minus(8760, ChronoUnit.HOURS));
-        int startDays = 30;  // 프로젝트 시작일 최근 30일
+        int startDays = 8760;  // 프로젝트 시작일 최근 30일
         int limit = 10;
 
         List<RecentTop10ProjectDto> ranked = projectMapper.findRecentTopProjectsJoined(since, startDays, limit);

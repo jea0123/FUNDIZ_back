@@ -28,6 +28,7 @@ public class ProjectDetailDto {
     private String thumbnail;
     private String projectStatus;
     private Integer backerCnt;
+    private Integer likeCnt;
     private Integer viewCnt;
     //달성률
     private Integer percentNow;

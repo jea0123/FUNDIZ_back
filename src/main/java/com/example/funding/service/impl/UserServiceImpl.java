@@ -6,7 +6,9 @@ import com.example.funding.dto.response.user.LoginUserDto;
 import com.example.funding.dto.response.user.MyPageUserDto;
 import com.example.funding.dto.response.user.BackingDto;
 import com.example.funding.mapper.*;
+import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
+import com.example.funding.model.Qna;
 import com.example.funding.model.User;
 import com.example.funding.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +29,9 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final ProjectMapper projectMapper;
     private final BackingMapper backingMapper;
-    private final  BackingDetailMapper backingDetailMapper;
+    private final BackingDetailMapper backingDetailMapper;
+    private final CreatorMapper creatorMapper;
+    private final QnADetailMapper qnaMapper;
 
     /**
      * <p>로그인 사용자 정보 조회</p>
@@ -110,6 +114,7 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.getUserById(userId);
         Project project = projectMapper.getProjectById(projectId);
 
+
         if(user == null || project == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"후원한 해당 프로젝트를 찾을 수 없습니다."));
         }
@@ -119,6 +124,13 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "후원한 프로젝트 리스트 상세 조회성공", backingDetailDto));
     }
 
+    /**
+     * <p>로그인 사용자 좋아요 리스트</p>
+     * @param userId 사용자
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @since 2025-09-05
+     * @author by: 이윤기
+     */
     @Override
     public ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(Long userId) {
         User user = userMapper.getUserById(userId);
@@ -131,6 +143,13 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "좋아요한 프로젝트 리스트 조회 성공" ,LikedList));
     }
 
+    /**
+     * <p>로그인 사용자 QNA 리스트 상세</p>
+     * @param userId 사용자
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @since 2025-09-05
+     * @author by: 이윤기
+     */
     @Override
     public ResponseEntity<ResponseDto<List<MyPageQnADto>>> getQnAList(Long userId) {
         User user = userMapper.getUserById(userId);
@@ -160,5 +179,45 @@ public class UserServiceImpl implements UserService {
         }
         List<RecentViewProject> recentViewProjects = userMapper.getRecentViewProjects(userId);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "최근 본 프로젝트 조회 성공", recentViewProjects));
+    }
+
+    /**
+     * <p>로그인 사용자 QnA 리스트 상세</p>
+     * @param userId 사용자
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @since 2025-09-07
+     * @author by: 이윤기
+     */
+    //서비스에서구현
+    @Override
+    public ResponseEntity<ResponseDto<MyPageQnADetailDto>> getQnADetail(Long userId, Long projectId) {
+        Project project = projectMapper.getProjectById(projectId);
+        User user = userMapper.getUserById(userId);
+        Creator creator = creatorMapper.findById(project.getCreatorId());
+        Qna qna = qnaMapper.getQnAById(userId,projectId);
+
+        if(user ==null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "잘못된 프로젝트 페이지 입니다."));
+        }
+
+        MyPageQnADetailDto myPageQnADetail  =MyPageQnADetailDto.builder()
+                //qna
+                .qnaId(qna.getQnaId())
+                .title(qna.getTitle())
+                .projectId(project.getProjectId())
+                .userId(qna.getUserId())
+                .createdAt(qna.getCreatedAt())
+                .content(qna.getContent())
+                // 프로젝트
+                .projectTitle(project.getTitle())
+                //창작자
+                .creatorName(creator.getCreatorName())
+                .creatorId(creator.getCreatorId())
+                // 유저
+                .nickName(user.getNickname())
+
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "QnA 상세 페이지 조회 성공",myPageQnADetail));
+
     }
 }

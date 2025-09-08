@@ -88,6 +88,11 @@ public class UserController {
         return userService.getQnAList(userId);
     }
 
+    @GetMapping("/me/QnAListDetail/{userId}/project/{projectId}")
+    public ResponseEntity<ResponseDto<MyPageQnADetailDto>> getQnADetail(@PathVariable Long userId, @PathVariable Long projectId){
+        return userService.getQnADetail(userId, projectId);
+    }
+
     /*
     @GetMapping("/me/creatorPage")
     public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageCreator() {

@@ -1,5 +1,6 @@
 package com.example.funding.mapper;
 
+import com.example.funding.dto.request.project.ProjectCreateRequestDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
 import com.example.funding.model.Project;
@@ -27,7 +28,7 @@ public interface ProjectMapper {
             @Param("excludeIds") List<Long> excludeIds
     );
 
-    //창작자, 프로젝트 전체 개수
     int getProjectCnt(@Param("creatorId") Long creatorId);
 
+    int saveProject(ProjectCreateRequestDto dto);
 }

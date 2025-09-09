@@ -8,25 +8,7 @@
     </update>
 
     <select id="getProjectById" resultType="project">
-        SELECT
-            PROJECTID,
-            CREATORID,
-            SUBCTGRID,
-            TITLE,
-            GOALAMOUNT,
-            CURRAMOUNT,
-            STARTDATE,
-            ENDDATE,
-            CONTENT,
-            THUMBNAIL,
-            CREATEDAT,
-            UPDATEDAT,
-            PROJECTSTATUS,
-            BACKERCNT,
-            LIKECNT,
-            VIEWCNT,
-            ISREQREVIEW,
-            REJECTEDREASON
+        SELECT *
         FROM PROJECT
         WHERE PROJECTID = #{projectId}
     </select>
@@ -125,67 +107,67 @@
 
     <select id="findRecentTopProjectsJoined" parameterType="map" resultType="recentTop10ProjectDto">
         <![CDATA[
-          SELECT *
-          FROM (
-            SELECT
-              pr.PROJECTID AS projectId,
-              pr.TITLE AS title,
-              pr.THUMBNAIL AS thumbnail,
-              pr.CREATORID AS creatorId,
-              NVL2(TRIM(c.CREATORNAME), c.CREATORNAME, 'Unknown Creator') AS creatorName,
-              NVL(pr.CURRAMOUNT,0) AS currAmount,
-              NVL(pr.GOALAMOUNT,0) AS goalAmount,
-              pr.ENDDATE AS endDate,
-              NVL(pr.LIKECNT,0) AS likeCnt,
-              NVL(pr.VIEWCNT,0) AS viewCnt,
+            SELECT *
+            FROM (
+              SELECT
+                pr.PROJECTID                                   AS projectId,
+                pr.TITLE                                       AS title,
+                pr.THUMBNAIL                                   AS thumbnail,
+                pr.CREATORID                                   AS creatorId,
+                NVL2(TRIM(c.CREATORNAME), c.CREATORNAME, 'Unknown Creator') AS creatorName,
+                NVL(pr.CURRAMOUNT,0)                           AS currAmount,
+                NVL(pr.GOALAMOUNT,0)                           AS goalAmount,
+                pr.ENDDATE                                     AS endDate,
+                NVL(pr.LIKECNT,0)                              AS likeCnt,
+                NVL(pr.VIEWCNT,0)                              AS viewCnt,
 
-              /* 결제 기준 지표 */
-              SUM(p.AMOUNT) AS totalPaidAmount,
-              COUNT(DISTINCT b.USERID) AS backerCnt,
-              MAX(p.CREATEDAT) AS lastPaidAt,
+                /* 결제 집계 (없으면 0) */
+                NVL(paid.totalPaidAmount, 0)                   AS totalPaidAmount,
+                NVL(paid.backerCnt, 0)                         AS backerCnt,
+                paid.lastPaidAt                                AS lastPaidAt,
 
-              /* 진행률(%) */
-              CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
-                   THEN ROUND(NVL(pr.CURRAMOUNT,0) / NULLIF(pr.GOALAMOUNT,0) * 100)
-                   ELSE 0 END AS percentNow,
+                /* 진행률(%) */
+                CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
+                     THEN ROUND(NVL(pr.CURRAMOUNT,0) / NULLIF(pr.GOALAMOUNT,0) * 100)
+                     ELSE 0 END                                AS percentNow,
 
-              (
-                (CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
-                      THEN (SUM(p.AMOUNT) / NULLIF(pr.GOALAMOUNT,0)) * 100
-                      ELSE 0 END) * 0.7
-                + (NVL(pr.LIKECNT,0) / 50.0)  * 0.2
-                + (NVL(pr.VIEWCNT,0) / 500.0) * 0.1
-              )  AS trendScore
-            FROM PAYMENT p
-              JOIN BACKING b ON b.BACKINGID = p.BACKINGID
-              /* BACKINGID -> PROJECTID 매핑(중복 제거) */
-              JOIN (
-                SELECT bd.BACKINGID, r.PROJECTID
-                FROM BACKINGDETAIL bd
-                JOIN REWARD r ON r.REWARDID = bd.REWARDID
-                GROUP BY bd.BACKINGID, r.PROJECTID
-              ) bp ON bp.BACKINGID = b.BACKINGID
-              JOIN PROJECT pr ON pr.PROJECTID = bp.PROJECTID
-              JOIN CREATOR c  ON c.CREATORID  = pr.CREATORID
-            WHERE p.STATUS = 'PAID'
-              AND p.CREATEDAT >= #{since}
-              AND pr.PROJECTSTATUS = 'OPEN'
-              /* startDays가 NULL이면 필터 무시 */
-              AND ( #{startDays,jdbcType=NUMERIC} IS NULL
-                    OR pr.STARTDATE >= TRUNC(SYSDATE) - #{startDays,jdbcType=NUMERIC} )
-            GROUP BY
-              pr.PROJECTID, pr.TITLE, pr.THUMBNAIL, pr.CREATORID, c.CREATORNAME,
-              pr.CURRAMOUNT, pr.GOALAMOUNT, pr.ENDDATE, pr.LIKECNT, pr.VIEWCNT
-            ORDER BY
-              (
-                (CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
-                      THEN (SUM(p.AMOUNT) / NULLIF(pr.GOALAMOUNT,0)) * 100
-                      ELSE 0 END) * 0.7
-                + (NVL(pr.LIKECNT,0) / 50.0)  * 0.2
-                + (NVL(pr.VIEWCNT,0) / 500.0) * 0.1
-              ) DESC
-          ) t
-          WHERE ROWNUM <= #{limit,jdbcType=NUMERIC}
+                /* 트렌드 점수: 결제비중 70% + 좋아요 20% + 조회수 10% */
+                ( (CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
+                        THEN (NVL(paid.totalPaidAmount,0) / NULLIF(pr.GOALAMOUNT,0)) * 100
+                        ELSE 0 END) * 0.7
+                  + (NVL(pr.LIKECNT,0)  / 50.0)  * 0.2
+                  + (NVL(pr.VIEWCNT,0)  / 500.0) * 0.1
+                )                                              AS trendScore
+              FROM PROJECT pr
+              JOIN CREATOR c ON c.CREATORID = pr.CREATORID
+
+              /* 최근 결제 집계: PAYMENT → BACKING → BACKINGDETAIL → REWARD */
+              LEFT JOIN (
+                SELECT
+                  r.PROJECTID,
+                  SUM(p.AMOUNT)                 AS totalPaidAmount,
+                  COUNT(DISTINCT b.USERID)      AS backerCnt,
+                  MAX(p.CREATEDAT)              AS lastPaidAt
+                FROM PAYMENT p
+                JOIN BACKING b        ON b.BACKINGID  = p.BACKINGID
+                JOIN BACKINGDETAIL bd ON bd.BACKINGID = b.BACKINGID
+                JOIN REWARD r         ON r.REWARDID   = bd.REWARDID
+                WHERE p.STATUS     = 'PAID'
+                  AND p.CREATEDAT >= #{since,jdbcType=TIMESTAMP}   -- 예: SYSDATE-1(최근 24시간)
+                GROUP BY r.PROJECTID
+              ) paid ON paid.PROJECTID = pr.PROJECTID
+
+              /* 프로젝트 조건 */
+              WHERE pr.PROJECTSTATUS = 'OPEN'
+                AND (
+                  #{startDays,jdbcType=NUMERIC} IS NULL
+                  OR pr.STARTDATE IS NULL
+                  OR pr.STARTDATE >= TRUNC(SYSDATE) - #{startDays,jdbcType=NUMERIC}  -- 예: 30
+                )
+
+              ORDER BY trendScore DESC
+            ) t
+            WHERE ROWNUM <= #{limit,jdbcType=NUMERIC}
         ]]>
     </select>
 
@@ -194,5 +176,19 @@
         FROM PROJECT
         WHERE CREATORID = #{creatorId}
     </select>
+
+    <insert id="saveProject">
+        <selectKey keyProperty="projectId" resultType="Long" order="BEFORE">
+            SELECT PROJECT_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO PROJECT (
+            PROJECTID, CREATORID, SUBCTGRID, TITLE, GOALAMOUNT,
+            STARTDATE, ENDDATE, CONTENT, THUMBNAIL
+        ) VALUES (
+            #{projectId}, #{creatorId}, #{subctgrId}, #{title}, #{goalAmount},
+            #{startDate}, #{endDate}, #{content}, #{thumbnail}
+        )
+    </insert>
 
 </mapper>

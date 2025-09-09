@@ -20,4 +20,7 @@ public interface UserService {
     ResponseEntity<ResponseDto<List<MyPageQnADto>>> getQnAList(Long userId);
 
     ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(Long userId);
+
+    //서비스에서구현
+    ResponseEntity<ResponseDto<MyPageQnADetailDto>> getQnADetail(Long userId, Long projectId);
 }

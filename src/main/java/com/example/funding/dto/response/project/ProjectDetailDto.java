@@ -17,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class ProjectDetailDto {
+    //프로젝트
     private Long projectId;
     private Long creatorId;
     private String title;
@@ -28,22 +29,24 @@ public class ProjectDetailDto {
     private String thumbnail;
     private String projectStatus;
     private Integer backerCnt;
+    private Integer likeCnt;
     private Integer viewCnt;
-    //달성률
-    private Integer percentNow;
-    //결제일
-    private Date paymentDate;
+    private Integer percentNow; //달성률
+    private Date paymentDate; //결제일
 
-    //창작자 관련
+    //창작자
     private String creatorName;
     private Long followerCnt;
     private String profileImg;
     private Integer projectCnt;
 
+    //서브카테고리
     private SubcategoryDto subcategory;
-
+    //태그
     private List<Tag> tagList;
+    //리워드
     private List<Reward> rewardList;
+    //새소식
     private List<News> newsList;
 
     //결제일 = 종료날짜 + 1

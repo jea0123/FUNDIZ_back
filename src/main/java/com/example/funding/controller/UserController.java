@@ -72,9 +72,9 @@ public class UserController {
         return userService.getBackingList(userId);
     }
 
-    @GetMapping("/me/backingPage/{userId}/project/{projectId}")
-    public ResponseEntity<ResponseDto<BackingDetailDto>> getBackingDetail(@PathVariable Long userId, @PathVariable Long projectId){
-        return userService.getBackingDetail(userId,projectId);
+    @GetMapping("/me/backingPage/{userId}/project/{projectId}/reward/{rewardId}")
+    public ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(@PathVariable Long userId, @PathVariable Long projectId, @PathVariable Long rewardId){
+        return userService.getBackingDetail(userId,projectId, rewardId);
     }
 
 

@@ -13,11 +13,11 @@ public interface UserService {
 
     ResponseEntity<ResponseDto<List<BackingDto>>> getBackingList(Long userId);
 
-    ResponseEntity<ResponseDto<BackingDetailDto>> getBackingDetail(Long userId, Long projectId);
-
+    ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(Long userId, Long projectId, Long rewardId);
 
     ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(Long userId);
 
     ResponseEntity<ResponseDto<List<MyPageQnADto>>> getQnAList(Long userId);
+
     ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(Long userId);
 }

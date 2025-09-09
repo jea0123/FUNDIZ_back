@@ -7,4 +7,9 @@
         WHERE PROJECTID = #{projectId}
     </select>
 
+    <insert id="saveTagList">
+        INSERT INTO TAG (TAGID, PROJECTID, TAGNAME)
+        VALUES (TAG_SEQ.NEXTVAL, #{projectId}, #{tagName})
+    </insert>
+
 </mapper>

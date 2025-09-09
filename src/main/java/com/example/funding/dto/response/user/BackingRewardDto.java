@@ -1,20 +1,18 @@
 package com.example.funding.dto.response.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class BackingRewardDto {
-    private long rewardId;
+    private Long rewardId;
     private String rewardName;
     private Date deliveryDate;
-    private BackingProjectDto BackingProject;
+    private BackingProjectDto backingProject;
 
 }

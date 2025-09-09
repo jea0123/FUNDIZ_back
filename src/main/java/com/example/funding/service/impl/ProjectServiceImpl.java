@@ -1,6 +1,7 @@
 package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.project.ProjectCreateRequestDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
@@ -37,6 +38,7 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * <p>프로젝트 상세 페이지 조회</p>
      * <p>조회수 +1</p>
+     *
      * @param projectId 프로젝트 ID
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author by: 조은애
@@ -53,18 +55,15 @@ public class ProjectServiceImpl implements ProjectService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트를 찾을 수 없습니다."));
         }
 
-        //진행상황 확인(퍼센트)
+        //달성률, 창작자 프로젝트 개수
         int percentNow = getPercentNow(project.getCurrAmount(), project.getGoalAmount());
+        int projectCnt = projectMapper.getProjectCnt(project.getCreatorId());
 
+        Creator creator = creatorMapper.findById(project.getCreatorId());
         SubcategoryDto subcategory = subcategoryMapper.getSubcategoryById(project.getSubctgrId());
-
         List<Tag> tagList = tagMapper.getTagListById(projectId);
         List<Reward> rewardList = rewardMapper.getRewardListById(projectId);
         List<News> newsList = newsMapper.getNewsListById(projectId);
-
-        Creator creator = creatorMapper.findById(project.getCreatorId());
-
-        int projectCnt = projectMapper.getProjectCnt(project.getCreatorId());
 
         ProjectDetailDto projectDetailDto = ProjectDetailDto.builder()
                 .projectId(project.getProjectId())
@@ -91,7 +90,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .newsList(newsList)
                 .build();
 
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "프로젝트 상세 조회 성공", projectDetailDto));
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 상세 조회 성공", projectDetailDto));
     }
 
     /**
@@ -158,5 +157,35 @@ public class ProjectServiceImpl implements ProjectService {
                     .body(ResponseDto.fail(404, "추천 프로젝트가 없습니다."));
         }
         return ResponseEntity.ok(ResponseDto.success(200, "추천 프로젝트 조회 성공", result));
+    }
+
+    /**
+     * <p>프로젝트 등록</p>
+     *
+     * @param dto 프로젝트 등록 데이터
+     * @param creatorId 사용자 ID
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author by: 조은애
+     * @since 2025-09-09
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> createProject(ProjectCreateRequestDto dto, Long creatorId) {
+        dto.setCreatorId(creatorId);
+
+        //프로젝트 등록
+        int result  = projectMapper.saveProject(dto);
+        if (result == 0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트 등록 실패"));
+        }
+
+        //태그 등록
+        List<String> tagList = dto.getTagList();
+        if (tagList != null && !tagList.isEmpty()) {
+            for (String tagName : tagList) {
+                tagMapper.saveTagList(dto.getProjectId(), tagName);
+            }
+        }
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 등록 성공", null));
     }
 }

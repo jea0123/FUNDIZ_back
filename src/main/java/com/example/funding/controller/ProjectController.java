@@ -1,6 +1,7 @@
 package com.example.funding.controller;
 
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.project.ProjectCreateRequestDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
@@ -57,4 +58,21 @@ public class ProjectController {
                                                                              @RequestParam(defaultValue = "8") int limit) {
         return projectService.getFeatured(days, limit);
     }
+
+    /**
+     * <p>프로젝트 등록</p>
+     *
+     * @param dto 프로젝트 등록 데이터
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author by: 조은애
+     * @since 2025-09-09
+     */
+    @PostMapping
+    public ResponseEntity<ResponseDto<String>> createProject(@RequestBody ProjectCreateRequestDto dto) {
+        //userId -> creatorId
+        Long creatorId = 1L;
+
+        return projectService.createProject(dto, creatorId);
+    }
+
 }

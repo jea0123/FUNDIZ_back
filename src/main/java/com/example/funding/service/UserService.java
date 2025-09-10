@@ -13,7 +13,7 @@ public interface UserService {
 
     ResponseEntity<ResponseDto<List<BackingDto>>> getBackingList(Long userId);
 
-    ResponseEntity<ResponseDto<BackingDetailDto>> getBackingDetail(Long userId, Long projectId);
+    ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(Long userId, Long projectId, Long rewardId);
 
     ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(Long userId);
 
@@ -21,5 +21,6 @@ public interface UserService {
 
     ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(Long userId);
 
+    //서비스에서구현
     ResponseEntity<ResponseDto<MyPageQnADetailDto>> getQnADetail(Long userId, Long projectId);
 }

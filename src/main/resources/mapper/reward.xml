@@ -16,5 +16,18 @@
         </foreach>
     </select>
 
+    <insert id="saveReward">
+        <selectKey keyProperty="rewardId" resultType="Long" order="BEFORE">
+            SELECT REWARD_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO REWARD (
+            REWARDID, PROJECTID, REWARDNAME, PRICE, REWARDCONTENT,
+            DELIVERYDATE, REWARDCNT, ISPOSTING, REMAIN
+        ) VALUES (
+            #{rewardId}, #{projectId}, #{rewardName}, #{price}, #{rewardContent},
+            #{deliveryDate}, #{rewardCnt}, #{isPosting}, #{remain}
+        )
+    </insert>
 
 </mapper>

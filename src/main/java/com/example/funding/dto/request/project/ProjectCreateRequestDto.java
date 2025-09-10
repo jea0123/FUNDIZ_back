@@ -1,8 +1,7 @@
 package com.example.funding.dto.request.project;
 
-import com.example.funding.model.Tag;
+import com.example.funding.dto.request.reward.RewardCreateRequestDto;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +11,6 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-@Builder
 public class ProjectCreateRequestDto {
     //프로젝트
     private Long projectId;
@@ -27,4 +25,7 @@ public class ProjectCreateRequestDto {
 
     //태그
     private List<String> tagList;
+
+    //리워드
+    private List<RewardCreateRequestDto> rewardList;
 }

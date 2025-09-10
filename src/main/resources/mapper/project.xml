@@ -8,7 +8,25 @@
     </update>
 
     <select id="getProjectById" resultType="project">
-        SELECT *
+        SELECT
+            PROJECTID,
+            CREATORID,
+            SUBCTGRID,
+            TITLE,
+            GOALAMOUNT,
+            CURRAMOUNT,
+            STARTDATE,
+            ENDDATE,
+            CONTENT AS CONTENT,
+            THUMBNAIL,
+            CREATEDAT,
+            UPDATEDAT,
+            PROJECTSTATUS,
+            BACKERCNT,
+            LIKECNT,
+            VIEWCNT,
+            ISREQREVIEW,
+            REJECTEDREASON
         FROM PROJECT
         WHERE PROJECTID = #{projectId}
     </select>

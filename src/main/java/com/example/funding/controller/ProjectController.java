@@ -60,9 +60,9 @@ public class ProjectController {
     }
 
     /**
-     * <p>프로젝트 등록</p>
+     * <p>프로젝트 생성</p>
      *
-     * @param dto 프로젝트 등록 데이터
+     * @param dto 프로젝트 생성 관련 데이터
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author by: 조은애
      * @since 2025-09-09

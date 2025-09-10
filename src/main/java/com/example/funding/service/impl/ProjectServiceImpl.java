@@ -9,6 +9,7 @@ import com.example.funding.dto.response.project.SubcategoryDto;
 import com.example.funding.mapper.*;
 import com.example.funding.model.*;
 import com.example.funding.service.ProjectService;
+import com.example.funding.service.RewardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +33,8 @@ public class ProjectServiceImpl implements ProjectService {
     private final TagMapper tagMapper;
     private final RewardMapper rewardMapper;
     private final NewsMapper newsMapper;
-
     private final CreatorMapper creatorMapper;
+    private final RewardService rewardService;
 
     /**
      * <p>프로젝트 상세 페이지 조회</p>
@@ -160,9 +161,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     /**
-     * <p>프로젝트 등록</p>
+     * <p>프로젝트 생성</p>
      *
-     * @param dto 프로젝트 등록 데이터
+     * @param dto 프로젝트 생성 관련 데이터
      * @param creatorId 사용자 ID
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author by: 조은애
@@ -172,20 +173,27 @@ public class ProjectServiceImpl implements ProjectService {
     public ResponseEntity<ResponseDto<String>> createProject(ProjectCreateRequestDto dto, Long creatorId) {
         dto.setCreatorId(creatorId);
 
-        //프로젝트 등록
+        //프로젝트 생성
         int result  = projectMapper.saveProject(dto);
         if (result == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트 등록 실패"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트 생성 실패"));
         }
 
-        //태그 등록
+        Long projectId = dto.getProjectId();
+
+        //태그 생성
         List<String> tagList = dto.getTagList();
         if (tagList != null && !tagList.isEmpty()) {
             for (String tagName : tagList) {
-                tagMapper.saveTagList(dto.getProjectId(), tagName);
+                tagMapper.saveTag(projectId, tagName);
             }
         }
 
-        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 등록 성공", null));
+        //리워드 생성
+        if (dto.getRewardList() != null && !dto.getRewardList().isEmpty()) {
+            rewardService.createRewardList(projectId, dto.getRewardList());
+        }
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 생성 성공", null));
     }
 }

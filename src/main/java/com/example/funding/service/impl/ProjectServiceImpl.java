@@ -38,7 +38,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     /**
      * <p>프로젝트 상세 페이지 조회</p>
-     * <p>조회수 +1</p>
      *
      * @param projectId 프로젝트 ID
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
@@ -51,7 +50,7 @@ public class ProjectServiceImpl implements ProjectService {
         //조회수 증가
         projectMapper.updateViewCnt(projectId);
 
-        Project project = projectMapper.getProjectById(projectId);
+        Project project = projectMapper.getProject(projectId);
         if (project == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트를 찾을 수 없습니다."));
         }
@@ -63,7 +62,7 @@ public class ProjectServiceImpl implements ProjectService {
         Creator creator = creatorMapper.findById(project.getCreatorId());
         SubcategoryDto subcategory = subcategoryMapper.getSubcategoryById(project.getSubctgrId());
         List<Tag> tagList = tagMapper.getTagListById(projectId);
-        List<Reward> rewardList = rewardMapper.getRewardListById(projectId);
+        List<Reward> rewardList = rewardMapper.getRewardList(projectId);
         List<News> newsList = newsMapper.getNewsListById(projectId);
 
         ProjectDetailDto projectDetailDto = ProjectDetailDto.builder()
@@ -163,7 +162,7 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * <p>프로젝트 생성</p>
      *
-     * @param dto 프로젝트 생성 관련 데이터
+     * @param dto ProjectCreateRequestDto
      * @param creatorId 사용자 ID
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author by: 조은애

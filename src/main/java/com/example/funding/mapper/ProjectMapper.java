@@ -12,7 +12,7 @@ import java.util.List;
 
 @Mapper
 public interface ProjectMapper {
-    Project getProjectById(@Param("projectId") Long projectId);
+    Project getProject(@Param("projectId") Long projectId);
 
     void updateViewCnt(@Param("projectId") Long projectId);
 
@@ -31,4 +31,6 @@ public interface ProjectMapper {
     int getProjectCnt(@Param("creatorId") Long creatorId);
 
     int saveProject(ProjectCreateRequestDto dto);
+
+    String getStatus(Long projectId);
 }

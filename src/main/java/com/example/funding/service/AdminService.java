@@ -4,6 +4,7 @@ import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
+import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Date;
@@ -15,4 +16,6 @@ public interface AdminService {
     ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(Long ctgrId);
 
     ResponseEntity<ResponseDto<Kpi>> getKpi(int month);
+
+    ResponseEntity<ResponseDto<List<RewardSalesTop>>> getRewardSalesTops(Date from, Date to, int limit, String metric);
 }

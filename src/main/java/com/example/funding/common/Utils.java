@@ -1,5 +1,13 @@
 package com.example.funding.common;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.util.Date;
+
 public class Utils {
     public static int getPercentNow(int currAmount, int goalAmount){
         if(goalAmount == 0) {
@@ -7,5 +15,42 @@ public class Utils {
         } else {
             return (int) Math.floor((currAmount * 100.0) / goalAmount);
         }
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class AnalyticsWindow {
+        private Date from;
+        private Date to;
+        private int months;
+        private String metric;
+    }
+
+    private static String normalizeMetric(String metric) {
+        return "revenue".equalsIgnoreCase(metric) ? "revenue" : "qty";
+    }
+
+    public static AnalyticsWindow resolveWindow(String period, String metric, ZoneId zone) {
+        int monthsInt = monthsInt(period);
+        YearMonth now = YearMonth.now(zone);
+        Date from = null, to = null;
+        if (monthsInt > 0) {
+            YearMonth startYm = now.minusMonths(monthsInt - 1);
+            from = Date.from(startYm.atDay(1).atStartOfDay(zone).toInstant());
+            to   = Date.from(now.plusMonths(1).atDay(1).atStartOfDay(zone).toInstant());
+        }
+        return new AnalyticsWindow(from, to, monthsInt, normalizeMetric(metric));
+    }
+
+    public static int monthsInt(String period) {
+        return switch (period) {
+            case "1m" -> 1;
+            case "3m" -> 3;
+            case "6m" -> 6;
+            case "1y" -> 12;
+            case "all" -> 0;
+            default -> 6;
+        };
     }
 }

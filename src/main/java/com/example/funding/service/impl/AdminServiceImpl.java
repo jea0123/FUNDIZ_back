@@ -91,4 +91,23 @@ public class AdminServiceImpl implements AdminService {
         }
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "KPI 조회 성공", kpi));
     }
+
+    /**
+     * 상위 리워드 판매량/매출 조회
+     * @param from   조회 시작 날짜
+     * @param to     조회 종료 날짜
+     * @param limit  상위 N개 리워드 조회 제한
+     * @param metric 정렬 기준 (qty: 판매 수량, revenue: 매출)
+     * @return 상위 리워드 판매량/매출 데이터 리스트
+     * @author 장민규
+     * @since 2025-09-11
+     */
+    @Override
+    public ResponseEntity<ResponseDto<List<RewardSalesTop>>> getRewardSalesTops(Date from, Date to, int limit, String metric) {
+        List<RewardSalesTop> rewardSalesTops = adminMapper.getRewardSalesTops(from, to, limit, metric);
+        if(rewardSalesTops.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "해당 기간에 대한 리워드 판매 데이터가 없습니다."));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "리워드 판매 상위 조회 성공", rewardSalesTops));
+    }
 }

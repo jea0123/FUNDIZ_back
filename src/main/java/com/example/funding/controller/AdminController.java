@@ -1,9 +1,11 @@
 package com.example.funding.controller;
 
+import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
+import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
 import com.example.funding.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,16 +14,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.YearMonth;
 import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
+
+import static com.example.funding.common.Utils.monthsInt;
+import static com.example.funding.common.Utils.resolveWindow;
 
 @RestController
 //@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
 public class AdminController {
+
+    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
     private final AdminService adminService;
 
@@ -39,20 +44,8 @@ public class AdminController {
     public ResponseEntity<ResponseDto<AdminAnalyticsDto>> getAdminAnalytics(@RequestParam(defaultValue = "6m") String period, @RequestParam(defaultValue = "qty") String metric,
                                                                             @RequestParam(defaultValue = "5") int limit, @RequestParam(defaultValue = "1") Long ctgrId
     ) {
-        ZoneId KST = ZoneId.of("Asia/Seoul");
-        YearMonth now = YearMonth.now(KST);
-
-        int monthsInt = monthsInt(period);
-
-        Date from = null, to = null;
-        if (monthsInt > 0) {
-            YearMonth startYm = now.minusMonths(monthsInt - 1);
-            from = Date.from(startYm.atDay(1).atStartOfDay(KST).toInstant());
-            to = Date.from(now.plusMonths(1).atDay(1).atStartOfDay(KST).toInstant());
-        }
-
-        if (!"revenue".equals(metric)) metric = "qty";
-        return adminService.getAdminAnalytics(from, to, limit, metric, monthsInt, ctgrId);
+        Utils.AnalyticsWindow w = resolveWindow(period, metric, KST);
+        return adminService.getAdminAnalytics(w.getFrom(), w.getTo(), limit, metric, w.getMonths(), ctgrId);
     }
 
     /**
@@ -80,14 +73,19 @@ public class AdminController {
         return adminService.getKpi(months);
     }
 
-    private static int monthsInt(String period) {
-        return switch (period) {
-            case "1m" -> 1;
-            case "3m" -> 3;
-            case "6m" -> 6;
-            case "1y" -> 12;
-            case "all" -> 0;
-            default -> 6;
-        };
+    /**
+     * 상위 리워드 판매량/매출 조회
+     * @param period 조회 기간 (1m, 3m, 6m, 1y, all)
+     * @param metric 정렬 기준 (qty: 판매 수량, revenue: 매출)
+     * @param limit  상위 N개 리워드 조회 제한
+     * @return 상위 리워드 판매량/매출 데이터 리스트
+     * @author 장민규
+     * @since 2025-09-11
+     */
+    @GetMapping("/reward-sales-top")
+    public ResponseEntity<ResponseDto<List<RewardSalesTop>>> getRewardSalesTops(@RequestParam (defaultValue = "6m") String period, @RequestParam(defaultValue = "qty") String metric,
+                                                                                @RequestParam(defaultValue = "5") int limit) {
+        Utils.AnalyticsWindow w = resolveWindow(period, metric, KST);
+        return adminService.getRewardSalesTops(w.getFrom(), w.getTo(), limit, metric);
     }
 }

@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface RewardService {
-    void createRewardList(Long projectId, List<RewardCreateRequestDto> rewardList);
+    void createReward(Long projectId, List<RewardCreateRequestDto> rewardList);
+
+    ResponseEntity<ResponseDto<String>> addReward(Long projectId, RewardCreateRequestDto dto);
 
     ResponseEntity<ResponseDto<String>> updateReward(Long projectId, Long rewardId, RewardUpdateRequestDto dto);
 

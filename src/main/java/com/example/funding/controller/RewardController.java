@@ -1,6 +1,7 @@
 package com.example.funding.controller;
 
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.reward.RewardCreateRequestDto;
 import com.example.funding.dto.request.reward.RewardUpdateRequestDto;
 import com.example.funding.service.RewardService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,21 @@ import org.springframework.web.bind.annotation.*;
 public class RewardController {
 
     private final RewardService rewardService;
+
+    /**
+     * <p>리워드 추가</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param dto RewardCreateRequestDto
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author by: 조은애
+     * @since 2025-09-11
+     */
+    @PostMapping
+    public ResponseEntity<ResponseDto<String>> addReward(@PathVariable Long projectId,
+                                                         @RequestBody RewardCreateRequestDto dto) {
+        return rewardService.addReward(projectId, dto);
+    }
 
     /**
      * <p>리워드 수정</p>

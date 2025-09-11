@@ -34,7 +34,7 @@ public class RewardServiceImpl implements RewardService {
      * @since 2025-09-09
      */
     @Override
-    public void createRewardList(Long projectId, List<RewardCreateRequestDto> rewardList) {
+    public void createReward(Long projectId, List<RewardCreateRequestDto> rewardList) {
         for (RewardCreateRequestDto dto : rewardList) {
             Reward reward = Reward.builder()
                     .projectId(projectId)
@@ -49,6 +49,36 @@ public class RewardServiceImpl implements RewardService {
 
             rewardMapper.saveReward(reward);
         }
+    }
+
+    /**
+     * <p>리워드 추가</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param dto RewardCreateRequestDto
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author by: 조은애
+     * @since 2025-09-11
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> addReward(Long projectId, RewardCreateRequestDto dto) {
+        Reward reward = Reward.builder()
+                .projectId(projectId)
+                .rewardName(dto.getRewardName())
+                .price(dto.getPrice())
+                .rewardContent(dto.getRewardContent())
+                .deliveryDate(dto.getDeliveryDate())
+                .rewardCnt((dto.getRewardCnt() == null) ? Integer.MAX_VALUE : dto.getRewardCnt()) // 무제한 처리
+                .isPosting(dto.getIsPosting())
+                .remain((dto.getRewardCnt() == null) ? Integer.MAX_VALUE : dto.getRewardCnt()) // 초기 remain = rewardCnt
+                .build();
+
+        int result = rewardMapper.saveReward(reward);
+        if (result == 0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "리워드 추가 실패"));
+        }
+
+        return ResponseEntity.ok(ResponseDto.success(200, "리워드 추가 성공", null));
     }
 
     /**
@@ -97,11 +127,15 @@ public class RewardServiceImpl implements RewardService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> deleteReward(Long projectId, Long rewardId) {
-        int result = rewardMapper.deleteReward(projectId, rewardId);
-        if (result == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "리워드 삭제 실패"));
+        //프로젝트 상태 조회
+        String status = projectMapper.getStatus(projectId);
+        //심사 요청 이전에만 리워드 삭제 가능
+        if ("DRAFT".equals(status)) {
+            int result = rewardMapper.deleteReward(projectId, rewardId);
+            if (result == 0) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "리워드 삭제 실패"));
+            }
         }
-
         return ResponseEntity.ok(ResponseDto.success(200, "리워드 삭제 성공", null));
     }
 }

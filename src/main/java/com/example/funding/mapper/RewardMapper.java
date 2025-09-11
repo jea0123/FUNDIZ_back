@@ -13,9 +13,9 @@ public interface RewardMapper {
 
     List<Reward> findProjectIdsByRewardIds(@Param("ids") List<Long> rewardIds);
 
-    void saveReward(Reward reward);
+    int saveReward(Reward reward);
 
     int updateReward(RewardUpdateRequestDto dto);
 
-    int deleteReward(Long projectId, Long rewardId);
+    int deleteReward(@Param("projectId") Long projectId, @Param("rewardId") Long rewardId);
 }

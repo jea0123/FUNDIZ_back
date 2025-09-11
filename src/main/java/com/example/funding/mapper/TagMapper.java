@@ -10,5 +10,5 @@ import java.util.List;
 public interface TagMapper {
     List<Tag> getTagListById(@Param("projectId") Long projectId);
 
-    void saveTagList(@Param("projectId") Long projectId, @Param("tagName") String tagName);
+    void saveTag(@Param("projectId") Long projectId, @Param("tagName") String tagName);
 }

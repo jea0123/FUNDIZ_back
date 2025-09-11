@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.funding.mapper.SubcategoryMapper">
 
-    <select id="getSubcategoryById" resultType="com.example.funding.dto.response.project.SubcategoryDto">
+    <select id="getSubcategoryById" resultType="subcategoryDto">
             SELECT
                 S.SUBCTGRID,
                 S.SUBCTGRNAME,

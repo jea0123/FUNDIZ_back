@@ -113,7 +113,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(Long userId, Long projectId, Long rewardId){
         User user = userMapper.getUserById(userId);
-        Project project = projectMapper.getProjectById(projectId);
+        Project project = projectMapper.getProject(projectId);
 
 
         if(user == null || project == null){
@@ -192,7 +192,7 @@ public class UserServiceImpl implements UserService {
     //서비스에서구현
     @Override
     public ResponseEntity<ResponseDto<MyPageQnADetailDto>> getQnADetail(Long userId, Long projectId) {
-        Project project = projectMapper.getProjectById(projectId);
+        Project project = projectMapper.getProject(projectId);
         User user = userMapper.getUserById(userId);
         Creator creator = creatorMapper.findById(project.getCreatorId());
         Qna qna = qnaMapper.getQnAById(userId,projectId);

@@ -7,26 +7,8 @@
         WHERE PROJECTID = #{projectId}
     </update>
 
-    <select id="getProjectById" resultType="project">
-        SELECT
-            PROJECTID,
-            CREATORID,
-            SUBCTGRID,
-            TITLE,
-            GOALAMOUNT,
-            CURRAMOUNT,
-            STARTDATE,
-            ENDDATE,
-            CONTENT AS CONTENT,
-            THUMBNAIL,
-            CREATEDAT,
-            UPDATEDAT,
-            PROJECTSTATUS,
-            BACKERCNT,
-            LIKECNT,
-            VIEWCNT,
-            ISREQREVIEW,
-            REJECTEDREASON
+    <select id="getProject" resultType="project">
+        SELECT *
         FROM PROJECT
         WHERE PROJECTID = #{projectId}
     </select>
@@ -208,5 +190,11 @@
             #{startDate}, #{endDate}, #{content}, #{thumbnail}
         )
     </insert>
+
+    <select id="getStatus" resultType="string">
+        SELECT PROJECTSTATUS
+        FROM PROJECT
+        WHERE PROJECTID = #{projectId}
+    </select>
 
 </mapper>

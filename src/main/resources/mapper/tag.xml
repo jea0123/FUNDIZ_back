@@ -5,6 +5,7 @@
     <select id="getTagListById" resultType="tag">
         SELECT * FROM TAG
         WHERE PROJECTID = #{projectId}
+        ORDER BY TAGID
     </select>
 
     <insert id="saveTag">

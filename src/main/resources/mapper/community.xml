@@ -32,7 +32,7 @@
                     CREATEDAT,
                     CODE
                 FROM COMMUNITY
-                WHERE PROJECTID = 222
+                WHERE PROJECTID = #{projectId}
                   AND TRIM(CODE) = 'CM'
                 ORDER BY CREATEDAT DESC
             ) T

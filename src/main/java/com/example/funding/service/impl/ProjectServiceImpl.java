@@ -190,7 +190,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         //리워드 생성
         if (dto.getRewardList() != null && !dto.getRewardList().isEmpty()) {
-            rewardService.createRewardList(projectId, dto.getRewardList());
+            rewardService.createReward(projectId, dto.getRewardList());
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 생성 성공", null));

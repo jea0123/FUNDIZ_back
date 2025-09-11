@@ -2,9 +2,30 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.funding.mapper.RewardMapper">
 
-    <select id="getRewardListById" resultType="reward">
-        SELECT * FROM reward
-        WHERE PROJECTID = #{projectId}
+    <select id="getRewardList" resultType="reward">
+        SELECT
+            r.REWARDID,
+            r.PROJECTID,
+            r.REWARDNAME,
+            r.PRICE,
+            r.REWARDCONTENT,
+            r.DELIVERYDATE,
+            r.REWARDCNT,
+            r.CREATEDAT,
+            r.ISPOSTING,
+            (r.REMAIN - NVL(s.qty, 0)) AS REMAIN
+        FROM reward r
+        LEFT JOIN (
+            SELECT
+                d.REWARDID,
+                SUM(d.QUANTITY) AS qty
+            FROM BACKINGDETAIL d
+            JOIN BACKING b ON b.BACKINGID = d.BACKINGID
+              AND b.BACKINGSTATUS = 'COMPLETED'
+            GROUP BY d.REWARDID
+        ) s ON s.REWARDID = r.REWARDID
+        WHERE r.PROJECTID = #{projectId}
+        ORDER BY r.PRICE
     </select>
 
     <select id="findProjectIdsByRewardIds" resultType="reward">
@@ -29,5 +50,24 @@
             #{deliveryDate}, #{rewardCnt}, #{isPosting}, #{remain}
         )
     </insert>
+
+    <update id="updateReward" parameterType="rewardUpdateRequestDto">
+        UPDATE REWARD
+        SET REWARDNAME = #{rewardName},
+            PRICE = #{price},
+            REWARDCONTENT = #{rewardContent},
+            DELIVERYDATE = #{deliveryDate},
+            REWARDCNT = #{rewardCnt},
+            ISPOSTING = #{isPosting},
+            REMAIN = #{remain}
+        WHERE REWARDID = #{rewardId}
+          AND PROJECTID = #{projectId}
+    </update>
+
+    <delete id="deleteReward">
+        DELETE FROM REWARD
+        WHERE PROJECTID = #{projectId}
+          AND REWARDID = #{rewardId}
+    </delete>
 
 </mapper>

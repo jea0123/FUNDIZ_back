@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.funding.mapper.AdminMapper">
+
+    <!-- KPI 조회 쿼리 -->
+    <select id="getKpiByMonths" parameterType="java.lang.Integer" resultType="kpi">
+        SELECT
+            NVL(SUM(CASE WHEN STATUS='PAID' THEN AMOUNT END),0) AS totalBackingAmount,
+            ROUND(NVL(SUM(CASE WHEN STATUS='PAID' THEN AMOUNT END),0) * 0.05, 0) AS fee,
+            CASE WHEN COUNT(*) > 0
+                THEN ROUND((COUNT(CASE WHEN STATUS='PAID' THEN 1 END)/COUNT(*))*100.0,1)
+                ELSE 0 END AS successRate,
+            ROUND(NVL(AVG(CASE WHEN STATUS='PAID' THEN AMOUNT END),0),0) AS backingAmountAvg
+        FROM PAYMENT
+        <if test="months != null and months != 0">
+            WHERE createdAt >= ADD_MONTHS(TRUNC(SYSDATE,'MM'), -(#{months} - 1))
+            <![CDATA[
+                AND createdAt <  ADD_MONTHS(TRUNC(SYSDATE,'MM'), 1)
+            ]]>
+        </if>
+    </select>
+
+    <!-- 월별 트렌드 조회 쿼리 -->
+    <select id="getMonthlyTrends" parameterType="java.lang.Integer" resultType="revenueTrend">
+        <choose>
+            <when test="months != null and months != 0">
+                WITH months AS (
+                    SELECT ADD_MONTHS(TRUNC(SYSDATE,'MM'), -(#{months} - LEVEL)) AS m
+                    FROM dual
+                    <![CDATA[
+                        CONNECT BY LEVEL <= #{months}
+                        )
+                    ]]>
+                SELECT
+                    TO_CHAR(m.m,'YYYY-MM') AS month,
+                    COUNT(DISTINCT CASE WHEN p.STATUS='PAID' THEN rw.projectId END) AS projectCnt,
+                    NVL(SUM(CASE WHEN p.STATUS='PAID' THEN p.AMOUNT END),0) AS revenue
+                FROM months m
+                LEFT JOIN PAYMENT p
+                    ON p.createdAt >= m.m
+                    <![CDATA[
+                        AND p.createdAt <  ADD_MONTHS(m.m,1)
+                    ]]>
+                LEFT JOIN backingDetail bd ON bd.backingId = p.backingId
+                LEFT JOIN reward rw ON rw.rewardId = bd.rewardId
+                GROUP BY m.m
+                ORDER BY m.m
+            </when>
+            <otherwise>
+                WITH bounds AS (
+                    SELECT TRUNC(MIN(createdAt),'MM') AS min_m, TRUNC(NVL(MAX(createdAt),SYSDATE),'MM') AS max_m
+                    FROM PAYMENT
+                ),
+                months AS (
+                    SELECT ADD_MONTHS(b.min_m, LEVEL-1) AS m
+                    FROM bounds b
+                    <![CDATA[
+                        CONNECT BY ADD_MONTHS(b.min_m, LEVEL-1) <= b.max_m
+                    )
+                    ]]>
+                SELECT
+                    TO_CHAR(m.m,'YYYY-MM') AS month,
+                    COUNT(DISTINCT CASE WHEN p.STATUS='PAID' THEN rw.projectId END) AS projectCnt,
+                    NVL(SUM(CASE WHEN p.STATUS='PAID' THEN p.AMOUNT END),0) AS revenue
+                FROM months m
+                LEFT JOIN PAYMENT p
+                    ON p.createdAt >= m.m
+                    <![CDATA[
+                        AND p.createdAt <  ADD_MONTHS(m.m,1)
+                    ]]>
+                LEFT JOIN backingDetail bd ON bd.backingId = p.backingId
+                LEFT JOIN reward rw ON rw.rewardId = bd.rewardId
+                GROUP BY m.m
+                ORDER BY m.m
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 리워드별 판매 Top 조회 쿼리 -->
+    <select id="getRewardSalesTops" parameterType="java.util.Map" resultType="rewardSalesTop">
+        SELECT * FROM (
+            SELECT
+                r.rewardName AS rewardName,
+                SUM(bd.quantity) AS qty,
+                SUM(bd.quantity * bd.price) AS revenue
+            FROM payment pay
+            JOIN backing b ON b.backingId = pay.backingId
+            JOIN backingDetail bd ON bd.backingId = b.backingId
+            JOIN reward r ON r.rewardId = bd.rewardId
+            WHERE pay.status = 'PAID'
+            <if test="from != null and to != null">
+                AND pay.createdAt >= #{from, jdbcType=TIMESTAMP}
+                <![CDATA[
+                    AND pay.createdAt < #{to, jdbcType=TIMESTAMP}
+                ]]>
+            </if>
+            GROUP BY r.rewardId, r.rewardName
+            <choose>
+                <when test="metric == 'revenue'">ORDER BY revenue DESC, qty DESC</when>
+                <otherwise>ORDER BY qty DESC, revenue DESC</otherwise>
+            </choose>
+            )
+            <![CDATA[
+                WHERE ROWNUM <= #{limit}
+            ]]>
+    </select>
+
+    <!-- 결제수단별 판매 비중 조회 쿼리 -->
+    <select id="getPaymentMethods" parameterType="java.util.Map" resultType="paymentMethod">
+        SELECT method AS paymentMethod, COUNT(*) AS cnt
+        FROM payment
+        WHERE status = 'PAID'
+        <if test="from != null and to != null">
+            AND createdAt >= #{from,jdbcType=TIMESTAMP}
+            <![CDATA[
+                AND createdAt < #{to, jdbcType=TIMESTAMP}
+            ]]>
+        </if>
+        GROUP BY method
+    </select>
+
+    <!-- 카테고리별 성공/실패 건수 조회 쿼리 -->
+    <select id="getCategorySuccessByCategory" parameterType="java.lang.Long" resultType="categorySuccess">
+        SELECT
+            sc.subctgrName AS categoryName,
+            SUM(CASE WHEN p.projectStatus IN ('SUCCESS','SETTLED') THEN 1 ELSE 0 END) AS successCnt,
+            SUM(CASE WHEN p.projectStatus = 'FAILED' THEN 1 ELSE 0 END) AS failCnt
+        FROM subcategory sc
+        LEFT JOIN project p
+            ON p.subctgrId = sc.subctgrId
+        WHERE sc.ctgrId = #{ctgrId}
+        GROUP BY sc.subctgrName
+        ORDER BY sc.subctgrName
+    </select>
+
+</mapper>

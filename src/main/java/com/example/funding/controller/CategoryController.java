@@ -18,6 +18,12 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
+    /**
+     * 모든 카테고리 조회
+     * @return 모든 카테고리 리스트
+     * @author 장민규
+     * @since 2025-09-11
+     */
     @GetMapping("")
     public ResponseEntity<ResponseDto<List<Category>>> getAllCategories() {
         return categoryService.getAllCategories();

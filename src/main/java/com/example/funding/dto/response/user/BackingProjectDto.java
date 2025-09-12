@@ -2,7 +2,7 @@ package com.example.funding.dto.response.user;
 
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -15,6 +15,6 @@ public class BackingProjectDto {
     private String title;
     private Long goalAmount;
     private Long currAmount;
-    private Date endDate;
+    private LocalDate endDate;
     private String projectStatus;
 }

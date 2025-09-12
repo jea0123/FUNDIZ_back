@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -15,7 +16,7 @@ public class RewardCreateRequestDto {
     private String rewardName;
     private Integer price;
     private String rewardContent;
-    private Date deliveryDate;
+    private LocalDate deliveryDate;
     private Integer rewardCnt;
     private Character isPosting;
 }

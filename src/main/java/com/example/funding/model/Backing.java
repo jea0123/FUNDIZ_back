@@ -2,7 +2,7 @@ package com.example.funding.model;
 
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -13,6 +13,6 @@ public class Backing {
     private Long backingId;
     private Long userId;
     private Long amount;
-    private Date createdAt;
+    private LocalDate createdAt;
     private String backingStatus;
 }

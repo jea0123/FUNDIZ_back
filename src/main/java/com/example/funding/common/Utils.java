@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.ZoneId;
-import java.util.Date;
 
 public class Utils {
     public static int getPercentNow(int currAmount, int goalAmount){
@@ -21,8 +21,8 @@ public class Utils {
     @Setter
     @AllArgsConstructor
     public static class AnalyticsWindow {
-        private Date from;
-        private Date to;
+        private LocalDate from;
+        private LocalDate to;
         private int months;
         private String metric;
     }
@@ -34,11 +34,11 @@ public class Utils {
     public static AnalyticsWindow resolveWindow(String period, String metric, ZoneId zone) {
         int monthsInt = monthsInt(period);
         YearMonth now = YearMonth.now(zone);
-        Date from = null, to = null;
+        LocalDate from = null, to = null;
         if (monthsInt > 0) {
             YearMonth startYm = now.minusMonths(monthsInt - 1);
-            from = Date.from(startYm.atDay(1).atStartOfDay(zone).toInstant());
-            to   = Date.from(now.plusMonths(1).atDay(1).atStartOfDay(zone).toInstant());
+            from = startYm.atDay(1);
+            to = now.atEndOfMonth();
         }
         return new AnalyticsWindow(from, to, monthsInt, normalizeMetric(metric));
     }

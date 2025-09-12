@@ -7,15 +7,15 @@ import com.example.funding.dto.response.admin.analytic.Kpi;
 import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface AdminService {
-    ResponseEntity<ResponseDto<AdminAnalyticsDto>> getAdminAnalytics(Date from, Date to, int limit, String metric, int month, Long ctgrId);
+    ResponseEntity<ResponseDto<AdminAnalyticsDto>> getAdminAnalytics(LocalDate from, LocalDate to, int limit, String metric, int month, Long ctgrId);
 
     ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(Long ctgrId);
 
     ResponseEntity<ResponseDto<Kpi>> getKpi(int month);
 
-    ResponseEntity<ResponseDto<List<RewardSalesTop>>> getRewardSalesTops(Date from, Date to, int limit, String metric);
+    ResponseEntity<ResponseDto<List<RewardSalesTop>>> getRewardSalesTops(LocalDate from, LocalDate to, int limit, String metric);
 }

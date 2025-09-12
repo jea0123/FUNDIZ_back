@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -15,5 +16,5 @@ public class News {
     private Long newsId;
     private Long projectId;
     private String content;
-    private Date createdAt;
+    private LocalDate createdAt;
 }

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -19,5 +20,5 @@ public class Payment {
     private String status;
     private Long amount;
     private String cardCompany;
-    private Date createdAt;
+    private LocalDate createdAt;
 }

@@ -3,19 +3,19 @@ package com.example.funding.dto.response.project;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 @Builder
 public class RecentTop10ProjectDto {
-    Long projectId;
-    String title;
-    String thumbnail;
-    Long creatorId;
-    String creatorName;
-    Integer currAmount;
-    Integer goalAmount;
-    Date endDate;
-    Integer percentNow;
-    Double trendScore;
+    private Long projectId;
+    private String title;
+    private String thumbnail;
+    private Long creatorId;
+    private String creatorName;
+    private Integer currAmount;
+    private Integer goalAmount;
+    private LocalDate endDate;
+    private Integer percentNow;
+    private Double trendScore;
 }

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -17,7 +18,7 @@ public class Inquiry {
     private Long adId;
     private String title;
     private String content;
-    private Date createdAt;
+    private LocalDate createdAt;
     private Character isCanceled;
     private String ctgr;
     private Character isAnswer;

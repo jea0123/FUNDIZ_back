@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -16,9 +16,9 @@ public class LoginUserDto {
     private String email;
     private String nickname;
     private String profileImg;
-    private Date joinedAt;
-    private int followCnt;
-    private char isCreator;
+    private LocalDate joinedAt;
+    private Integer followCnt;
+    private Character isCreator;
     private String role;
 
 

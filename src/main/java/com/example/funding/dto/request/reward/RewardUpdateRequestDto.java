@@ -2,6 +2,7 @@ package com.example.funding.dto.request.reward;
 
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -14,7 +15,7 @@ public class RewardUpdateRequestDto {
     private String rewardName;
     private Integer price;
     private String rewardContent;
-    private Date deliveryDate;
+    private LocalDate deliveryDate;
     private Integer rewardCnt;
     private Character isPosting;
     private Integer remain;

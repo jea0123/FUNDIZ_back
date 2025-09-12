@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -37,7 +38,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<AdminAnalyticsDto>> getAdminAnalytics(Date from, Date to, int limit, String metric, int months, Long ctgrId) {
+    public ResponseEntity<ResponseDto<AdminAnalyticsDto>> getAdminAnalytics(LocalDate from, LocalDate to, int limit, String metric, int months, Long ctgrId) {
         Kpi kpi = adminMapper.getKpiByMonths(months);
         List<RevenueTrend> revenueTrends = adminMapper.getMonthlyTrends(months);
         List<RewardSalesTop> rewardSalesTops = adminMapper.getRewardSalesTops(from, to, limit, metric);
@@ -103,7 +104,7 @@ public class AdminServiceImpl implements AdminService {
      * @since 2025-09-11
      */
     @Override
-    public ResponseEntity<ResponseDto<List<RewardSalesTop>>> getRewardSalesTops(Date from, Date to, int limit, String metric) {
+    public ResponseEntity<ResponseDto<List<RewardSalesTop>>> getRewardSalesTops(LocalDate from, LocalDate to, int limit, String metric) {
         List<RewardSalesTop> rewardSalesTops = adminMapper.getRewardSalesTops(from, to, limit, metric);
         if(rewardSalesTops.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "해당 기간에 대한 리워드 판매 데이터가 없습니다."));

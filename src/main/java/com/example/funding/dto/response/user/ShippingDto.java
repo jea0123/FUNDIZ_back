@@ -1,23 +1,20 @@
-package com.example.funding.model;
+package com.example.funding.dto.response.user;
+
 
 import com.example.funding.enums.BackingStatus;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Date;
 
 @Getter
 @Setter
 @AllArgsConstructor
-@Builder
-public class Shipping {
+public class ShippingDto {
     private Long shippingId;
     private Long backingId;
     private Long addrId;
     private BackingStatus shippingStatus;
-    private String trackingNum;
-    private Date shippedAt;
-    private Date deliveredAt;
+
+
+
 }

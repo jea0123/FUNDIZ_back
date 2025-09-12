@@ -18,4 +18,5 @@ public interface ProjectService {
     ResponseEntity<ResponseDto<List<FeaturedProjectDto>>> getFeatured(int days, int limit);
 
     ResponseEntity<ResponseDto<String>> createProject(ProjectCreateRequestDto dto, Long creatorId);
+
 }

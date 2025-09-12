@@ -13,10 +13,12 @@ import java.util.Date;
 @Builder
 public class MyPageLikedDto {
     //좋아요 테이블
+    private Long userId;
     private Long projectId;
     private Date createdAt;
 
     //창작자 테이블
+
     private String creatorName;
 
     //프로젝트 테이블

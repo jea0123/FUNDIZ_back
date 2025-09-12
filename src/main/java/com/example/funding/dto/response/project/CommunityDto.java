@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -19,7 +19,7 @@ public class CommunityDto {
     private String profileImg;
     private String cmContent;
     private Integer rating;
-    private Date createdAt;
+    private LocalDate createdAt;
     private String code;
 
     private List<Reply> replyList;

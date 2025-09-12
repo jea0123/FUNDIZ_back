@@ -153,7 +153,7 @@
                 JOIN BACKINGDETAIL bd ON bd.BACKINGID = b.BACKINGID
                 JOIN REWARD r         ON r.REWARDID   = bd.REWARDID
                 WHERE p.STATUS     = 'PAID'
-                  AND p.CREATEDAT >= #{since,jdbcType=TIMESTAMP}   -- 예: SYSDATE-1(최근 24시간)
+                  AND p.CREATEDAT >= #{since}   -- 예: SYSDATE-1(최근 24시간)
                 GROUP BY r.PROJECTID
               ) paid ON paid.PROJECTID = pr.PROJECTID
 

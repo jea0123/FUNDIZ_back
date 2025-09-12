@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -14,5 +15,5 @@ import java.util.Date;
 public class Follow {
     private Long creatorId;
     private Long userId;
-    private Date followDate;
+    private LocalDate followDate;
 }

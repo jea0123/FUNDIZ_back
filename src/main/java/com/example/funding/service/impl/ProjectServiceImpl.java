@@ -16,9 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.example.funding.common.Utils.getPercentNow;
@@ -115,7 +113,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<RecentTop10ProjectDto>>> getRecentTop10() {
 //        Date since = Date.from(Instant.now().minus(24, ChronoUnit.HOURS));
-        Date since = Date.from(Instant.now().minus(8760, ChronoUnit.HOURS));
+        LocalDate since = LocalDate.now().minusDays(800);
         int startDays = 8760;  // 프로젝트 시작일 최근 30일
         int limit = 10;
 

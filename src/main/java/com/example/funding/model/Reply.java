@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -19,7 +19,7 @@ public class Reply {
     private Long inqId;
     private String content;
     private Character isSecret;
-    private Date createdAt;
-    private Date deletedAt;
+    private LocalDate createdAt;
+    private LocalDate deletedAt;
     private String code;
 }

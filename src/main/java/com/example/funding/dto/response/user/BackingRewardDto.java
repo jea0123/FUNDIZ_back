@@ -2,7 +2,7 @@ package com.example.funding.dto.response.user;
 
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -12,7 +12,7 @@ import java.util.Date;
 public class BackingRewardDto {
     private Long rewardId;
     private String rewardName;
-    private Date deliveryDate;
+    private LocalDate deliveryDate;
     private BackingProjectDto backingProject;
 
 }

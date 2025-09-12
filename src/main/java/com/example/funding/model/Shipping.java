@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -18,6 +18,6 @@ public class Shipping {
     private Long addrId;
     private BackingStatus shippingStatus;
     private String trackingNum;
-    private Date shippedAt;
-    private Date deliveredAt;
+    private LocalDate shippedAt;
+    private LocalDate deliveredAt;
 }

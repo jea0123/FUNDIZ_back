@@ -8,8 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -23,8 +22,8 @@ public class ProjectDetailDto {
     private String title;
     private Integer goalAmount;
     private Integer currAmount;
-    private Date startDate;
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private String content;
     private String thumbnail;
     private String projectStatus;
@@ -32,7 +31,7 @@ public class ProjectDetailDto {
     private Integer likeCnt;
     private Integer viewCnt;
     private Integer percentNow; //달성률
-    private Date paymentDate; //결제일
+    private LocalDate paymentDate; //결제일
 
     //창작자
     private String creatorName;
@@ -50,8 +49,8 @@ public class ProjectDetailDto {
     private List<News> newsList;
 
     //결제일 = 종료날짜 + 1
-    public Date getPaymentDate() {
+    public LocalDate getPaymentDate() {
         if (endDate == null) return null;
-        return Date.from(endDate.toInstant().plus(1, ChronoUnit.DAYS));
+        return endDate.plusDays(1);
     }
 }

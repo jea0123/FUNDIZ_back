@@ -5,4 +5,14 @@
     <select id="getAllCategories" resultType="category">
         SELECT * FROM category
     </select>
+
+    <select id="getAllSubcategories" resultType="subcategoryDto">
+        SELECT
+            s.CTGRID,
+            c.CTGRNAME,
+            s.SUBCTGRID,
+            s.SUBCTGRNAME
+        FROM SUBCATEGORY s
+        JOIN CATEGORY c ON c.CTGRID = s.CTGRID
+    </select>
 </mapper>

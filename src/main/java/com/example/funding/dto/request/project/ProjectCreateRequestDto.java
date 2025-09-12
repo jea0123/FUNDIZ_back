@@ -12,10 +12,11 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class ProjectCreateRequestDto {
-    //프로젝트
     private Long projectId;
     private Long subctgrId;
     private Long creatorId;
+
+    //프로젝트
     private String title;
     private String content;
     private String thumbnail;
@@ -28,4 +29,10 @@ public class ProjectCreateRequestDto {
 
     //리워드
     private List<RewardCreateRequestDto> rewardList;
+
+    //창작자
+    private String creatorName;
+    private String businessNum;
+    private String email;
+    private String phone;
 }

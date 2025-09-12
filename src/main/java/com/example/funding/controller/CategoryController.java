@@ -1,6 +1,7 @@
 package com.example.funding.controller;
 
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.response.project.SubcategoryDto;
 import com.example.funding.model.Category;
 import com.example.funding.service.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/categories")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class CategoryController {
 
@@ -24,8 +25,13 @@ public class CategoryController {
      * @author 장민규
      * @since 2025-09-11
      */
-    @GetMapping("")
+    @GetMapping("/categories")
     public ResponseEntity<ResponseDto<List<Category>>> getAllCategories() {
         return categoryService.getAllCategories();
+    }
+
+    @GetMapping("/subcategories")
+    public ResponseEntity<ResponseDto<List<SubcategoryDto>>> getAllSubcategories() {
+        return categoryService.getAllSubcategories();
     }
 }

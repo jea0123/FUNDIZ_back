@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -16,7 +17,7 @@ public class Report {
     private Long userId;
     private Long target;
     private String reason;
-    private Date reportDate;
+    private LocalDate reportDate;
     private String reportStatus;
     private String reportType;
 }

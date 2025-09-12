@@ -7,6 +7,7 @@ import com.example.funding.model.Project;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public interface ProjectMapper {
 
     void updateViewCnt(@Param("projectId") Long projectId);
 
-    List<RecentTop10ProjectDto> findRecentTopProjectsJoined(@Param("since") Date since,
+    List<RecentTop10ProjectDto> findRecentTopProjectsJoined(@Param("since") LocalDate since,
                                                             @Param("startDays") int startDays,
                                                             @Param("limit") int limit);
 

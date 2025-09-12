@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -17,9 +17,9 @@ public class Reward {
     private String rewardName;
     private Integer price;
     private String rewardContent;
-    private Date deliveryDate;
+    private LocalDate deliveryDate;
     private Integer rewardCnt;
-    private Date createdAt;
+    private LocalDate createdAt;
     private Character isPosting;
     private Integer remain;
 }

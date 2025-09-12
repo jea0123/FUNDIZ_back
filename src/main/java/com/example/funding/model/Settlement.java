@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @AllArgsConstructor
@@ -17,5 +18,5 @@ public class Settlement {
     private Long totalAmount;
     private Long fee;
     private Long settlementAmount;
-    private Date settlementDate;
+    private LocalDate settlementDate;
 }

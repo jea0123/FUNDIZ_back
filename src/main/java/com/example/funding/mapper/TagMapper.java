@@ -8,7 +8,7 @@ import java.util.List;
 
 @Mapper
 public interface TagMapper {
-    List<Tag> getTagListById(@Param("projectId") Long projectId);
+    List<Tag> getTagList(@Param("projectId") Long projectId);
 
     void saveTag(@Param("projectId") Long projectId, @Param("tagName") String tagName);
 }

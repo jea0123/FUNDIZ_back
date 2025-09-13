@@ -1,18 +1,13 @@
-package com.example.funding.dto.response.project;
+package com.example.funding.dto.row;
 
-import com.example.funding.model.News;
-import com.example.funding.model.Reward;
-import com.example.funding.model.Tag;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@Builder
-public class ProjectDetailDto {
+public class ProjectRow {
     private Long projectId;
     private Long creatorId;
     private Long subctgrId;
@@ -30,11 +25,6 @@ public class ProjectDetailDto {
     private Integer likeCnt;
     private Integer viewCnt;
 
-    //계산 필드
-    private Integer percentNow;
-    private Integer projectCnt;
-    private LocalDate paymentDate;
-
     //창작자
     private String creatorName;
     private Long followerCnt;
@@ -43,10 +33,4 @@ public class ProjectDetailDto {
     //카테고리
     private String ctgrName;
     private String subctgrName;
-    //태그
-    private List<Tag> tagList;
-    //리워드
-    private List<Reward> rewardList;
-    //새소식
-    private List<News> newsList;
 }

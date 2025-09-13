@@ -8,5 +8,5 @@ import java.util.List;
 
 @Mapper
 public interface NewsMapper {
-    List<News> getNewsListById(@Param("projectId") Long projectId);
+    List<News> getNewsList(@Param("projectId") Long projectId);
 }

@@ -1,11 +1,12 @@
 package com.example.funding.service.impl;
 
+import com.example.funding.common.Utils;
+import com.example.funding.dto.row.ProjectRow;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.ProjectCreateRequestDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
-import com.example.funding.dto.response.project.SubcategoryDto;
 import com.example.funding.mapper.*;
 import com.example.funding.model.*;
 import com.example.funding.service.ProjectService;
@@ -19,19 +20,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.example.funding.common.Utils.getPercentNow;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectMapper projectMapper;
-    private final SubcategoryMapper subcategoryMapper;
     private final TagMapper tagMapper;
     private final RewardMapper rewardMapper;
     private final NewsMapper newsMapper;
-    private final CreatorMapper creatorMapper;
     private final RewardService rewardService;
 
     /**
@@ -48,47 +45,52 @@ public class ProjectServiceImpl implements ProjectService {
         //조회수 증가
         projectMapper.updateViewCnt(projectId);
 
-        Project project = projectMapper.getProject(projectId);
-        if (project == null) {
+        //프로젝트 단건 조회
+        ProjectRow row = projectMapper.getProjectRow(projectId);
+        if (row == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트를 찾을 수 없습니다."));
         }
 
-        //달성률, 창작자 프로젝트 개수
-        int percentNow = getPercentNow(project.getCurrAmount(), project.getGoalAmount());
-        int projectCnt = projectMapper.getProjectCnt(project.getCreatorId());
-
-        Creator creator = creatorMapper.findById(project.getCreatorId());
-        SubcategoryDto subcategory = subcategoryMapper.getSubcategoryById(project.getSubctgrId());
-        List<Tag> tagList = tagMapper.getTagListById(projectId);
+        //컬렉션 조회
+        List<Tag> tagList = tagMapper.getTagList(projectId);
         List<Reward> rewardList = rewardMapper.getRewardList(projectId);
-        List<News> newsList = newsMapper.getNewsListById(projectId);
+        List<News> newsList = newsMapper.getNewsList(projectId);
 
-        ProjectDetailDto projectDetailDto = ProjectDetailDto.builder()
-                .projectId(project.getProjectId())
-                .creatorId(project.getCreatorId())
-                .title(project.getTitle())
-                .goalAmount(project.getGoalAmount())
-                .currAmount(project.getCurrAmount())
-                .startDate(project.getStartDate())
-                .endDate(project.getEndDate())
-                .content(project.getContent())
-                .thumbnail(project.getThumbnail())
-                .projectStatus(project.getProjectStatus())
-                .backerCnt(project.getBackerCnt())
-                .likeCnt(project.getLikeCnt())
-                .viewCnt(project.getViewCnt())
-                .percentNow(percentNow)
-                .creatorName(creator.getCreatorName())
-                .followerCnt(creator.getFollowerCnt())
-                .profileImg(creator.getProfileImg())
-                .projectCnt(projectCnt)
-                .subcategory(subcategory)
-                .tagList(tagList)
-                .rewardList(rewardList)
-                .newsList(newsList)
-                .build();
+        //달성률, 창작자가 등록한 프로젝트 수, 결제일
+        int percentNow = Utils.getPercentNow(row.getCurrAmount(), row.getGoalAmount());
+        int projectCnt = projectMapper.getProjectCnt(row.getCreatorId());
+        LocalDate paymentDate = row.getEndDate().plusDays(1);
 
-        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 상세 조회 성공", projectDetailDto));
+        //응답Dto 조립
+        ProjectDetailDto dto = ProjectDetailDto.builder()
+            .projectId(row.getProjectId())
+            .creatorId(row.getCreatorId())
+            .subctgrId(row.getSubctgrId())
+            .title(row.getTitle())
+            .goalAmount(row.getGoalAmount())
+            .currAmount(row.getCurrAmount())
+            .startDate(row.getStartDate())
+            .endDate(row.getEndDate())
+            .content(row.getContent())
+            .thumbnail(row.getThumbnail())
+            .projectStatus(row.getProjectStatus())
+            .backerCnt(row.getBackerCnt())
+            .likeCnt(row.getLikeCnt())
+            .viewCnt(row.getViewCnt())
+            .percentNow(percentNow)
+            .projectCnt(projectCnt)
+            .paymentDate(paymentDate)
+            .creatorName(row.getCreatorName())
+            .followerCnt(row.getFollowerCnt())
+            .profileImg(row.getProfileImg())
+            .ctgrName(row.getCtgrName())
+            .subctgrName(row.getSubctgrName())
+            .tagList(tagList)
+            .rewardList(rewardList)
+            .newsList(newsList)
+            .build();
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 상세 조회 성공", dto));
     }
 
     /**
@@ -152,7 +154,7 @@ public class ProjectServiceImpl implements ProjectService {
         List<FeaturedProjectDto> result = projectMapper.findFeaturedJoinedWithRecent(days, limit);
         if (result == null || result.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ResponseDto.fail(404, "추천 프로젝트가 없습니다."));
+                .body(ResponseDto.fail(404, "추천 프로젝트가 없습니다."));
         }
         return ResponseEntity.ok(ResponseDto.success(200, "추천 프로젝트 조회 성공", result));
     }
@@ -160,7 +162,7 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * <p>프로젝트 생성</p>
      *
-     * @param dto ProjectCreateRequestDto
+     * @param dto       ProjectCreateRequestDto
      * @param creatorId 사용자 ID
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author by: 조은애
@@ -171,7 +173,7 @@ public class ProjectServiceImpl implements ProjectService {
         dto.setCreatorId(creatorId);
 
         //프로젝트 생성
-        int result  = projectMapper.saveProject(dto);
+        int result = projectMapper.saveProject(dto);
         if (result == 0) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트 생성 실패"));
         }

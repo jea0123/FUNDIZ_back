@@ -1,5 +1,6 @@
 package com.example.funding.mapper;
 
+import com.example.funding.dto.row.ProjectRow;
 import com.example.funding.dto.request.project.ProjectCreateRequestDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
@@ -8,12 +9,13 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 @Mapper
 public interface ProjectMapper {
-    Project getProject(@Param("projectId") Long projectId);
+    Project findById(@Param("projectId") Long projectId);
+
+    ProjectRow getProjectRow(@Param("projectId") Long projectId);
 
     void updateViewCnt(@Param("projectId") Long projectId);
 

@@ -1,7 +1,7 @@
 package com.example.funding.mapper;
 
-import com.example.funding.dto.response.project.SubcategoryDto;
 import com.example.funding.model.Category;
+import com.example.funding.model.Subcategory;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -10,5 +10,7 @@ import java.util.List;
 public interface CategoryMapper {
     List<Category> getAllCategories();
 
-    List<SubcategoryDto> getAllSubcategories();
+    List<Subcategory> getAllSubcategories();
+
+    Subcategory findSubcategoryById(Long subctgrId);
 }

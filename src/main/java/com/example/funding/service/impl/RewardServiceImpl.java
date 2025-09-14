@@ -75,7 +75,7 @@ public class RewardServiceImpl implements RewardService {
 
         int result = rewardMapper.saveReward(reward);
         if (result == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "리워드 추가 실패"));
+            throw new IllegalStateException("리워드 추가 실패");
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "리워드 추가 성공", null));
@@ -109,11 +109,11 @@ public class RewardServiceImpl implements RewardService {
             //리워드 수정 처리
             int result = rewardMapper.updateReward(dto);
             if (result == 0) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "리워드 수정 실패"));
+                throw new IllegalStateException("리워드 수정 실패");
             }
             return ResponseEntity.ok(ResponseDto.success(200, "리워드 수정 성공", null));
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDto.fail(400, "심사 요청 이후에는 리워드를 수정할 수 없습니다."));
+        throw new IllegalStateException("심사 요청 이후에는 리워드를 수정할 수 없습니다.");
     }
 
     /**

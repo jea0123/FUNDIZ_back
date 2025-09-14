@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final RewardMapper rewardMapper;
     private final NewsMapper newsMapper;
     private final RewardService rewardService;
+    private final CategoryMapper categoryMapper;
 
     /**
      * <p>프로젝트 상세 페이지 조회</p>
@@ -170,12 +172,21 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> createProject(ProjectCreateRequestDto dto, Long creatorId) {
+        if (dto.getSubctgrId() == null) {
+            throw new IllegalArgumentException("유효하지 않은 서브카테고리 ID 입니다.");
+        }
+
+        Subcategory subcategory = categoryMapper.findSubcategoryById(dto.getSubctgrId());
+        if (subcategory == null) {
+            throw new IllegalArgumentException("존재하지 않는 서브카테고리 입니다.");
+        }
+
         dto.setCreatorId(creatorId);
 
         //프로젝트 생성
         int result = projectMapper.saveProject(dto);
         if (result == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트 생성 실패"));
+            throw new IllegalStateException("프로젝트 생성 실패");
         }
 
         Long projectId = dto.getProjectId();
@@ -183,8 +194,21 @@ public class ProjectServiceImpl implements ProjectService {
         //태그 생성
         List<String> tagList = dto.getTagList();
         if (tagList != null && !tagList.isEmpty()) {
-            for (String tagName : tagList) {
-                tagMapper.saveTag(projectId, tagName);
+            //정규화, 중복 제거, 최대 10개 제한
+            List<String> normalized = tagList.stream()
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(s-> s.length() > 20 ? s.substring(0, 20) : s)
+                .distinct()
+                .limit(10)
+                .toList();
+
+            for (String tagName : normalized) {
+                int saved = tagMapper.saveTag(projectId, tagName);
+                if (saved == 0) {
+                    throw new IllegalStateException("태그 생성 실패");
+                }
             }
         }
 

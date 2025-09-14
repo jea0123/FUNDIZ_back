@@ -14,9 +14,9 @@ import java.util.Date;
 @Builder
 public class RewardCreateRequestDto {
     private String rewardName;
-    private Integer price;
+    private Long price;
     private String rewardContent;
-    private LocalDate deliveryDate;
+    private Date deliveryDate;
     private Integer rewardCnt;
     private Character isPosting;
 }

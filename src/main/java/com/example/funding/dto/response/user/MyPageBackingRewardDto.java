@@ -9,10 +9,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BackingRewardDto {
+public class MyPageBackingRewardDto {
     private Long rewardId;
     private String rewardName;
     private LocalDate deliveryDate;
-    private BackingProjectDto backingProject;
+    private MyPageBackingProjectDto backingProject;
 
 }

@@ -1,4 +1,4 @@
-package com.example.funding.dto.response.reward;
+package com.example.funding.dto.response.Backing;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @Builder
-public class OrderRewardDto {
+public class BackingRewardDto {
     private Long rewardId;
     private String rewardName;
     private Long price;

@@ -63,7 +63,7 @@ public class RewardServiceImpl implements RewardService {
     @Override
     public ResponseEntity<ResponseDto<String>> addReward(Long projectId, RewardCreateRequestDto dto) {
         Reward reward = Reward.builder()
-                .projectId(projectId)
+                    .projectId(projectId)
                 .rewardName(dto.getRewardName())
                 .price(dto.getPrice())
                 .rewardContent(dto.getRewardContent())
@@ -95,7 +95,6 @@ public class RewardServiceImpl implements RewardService {
     public ResponseEntity<ResponseDto<String>> updateReward(Long projectId, Long rewardId, RewardUpdateRequestDto dto) {
         dto.setProjectId(projectId);
         dto.setRewardId(rewardId);
-
         //프로젝트 상태 조회
         String status = projectMapper.getStatus(projectId);
         //심사 요청 이전에만 리워드 수정 가능

@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class BackingDto {
-    BackingRewardDto backingReward;
+    MyPageBackingRewardDto backingReward;
     private Long price;
     private Long quantity;
     Backing backing;

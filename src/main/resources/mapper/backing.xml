@@ -19,13 +19,13 @@
         <result property="quantity" column="quantity"/>
 
         <!-- backingReward -->
-        <association property="backingReward" javaType="com.example.funding.dto.response.user.BackingRewardDto">
+        <association property="backingReward" javaType="com.example.funding.dto.response.user.MyPageBackingRewardDto">
             <id property="rewardId" column="rewardId"/>
             <result property="rewardName" column="rewardName"/>
             <result property="deliveryDate" column="deliveryDate"/>
 
             <!-- backingProject-->
-            <association property="backingProject" javaType="com.example.funding.dto.response.user.BackingProjectDto">
+            <association property="backingProject" javaType="com.example.funding.dto.response.user.MyPageBackingProjectDto">
                 <id property="projectId" column="projectId"/>
                 <result property="thumbnail" column="thumbnail"/>
                 <result property="title" column="title"/>
@@ -88,11 +88,11 @@
         <result property="price" column="price" jdbcType="NUMERIC"/>
         <result property="quantity" column="quantity" jdbcType="NUMERIC"/>
 
-        <association property="backingReward" javaType="com.example.funding.dto.response.user.BackingRewardDto">
+        <association property="backingReward" javaType="com.example.funding.dto.response.user.MyPageBackingRewardDto">
             <id property="rewardId" column="rewardId" jdbcType="NUMERIC"/>
             <result property="rewardName" column="rewardName"/>
 
-            <association property="backingProject" javaType="com.example.funding.dto.response.user.BackingProjectDto">
+            <association property="backingProject" javaType="com.example.funding.dto.response.user.MyPageBackingProjectDto">
                 <id property="projectId" column="projectId" jdbcType="NUMERIC"/>
                 <result property="title" column="title"/>
                 <result property="thumbnail" column="thumbnail"/>
@@ -140,5 +140,87 @@
         WHERE b.userId =#{userId}
         ORDER BY b.createdAt DESC
     </select>
+
+    <resultMap id="BackingResponseMap" type="com.example.funding.dto.response.Backing.BackingResponseDto">
+        <!-- 유저 -->
+        <result property="userId" column="userId"/>
+        <result property="nickname" column="nickname"/>
+        <result property="email" column="email"/>
+
+        <!-- 창작자 -->
+        <result property="creatorId" column="creatorId"/>
+        <result property="creatorName" column="creatorName"/>
+        <result property="profileImg" column="profileImg"/>
+
+        <!-- 프로젝트 -->
+        <result property="projectId" column="projectId"/>
+        <result property="title" column="title"/>
+        <result property="thumbnail" column="thumbnail"/>
+
+        <!-- 배송지 리스트 -->
+        <collection property="addressList" ofType="com.example.funding.dto.response.address.AddressResponseDto">
+            <id property="addrId" column="addrId"/>
+            <result property="addrName" column="addrName"/>
+            <result property="recipient" column="recipient"/>
+            <result property="postalCode" column="postalCode"/>
+            <result property="roadAddr" column="roadAddr"/>
+            <result property="detailAddr" column="detailAddr"/>
+            <result property="recipientPhone" column="recipientPhone"/>
+            <result property="isDefault" column="isDefault"/>
+        </collection>
+
+        <!-- 리워드 리스트 -->
+        <collection property="rewards" ofType="com.example.funding.dto.response.Backing.BackingRewardDto">
+            <id property="rewardId" column="rewardId"/>
+            <result property="rewardName" column="rewardName"/>
+            <result property="price" column="price"/>
+            <result property="deliveryDate" column="deliveryDate"/>
+        </collection>
+    </resultMap>
+
+    <select id = "prepareBacking" parameterType="map" resultMap = "BackingResponseMap">
+        SELECT
+        <!-- 유저 테이블 -->
+        u.userId,
+        u.nickname,
+        u.email,
+
+        <!-- 창작자 테이블 -->
+        c.creatorId,
+        c.creatorName,
+        c.profileImg,
+
+        <!-- 프로젝트 테이블-->
+        p.projectId,
+        p.title,
+        p.thumbnail,
+
+        <!-- 배송지 테이블 -->
+        a.addrId,
+        a.addrName,
+        a.recipient,
+        a.postalCode,
+        a.roadAddr,
+        a.detailAddr,
+        a.recipientPhone,
+        a.isDefault,
+
+        <!-- 리워드 테이블 -->
+        r.rewardId,
+        r.rewardName,
+        r.price,
+        r.deliveryDate
+
+        FROM users u
+        JOIN project p ON p.projectId = #{projectId}
+        JOIN creator c ON c.creatorId = p.creatorId
+        LEFT JOIN address a ON a.userId = u.userId
+        LEFT JOIN reward r ON r.projectId = p.projectId
+        WHERE u.userId = #{userId}
+    </select>
+    
+    <insert id="addBacking">
+<!--        <selectKey keyProperty=""-->
+    </insert>
 </mapper>
 

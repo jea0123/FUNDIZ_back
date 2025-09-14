@@ -8,16 +8,19 @@
         (USERS_SEQ.NEXTVAL, #{email}, #{password}, #{nickname})
     </insert>
 
-    <select id="getUserById" resultType="user">
-        SELECT * FROM USERS
-        WHERE USERID = #{userId}
-    </select>
     
     <update id="updateLastLogin" parameterType="Long">
         UPDATE USERS
         SET LASTLOGINAT = SYSDATE
         WHERE USERID = #{userId}
     </update>
+
+    <select id ="getUserById" parameterType="long" resultType="com.example.funding.model.User">
+            SELECT *
+            FROM users
+            WHERE userId=#{userId, jdbcType=NUMERIC}
+
+    </select>
 
     <select id="findByEmail" parameterType="String" resultType="user">
         SELECT * FROM USERS WHERE EMAIL = #{email}

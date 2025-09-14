@@ -93,9 +93,4 @@ public class UserController {
         return userService.getQnADetail(userId, projectId);
     }
 
-    /*
-    @GetMapping("/me/creatorPage")
-    public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageCreator() {
-
-    }*/
 }

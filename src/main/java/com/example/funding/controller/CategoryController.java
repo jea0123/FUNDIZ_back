@@ -1,8 +1,8 @@
 package com.example.funding.controller;
 
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.response.project.SubcategoryDto;
 import com.example.funding.model.Category;
+import com.example.funding.model.Subcategory;
 import com.example.funding.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +30,14 @@ public class CategoryController {
         return categoryService.getAllCategories();
     }
 
+    /**
+     * 모든 세부카테고리 조회
+     * @return 모든 세부 카테고리 리스트
+     * @author 조은애
+     * @since 2025-09-12
+     */
     @GetMapping("/subcategories")
-    public ResponseEntity<ResponseDto<List<SubcategoryDto>>> getAllSubcategories() {
+    public ResponseEntity<ResponseDto<List<Subcategory>>> getAllSubcategories() {
         return categoryService.getAllSubcategories();
     }
 }

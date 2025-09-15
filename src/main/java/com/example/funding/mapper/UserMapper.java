@@ -1,5 +1,6 @@
 package com.example.funding.mapper;
 
+import com.example.funding.dto.response.address.AddressResponseDto;
 import com.example.funding.dto.response.user.MyPageLikedDto;
 import com.example.funding.dto.response.user.MyPageQnADto;
 import com.example.funding.dto.response.user.RecentViewProject;
@@ -24,7 +25,6 @@ public interface UserMapper {
     List<MyPageLikedDto> getLikedList(@Param("userId") Long userId);
 
     List<MyPageQnADto> getQnAList(@Param("userId") Long userId);
-
 
     List<RecentViewProject> getRecentViewProjects(@Param("userId") Long userId);
 

@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BackingProjectDto {
+public class MyPageBackingProjectDto {
     private Long projectId;
     private String thumbnail;
     private String title;

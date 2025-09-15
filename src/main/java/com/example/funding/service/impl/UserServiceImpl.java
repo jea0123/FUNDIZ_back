@@ -84,48 +84,6 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * <p>로그인 사용자 후원 리스트</p>
-     * @param userId 사용자
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-     * @since 2025-09-05
-     * @author by: 이윤기
-     */
-    @Override
-    public ResponseEntity<ResponseDto<List<BackingDto>>> getBackingList(Long userId) {
-
-        User user = userMapper.getUserById(userId);
-
-        if(user == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"후원한 프로젝트 목록을 찾을 수 없습니다."));
-        }
-        List<BackingDto> backingList = backingMapper.getBackingListUserId(userId);
-
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "후원한 프로젝트 리스트 조회 성공",backingList));
-    }
-
-    /**
-     * <p>로그인 사용자 후원 리스트 상세</p>
-     * @param userId 사용자
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-     * @since 2025-09-05
-     * @author by: 이윤기
-     */
-    @Override
-    public ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(Long userId, Long projectId, Long rewardId){
-        User user = userMapper.getUserById(userId);
-        Project project = projectMapper.findById(projectId);
-
-
-        if(user == null || project == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"후원한 해당 프로젝트를 찾을 수 없습니다."));
-        }
-
-        BackingDto backingDetailDto = backingMapper.getBackingProjectAndUserId(userId, projectId, rewardId);
-
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "후원한 프로젝트 리스트 상세 조회성공", backingDetailDto));
-    }
-
-    /**
      * <p>로그인 사용자 좋아요 리스트</p>
      * @param userId 사용자
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND

@@ -67,16 +67,6 @@ public class UserController {
      * @since 2025-09-02
      * @author by: 이윤기
      */
-    @GetMapping("/me/backingPage/{userId}")
-    public ResponseEntity<ResponseDto<List<BackingDto>>>getBackingList(@PathVariable Long userId) {
-        return userService.getBackingList(userId);
-    }
-
-    @GetMapping("/me/backingPage/{userId}/project/{projectId}/reward/{rewardId}")
-    public ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(@PathVariable Long userId, @PathVariable Long projectId, @PathVariable Long rewardId){
-        return userService.getBackingDetail(userId,projectId, rewardId);
-    }
-
 
     @GetMapping("/me/likedList/{userId}")
     public ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(@PathVariable Long userId) {

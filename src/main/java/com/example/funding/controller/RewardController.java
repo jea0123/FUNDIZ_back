@@ -20,7 +20,7 @@ public class RewardController {
      *
      * @param projectId 프로젝트 ID
      * @param dto RewardCreateRequestDto
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @return 성공 시 200 OK
      * @author by: 조은애
      * @since 2025-09-11
      */
@@ -36,11 +36,11 @@ public class RewardController {
      * @param projectId 프로젝트 ID
      * @param rewardId 리워드 ID
      * @param dto RewardUpdateRequestDto
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @return 성공 시 200 OK
      * @author by: 조은애
      * @since 2025-09-11
      */
-    @PostMapping("/{rewardId}/update")
+    @PostMapping("/{rewardId}")
     public ResponseEntity<ResponseDto<String>> updateReward(@PathVariable Long projectId,
                                                             @PathVariable Long rewardId,
                                                             @RequestBody RewardUpdateRequestDto dto) {
@@ -52,11 +52,11 @@ public class RewardController {
      *
      * @param projectId 프로젝트 ID
      * @param rewardId 리워드 ID
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @return 성공 시 200 OK
      * @author by: 조은애
      * @since 2025-09-11
      */
-    @PostMapping("/{rewardId}/delete")
+    @DeleteMapping("/{rewardId}")
     public ResponseEntity<ResponseDto<String>> deleteReward(@PathVariable Long projectId,
                                                             @PathVariable Long rewardId) {
         return rewardService.deleteReward(projectId, rewardId);

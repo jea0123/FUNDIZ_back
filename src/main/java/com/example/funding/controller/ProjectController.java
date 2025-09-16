@@ -4,6 +4,7 @@ import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.ProjectCreateRequestDto;
+import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
@@ -65,8 +66,8 @@ public class ProjectController {
     /**
      * <p>프로젝트 생성</p>
      *
-     * @param dto 프로젝트 생성 관련 데이터
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @param dto ProjectCreateRequestDto
+     * @return 성공 시 200 OK
      * @author by: 조은애
      * @since 2025-09-09
      */
@@ -78,6 +79,49 @@ public class ProjectController {
         return projectService.createProject(dto, creatorId);
     }
 
+    /**
+     * <p>프로젝트 수정</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param dto ProjectUpdateRequestDto
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-16
+     */
+    @PostMapping("/{projectId}")
+    public ResponseEntity<ResponseDto<String>> updateProject(@PathVariable Long projectId, @RequestBody ProjectUpdateRequestDto dto) {
+        //userId -> creatorId
+        Long creatorId = 1L;
+
+        dto.setProjectId(projectId);
+        return projectService.updateProject(dto, creatorId);
+    }
+
+    /**
+     * <p>프로젝트 삭제</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-16
+     */
+    @DeleteMapping("/{projectId}")
+    public ResponseEntity<ResponseDto<String>> deleteProject(@PathVariable Long projectId) {
+        //userId -> creatorId
+        Long creatorId = 1L;
+
+        return projectService.deleteProject(projectId, creatorId);
+    }
+
+    /**
+     * <p>검색 기능 (제목, 내용, 창작자명, 태그)</p>
+     *
+     * @param dto SearchProjectDto
+     * @param pager 페이지네이션
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-16
+     */
     @GetMapping("/search")
     public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> search(SearchProjectDto dto, Pager pager) {
         pager.setDefault();

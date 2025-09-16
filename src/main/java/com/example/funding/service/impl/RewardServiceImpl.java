@@ -56,7 +56,7 @@ public class RewardServiceImpl implements RewardService {
      *
      * @param projectId 프로젝트 ID
      * @param dto RewardCreateRequestDto
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @return 성공 시 200 OK
      * @author by: 조은애
      * @since 2025-09-11
      */
@@ -87,7 +87,7 @@ public class RewardServiceImpl implements RewardService {
      * @param projectId 프로젝트 ID
      * @param rewardId 리워드 ID
      * @param dto RewardUpdateRequestDto
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @return 성공 시 200 OK
      * @author by: 조은애
      * @since 2025-09-11
      */
@@ -120,7 +120,7 @@ public class RewardServiceImpl implements RewardService {
      *
      * @param projectId 프로젝트 ID
      * @param rewardId 리워드 ID
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @return 성공 시 200 OK
      * @author by: 조은애
      * @since 2025-09-11
      */
@@ -129,12 +129,15 @@ public class RewardServiceImpl implements RewardService {
         //프로젝트 상태 조회
         String status = projectMapper.getStatus(projectId);
         //심사 요청 이전에만 리워드 삭제 가능
-        if ("DRAFT".equals(status)) {
-            int result = rewardMapper.deleteReward(projectId, rewardId);
-            if (result == 0) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "리워드 삭제 실패"));
-            }
+        if (!"DRAFT".equals(status)) {
+            throw new IllegalStateException("현재 상태에서는 리워드를 삭제할 수 없습니다.");
         }
+
+        int result = rewardMapper.deleteReward(projectId, rewardId);
+        if (result == 0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "존재하지 않는 리워드입니다."));
+        }
+
         return ResponseEntity.ok(ResponseDto.success(200, "리워드 삭제 성공", null));
     }
 }

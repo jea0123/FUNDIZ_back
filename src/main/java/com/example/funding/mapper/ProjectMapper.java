@@ -39,7 +39,11 @@ public interface ProjectMapper {
 
     String getStatus(@Param("projectId") Long projectId);
 
+    int updateProject(Project project);
+
     List<FeaturedProjectDto> searchProjects(@Param("dto") SearchProjectDto dto, @Param("pager") Pager pager);
 
     int countSearchProjects(@Param("dto") SearchProjectDto dto);
+
+    int deleteProject(Long projectId);
 }

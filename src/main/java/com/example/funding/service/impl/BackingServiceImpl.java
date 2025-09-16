@@ -2,9 +2,11 @@ package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.backing.BackingRequestDto;
+import com.example.funding.dto.request.backing.BackingRequestUpdateDto;
 import com.example.funding.dto.response.Backing.BackingResponseDto;
 import com.example.funding.dto.response.Backing.BackingRewardDto;
 import com.example.funding.dto.response.address.AddressResponseDto;
+import com.example.funding.dto.response.user.BackingDto;
 import com.example.funding.mapper.*;
 import com.example.funding.model.*;
 import com.example.funding.service.BackingService;
@@ -77,5 +79,68 @@ public class BackingServiceImpl implements BackingService {
                 .newAddress(requestDto.getNewAddress())
                 .build();
         return ResponseEntity.ok(ResponseDto.success(200, "후원 페이지 추가 성공", "추가!!"));
+    }
+
+    /**
+     * <p>로그인 사용자 후원 리스트</p>
+     * @param userId 사용자 Backing으로 통합
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @since 2025-09-15
+     * @author by: 이윤기
+     */
+    @Override
+    public ResponseEntity<ResponseDto<List<BackingDto>>> getBackingList(Long userId) {
+
+        User user = userMapper.getUserById(userId);
+
+        if(user == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"후원한 프로젝트 목록을 찾을 수 없습니다."));
+        }
+        List<BackingDto> backingList = backingMapper.getBackingListUserId(userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "후원한 프로젝트 리스트 조회 성공",backingList));
+    }
+
+    /**
+     * <p>로그인 사용자 후원 리스트 상세 Backing 통합</p>
+     * @param userId 사용자
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @since 2025-09-05
+     * @author by: 이윤기
+     */
+
+    @Override
+    public ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(Long userId, Long projectId, Long rewardId){
+        User user = userMapper.getUserById(userId);
+        Project project = projectMapper.findById(projectId);
+
+
+        if(user == null || project == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"후원한 해당 프로젝트를 찾을 수 없습니다."));
+        }
+
+        BackingDto backingDetailDto = backingMapper.getBackingProjectAndUserId(userId, projectId, rewardId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "후원한 프로젝트 리스트 상세 조회성공", backingDetailDto));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<String>> updateBacking(BackingRequestUpdateDto updateDto, Long backingId) {
+        updateDto.setBackingId(backingId);
+        updateDto.setUserId(backingId);
+
+        int result = backingMapper.updateBacking(updateDto);
+        if (result == 0) {
+            throw  new IllegalArgumentException("후원 수정 실패");
+        }
+        return ResponseEntity.ok(ResponseDto.success(200, "후원 수정 성공","이런들어떠하리"));
+
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<String>> deleteBacking(Long backingId, Long userId) {
+        int delete =backingMapper.deleteBacking(backingId, userId);
+        
+        return ResponseEntity.ok((ResponseDto.success(200, "후원내용 삭제",null)));
     }
 }

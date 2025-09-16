@@ -220,7 +220,26 @@
     </select>
     
     <insert id="addBacking">
-<!--        <selectKey keyProperty=""-->
+        <selectKey keyProperty="backingId" resultType="long" order="BEFORE">
+            SELECT BACKING_SEQ.NEXTVAL FROM DOAL
+        </selectKey>
+
+        INSERT INTO BACKING(
+            BACKINGID, USERID, AMOUNT, CREATEDAT, BACKINGSTATUS
+        ) VALUES ( #{backingId}, #{userId}, #{amount}, SYSDATE, #{backingStatus}
+        )
     </insert>
+
+    <update id="updateBacking" parameterType="com.example.funding.dto.request.backing.BackingRequestUpdateDto">
+<!--        UPDATE BACKING-->
+<!--        SET ad-->
+
+    </update>
+
+    <delete id="deleteBacking">
+        DELETE FROM BACKING
+        WHERE BACKINGID =#{backingId}
+        AND USERID =#{userId}
+    </delete>
 </mapper>
 

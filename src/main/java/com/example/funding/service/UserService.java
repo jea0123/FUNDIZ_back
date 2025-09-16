@@ -11,10 +11,6 @@ public interface UserService {
 
     ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageUser(Long userId);
 
-    ResponseEntity<ResponseDto<List<BackingDto>>> getBackingList(Long userId);
-
-    ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(Long userId, Long projectId, Long rewardId);
-
     ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(Long userId);
 
     ResponseEntity<ResponseDto<List<MyPageQnADto>>> getQnAList(Long userId);

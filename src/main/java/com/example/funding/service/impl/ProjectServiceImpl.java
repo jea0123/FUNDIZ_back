@@ -3,6 +3,7 @@ package com.example.funding.service.impl;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.common.Utils;
+import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.project.SearchProjectDto;
 import com.example.funding.dto.row.ProjectRow;
 import com.example.funding.dto.ResponseDto;
@@ -168,9 +169,9 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * <p>프로젝트 생성</p>
      *
-     * @param dto       ProjectCreateRequestDto
+     * @param dto ProjectCreateRequestDto
      * @param creatorId 사용자 ID
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @return 성공 시 200 OK
      * @author by: 조은애
      * @since 2025-09-09
      */
@@ -224,6 +225,74 @@ public class ProjectServiceImpl implements ProjectService {
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 생성 성공", null));
     }
 
+    /**
+     * <p>프로젝트 수정</p>
+     *
+     * @param dto ProjectUpdateRequestDto
+     * @param creatorId 사용자 ID
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-16
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> updateProject(ProjectUpdateRequestDto dto, Long creatorId) {
+        if (dto.getProjectId() == null) {
+            throw new IllegalArgumentException("프로젝트 ID가 필요합니다.");
+        }
+
+        //creatorId 권한 확인
+
+        Project project = Project.builder()
+                .projectId(dto.getProjectId())
+                .subctgrId(dto.getSubctgrId())
+                .title(dto.getTitle())
+                .content(dto.getContent())
+                .thumbnail(dto.getThumbnail())
+                .goalAmount(dto.getGoalAmount())
+                .startDate(dto.getStartDate())
+                .endDate(dto.getEndDate())
+                .build();
+
+        int result = projectMapper.updateProject(project);
+        if (result == 0) {
+            throw new IllegalStateException("프로젝트 수정 실패");
+        }
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 수정 성공", null));
+    }
+
+    /**
+     * <p>프로젝트 삭제</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param creatorId 창작자 ID
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-16
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> deleteProject(Long projectId, Long creatorId) {
+        //creatorId 권한 확인
+
+        int result = projectMapper.deleteProject(projectId);
+        if (result == 0) {
+            throw new IllegalStateException("프로젝트 삭제 실패");
+        }
+
+        //연관 데이터 삭제 처리: 리워드, 태그 등
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 삭제 성공", null));
+    }
+
+    /**
+     * <p>검색 기능 (제목, 내용, 창작자명, 태그)</p>
+     *
+     * @param dto SearchProjectDto
+     * @param pager 페이지네이션
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-16
+     */
     @Override
     public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> search(SearchProjectDto dto, Pager pager) {
         int total = projectMapper.countSearchProjects(dto);

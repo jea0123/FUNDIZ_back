@@ -226,6 +226,27 @@
         FROM PROJECT
         WHERE PROJECTID = #{projectId}
     </select>
+    
+    <update id="updateProject">
+        UPDATE PROJECT
+        <set>
+            <if test="subctgrId != null"> SUBCTGRID = #{subctgrId}, </if>
+            <if test="title != null"> TITLE = #{title}, </if>
+            <if test="content != null"> CONTENT = #{content}, </if>
+            <if test="thumbnail != null"> THUMBNAIL = #{thumbnail}, </if>
+            <if test="goalAmount != null"> GOALAMOUNT = #{goalAmount}, </if>
+            <if test="startDate != null"> STARTDATE = #{startDate}, </if>
+            <if test="endDate != null"> ENDDATE = #{endDate}, </if>
+            UPDATEDAT = SYSDATE
+        </set>
+        WHERE PROJECTID = #{projectId}
+          AND PROJECTSTATUS IN ('DRAFT')
+    </update>
+
+    <delete id="deleteProject">
+        DELETE FROM PROJECT
+        WHERE PROJECTID = #{projectId}
+    </delete>
 
     <select id="searchProjects" resultType="featuredProjectDto">
         <bind name="startRow" value="(pager.page - 1) * pager.size + 1"/>

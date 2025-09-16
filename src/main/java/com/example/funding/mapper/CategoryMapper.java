@@ -3,6 +3,7 @@ package com.example.funding.mapper;
 import com.example.funding.model.Category;
 import com.example.funding.model.Subcategory;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -12,5 +13,5 @@ public interface CategoryMapper {
 
     List<Subcategory> getAllSubcategories();
 
-    Subcategory findSubcategoryById(Long subctgrId);
+    Subcategory findSubcategoryById(@Param("subctgrId") Long subctgrId);
 }

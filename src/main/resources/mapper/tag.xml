@@ -13,4 +13,9 @@
         VALUES (TAG_SEQ.NEXTVAL, #{projectId}, #{tagName})
     </insert>
 
+    <delete id="deleteTags">
+        DELETE FROM TAG
+        WHERE PROJECTID = #{projectId}
+    </delete>
+
 </mapper>

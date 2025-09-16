@@ -1,10 +1,13 @@
 package com.example.funding.controller;
 
+import com.example.funding.common.PageResult;
+import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.ProjectCreateRequestDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
+import com.example.funding.dto.response.project.SearchProjectDto;
 import com.example.funding.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -73,6 +76,13 @@ public class ProjectController {
         Long creatorId = 1L;
 
         return projectService.createProject(dto, creatorId);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> search(SearchProjectDto dto, Pager pager) {
+        pager.setDefault();
+
+        return projectService.search(dto, pager);
     }
 
 }

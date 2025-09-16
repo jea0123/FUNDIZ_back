@@ -8,15 +8,15 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class Pager {
-    private Integer page;
-    private Integer size;
-    private Integer perGroup;
+    private int page;
+    private int size;
+    private int perGroup;
     private Integer totalElements;
     private Integer totalPage;
 
     public void setDefault() {
-        this.page = 1;
-        this.size = 10;
-        this.perGroup = 5;
+        if (page < 1) page = 1;
+        if (size < 1) size = 10;
+        if (perGroup < 1) perGroup = 5;
     }
 }

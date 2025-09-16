@@ -98,7 +98,7 @@ public class ProjectController {
     }
 
     /**
-     * <p>프로젝트 삭제</p>
+     * <p>프로젝트 삭제(창작자)</p>
      *
      * @param projectId 프로젝트 ID
      * @return 성공 시 200 OK
@@ -106,12 +106,15 @@ public class ProjectController {
      * @since 2025-09-16
      */
     @DeleteMapping("/{projectId}")
-    public ResponseEntity<ResponseDto<String>> deleteProject(@PathVariable Long projectId) {
+    public ResponseEntity<ResponseDto<String>> deleteByCreator(@PathVariable Long projectId) {
         //userId -> creatorId
         Long creatorId = 1L;
 
-        return projectService.deleteProject(projectId, creatorId);
+        return projectService.deleteByCreator(projectId, creatorId);
     }
+//    프로젝트 취소(관리자)
+//    @PostMapping("/{projectId}/cancel")
+//    public ResponseEntity<ResponseDto<String>> cancelByAdmin(@PathVariable Long projectId, @RequestBody)
 
     /**
      * <p>검색 기능 (제목, 내용, 창작자명, 태그)</p>

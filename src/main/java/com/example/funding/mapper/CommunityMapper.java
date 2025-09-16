@@ -10,7 +10,7 @@ import java.util.List;
 
 @Mapper
 public interface CommunityMapper {
-    int countTotal(Long projectId, String code);
+    int countTotal(@Param("projectId") Long projectId, @Param("code") String code);
 
-    List<Community> getCommunityById(@Param("projectId") Long projectId, @Param("code") String code, Pager pager);
+    List<Community> getCommunityList(@Param("projectId") Long projectId, @Param("code") String code, Pager pager);
 }

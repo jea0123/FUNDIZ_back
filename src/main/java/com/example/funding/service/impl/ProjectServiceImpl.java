@@ -32,11 +32,13 @@ import java.util.Objects;
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectMapper projectMapper;
+    private final CategoryMapper categoryMapper;
     private final TagMapper tagMapper;
     private final RewardMapper rewardMapper;
-    private final NewsMapper newsMapper;
     private final RewardService rewardService;
-    private final CategoryMapper categoryMapper;
+    private final NewsMapper newsMapper;
+    private final CommunityMapper communityMapper;
+    private final ReplyMapper replyMapper;
 
     /**
      * <p>프로젝트 상세 페이지 조회</p>
@@ -196,7 +198,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         Long projectId = dto.getProjectId();
 
-        //태그 생성
+        //태그 저장
         List<String> tagList = dto.getTagList();
         if (tagList != null && !tagList.isEmpty()) {
             //정규화, 중복 제거, 최대 10개 제한
@@ -212,7 +214,7 @@ public class ProjectServiceImpl implements ProjectService {
             for (String tagName : normalized) {
                 int saved = tagMapper.saveTag(projectId, tagName);
                 if (saved == 0) {
-                    throw new IllegalStateException("태그 생성 실패");
+                    throw new IllegalStateException("태그 저장 실패");
                 }
             }
         }
@@ -240,7 +242,7 @@ public class ProjectServiceImpl implements ProjectService {
             throw new IllegalArgumentException("프로젝트 ID가 필요합니다.");
         }
 
-        //creatorId 권한 확인
+        //소유자 확인 추가
 
         Project project = Project.builder()
                 .projectId(dto.getProjectId())
@@ -258,6 +260,17 @@ public class ProjectServiceImpl implements ProjectService {
             throw new IllegalStateException("프로젝트 수정 실패");
         }
 
+        //태그 전체 삭제 후 저장
+        tagMapper.deleteTags(dto.getProjectId());
+        if (dto.getTagList() != null) {
+            for (Tag tag : dto.getTagList()) {
+                int saved = tagMapper.saveTag(dto.getProjectId(), tag.getTagName());
+                if (saved == 0) {
+                    throw new IllegalStateException("태그 저장 실패");
+                }
+            }
+        }
+
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 수정 성공", null));
     }
 
@@ -271,15 +284,22 @@ public class ProjectServiceImpl implements ProjectService {
      * @since 2025-09-16
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> deleteProject(Long projectId, Long creatorId) {
-        //creatorId 권한 확인
+    public ResponseEntity<ResponseDto<String>> deleteByCreator(Long projectId, Long creatorId) {
+        //소유자 확인 추가
+
+        //상태 확인
+        String status = projectMapper.getStatus(projectId);
+        if (!"DRAFT".equalsIgnoreCase(status)) {
+            throw new IllegalStateException("DRAFT 상태에서만 삭제할 수 있습니다.");
+        }
+
+        rewardMapper.deleteRewards(projectId);
+        tagMapper.deleteTags(projectId);
 
         int result = projectMapper.deleteProject(projectId);
         if (result == 0) {
             throw new IllegalStateException("프로젝트 삭제 실패");
         }
-
-        //연관 데이터 삭제 처리: 리워드, 태그 등
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 삭제 성공", null));
     }

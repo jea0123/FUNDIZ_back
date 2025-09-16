@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/categories")
 @RequiredArgsConstructor
 public class CategoryController {
 
@@ -25,7 +25,7 @@ public class CategoryController {
      * @author 장민규
      * @since 2025-09-11
      */
-    @GetMapping("/categories")
+    @GetMapping
     public ResponseEntity<ResponseDto<List<Category>>> getAllCategories() {
         return categoryService.getAllCategories();
     }

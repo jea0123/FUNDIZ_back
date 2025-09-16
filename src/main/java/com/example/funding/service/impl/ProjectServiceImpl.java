@@ -1,6 +1,9 @@
 package com.example.funding.service.impl;
 
+import com.example.funding.common.PageResult;
+import com.example.funding.common.Pager;
 import com.example.funding.common.Utils;
+import com.example.funding.dto.response.project.SearchProjectDto;
 import com.example.funding.dto.row.ProjectRow;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.ProjectCreateRequestDto;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -219,4 +223,20 @@ public class ProjectServiceImpl implements ProjectService {
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 생성 성공", null));
     }
+
+    @Override
+    public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> search(SearchProjectDto dto, Pager pager) {
+        int total = projectMapper.countSearchProjects(dto);
+        pager.setTotalElements(total);
+        pager.setTotalPage((int) Math.ceil((double) total / pager.getSize()));
+
+        List<FeaturedProjectDto> items = Collections.emptyList();
+        if (total > 0) {
+            items = projectMapper.searchProjects(dto, pager);
+        }
+        PageResult<FeaturedProjectDto> result = PageResult.of(items, pager);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "검색 성공", result));
+    }
+
 }

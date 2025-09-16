@@ -78,7 +78,7 @@ public class BackingServiceImpl implements BackingService {
                 .addrId(requestDto.getAddrId())
                 .newAddress(requestDto.getNewAddress())
                 .build();
-        return ResponseEntity.ok(ResponseDto.success(200, "후원 페이지 추가 성공", "추가!!"));
+        return ResponseEntity.ok(ResponseDto.success(200, "후원 페이지 추가 성공", /*"추가!!"*/ backingRequest.toString()));
     }
 
     /**
@@ -125,9 +125,13 @@ public class BackingServiceImpl implements BackingService {
     }
 
     @Override
-    public ResponseEntity<ResponseDto<String>> updateBacking(BackingRequestUpdateDto updateDto, Long backingId) {
+    public ResponseEntity<ResponseDto<String>> updateBacking(BackingRequestUpdateDto updateDto, Long backingId, Long userId) {
         updateDto.setBackingId(backingId);
         updateDto.setUserId(backingId);
+
+        if(updateDto.getNewAddress() ==null && (updateDto.getBackingRewards() == null || updateDto.getBackingRewards().isEmpty())){
+            throw new IllegalArgumentException("수정할 값이 없습니다.");
+        }
 
         int result = backingMapper.updateBacking(updateDto);
         if (result == 0) {

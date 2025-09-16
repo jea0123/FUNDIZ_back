@@ -1,6 +1,10 @@
 package com.example.funding.service.impl;
 
+import com.example.funding.common.PageResult;
+import com.example.funding.common.Pager;
 import com.example.funding.common.Utils;
+import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
+import com.example.funding.dto.response.project.SearchProjectDto;
 import com.example.funding.dto.row.ProjectRow;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.ProjectCreateRequestDto;
@@ -18,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,11 +32,13 @@ import java.util.Objects;
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectMapper projectMapper;
+    private final CategoryMapper categoryMapper;
     private final TagMapper tagMapper;
     private final RewardMapper rewardMapper;
-    private final NewsMapper newsMapper;
     private final RewardService rewardService;
-    private final CategoryMapper categoryMapper;
+    private final NewsMapper newsMapper;
+    private final CommunityMapper communityMapper;
+    private final ReplyMapper replyMapper;
 
     /**
      * <p>프로젝트 상세 페이지 조회</p>
@@ -164,9 +171,9 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * <p>프로젝트 생성</p>
      *
-     * @param dto       ProjectCreateRequestDto
+     * @param dto ProjectCreateRequestDto
      * @param creatorId 사용자 ID
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @return 성공 시 200 OK
      * @author by: 조은애
      * @since 2025-09-09
      */
@@ -191,7 +198,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         Long projectId = dto.getProjectId();
 
-        //태그 생성
+        //태그 저장
         List<String> tagList = dto.getTagList();
         if (tagList != null && !tagList.isEmpty()) {
             //정규화, 중복 제거, 최대 10개 제한
@@ -207,7 +214,7 @@ public class ProjectServiceImpl implements ProjectService {
             for (String tagName : normalized) {
                 int saved = tagMapper.saveTag(projectId, tagName);
                 if (saved == 0) {
-                    throw new IllegalStateException("태그 생성 실패");
+                    throw new IllegalStateException("태그 저장 실패");
                 }
             }
         }
@@ -219,4 +226,106 @@ public class ProjectServiceImpl implements ProjectService {
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 생성 성공", null));
     }
+
+    /**
+     * <p>프로젝트 수정</p>
+     *
+     * @param dto ProjectUpdateRequestDto
+     * @param creatorId 사용자 ID
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-16
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> updateProject(ProjectUpdateRequestDto dto, Long creatorId) {
+        if (dto.getProjectId() == null) {
+            throw new IllegalArgumentException("프로젝트 ID가 필요합니다.");
+        }
+
+        //소유자 확인 추가
+
+        Project project = Project.builder()
+                .projectId(dto.getProjectId())
+                .subctgrId(dto.getSubctgrId())
+                .title(dto.getTitle())
+                .content(dto.getContent())
+                .thumbnail(dto.getThumbnail())
+                .goalAmount(dto.getGoalAmount())
+                .startDate(dto.getStartDate())
+                .endDate(dto.getEndDate())
+                .build();
+
+        int result = projectMapper.updateProject(project);
+        if (result == 0) {
+            throw new IllegalStateException("프로젝트 수정 실패");
+        }
+
+        //태그 전체 삭제 후 저장
+        tagMapper.deleteTags(dto.getProjectId());
+        if (dto.getTagList() != null) {
+            for (Tag tag : dto.getTagList()) {
+                int saved = tagMapper.saveTag(dto.getProjectId(), tag.getTagName());
+                if (saved == 0) {
+                    throw new IllegalStateException("태그 저장 실패");
+                }
+            }
+        }
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 수정 성공", null));
+    }
+
+    /**
+     * <p>프로젝트 삭제</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param creatorId 창작자 ID
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-16
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> deleteByCreator(Long projectId, Long creatorId) {
+        //소유자 확인 추가
+
+        //상태 확인
+        String status = projectMapper.getStatus(projectId);
+        if (!"DRAFT".equalsIgnoreCase(status)) {
+            throw new IllegalStateException("DRAFT 상태에서만 삭제할 수 있습니다.");
+        }
+
+        rewardMapper.deleteRewards(projectId);
+        tagMapper.deleteTags(projectId);
+
+        int result = projectMapper.deleteProject(projectId);
+        if (result == 0) {
+            throw new IllegalStateException("프로젝트 삭제 실패");
+        }
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 삭제 성공", null));
+    }
+
+    /**
+     * <p>검색 기능 (제목, 내용, 창작자명, 태그)</p>
+     *
+     * @param dto SearchProjectDto
+     * @param pager 페이지네이션
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-16
+     */
+    @Override
+    public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> search(SearchProjectDto dto, Pager pager) {
+        int total = projectMapper.countSearchProjects(dto);
+        pager.setTotalElements(total);
+        pager.setTotalPage((int) Math.ceil((double) total / pager.getSize()));
+
+        List<FeaturedProjectDto> items = Collections.emptyList();
+        if (total > 0) {
+            items = projectMapper.searchProjects(dto, pager);
+        }
+        PageResult<FeaturedProjectDto> result = PageResult.of(items, pager);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "검색 성공", result));
+    }
+
 }

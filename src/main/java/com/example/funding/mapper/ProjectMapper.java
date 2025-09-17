@@ -46,4 +46,10 @@ public interface ProjectMapper {
     int countSearchProjects(@Param("dto") SearchProjectDto dto);
 
     int deleteProject(@Param("projectId") Long projectId);
+
+    int updateProjectsToOpen();
+
+    int updateProjectsToSuccess();
+
+    int updateProjectsToFailed();
 }

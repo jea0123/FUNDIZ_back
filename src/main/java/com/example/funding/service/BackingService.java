@@ -18,7 +18,7 @@ public interface BackingService {
 
     ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(Long userId, Long projectId, Long rewardId);
 
-    ResponseEntity<ResponseDto<String>> updateBacking(BackingRequestUpdateDto requestDto, Long backingId);
+    ResponseEntity<ResponseDto<String>> updateBacking(BackingRequestUpdateDto requestDto, Long backingId, Long userId);
 
     ResponseEntity<ResponseDto<String>> deleteBacking(Long backingId, Long userId);
 }

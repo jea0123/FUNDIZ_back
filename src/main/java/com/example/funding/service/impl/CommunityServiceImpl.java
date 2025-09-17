@@ -35,7 +35,7 @@ public class CommunityServiceImpl implements CommunityService {
         pager.setTotalElements(total);
         pager.setDefault();
 
-        List<Community> communityList = communityMapper.getCommunityById(projectId, code, pager);
+        List<Community> communityList = communityMapper.getCommunityList(projectId, code, pager);
 
         if (communityList == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "커뮤니티&후기를 찾을 수 없습니다."));

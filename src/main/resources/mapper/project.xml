@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.funding.mapper.ProjectMapper">
+
     <update id="updateViewCnt">
         UPDATE PROJECT
         SET VIEWCNT = VIEWCNT + 1
@@ -71,6 +72,7 @@
               pr.THUMBNAIL AS thumbnail,
               pr.ENDDATE AS endDate,
               /* 진행률(%) */
+
               CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
                    THEN ROUND(NVL(pr.CURRAMOUNT,0) / NULLIF(pr.GOALAMOUNT,0) * 100)
                    ELSE 0
@@ -223,6 +225,136 @@
         SELECT PROJECTSTATUS
         FROM PROJECT
         WHERE PROJECTID = #{projectId}
+    </select>
+    
+    <update id="updateProject">
+        UPDATE PROJECT
+        <set>
+            <if test="subctgrId != null"> SUBCTGRID = #{subctgrId}, </if>
+            <if test="title != null"> TITLE = #{title}, </if>
+            <if test="content != null"> CONTENT = #{content}, </if>
+            <if test="thumbnail != null"> THUMBNAIL = #{thumbnail}, </if>
+            <if test="goalAmount != null"> GOALAMOUNT = #{goalAmount}, </if>
+            <if test="startDate != null"> STARTDATE = #{startDate}, </if>
+            <if test="endDate != null"> ENDDATE = #{endDate}, </if>
+            UPDATEDAT = SYSDATE
+        </set>
+        WHERE PROJECTID = #{projectId}
+          AND PROJECTSTATUS IN ('DRAFT')
+    </update>
+
+    <delete id="deleteProject">
+        DELETE FROM PROJECT
+        WHERE PROJECTID = #{projectId}
+    </delete>
+
+    <select id="searchProjects" resultType="featuredProjectDto">
+        <bind name="startRow" value="(pager.page - 1) * pager.size + 1"/>
+        <bind name="endRow" value="pager.page * pager.size"/>
+
+        SELECT *
+        FROM (
+            SELECT T.*, ROWNUM rnum
+            FROM (
+                SELECT
+                    p.PROJECTID AS projectId,
+                    p.TITLE AS title,
+                    NVL2(TRIM(c.CREATORNAME), c.CREATORNAME, 'Unknown Creator') AS creatorName,
+                    p.THUMBNAIL AS thumbnail,
+                    p.ENDDATE AS endDate,
+                    p.CURRAMOUNT AS currAmount,
+
+                    /* 진행률(%) */
+                    CASE WHEN NVL(p.GOALAMOUNT,0) > 0
+                         THEN ROUND(NVL(p.CURRAMOUNT,0) / NULLIF(p.GOALAMOUNT,0) * 100)
+                         ELSE 0
+                    END AS percentNow,
+
+                    NVL(p.GOALAMOUNT,0) AS goalAmount
+                FROM PROJECT p
+                JOIN CREATOR c ON c.CREATORID = p.CREATORID
+                JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
+                JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
+                <where>
+                    <if test="dto.keyword != null and dto.keyword != ''">
+                        (
+                        LOWER(p.TITLE) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                        OR LOWER(p.CONTENT) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                        OR LOWER(c.CREATORNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                        OR EXISTS (
+                            SELECT 1 FROM TAG t
+                            WHERE t.PROJECTID = p.PROJECTID
+                              AND LOWER(t.TAGNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                            )
+                        )
+                    </if>
+                    <if test="dto.ctgrId != null">
+                        AND cg.CTGRID = #{dto.ctgrId}
+                    </if>
+                    <if test="dto.subctgrId != null">
+                        AND sc.SUBCTGRID = #{dto.subctgrId}
+                    </if>
+                    <if test="dto.activeOnly != null and dto.activeOnly">
+                        AND p.ENDDATE &gt;= SYSDATE
+                    </if>
+                </where>
+
+                <choose>
+                    <when test="dto.sort == 'liked'">
+                        ORDER BY p.LIKECNT DESC, P.PROJECTID DESC
+                    </when>
+                    <when test="dto.sort == 'recent'">
+                        ORDER BY p.PROJECTID DESC
+                    </when>
+                    <when test="dto.sort == 'amount'">
+                        ORDER BY p.CURRAMOUNT DESC, P.PROJECTID DESC
+                    </when>
+                    <when test="dto.sort == 'deadline'">
+                        ORDER BY p.ENDDATE ASC, P.PROJECTID DESC
+                    </when>
+                    <when test="dto.sort == 'percent'">
+                        ORDER BY percentNow DESC, P.PROJECTID DESC
+                    </when>
+                    <otherwise>
+                        ORDER BY p.VIEWCNT DESC, p.PROJECTID DESC
+                    </otherwise>
+                </choose>
+                ) T
+            WHERE ROWNUM &lt;= #{endRow}
+            )
+        WHERE rnum &gt;= #{startRow}
+
+    </select>
+
+    <select id="countSearchProjects" resultType="int">
+        SELECT COUNT(*)
+        FROM PROJECT p
+        JOIN CREATOR c ON c.CREATORID = p.CREATORID
+        JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
+        JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
+        <where>
+            <if test="dto.keyword != null and dto.keyword != ''">
+                (
+                LOWER(p.TITLE) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                OR LOWER(p.CONTENT) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                OR LOWER(c.CREATORNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                OR EXISTS (
+                    SELECT 1 FROM TAG t
+                    WHERE t.PROJECTID = p.PROJECTID
+                    AND LOWER(t.TAGNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                    )
+                )
+            </if>
+            <if test="dto.ctgrId != null">
+                AND cg.CTGRID = #{dto.ctgrId}
+            </if>
+            <if test="dto.subctgrId != null">
+                AND sc.SUBCTGRID = #{dto.subctgrId}
+            </if>
+            <if test="dto.activeOnly != null and dto.activeOnly">
+                AND p.ENDDATE &gt;= SYSDATE
+            </if>
+        </where>
     </select>
 
 </mapper>

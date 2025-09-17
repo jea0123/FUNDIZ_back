@@ -24,7 +24,7 @@ import java.util.List;
 public class BackingController {
     private final BackingService backingService;
 
-    @GetMapping("/CreateBacking/{userId}/{projectId}")
+    @GetMapping("/{userId}/CreateBacking/{projectId}")
     public ResponseEntity<ResponseDto<BackingResponseDto>>prepareBacking(@PathVariable Long projectId,
                                                                          @PathVariable Long userId) {
         return backingService.prepareBacking(userId, projectId);
@@ -36,22 +36,18 @@ public class BackingController {
         return backingService.createBacking(userId, requestDto);
     }
 
-    @PostMapping("/Backing/{backingId}/update{userId}")
+    @PostMapping("/{backingId}/update/{userId}")
     public ResponseEntity<ResponseDto<String>>UpdateBacking(@RequestBody BackingRequestUpdateDto requestDto,
                                                             @PathVariable Long backingId,
                                                             @PathVariable Long userId) {
-        return backingService.updateBacking(requestDto, backingId);
+        return backingService.updateBacking(requestDto, backingId, userId);
     }
 
-    @PostMapping("/Backing/{backingId}/delete{userId}")
+    @PostMapping("/{backingId}/delete/{userId}")
     public ResponseEntity<ResponseDto<String>>DeleteBacking(@PathVariable Long backingId,
                                                             @PathVariable Long userId) {
         return backingService.deleteBacking(backingId, userId);
     }
-
-
-
-
 
     @GetMapping("/me/backingPage/{userId}")
     public ResponseEntity<ResponseDto<List<BackingDto>>>getBackingList(@PathVariable Long userId) {

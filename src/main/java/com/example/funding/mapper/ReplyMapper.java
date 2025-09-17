@@ -8,5 +8,5 @@ import java.util.List;
 
 @Mapper
 public interface ReplyMapper {
-  List<Reply> getReplyListById(@Param("cmId") Long cmId, @Param("code") String code);
+    List<Reply> getReplyListById(@Param("cmId") Long cmId, @Param("code") String code);
 }

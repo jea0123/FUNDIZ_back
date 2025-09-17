@@ -18,4 +18,6 @@ public interface RewardMapper {
     int updateReward(RewardUpdateRequestDto dto);
 
     int deleteReward(@Param("projectId") Long projectId, @Param("rewardId") Long rewardId);
+
+    void deleteRewards(@Param("projectId") Long projectId);
 }

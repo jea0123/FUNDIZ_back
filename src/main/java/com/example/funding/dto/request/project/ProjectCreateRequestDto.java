@@ -10,7 +10,6 @@ import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
 public class ProjectCreateRequestDto {
     private Long projectId;
     private Long subctgrId;

@@ -231,9 +231,23 @@
     </insert>
 
     <update id="updateBacking" parameterType="com.example.funding.dto.request.backing.BackingRequestUpdateDto">
-<!--        UPDATE BACKING-->
-<!--        SET ad-->
-
+        UPDATE backing
+        <set>
+            <if test="newAddress!=null">
+                addrId = (
+                    SELECT addrId
+                    FROM address
+                    WHERE roadAddr =#{newAddress.roadAddr}
+                    AND detailAddr =#{newAddress.detailAddr}
+                FETCH FIRST 1 ROWS ONLY
+                )
+            </if>
+            <if test="newAddress ==null">
+                addrId = addrId
+            </if>
+        </set>
+        WHERE backingId = #{backingId}
+        AND userId = #{userId}
     </update>
 
     <delete id="deleteBacking">

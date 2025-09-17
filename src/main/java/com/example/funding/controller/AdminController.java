@@ -2,6 +2,7 @@ package com.example.funding.controller;
 
 import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
@@ -9,10 +10,7 @@ import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
 import com.example.funding.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.ZoneId;
 import java.util.List;
@@ -87,5 +85,40 @@ public class AdminController {
                                                                                 @RequestParam(defaultValue = "5") int limit) {
         Utils.AnalyticsWindow w = resolveWindow(period, metric, KST);
         return adminService.getRewardSalesTops(w.getFrom(), w.getTo(), limit, metric);
+    }
+
+    /**
+     * <p>프로젝트 취소</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-17
+     */
+    @PostMapping("/project/{projectId}/cancel")
+    public ResponseEntity<ResponseDto<String>> cancelProject(@PathVariable Long projectId) {
+        //관리자 체크
+        Long adId = 1L;
+
+        return adminService.cancelProject(projectId, adId);
+    }
+
+    /**
+     * <p>프로젝트 수정</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param dto ProjectUpdateRequestDto
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-17
+     */
+    @PostMapping("/project/{projectId}")
+    public ResponseEntity<ResponseDto<String>> updateProject(@PathVariable Long projectId, @RequestBody ProjectUpdateRequestDto dto) {
+        //관리자 체크
+        Long adId = 1L;
+
+        dto.setProjectId(projectId);
+
+        return adminService.updateProject(dto);
     }
 }

@@ -22,4 +22,6 @@ public interface AdminMapper {
                                           @Param("to") LocalDate to);
 
     List<CategorySuccess> getCategorySuccessByCategory(@Param("ctgrId") Long ctgrId);
+
+    int cancelProject(@Param("projectId") Long projectId);
 }

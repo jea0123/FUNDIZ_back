@@ -1,9 +1,14 @@
 package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.analytic.*;
 import com.example.funding.mapper.AdminMapper;
+import com.example.funding.mapper.ProjectMapper;
+import com.example.funding.mapper.TagMapper;
+import com.example.funding.model.Project;
+import com.example.funding.model.Tag;
 import com.example.funding.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -23,6 +27,8 @@ import java.util.List;
 public class AdminServiceImpl implements AdminService {
 
     private final AdminMapper adminMapper;
+    private final ProjectMapper projectMapper;
+    private final TagMapper tagMapper;
 
     /**
      * 관리자 대시보드 분석 데이터 조회
@@ -110,5 +116,75 @@ public class AdminServiceImpl implements AdminService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "해당 기간에 대한 리워드 판매 데이터가 없습니다."));
         }
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "리워드 판매 상위 조회 성공", rewardSalesTops));
+    }
+
+    /**
+     * <p>프로젝트 취소</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param adId 관리자번호
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-17
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> cancelProject(Long projectId, Long adId) {
+        int result = adminMapper.cancelProject(projectId);
+        if (result == 0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "이미 취소되었거나 존재하지 않는 프로젝트입니다."));
+        }
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 취소 성공", null));
+    }
+
+    /**
+     * <p>프로젝트 수정</p>
+     *
+     * @param dto ProjectUpdateRequestDto
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-17
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> updateProject(ProjectUpdateRequestDto dto) {
+        if (dto.getProjectId() == null) {
+            throw new IllegalArgumentException("프로젝트 ID가 필요합니다.");
+        }
+
+        Project existing = projectMapper.findById(dto.getProjectId());
+        if (existing == null) {
+            throw new IllegalStateException("존재하지 않는 프로젝트입니다.");
+        }
+
+        //목표금액, 종료일 무결성 체크
+
+        Project project = Project.builder()
+                .projectId(existing.getProjectId())
+                .subctgrId(dto.getSubctgrId())
+                .title(dto.getTitle())
+                .content(dto.getContent())
+                .thumbnail(dto.getThumbnail())
+                .goalAmount(dto.getGoalAmount())
+                .startDate(dto.getStartDate())
+                .endDate(dto.getEndDate())
+                .build();
+
+        int result = projectMapper.updateProject(project);
+        if (result == 0) {
+            throw new IllegalStateException("프로젝트 수정 실패");
+        }
+
+        //태그 전체 삭제 후 저장
+        tagMapper.deleteTags(dto.getProjectId());
+        if (dto.getTagList() != null) {
+            for (Tag tag : dto.getTagList()) {
+                int saved = tagMapper.saveTag(dto.getProjectId(), tag.getTagName());
+                if (saved == 0) {
+                    throw new IllegalStateException("태그 저장 실패");
+                }
+            }
+        }
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 수정 성공", null));
     }
 }

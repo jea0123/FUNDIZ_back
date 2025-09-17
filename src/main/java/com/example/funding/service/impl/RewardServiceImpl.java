@@ -63,7 +63,7 @@ public class RewardServiceImpl implements RewardService {
     @Override
     public ResponseEntity<ResponseDto<String>> addReward(Long projectId, RewardCreateRequestDto dto) {
         Reward reward = Reward.builder()
-                    .projectId(projectId)
+                .projectId(projectId)
                 .rewardName(dto.getRewardName())
                 .price(dto.getPrice())
                 .rewardContent(dto.getRewardContent())
@@ -95,24 +95,25 @@ public class RewardServiceImpl implements RewardService {
     public ResponseEntity<ResponseDto<String>> updateReward(Long projectId, Long rewardId, RewardUpdateRequestDto dto) {
         dto.setProjectId(projectId);
         dto.setRewardId(rewardId);
+
         //프로젝트 상태 조회
         String status = projectMapper.getStatus(projectId);
-        //심사 요청 이전에만 리워드 수정 가능
-        if ("DRAFT".equals(status)) {
-            //무제한 처리
-            Integer reqCnt = dto.getRewardCnt();
-            int newCnt = (reqCnt == null) ? Integer.MAX_VALUE : reqCnt;
-            dto.setRewardCnt(newCnt);
-            dto.setRemain(newCnt);
-
-            //리워드 수정 처리
-            int result = rewardMapper.updateReward(dto);
-            if (result == 0) {
-                throw new IllegalStateException("리워드 수정 실패");
-            }
-            return ResponseEntity.ok(ResponseDto.success(200, "리워드 수정 성공", null));
+        if (!"DRAFT".equals(status)) {
+            throw new IllegalStateException("현재 상태에서는 리워드를 수정할 수 없습니다.");
         }
-        throw new IllegalStateException("심사 요청 이후에는 리워드를 수정할 수 없습니다.");
+
+        //무제한 처리
+        Integer reqCnt = dto.getRewardCnt();
+        int newCnt = (reqCnt == null) ? Integer.MAX_VALUE : reqCnt;
+        dto.setRewardCnt(newCnt);
+        dto.setRemain(newCnt);
+
+        //리워드 수정 처리
+        int result = rewardMapper.updateReward(dto);
+        if (result == 0) {
+            throw new IllegalStateException("리워드 수정 실패");
+        }
+        return ResponseEntity.ok(ResponseDto.success(200, "리워드 수정 성공", null));
     }
 
     /**
@@ -128,7 +129,6 @@ public class RewardServiceImpl implements RewardService {
     public ResponseEntity<ResponseDto<String>> deleteReward(Long projectId, Long rewardId) {
         //프로젝트 상태 조회
         String status = projectMapper.getStatus(projectId);
-        //심사 요청 이전에만 리워드 삭제 가능
         if (!"DRAFT".equals(status)) {
             throw new IllegalStateException("현재 상태에서는 리워드를 삭제할 수 없습니다.");
         }

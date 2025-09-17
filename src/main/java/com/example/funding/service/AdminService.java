@@ -1,6 +1,7 @@
 package com.example.funding.service;
 
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
@@ -18,4 +19,8 @@ public interface AdminService {
     ResponseEntity<ResponseDto<Kpi>> getKpi(int month);
 
     ResponseEntity<ResponseDto<List<RewardSalesTop>>> getRewardSalesTops(LocalDate from, LocalDate to, int limit, String metric);
+
+    ResponseEntity<ResponseDto<String>> cancelProject(Long projectId, Long adId);
+
+    ResponseEntity<ResponseDto<String>> updateProject(ProjectUpdateRequestDto dto);
 }

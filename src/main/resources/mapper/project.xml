@@ -295,7 +295,7 @@
                         AND sc.SUBCTGRID = #{dto.subctgrId}
                     </if>
                     <if test="dto.activeOnly != null and dto.activeOnly">
-                        AND p.ENDDATE &gt;= SYSDATE
+                        <![CDATA[ AND p.ENDDATE >= SYSDATE ]]>
                     </if>
                 </where>
 
@@ -320,10 +320,9 @@
                     </otherwise>
                 </choose>
                 ) T
-            WHERE ROWNUM &lt;= #{endRow}
+            <![CDATA[ WHERE ROWNUM <= #{endRow}
             )
-        WHERE rnum &gt;= #{startRow}
-
+        WHERE rnum >= #{startRow} ]]>
     </select>
 
     <select id="countSearchProjects" resultType="int">
@@ -352,9 +351,35 @@
                 AND sc.SUBCTGRID = #{dto.subctgrId}
             </if>
             <if test="dto.activeOnly != null and dto.activeOnly">
-                AND p.ENDDATE &gt;= SYSDATE
+                <![CDATA[ AND p.ENDDATE >= SYSDATE ]]>
             </if>
         </where>
     </select>
 
+    <update id="updateProjectsToOpen">
+        UPDATE PROJECT
+        SET PROJECTSTATUS = 'OPEN',
+            UPDATEDAT = SYSDATE
+        WHERE PROJECTSTATUS = 'UPCOMING'
+          AND STARTDATE <![CDATA[ <= ]]> TRUNC(SYSDATE)
+          AND ENDDATE <![CDATA[ >= ]]> TRUNC(SYSDATE)
+    </update>
+
+    <update id="updateProjectsToSuccess">
+        UPDATE PROJECT
+        SET PROJECTSTATUS = 'SUCCESS',
+        UPDATEDAT = SYSDATE
+        WHERE PROJECTSTATUS = 'OPEN'
+          AND ENDDATE <![CDATA[ < ]]> TRUNC(SYSDATE)
+          AND CURRAMOUNT <![CDATA[ >= ]]> GOALAMOUNT
+    </update>
+
+    <update id="updateProjectsToFailed">
+        UPDATE PROJECT
+        SET PROJECTSTATUS = 'FAILED',
+        UPDATEDAT = SYSDATE
+        WHERE PROJECTSTATUS = 'OPEN'
+          AND ENDDATE <![CDATA[ < ]]> TRUNC(SYSDATE)
+          AND CURRAMOUNT <![CDATA[ < ]]> GOALAMOUNT
+    </update>
 </mapper>

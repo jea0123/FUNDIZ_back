@@ -37,8 +37,6 @@ public class ProjectServiceImpl implements ProjectService {
     private final RewardMapper rewardMapper;
     private final RewardService rewardService;
     private final NewsMapper newsMapper;
-    private final CommunityMapper communityMapper;
-    private final ReplyMapper replyMapper;
 
     /**
      * <p>프로젝트 상세 페이지 조회</p>
@@ -57,7 +55,7 @@ public class ProjectServiceImpl implements ProjectService {
         //프로젝트 단건 조회
         ProjectRow row = projectMapper.getProjectRow(projectId);
         if (row == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트를 찾을 수 없습니다."));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "존재하지 않는 프로젝트입니다."));
         }
 
         //컬렉션 조회
@@ -188,6 +186,7 @@ public class ProjectServiceImpl implements ProjectService {
             throw new IllegalArgumentException("존재하지 않는 서브카테고리 입니다.");
         }
 
+        //소유자 체크
         dto.setCreatorId(creatorId);
 
         //프로젝트 생성
@@ -242,7 +241,13 @@ public class ProjectServiceImpl implements ProjectService {
             throw new IllegalArgumentException("프로젝트 ID가 필요합니다.");
         }
 
-        //소유자 확인 추가
+        //소유자 체크
+
+        //프로젝트 상태 조회
+        String status = projectMapper.getStatus(dto.getProjectId());
+        if (!"DRAFT".equals(status)) {
+            throw new IllegalStateException("DRAFT 상태에서만 프로젝트를 수정할 수 있습니다.");
+        }
 
         Project project = Project.builder()
                 .projectId(dto.getProjectId())
@@ -285,12 +290,13 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> deleteByCreator(Long projectId, Long creatorId) {
-        //소유자 확인 추가
 
-        //상태 확인
+        //소유자 체크
+
+        //프로젝트 상태 조회
         String status = projectMapper.getStatus(projectId);
         if (!"DRAFT".equalsIgnoreCase(status)) {
-            throw new IllegalStateException("DRAFT 상태에서만 삭제할 수 있습니다.");
+            throw new IllegalStateException("DRAFT 상태에서만 프로젝트를 삭제할 수 있습니다.");
         }
 
         rewardMapper.deleteRewards(projectId);

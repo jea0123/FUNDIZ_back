@@ -13,12 +13,14 @@
             r.REWARDCNT,
             r.CREATEDAT,
             r.ISPOSTING,
-            (r.REMAIN - NVL(s.qty, 0)) AS REMAIN
+            CASE
+                WHEN r.REWARDCNT IS NULL THEN NULL
+                ELSE GREATEST(r.REWARDCNT - NVL(s.qty, 0), 0)
+            END AS REMAIN
         FROM reward r
         LEFT JOIN (
             SELECT
-                d.REWARDID,
-                SUM(d.QUANTITY) AS qty
+                d.REWARDID, SUM(d.QUANTITY) AS qty
             FROM BACKINGDETAIL d
             JOIN BACKING b ON b.BACKINGID = d.BACKINGID
               AND b.BACKINGSTATUS = 'COMPLETED'
@@ -26,6 +28,11 @@
         ) s ON s.REWARDID = r.REWARDID
         WHERE r.PROJECTID = #{projectId}
         ORDER BY r.PRICE
+    </select>
+
+    <select id="findByProjectId" resultType="reward">
+        SELECT * FROM REWARD
+        WHERE PROJECTID = #{projectId}
     </select>
 
     <select id="findProjectIdsByRewardIds" resultType="reward">

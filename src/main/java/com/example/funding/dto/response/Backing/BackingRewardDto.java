@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -16,5 +17,5 @@ public class BackingRewardDto {
     private String rewardName;
     private Long price;
     private Long quantity;
-    private Date deliveryDate;
+    private LocalDate deliveryDate;
 }

@@ -1,5 +1,6 @@
 package com.example.funding.controller;
 
+import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.response.project.CommunityDto;
@@ -23,28 +24,28 @@ public class CommunityController {
     private final CommunityService communityService;
 
     /**
-     * <p>프로젝트 상세 페이지 내 커뮤니티 목록 조회/p>
+     * <p>프로젝트 상세 페이지 내 커뮤니티 목록 조회</p>
      * @param projectId 프로젝트 ID
-     * @param pager 페이징 정보
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @param reqPager 요청 pager
+     * @return 성공 시 200 OK
      * @author by: 조은애
-     * @since 2025-09-02
+     * @since 2025-09-03
      */
     @GetMapping("/community")
-    public ResponseEntity<ResponseDto<List<CommunityDto>>> getCommunity(@PathVariable("projectId") Long projectId, Pager pager) {
-        return communityService.getCommunity(projectId, "CM", pager);
+    public ResponseEntity<ResponseDto<PageResult<CommunityDto>>> getCommunity(@PathVariable("projectId") Long projectId, Pager reqPager) {
+        return communityService.getCommunity(projectId, "CM", reqPager);
     }
 
     /**
-     * <p>프로젝트 상세 페이지 내 후기 목록 조회/p>
+     * <p>프로젝트 상세 페이지 내 후기 목록 조회</p>
      * @param projectId 프로젝트 ID
-     * @param pager 페이징 정보
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @param reqPager 요청 pager
+     * @return 성공 시 200 OK
      * @author by: 조은애
-     * @since 2025-09-02
+     * @since 2025-09-03
      */
     @GetMapping("/review")
-    public ResponseEntity<ResponseDto<List<CommunityDto>>> getReview(@PathVariable("projectId") Long projectId, Pager pager) {
-        return communityService.getCommunity(projectId, "RV", pager);
+    public ResponseEntity<ResponseDto<PageResult<CommunityDto>>> getReview(@PathVariable("projectId") Long projectId, Pager reqPager) {
+        return communityService.getCommunity(projectId, "RV", reqPager);
     }
 }

@@ -23,7 +23,7 @@ public interface ProjectService {
 
     ResponseEntity<ResponseDto<String>> createProject(ProjectCreateRequestDto dto, Long creatorId);
 
-    ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> search(SearchProjectDto dto, Pager pager);
+    ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> search(SearchProjectDto dto, Pager reqPager);
 
     ResponseEntity<ResponseDto<String>> updateProject(ProjectUpdateRequestDto dto, Long creatorId);
 

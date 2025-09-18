@@ -136,9 +136,61 @@
     <update id="cancelProject">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'CANCELED',
-        UPDATEDAT = SYSDATE
+            UPDATEDAT = SYSDATE
         WHERE PROJECTID = #{projectId}
-        <![CDATA[  AND PROJECTSTATUS <> 'CANCELED' ]]>
+          AND PROJECTSTATUS <![CDATA[ <> ]]> 'CANCELED'
     </update>
+    
+    <sql id="reviewFilterWhere">
+        <where>
+            p.PROJECTSTATUS = 'UNDER_REVIEW'
+            AND p.ISREQREVIEW = 'Y'
+            <if test="dto.fromDate != null">
+                AND p.REQUESTEDAT <![CDATA[ >= ]]> #{dto.fromDate}
+            </if>
+            <if test="dto.toDate != null">
+                AND p.REQUESTEDAT <![CDATA[ < ]]> #{dto.toDateEndExclusive}
+            </if>
+        </where>
+    </sql>
+    
+    <select id="countReviews" resultType="Integer">
+        SELECT COUNT(*)
+        FROM PROJECT p
+        JOIN CREATOR c ON c.CREATORID = p.CREATORID
+        JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
+        JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
+        <include refid="reviewFilterWhere" />
+    </select>
+
+    <select id="getReviewList" resultType="reviewListRow">
+        SELECT *
+        FROM (
+            SELECT T.*, ROWNUM rnum
+            FROM (
+                SELECT
+                    p.PROJECTID AS projectId,
+                    p.TITLE AS title,
+                    c.CREATORNAME AS creatorName,
+                    cg.CTGRID AS ctgrId,
+                    cg.CTGRNAME AS ctgrName,
+                    sc.SUBCTGRID AS subctgrId,
+                    sc.SUBCTGRNAME AS subctgrName,
+                    p.GOALAMOUNT AS goalAmount,
+                    p.STARTDATE AS startDate,
+                    p.ENDDATE AS endDate,
+                    p.PROJECTSTATUS AS projectStatus,
+                    p.REQUESTEDAT AS requestedAt
+                FROM PROJECT p
+                JOIN CREATOR c ON c.CREATORID = p.CREATORID
+                JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
+                JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
+                <include refid="reviewFilterWhere" />
+                ORDER BY p.REQUESTEDAT DESC
+                ) T
+            WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
+            )
+        WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
+    </select>
 
 </mapper>

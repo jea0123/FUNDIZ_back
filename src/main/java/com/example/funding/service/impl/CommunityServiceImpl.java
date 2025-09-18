@@ -1,5 +1,6 @@
 package com.example.funding.service.impl;
 
+import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.response.project.CommunityDto;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -28,21 +30,33 @@ public class CommunityServiceImpl implements CommunityService {
     private final UserMapper userMapper;
     private final ReplyMapper replyMapper;
 
+    /**
+     * <p>프로젝트 상세 페이지 내 커뮤니티&후기 목록 조회</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param code CM 또는 RV
+     * @param reqPager 요청 pager
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-03
+     */
     @Override
-    public ResponseEntity<ResponseDto<List<CommunityDto>>> getCommunity(Long projectId, String code, Pager pager) {
-        //페이지네이션
+    public ResponseEntity<ResponseDto<PageResult<CommunityDto>>> getCommunity(Long projectId, String code, Pager reqPager) {
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 10,
+                reqPager != null ? reqPager.getPerGroup() : 5
+        );
+
         int total = communityMapper.countTotal(projectId, code);
-        pager.setTotalElements(total);
-        pager.setDefault();
 
-        List<Community> communityList = communityMapper.getCommunityList(projectId, code, pager);
-
-        if (communityList == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "커뮤니티&후기를 찾을 수 없습니다."));
+        List<Community> items = Collections.emptyList();
+        if (total > 0) {
+            items = communityMapper.getCommunityList(projectId, code, pager);
         }
 
         //Community에 Reply도 가져와서 CommunityDto로 매핑
-        List<CommunityDto> communityDtoList = communityList.stream()
+        List<CommunityDto> list = items.stream()
                 .map(cm -> {
                     User user = userMapper.getUserById(cm.getUserId());
                     List<Reply> replyList = replyMapper.getReplyListById(cm.getCmId(), code.trim());
@@ -59,7 +73,8 @@ public class CommunityServiceImpl implements CommunityService {
                             .build();
                 })
                 .toList();
+        PageResult<CommunityDto> result = PageResult.of(list, pager, total);
 
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "커뮤니티&후기 조회 성공", communityDtoList));
+        return ResponseEntity.ok(ResponseDto.success(200, "커뮤니티&후기 조회 성공", result));
     }
 }

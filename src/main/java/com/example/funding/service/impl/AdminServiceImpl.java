@@ -1,9 +1,13 @@
 package com.example.funding.service.impl;
 
+import com.example.funding.common.PageResult;
+import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
+import com.example.funding.dto.response.admin.SearchReviewDto;
 import com.example.funding.dto.response.admin.analytic.*;
+import com.example.funding.dto.row.ReviewListRow;
 import com.example.funding.mapper.AdminMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.TagMapper;
@@ -18,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -186,5 +191,30 @@ public class AdminServiceImpl implements AdminService {
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 수정 성공", null));
+    }
+
+    /**
+     * <p>프로젝트 심사 목록 조회</p>
+     *
+     * @param dto SearchReviewDto
+     * @param reqPager 요청 pager
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-18
+     */
+    @Override
+    public ResponseEntity<ResponseDto<PageResult<ReviewListRow>>> getReviewList(SearchReviewDto dto, Pager reqPager) {
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 20,
+                reqPager != null ? reqPager.getPerGroup() : 5
+        );
+
+        int total = adminMapper.countReviews(dto);
+
+        List<ReviewListRow> items = (total == 0) ? Collections.emptyList() : adminMapper.getReviewList(dto, pager);
+        PageResult<ReviewListRow> result = PageResult.of(items, pager, total);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 심사 조회 성공", result));
     }
 }

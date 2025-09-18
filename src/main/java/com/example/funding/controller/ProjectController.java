@@ -133,16 +133,14 @@ public class ProjectController {
      * <p>검색 기능 (제목, 내용, 창작자명, 태그)</p>
      *
      * @param dto SearchProjectDto
-     * @param pager 페이지네이션
+     * @param reqPager 요청 pager
      * @return 성공 시 200 OK
      * @author by: 조은애
      * @since 2025-09-16
      */
     @GetMapping("/search")
-    public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> search(SearchProjectDto dto, Pager pager) {
-        pager.setDefault();
-
-        return projectService.search(dto, pager);
+    public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> search(SearchProjectDto dto, Pager reqPager) {
+        return projectService.search(dto, reqPager);
     }
 
 }

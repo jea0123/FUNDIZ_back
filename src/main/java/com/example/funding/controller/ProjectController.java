@@ -114,6 +114,22 @@ public class ProjectController {
     }
 
     /**
+     * <p>프로젝트 심사 요청</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-18
+     */
+    @PostMapping("{projectId}/review-request")
+    public ResponseEntity<ResponseDto<String>> requestReview(@PathVariable Long projectId){
+        //userId -> creatorId
+        Long creatorId = 1L;
+
+        return projectService.requestReview(projectId, creatorId);
+    }
+
+    /**
      * <p>검색 기능 (제목, 내용, 창작자명, 태그)</p>
      *
      * @param dto SearchProjectDto

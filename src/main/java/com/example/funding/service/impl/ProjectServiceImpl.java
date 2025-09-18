@@ -15,6 +15,7 @@ import com.example.funding.mapper.*;
 import com.example.funding.model.*;
 import com.example.funding.service.ProjectService;
 import com.example.funding.service.RewardService;
+import com.example.funding.service.validator.ReviewRequestValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -69,7 +70,7 @@ public class ProjectServiceImpl implements ProjectService {
         LocalDate paymentDate = row.getEndDate().plusDays(1);
 
         //응답Dto 조립
-        ProjectDetailDto dto = ProjectDetailDto.builder()
+        ProjectDetailDto detail = ProjectDetailDto.builder()
             .projectId(row.getProjectId())
             .creatorId(row.getCreatorId())
             .subctgrId(row.getSubctgrId())
@@ -97,7 +98,7 @@ public class ProjectServiceImpl implements ProjectService {
             .newsList(newsList)
             .build();
 
-        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 상세 조회 성공", dto));
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 상세 조회 성공", detail));
     }
 
     /**
@@ -245,7 +246,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         //프로젝트 상태 조회
         String status = projectMapper.getStatus(dto.getProjectId());
-        if (!"DRAFT".equals(status)) {
+        if (!"DRAFT".equalsIgnoreCase(status)) {
             throw new IllegalStateException("DRAFT 상태에서만 프로젝트를 수정할 수 있습니다.");
         }
 
@@ -308,6 +309,49 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 삭제 성공", null));
+    }
+
+    /**
+     * <p>프로젝트 심사 요청</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param creatorId 창작자 ID
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-18
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> requestReview(Long projectId, Long creatorId) {
+
+        //소유자 체크
+
+        Project project = projectMapper.findById(projectId);
+        if (project == null) {
+            throw new IllegalStateException("존재하지 않는 프로젝트입니다.");
+        }
+        if (!project.getCreatorId().equals(creatorId)) {
+            throw new IllegalStateException("심사 요청 권한이 없습니다.");
+        }
+        if (!"DRAFT".equalsIgnoreCase(project.getProjectStatus())) {
+            throw new IllegalStateException("현재 상태에서는 심사 요청을 할 수 없습니다.");
+        }
+        if ("Y".equalsIgnoreCase(String.valueOf(project.getIsReqReview()))) {
+            throw new IllegalStateException("이미 심사 요청된 프로젝트입니다.");
+        }
+
+        //검증 처리
+        List<String> errors = ReviewRequestValidator.validateAll(projectId, project);
+        if (!errors.isEmpty()) {
+            throw new IllegalArgumentException("심사 요청 검증 실패 : " + String.join(", ", errors));
+        }
+
+        //상태 업데이트
+        int result = projectMapper.markRequestReview(projectId);
+        if (result == 0) {
+            throw new IllegalStateException("심사 요청 실패");
+        }
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 심사 요청 성공", null));
     }
 
     /**

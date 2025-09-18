@@ -382,4 +382,21 @@
           AND ENDDATE <![CDATA[ < ]]> TRUNC(SYSDATE)
           AND CURRAMOUNT <![CDATA[ < ]]> GOALAMOUNT
     </update>
+
+    <select id="findDetailForReview" resultType="projectDetailDto">
+        SELECT p.PROJECTID, p.TITLE, p.GOALAMOUNT, p.
+        FROM PROJECT p
+        WHERE PROJECTID = #{projectId}
+    </select>
+
+    <update id="markRequestReview">
+        UPDATE PROJECT
+        SET ISREQREVIEW = 'Y',
+            PROJECTSTATUS = 'UNDER_REVIEW',
+            UPDATEAT = SYSDATE
+        WHERE PROJECTID = #{projectId}
+          AND UPPER(PROJECTSTATUS) = 'DRAFT'
+          AND UPPER(ISREQREVIEW) = 'N'
+    </update>
+
 </mapper>

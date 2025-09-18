@@ -1,12 +1,16 @@
 package com.example.funding.controller;
 
+import com.example.funding.common.PageResult;
+import com.example.funding.common.Pager;
 import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
+import com.example.funding.dto.response.admin.SearchReviewDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
 import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
+import com.example.funding.dto.row.ReviewListRow;
 import com.example.funding.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -120,5 +124,19 @@ public class AdminController {
         dto.setProjectId(projectId);
 
         return adminService.updateProject(dto);
+    }
+
+    /**
+     * <p>프로젝트 심사 목록 조회</p>
+     *
+     * @param dto SearchReviewDto
+     * @param reqPager 요청 pager
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-18
+     */
+    @GetMapping("/review")
+    public ResponseEntity<ResponseDto<PageResult<ReviewListRow>>> getReviewList(SearchReviewDto dto, Pager reqPager) {
+        return adminService.getReviewList(dto, reqPager);
     }
 }

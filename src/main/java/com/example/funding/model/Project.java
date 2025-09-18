@@ -30,4 +30,5 @@ public class Project {
     private Integer viewCnt;
     private Character isReqReview;
     private String rejectedReason;
+    private LocalDate requestedAt;
 }

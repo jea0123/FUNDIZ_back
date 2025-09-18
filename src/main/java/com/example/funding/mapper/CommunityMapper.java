@@ -12,5 +12,5 @@ import java.util.List;
 public interface CommunityMapper {
     int countTotal(@Param("projectId") Long projectId, @Param("code") String code);
 
-    List<Community> getCommunityList(@Param("projectId") Long projectId, @Param("code") String code, Pager pager);
+    List<Community> getCommunityList(@Param("projectId") Long projectId, @Param("code") String code, @Param("pager") Pager pager);
 }

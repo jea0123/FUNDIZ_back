@@ -1,6 +1,9 @@
 package com.example.funding.mapper;
 
+import com.example.funding.common.Pager;
+import com.example.funding.dto.response.admin.SearchReviewDto;
 import com.example.funding.dto.response.admin.analytic.*;
+import com.example.funding.dto.row.ReviewListRow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -24,4 +27,8 @@ public interface AdminMapper {
     List<CategorySuccess> getCategorySuccessByCategory(@Param("ctgrId") Long ctgrId);
 
     int cancelProject(@Param("projectId") Long projectId);
+
+    int countReviews(@Param("dto") SearchReviewDto dto);
+
+    List<ReviewListRow> getReviewList(@Param("dto") SearchReviewDto dto, @Param("pager") Pager pager);
 }

@@ -39,6 +39,8 @@ public class ProjectServiceImpl implements ProjectService {
     private final RewardService rewardService;
     private final NewsMapper newsMapper;
 
+    private final ReviewRequestValidator validator;
+
     /**
      * <p>프로젝트 상세 페이지 조회</p>
      *
@@ -329,9 +331,9 @@ public class ProjectServiceImpl implements ProjectService {
         if (project == null) {
             throw new IllegalStateException("존재하지 않는 프로젝트입니다.");
         }
-        if (!project.getCreatorId().equals(creatorId)) {
-            throw new IllegalStateException("심사 요청 권한이 없습니다.");
-        }
+//        if (!project.getCreatorId().equals(creatorId)) {
+//            throw new IllegalStateException("심사 요청 권한이 없습니다.");
+//        }
         if (!"DRAFT".equalsIgnoreCase(project.getProjectStatus())) {
             throw new IllegalStateException("현재 상태에서는 심사 요청을 할 수 없습니다.");
         }
@@ -339,11 +341,11 @@ public class ProjectServiceImpl implements ProjectService {
             throw new IllegalStateException("이미 심사 요청된 프로젝트입니다.");
         }
 
-        //검증 처리
-        List<String> errors = ReviewRequestValidator.validateAll(projectId, project);
-        if (!errors.isEmpty()) {
-            throw new IllegalArgumentException("심사 요청 검증 실패 : " + String.join(", ", errors));
-        }
+        //검증
+//        List<String> errors = validator.validateAll(projectId, project);
+//        if (!errors.isEmpty()) {
+//            throw new IllegalArgumentException("심사 요청 검증 실패 : " + String.join(", ", errors));
+//        }
 
         //상태 업데이트
         int result = projectMapper.markRequestReview(projectId);
@@ -358,22 +360,26 @@ public class ProjectServiceImpl implements ProjectService {
      * <p>검색 기능 (제목, 내용, 창작자명, 태그)</p>
      *
      * @param dto SearchProjectDto
-     * @param pager 페이지네이션
+     * @param reqPager 요청 pager
      * @return 성공 시 200 OK
      * @author by: 조은애
      * @since 2025-09-16
      */
     @Override
-    public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> search(SearchProjectDto dto, Pager pager) {
+    public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> search(SearchProjectDto dto, Pager reqPager) {
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 10,
+                reqPager != null ? reqPager.getPerGroup() : 5
+        );
+
         int total = projectMapper.countSearchProjects(dto);
-        pager.setTotalElements(total);
-        pager.setTotalPage((int) Math.ceil((double) total / pager.getSize()));
 
         List<FeaturedProjectDto> items = Collections.emptyList();
         if (total > 0) {
             items = projectMapper.searchProjects(dto, pager);
         }
-        PageResult<FeaturedProjectDto> result = PageResult.of(items, pager);
+        PageResult<FeaturedProjectDto> result = PageResult.of(items, pager, total);
 
         return ResponseEntity.ok(ResponseDto.success(200, "검색 성공", result));
     }

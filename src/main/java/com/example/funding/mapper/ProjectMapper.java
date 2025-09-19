@@ -54,5 +54,7 @@ public interface ProjectMapper {
 
     int updateProjectsToFailed();
 
-    int markRequestReview(Long projectId);
+    int markRequestReview(@Param("projectId") Long projectId);
+
+    String getReason(@Param("projectId") Long projectId);
 }

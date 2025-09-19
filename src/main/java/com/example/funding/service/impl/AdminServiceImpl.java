@@ -3,6 +3,7 @@ package com.example.funding.service.impl;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.admin.RejectRequestDto;
 import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.ReviewDetailDto;
@@ -243,5 +244,42 @@ public class AdminServiceImpl implements AdminService {
         detail.setRewardList(rewardList);
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 심사 상세 조회 성공", detail));
+    }
+
+    /**
+     * <p>프로젝트 승인</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-19
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> approve(Long projectId) {
+        int result = adminMapper.approve(projectId);
+        if (result == 0) {
+            throw new IllegalStateException("승인 처리가 실패되었습니다.");
+        }
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트가 성공적으로 승인되었습니다.", null));
+    }
+
+    /**
+     * <p>프로젝트 반려</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param rejectedReason 반려 사유
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-19
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> reject(Long projectId, String rejectedReason) {
+        int result = adminMapper.reject(projectId, rejectedReason);
+        if (result == 0) {
+            throw new IllegalStateException("반려 처리가 실패되었습니다.");
+        }
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트가 성공적으로 반려되었습니다.", null));
     }
 }

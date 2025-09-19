@@ -202,4 +202,19 @@
         WHERE p.PROJECTID = #{projectId}
     </select>
 
+    <update id="approve">
+        UPDATE PROJECT
+        SET PROJECTSTATUS = 'UPCOMING'
+        WHERE PROJECTID = #{projectId}
+          AND PROJECTSTATUS = 'UNDER_REVIEW'
+    </update>
+
+    <update id="reject">
+        UPDATE PROJECT
+        SET PROJECTSTATUS = 'REJECTED',
+            REJECTEDREASON = #{rejectedReason}
+        WHERE PROJECTID = #{projectId}
+        AND PROJECTSTATUS = 'UNDER_REVIEW'
+    </update>
+
 </mapper>

@@ -4,6 +4,7 @@ import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.admin.RejectRequestDto;
 import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.ReviewDetailDto;
@@ -153,5 +154,32 @@ public class AdminController {
     @GetMapping("/review/{projectId}")
     public ResponseEntity<ResponseDto<ReviewDetailDto>> getReviewDetail(@PathVariable Long projectId) {
         return adminService.getReviewDetail(projectId);
+    }
+
+    /**
+     * <p>프로젝트 승인</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-19
+     */
+    @PostMapping("/review/{projectId}/approve")
+    public ResponseEntity<ResponseDto<String>> approve(@PathVariable Long projectId) {
+        return adminService.approve(projectId);
+    }
+
+    /**
+     * <p>프로젝트 반려</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param dto RejectRequestDto
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-19
+     */
+    @PostMapping("/review/{projectId}/reject")
+    public ResponseEntity<ResponseDto<String>> reject(@PathVariable Long projectId, @RequestBody RejectRequestDto dto) {
+        return adminService.reject(projectId, dto.getRejectedReason());
     }
 }

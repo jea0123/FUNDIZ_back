@@ -33,5 +33,9 @@ public interface AdminMapper {
 
     List<ReviewListRow> getReviewList(@Param("dto") SearchReviewDto dto, @Param("pager") Pager pager);
 
-    ReviewDetailDto getReviewDetail(Long projectId);
+    ReviewDetailDto getReviewDetail(@Param("projectId") Long projectId);
+
+    int approve(@Param("projectId") Long projectId);
+
+    int reject(@Param("projectId") Long projectId, @Param("rejectedReason") String rejectedReason);
 }

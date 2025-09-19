@@ -193,4 +193,13 @@
         WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
 
+    <select id="getReviewDetail" resultType="reviewDetailDto">
+        SELECT *
+        FROM PROJECT p
+        JOIN CREATOR c ON c.CREATORID = p.CREATORID
+        JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
+        JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
+        WHERE p.PROJECTID = #{projectId}
+    </select>
+
 </mapper>

@@ -1,6 +1,7 @@
 package com.example.funding.mapper;
 
 import com.example.funding.common.Pager;
+import com.example.funding.dto.response.admin.ReviewDetailDto;
 import com.example.funding.dto.response.admin.SearchReviewDto;
 import com.example.funding.dto.response.admin.analytic.*;
 import com.example.funding.dto.row.ReviewListRow;
@@ -31,4 +32,6 @@ public interface AdminMapper {
     int countReviews(@Param("dto") SearchReviewDto dto);
 
     List<ReviewListRow> getReviewList(@Param("dto") SearchReviewDto dto, @Param("pager") Pager pager);
+
+    ReviewDetailDto getReviewDetail(Long projectId);
 }

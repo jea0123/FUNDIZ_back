@@ -6,10 +6,12 @@ import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
+import com.example.funding.dto.response.admin.ReviewDetailDto;
 import com.example.funding.dto.response.admin.SearchReviewDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
 import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
+import com.example.funding.dto.row.ProjectRow;
 import com.example.funding.dto.row.ReviewListRow;
 import com.example.funding.service.AdminService;
 import lombok.RequiredArgsConstructor;
@@ -138,5 +140,18 @@ public class AdminController {
     @GetMapping("/review")
     public ResponseEntity<ResponseDto<PageResult<ReviewListRow>>> getReviewList(SearchReviewDto dto, Pager reqPager) {
         return adminService.getReviewList(dto, reqPager);
+    }
+
+    /**
+     * <p>프로젝트 심사 상세 조회</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-19
+     */
+    @GetMapping("/review/{projectId}")
+    public ResponseEntity<ResponseDto<ReviewDetailDto>> getReviewDetail(@PathVariable Long projectId) {
+        return adminService.getReviewDetail(projectId);
     }
 }

@@ -5,6 +5,7 @@ import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
+import com.example.funding.dto.response.admin.ReviewDetailDto;
 import com.example.funding.dto.response.admin.SearchReviewDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
@@ -29,4 +30,6 @@ public interface AdminService {
     ResponseEntity<ResponseDto<String>> updateProject(ProjectUpdateRequestDto dto);
 
     ResponseEntity<ResponseDto<PageResult<ReviewListRow>>> getReviewList(SearchReviewDto dto, Pager reqPager);
+
+    ResponseEntity<ResponseDto<ReviewDetailDto>> getReviewDetail(Long projectId);
 }

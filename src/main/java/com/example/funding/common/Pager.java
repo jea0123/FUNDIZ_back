@@ -1,22 +1,31 @@
 package com.example.funding.common;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-@Setter
+@Builder
 @AllArgsConstructor
 public class Pager {
-    private int page;
-    private int size;
-    private int perGroup;
-    private Integer totalElements;
-    private Integer totalPage;
+    private final int page;
+    private final int size;
+    private final int perGroup;
 
-    public void setDefault() {
-        if (page < 1) page = 1;
-        if (size < 1) size = 10;
-        if (perGroup < 1) perGroup = 5;
+    public static Pager ofRequest(Integer page, Integer size, Integer perGroup) {
+        int p = (page == null || page < 1) ? 1 : page;
+        int s = (size == null || size < 1) ? 10 : size;
+        int g = (perGroup == null || perGroup < 1) ? 5 : perGroup;
+
+        return Pager.builder().page(p).size(s).perGroup(g).build();
+    }
+
+    public int getStartRow() {
+        return (page - 1) * size + 1;
+    }
+
+    public int getEndRow() {
+        return page * size;
     }
 }

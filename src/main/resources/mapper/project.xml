@@ -248,10 +248,33 @@
         WHERE PROJECTID = #{projectId}
     </delete>
 
-    <select id="searchProjects" resultType="featuredProjectDto">
-        <bind name="startRow" value="(pager.page - 1) * pager.size + 1"/>
-        <bind name="endRow" value="pager.page * pager.size"/>
+    <sql id="searchFilterWhere">
+        <where>
+            <if test="dto.keyword != null and dto.keyword != ''">
+                (
+                LOWER(p.TITLE) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                OR LOWER(p.CONTENT) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                OR LOWER(c.CREATORNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                OR EXISTS (
+                SELECT 1 FROM TAG t
+                WHERE t.PROJECTID = p.PROJECTID
+                AND LOWER(t.TAGNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                )
+                )
+            </if>
+            <if test="dto.ctgrId != null">
+                AND cg.CTGRID = #{dto.ctgrId}
+            </if>
+            <if test="dto.subctgrId != null">
+                AND sc.SUBCTGRID = #{dto.subctgrId}
+            </if>
+            <if test="dto.activeOnly != null and dto.activeOnly">
+                AND p.ENDDATE <![CDATA[ >= ]]> SYSDATE
+            </if>
+        </where>
+    </sql>
 
+    <select id="searchProjects" resultType="featuredProjectDto">
         SELECT *
         FROM (
             SELECT T.*, ROWNUM rnum
@@ -259,7 +282,7 @@
                 SELECT
                     p.PROJECTID AS projectId,
                     p.TITLE AS title,
-                    NVL2(TRIM(c.CREATORNAME), c.CREATORNAME, 'Unknown Creator') AS creatorName,
+                    c.CREATORNAME AS creatorName,
                     p.THUMBNAIL AS thumbnail,
                     p.ENDDATE AS endDate,
                     p.CURRAMOUNT AS currAmount,
@@ -275,29 +298,7 @@
                 JOIN CREATOR c ON c.CREATORID = p.CREATORID
                 JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
                 JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
-                <where>
-                    <if test="dto.keyword != null and dto.keyword != ''">
-                        (
-                        LOWER(p.TITLE) LIKE '%' || LOWER(#{dto.keyword}) || '%'
-                        OR LOWER(p.CONTENT) LIKE '%' || LOWER(#{dto.keyword}) || '%'
-                        OR LOWER(c.CREATORNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
-                        OR EXISTS (
-                            SELECT 1 FROM TAG t
-                            WHERE t.PROJECTID = p.PROJECTID
-                              AND LOWER(t.TAGNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
-                            )
-                        )
-                    </if>
-                    <if test="dto.ctgrId != null">
-                        AND cg.CTGRID = #{dto.ctgrId}
-                    </if>
-                    <if test="dto.subctgrId != null">
-                        AND sc.SUBCTGRID = #{dto.subctgrId}
-                    </if>
-                    <if test="dto.activeOnly != null and dto.activeOnly">
-                        <![CDATA[ AND p.ENDDATE >= SYSDATE ]]>
-                    </if>
-                </where>
+                <include refid="searchFilterWhere" />
 
                 <choose>
                     <when test="dto.sort == 'liked'">
@@ -315,45 +316,23 @@
                     <when test="dto.sort == 'percent'">
                         ORDER BY percentNow DESC, P.PROJECTID DESC
                     </when>
-                    <otherwise>
+                    <when test="dto.sort == 'view'">
                         ORDER BY p.VIEWCNT DESC, p.PROJECTID DESC
-                    </otherwise>
+                    </when>
                 </choose>
                 ) T
-            <![CDATA[ WHERE ROWNUM <= #{endRow}
+            WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
             )
-        WHERE rnum >= #{startRow} ]]>
+        WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
 
-    <select id="countSearchProjects" resultType="int">
+    <select id="countSearchProjects" resultType="Integer">
         SELECT COUNT(*)
         FROM PROJECT p
         JOIN CREATOR c ON c.CREATORID = p.CREATORID
         JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
         JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
-        <where>
-            <if test="dto.keyword != null and dto.keyword != ''">
-                (
-                LOWER(p.TITLE) LIKE '%' || LOWER(#{dto.keyword}) || '%'
-                OR LOWER(p.CONTENT) LIKE '%' || LOWER(#{dto.keyword}) || '%'
-                OR LOWER(c.CREATORNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
-                OR EXISTS (
-                    SELECT 1 FROM TAG t
-                    WHERE t.PROJECTID = p.PROJECTID
-                    AND LOWER(t.TAGNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
-                    )
-                )
-            </if>
-            <if test="dto.ctgrId != null">
-                AND cg.CTGRID = #{dto.ctgrId}
-            </if>
-            <if test="dto.subctgrId != null">
-                AND sc.SUBCTGRID = #{dto.subctgrId}
-            </if>
-            <if test="dto.activeOnly != null and dto.activeOnly">
-                <![CDATA[ AND p.ENDDATE >= SYSDATE ]]>
-            </if>
-        </where>
+        <include refid="searchFilterWhere" />
     </select>
 
     <update id="updateProjectsToOpen">
@@ -382,4 +361,21 @@
           AND ENDDATE <![CDATA[ < ]]> TRUNC(SYSDATE)
           AND CURRAMOUNT <![CDATA[ < ]]> GOALAMOUNT
     </update>
+
+    <select id="findDetailForReview" resultType="projectDetailDto">
+        SELECT p.PROJECTID, p.TITLE, p.GOALAMOUNT, p.
+        FROM PROJECT p
+        WHERE PROJECTID = #{projectId}
+    </select>
+
+    <update id="markRequestReview">
+        UPDATE PROJECT
+        SET ISREQREVIEW = 'Y',
+            PROJECTSTATUS = 'UNDER_REVIEW',
+            REQUESTEDAT = SYSDATE
+        WHERE PROJECTID = #{projectId}
+          AND UPPER(PROJECTSTATUS) = 'DRAFT'
+          AND UPPER(ISREQREVIEW) = 'N'
+    </update>
+
 </mapper>

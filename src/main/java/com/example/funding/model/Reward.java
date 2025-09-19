@@ -18,7 +18,7 @@ public class Reward {
     private String rewardName;
     private Long price;
     private String rewardContent;
-    private Date deliveryDate;
+    private LocalDate deliveryDate;
     private Integer rewardCnt;
     private LocalDate createdAt;
     private Character isPosting;

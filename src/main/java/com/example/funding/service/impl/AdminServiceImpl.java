@@ -1,13 +1,21 @@
 package com.example.funding.service.impl;
 
+import com.example.funding.common.PageResult;
+import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.admin.RejectRequestDto;
 import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
+import com.example.funding.dto.response.admin.ReviewDetailDto;
+import com.example.funding.dto.response.admin.SearchReviewDto;
 import com.example.funding.dto.response.admin.analytic.*;
+import com.example.funding.dto.row.ReviewListRow;
 import com.example.funding.mapper.AdminMapper;
 import com.example.funding.mapper.ProjectMapper;
+import com.example.funding.mapper.RewardMapper;
 import com.example.funding.mapper.TagMapper;
 import com.example.funding.model.Project;
+import com.example.funding.model.Reward;
 import com.example.funding.model.Tag;
 import com.example.funding.service.AdminService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -29,6 +38,7 @@ public class AdminServiceImpl implements AdminService {
     private final AdminMapper adminMapper;
     private final ProjectMapper projectMapper;
     private final TagMapper tagMapper;
+    private final RewardMapper rewardMapper;
 
     /**
      * 관리자 대시보드 분석 데이터 조회
@@ -186,5 +196,90 @@ public class AdminServiceImpl implements AdminService {
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 수정 성공", null));
+    }
+
+    /**
+     * <p>프로젝트 심사 목록 조회</p>
+     *
+     * @param dto SearchReviewDto
+     * @param reqPager 요청 pager
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-18
+     */
+    @Override
+    public ResponseEntity<ResponseDto<PageResult<ReviewListRow>>> getReviewList(SearchReviewDto dto, Pager reqPager) {
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 20,
+                reqPager != null ? reqPager.getPerGroup() : 5
+        );
+
+        int total = adminMapper.countReviews(dto);
+
+        List<ReviewListRow> items = (total == 0) ? Collections.emptyList() : adminMapper.getReviewList(dto, pager);
+        PageResult<ReviewListRow> result = PageResult.of(items, pager, total);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 심사 목록 조회 성공", result));
+    }
+
+    /**
+     * <p>프로젝트 심사 상세 조회</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-19
+     */
+    @Override
+    public ResponseEntity<ResponseDto<ReviewDetailDto>> getReviewDetail(Long projectId) {
+        ReviewDetailDto detail = adminMapper.getReviewDetail(projectId);
+        if (detail == null) {
+            throw new IllegalStateException("존재하지 않는 프로젝트입니다.");
+        }
+        List<Tag> tagList = tagMapper.getTagList(projectId);
+        detail.setTagList(tagList);
+
+        List<Reward> rewardList = rewardMapper.findByProjectId(projectId);
+        detail.setRewardList(rewardList);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 심사 상세 조회 성공", detail));
+    }
+
+    /**
+     * <p>프로젝트 승인</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-19
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> approve(Long projectId) {
+        int result = adminMapper.approve(projectId);
+        if (result == 0) {
+            throw new IllegalStateException("승인 처리가 실패되었습니다.");
+        }
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트가 성공적으로 승인되었습니다.", null));
+    }
+
+    /**
+     * <p>프로젝트 반려</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param rejectedReason 반려 사유
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-09-19
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> reject(Long projectId, String rejectedReason) {
+        int result = adminMapper.reject(projectId, rejectedReason);
+        if (result == 0) {
+            throw new IllegalStateException("반려 처리가 실패되었습니다.");
+        }
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트가 성공적으로 반려되었습니다.", null));
     }
 }

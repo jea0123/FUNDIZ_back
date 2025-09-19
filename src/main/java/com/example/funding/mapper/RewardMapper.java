@@ -11,6 +11,8 @@ import java.util.List;
 public interface RewardMapper {
     List<Reward> getRewardList(@Param("projectId") Long projectId);
 
+    List<Reward> findByProjectId(@Param("projectId") Long projectId);
+
     List<Reward> findProjectIdsByRewardIds(@Param("ids") List<Long> rewardIds);
 
     int saveReward(Reward reward);

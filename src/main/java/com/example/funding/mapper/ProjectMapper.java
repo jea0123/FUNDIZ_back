@@ -1,6 +1,7 @@
 package com.example.funding.mapper;
 
 import com.example.funding.common.Pager;
+import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.SearchProjectDto;
 import com.example.funding.dto.row.ProjectRow;
 import com.example.funding.dto.request.project.ProjectCreateRequestDto;
@@ -52,4 +53,8 @@ public interface ProjectMapper {
     int updateProjectsToSuccess();
 
     int updateProjectsToFailed();
+
+    int markRequestReview(@Param("projectId") Long projectId);
+
+    String getReason(@Param("projectId") Long projectId);
 }

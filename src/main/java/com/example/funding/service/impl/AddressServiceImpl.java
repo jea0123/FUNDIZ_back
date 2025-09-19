@@ -75,6 +75,10 @@ public class AddressServiceImpl implements AddressService {
     
     @Override
     public ResponseEntity<ResponseDto<String>> deleteAddr(Long userId, Long addrId) {
+        int deleted = addressMapper.deleteAddr(userId, addrId);
+        if(deleted == 0){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"주소 삭제 실패"));
+        }
         return ResponseEntity.ok(ResponseDto.success(200, "주소 삭제 완료", "주소 삭제"));
     }
 }

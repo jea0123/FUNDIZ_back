@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -58,6 +55,11 @@ public class UserController {
     @GetMapping("/me/userPage/{userId}")
     public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageUser(@PathVariable Long userId) {
         return userService.getMyPageUser(userId);
+    }
+
+    @PostMapping("me/userPage/{userId}")
+    public ResponseEntity<ResponseDto<String>> updateMydata (@PathVariable Long userId, @RequestBody MyPageUserDto myPageUserDto) {
+        return userService.getMyData(userId);
     }
 
     /**

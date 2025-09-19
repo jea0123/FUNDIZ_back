@@ -19,19 +19,27 @@
         Order BY addrId DESC
     </select>
 
-    <insert id ="addAddr">
+    <insert id ="addAddr" parameterType="com.example.funding.dto.request.address.AddrAddRequestDto">
         <selectKey keyProperty="addrId" resultType="Long" order="BEFORE">
             SELECT ADDRESS_SEQ.NEXTVAL FROM DUAL
         </selectKey>
 
-        INSERT INTO ADDRESS (
-            ADDRID, USERID, ADDRNAME, RECIPIENT, POSTALCODE, ROADADDR,
-            DETAILADDR, RECIPIENTPHONE, ISDEFAULT
-        ) VALUES (
-            #{addrId}, #{userId}, #{addrName}, #{recipient}, #{postalCode}, #{roadAddr},
-            #{detailAddr}, #{recipientPhone}, #{isDefault}
-        )
+        <!-- 새 주소를 등록하면
+             기존 기본배송지(Y)를 전부 보조배송지(N)로 변경 -->
+        <if test="isDefault == 'Y'">
+            UPDATE ADDRESS
+            SET ISDEFAULT = 'N'
+            WHERE USERID = #{userId}
+            AND ISDEFAULT = 'Y';
+        </if>
 
+        INSERT INTO ADDRESS (
+        ADDRID, USERID, ADDRNAME, RECIPIENT, POSTALCODE, ROADADDR,
+        DETAILADDR, RECIPIENTPHONE, ISDEFAULT
+        ) VALUES (
+        #{addrId}, #{userId}, #{addrName}, #{recipient}, #{postalCode}, #{roadAddr},
+        #{detailAddr}, #{recipientPhone}, #{isDefault}
+        )
     </insert>
 
     <update id="updateAddr" parameterType="com.example.funding.dto.request.address.AddrUpdateRequestDto">

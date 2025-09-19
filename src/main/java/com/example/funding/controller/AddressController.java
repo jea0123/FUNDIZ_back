@@ -40,7 +40,7 @@ public class AddressController {
         return addressService.updateAddr(userId, addrId,addrDto);
     }
 
-    @PostMapping("{userId}/delete/{addrId}")
+    @DeleteMapping("{userId}/delete/{addrId}")
     public ResponseEntity<ResponseDto<String>> deleteAddress(@PathVariable Long userId,
                                                              @PathVariable Long addrId) {
         return addressService.deleteAddr(userId,addrId);

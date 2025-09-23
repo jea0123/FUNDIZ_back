@@ -19,6 +19,7 @@ public class MyPageLikedDto {
 
     //창작자 테이블
 
+    private Long creatorId;
     private String creatorName;
 
     //프로젝트 테이블

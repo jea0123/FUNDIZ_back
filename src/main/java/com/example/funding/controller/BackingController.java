@@ -43,7 +43,7 @@ public class BackingController {
         return backingService.updateBacking(requestDto, backingId, userId);
     }
 
-    @PostMapping("/{backingId}/delete/{userId}")
+    @DeleteMapping("/{backingId}/delete/{userId}")
     public ResponseEntity<ResponseDto<String>>DeleteBacking(@PathVariable Long backingId,
                                                             @PathVariable Long userId) {
         return backingService.deleteBacking(backingId, userId);

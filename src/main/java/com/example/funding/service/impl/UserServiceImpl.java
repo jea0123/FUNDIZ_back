@@ -179,4 +179,10 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "QnA 상세 페이지 조회 성공",myPageQnADetail));
 
     }
+
+    @Override
+    public ResponseEntity<ResponseDto<String>> getMyData(Long userId) {
+        // TODO:계정 정보 수정 구현
+        return null;
+    }
 }

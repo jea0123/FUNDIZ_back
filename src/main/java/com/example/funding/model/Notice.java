@@ -19,6 +19,4 @@ public class Notice {
     private String content;
     private Long viewCnt;
     private LocalDate createdAt;
-
-
 }

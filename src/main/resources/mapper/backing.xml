@@ -221,7 +221,7 @@
     
     <insert id="addBacking">
         <selectKey keyProperty="backingId" resultType="long" order="BEFORE">
-            SELECT BACKING_SEQ.NEXTVAL FROM DOAL
+            SELECT BACKING_SEQ.NEXTVAL FROM DUAL
         </selectKey>
 
         INSERT INTO BACKING(

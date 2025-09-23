@@ -2,7 +2,7 @@ package com.example.funding.mapper;
 
 import com.example.funding.common.Pager;
 import com.example.funding.dto.response.admin.ReviewDetailDto;
-import com.example.funding.dto.response.admin.SearchReviewDto;
+import com.example.funding.dto.request.admin.SearchReviewDto;
 import com.example.funding.dto.response.admin.analytic.*;
 import com.example.funding.dto.row.ReviewListRow;
 import org.apache.ibatis.annotations.Mapper;

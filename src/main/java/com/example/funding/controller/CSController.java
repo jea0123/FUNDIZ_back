@@ -1,7 +1,9 @@
 package com.example.funding.controller;
 
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.model.Inquiry;
 import com.example.funding.model.Notice;
+import com.example.funding.model.Report;
 import com.example.funding.service.CSService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,4 +35,15 @@ public class CSController {
 
         return item;
     }
+
+    @GetMapping("/inquiry")
+    public ResponseEntity<ResponseDto<List<Inquiry>>> inquiryList() {
+        return csService.inquiryList();
+    }
+
+    @GetMapping("/report")
+    public ResponseEntity<ResponseDto<List<Report>>> reportList() {
+        return csService.reportList();
+    }
+
 }

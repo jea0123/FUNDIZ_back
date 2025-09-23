@@ -4,7 +4,7 @@ import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.common.Utils;
 import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
-import com.example.funding.dto.response.project.SearchProjectDto;
+import com.example.funding.dto.request.project.SearchProjectDto;
 import com.example.funding.dto.row.ProjectRow;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.ProjectCreateRequestDto;
@@ -367,19 +367,13 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> search(SearchProjectDto dto, Pager reqPager) {
-        Pager pager = Pager.ofRequest(
-                reqPager != null ? reqPager.getPage() : 1,
-                reqPager != null ? reqPager.getSize() : 10,
-                reqPager != null ? reqPager.getPerGroup() : 5
-        );
-
         int total = projectMapper.countSearchProjects(dto);
 
         List<FeaturedProjectDto> items = Collections.emptyList();
         if (total > 0) {
-            items = projectMapper.searchProjects(dto, pager);
+            items = projectMapper.searchProjects(dto, reqPager);
         }
-        PageResult<FeaturedProjectDto> result = PageResult.of(items, pager, total);
+        PageResult<FeaturedProjectDto> result = PageResult.of(items, reqPager, total);
 
         return ResponseEntity.ok(ResponseDto.success(200, "검색 성공", result));
     }

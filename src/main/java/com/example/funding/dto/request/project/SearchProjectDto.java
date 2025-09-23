@@ -1,4 +1,4 @@
-package com.example.funding.dto.response.project;
+package com.example.funding.dto.request.project;
 
 import lombok.Getter;
 import lombok.Setter;

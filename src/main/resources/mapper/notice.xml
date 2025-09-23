@@ -27,7 +27,7 @@
 
     <insert id="add">
         INSERT INTO notice
-        VALUES (notice_seq.NEXTVAL, #{adId}, #{title}, #{content}, #{viewCnt}, #{createdAt})
+        VALUES (notice_seq.NEXTVAL, #{adId}, #{title}, #{content}, #{viewCnt}, SYSDATE)
     </insert>
 
     <update id="update">

@@ -1,8 +1,12 @@
 package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.mapper.InquiryMapper;
 import com.example.funding.mapper.NoticeMapper;
+import com.example.funding.mapper.ReportMapper;
+import com.example.funding.model.Inquiry;
 import com.example.funding.model.Notice;
+import com.example.funding.model.Report;
 import com.example.funding.service.CSService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +24,8 @@ import java.util.List;
 public class CSServiceImpl implements CSService {
 
     private final NoticeMapper noticeMapper;
+    private final InquiryMapper inquiryMapper;
+    private final ReportMapper reportMapper;
 
     @Override
     public ResponseEntity<ResponseDto<List<Notice>>> noticeList() {
@@ -36,9 +42,9 @@ public class CSServiceImpl implements CSService {
 
         Notice item =  noticeMapper.noticeDetail(noticeId);
         if (item == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(409,"공지사항 목록 조회 불가"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(409,"공지사항 상세 조회 불가"));
         }
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200,"공지사항 목록 조회 성공", item));
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200,"공지사항 상세 조회 성공", item));
     }
 
     @Override
@@ -55,6 +61,24 @@ public class CSServiceImpl implements CSService {
      * @since 2025-08-31
      * @author by: 이동혁
      */
+
+    @Override
+    public ResponseEntity<ResponseDto<List<Inquiry>>> inquiryList() {
+        List<Inquiry> inquiryList =  inquiryMapper.inquiryList();
+        if (inquiryList == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(409,"문의내역 목록 조회 불가"));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200,"문의내역 목록 조회 성공", inquiryList));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<List<Report>>> reportList() {
+        List<Report> reportList =  reportMapper.reportList();
+        if (reportList == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(409,"신고내역 목록 조회 불가"));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200,"신고내역 목록 조회 성공", reportList));
+    }
 
 
 }

@@ -7,11 +7,10 @@ import lombok.Setter;
 
 @Getter
 @Builder
-@AllArgsConstructor
 public class Pager {
-    private final int page;
-    private final int size;
-    private final int perGroup;
+    private final Integer page;
+    private final Integer size;
+    private final Integer perGroup;
 
     public static Pager ofRequest(Integer page, Integer size, Integer perGroup) {
         int p = (page == null || page < 1) ? 1 : page;

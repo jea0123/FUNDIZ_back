@@ -8,7 +8,7 @@ import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
-import com.example.funding.dto.response.project.SearchProjectDto;
+import com.example.funding.dto.request.project.SearchProjectDto;
 import com.example.funding.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -140,7 +140,13 @@ public class ProjectController {
      */
     @GetMapping("/search")
     public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> search(SearchProjectDto dto, Pager reqPager) {
-        return projectService.search(dto, reqPager);
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : null,
+                reqPager != null ? 20 : null,
+                reqPager != null ? reqPager.getPerGroup() : null
+        );
+
+        return projectService.search(dto, pager);
     }
 
 }

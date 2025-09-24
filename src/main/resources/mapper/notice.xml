@@ -25,18 +25,22 @@
         WHERE NOTICEID=#{noticeId}
     </select>
 
-    <insert id="add">
-        INSERT INTO notice
-        VALUES (notice_seq.NEXTVAL, #{adId}, #{title}, #{content}, #{viewCnt}, SYSDATE)
+    <insert id="addNotice" parameterType="com.example.funding.dto.request.cs.NoticeAddRequestDto">
+        <selectKey keyProperty="noticeId" resultType="Long" order="BEFORE">
+            SELECT NOTICE_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO notice (NOTICEID, ADID, TITLE, CONTENT, VIEWCNT, CREATEDAT)
+        VALUES (notice_seq.NEXTVAL, 10, #{title}, #{content}, 0, SYSDATE)
     </insert>
 
-    <update id="update">
+    <update id="updateNotice" parameterType="com.example.funding.dto.request.cs.NoticeUpdateRequestDto">
         UPDATE notice
         SET TITLE=#{title}, CONTENT=#{content}
         WHERE NOTICEID=#{noticeId}
     </update>
 
-    <delete id="delete">
+    <delete id="deleteNotice">
         DELETE FROM notice
         WHERE NOTICEID=#{noticeId}
     </delete>

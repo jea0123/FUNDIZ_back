@@ -25,18 +25,18 @@
         WHERE NOTICEID=#{noticeId}
     </select>
 
-    <insert id="add">
+    <insert id="addNotice">
         INSERT INTO notice
-        VALUES (notice_seq.NEXTVAL, #{adId}, #{title}, #{content}, #{viewCnt}, SYSDATE)
+        VALUES (notice_seq.NEXTVAL, #{adId}, #{title}, #{content}, 0, SYSDATE)
     </insert>
 
-    <update id="update">
+    <update id="updateNotice">
         UPDATE notice
         SET TITLE=#{title}, CONTENT=#{content}
         WHERE NOTICEID=#{noticeId}
     </update>
 
-    <delete id="delete">
+    <delete id="deleteNotice">
         DELETE FROM notice
         WHERE NOTICEID=#{noticeId}
     </delete>

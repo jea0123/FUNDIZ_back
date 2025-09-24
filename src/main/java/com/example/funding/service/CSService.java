@@ -13,7 +13,11 @@ public interface CSService {
 
     ResponseEntity<ResponseDto<Notice>> item(Long noticeId);
 
-    void add(ResponseEntity<ResponseDto<Notice>> item);
+    ResponseEntity<ResponseDto<String>> addNotice(Notice notice);
+
+    ResponseEntity<ResponseDto<String>> updateNotice(Long noticeId, Notice notice);
+
+    ResponseEntity<ResponseDto<String>> deleteNotice(Long noticeId);
 
     ResponseEntity<ResponseDto<List<Inquiry>>> inquiryList();
 

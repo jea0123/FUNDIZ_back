@@ -17,6 +17,12 @@ public interface NoticeMapper {
 
     void add(ResponseEntity<ResponseDto<Notice>> item);
 
+    int addNotice(Notice item);
+
+    int updateNotice(Notice notice);
+
+    int deleteNotice(Long noticeId);
+
     //Notice update(@Param("noticeId") Notice item);
 
     //Notice delete(@Param("noticeId") Long noticeId);

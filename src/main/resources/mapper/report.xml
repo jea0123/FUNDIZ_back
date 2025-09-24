@@ -19,9 +19,13 @@
         WHERE REPORTID = #{reportId}
     </select>
 
-    <insert id="add">
-        INSERT INTO report
-        VALUES (report_seq.NEXTVAL, #{userId}, #{target}, #{reason}, SYSDATE, #{reportStatus}, #{reportType})
+    <insert id="addReport">
+        <selectKey keyProperty="reportId" resultType="Long" order="BEFORE">
+            SELECT REPORT_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO report (REPORTID, USERID, TARGET, REASON, REPORTDATE, REPORTSTATUS, REPORTTYPE)
+        VALUES (report_seq.NEXTVAL, 500, 200, #{reason}, SYSDATE, 'RECEIVED', #{reportType})
     </insert>
 
 </mapper>

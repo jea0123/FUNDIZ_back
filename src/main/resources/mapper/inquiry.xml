@@ -19,15 +19,13 @@
         WHERE INQID=#{inqId}
     </select>
 
-    <insert id="add">
-        INSERT INTO inquiry
-        VALUES (inquiry_seq.NEXTVAL, #{userId}, #{adId}, #{title}, #{content}, SYSDATE, 'N', #{ctgr}, 'N')
-    </insert>
+    <insert id="addInquiry" parameterType="com.example.funding.dto.request.cs.IqrAddRequestDto">
+        <selectKey keyProperty="inqId" resultType="Long" order="BEFORE">
+            SELECT INQUIRY_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
 
-    <update id="update">
-        UPDATE inquiry
-        SET TITLE=#{title}, CONTENT=#{content}
-        WHERE INQID=#{inqId}
-    </update>
+        INSERT INTO inquiry (INQID, USERID, ADID, TITLE, CONTENT, CREATEDAT, ISCANCELED, CTGR, ISANSWER)
+        VALUES (inquiry_seq.NEXTVAL, 500, 10, #{title}, #{content}, SYSDATE, 'N', #{ctgr}, 'N')
+    </insert>
 
 </mapper>

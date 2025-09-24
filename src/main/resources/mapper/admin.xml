@@ -141,10 +141,10 @@
           AND PROJECTSTATUS <![CDATA[ <> ]]> 'CANCELED'
     </update>
     
-    <sql id="reviewFilterWhere">
+    <sql id="verifyFilterWhere">
         <where>
-            p.PROJECTSTATUS = 'UNDER_REVIEW'
-            AND p.ISREQREVIEW = 'Y'
+            p.PROJECTSTATUS = 'VERIFYING'
+            AND p.ISVERIFIED = 'Y'
             <if test="dto.fromDate != null">
                 AND p.REQUESTEDAT <![CDATA[ >= ]]> #{dto.fromDate}
             </if>
@@ -154,16 +154,16 @@
         </where>
     </sql>
     
-    <select id="countReviews" resultType="Integer">
+    <select id="countProjectVerify" resultType="Integer">
         SELECT COUNT(*)
         FROM PROJECT p
         JOIN CREATOR c ON c.CREATORID = p.CREATORID
         JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
         JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
-        <include refid="reviewFilterWhere" />
+        <include refid="verifyFilterWhere" />
     </select>
 
-    <select id="getReviewList" resultType="reviewListRow">
+    <select id="getProjectVerifyList" resultType="projectVerifyListDto">
         SELECT *
         FROM (
             SELECT T.*, ROWNUM rnum
@@ -185,7 +185,7 @@
                 JOIN CREATOR c ON c.CREATORID = p.CREATORID
                 JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
                 JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
-                <include refid="reviewFilterWhere" />
+                <include refid="verifyFilterWhere" />
                 ORDER BY p.REQUESTEDAT DESC
                 ) T
             WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
@@ -193,7 +193,7 @@
         WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
 
-    <select id="getReviewDetail" resultType="reviewDetailDto">
+    <select id="getProjectVerifyDetail" resultType="projectVerifyDetailDto">
         SELECT *
         FROM PROJECT p
         JOIN CREATOR c ON c.CREATORID = p.CREATORID
@@ -202,19 +202,19 @@
         WHERE p.PROJECTID = #{projectId}
     </select>
 
-    <update id="approve">
+    <update id="approveProject">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'UPCOMING'
         WHERE PROJECTID = #{projectId}
-          AND PROJECTSTATUS = 'UNDER_REVIEW'
+          AND PROJECTSTATUS = 'VERIFYING'
     </update>
 
-    <update id="reject">
+    <update id="rejectProject">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'REJECTED',
             REJECTEDREASON = #{rejectedReason}
         WHERE PROJECTID = #{projectId}
-        AND PROJECTSTATUS = 'UNDER_REVIEW'
+        AND PROJECTSTATUS = 'VERIFYING'
     </update>
 
 </mapper>

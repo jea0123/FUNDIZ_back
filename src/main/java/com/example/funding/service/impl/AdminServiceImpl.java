@@ -5,10 +5,10 @@ import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
-import com.example.funding.dto.response.admin.ReviewDetailDto;
-import com.example.funding.dto.request.admin.SearchReviewDto;
+import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
+import com.example.funding.dto.request.admin.SearchProjectVerifyDto;
 import com.example.funding.dto.response.admin.analytic.*;
-import com.example.funding.dto.row.ReviewListRow;
+import com.example.funding.dto.response.admin.ProjectVerifyListDto;
 import com.example.funding.mapper.AdminMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.RewardMapper;
@@ -200,24 +200,23 @@ public class AdminServiceImpl implements AdminService {
     /**
      * <p>프로젝트 심사 목록 조회</p>
      *
-     * @param dto SearchReviewDto
-     * @param reqPager 요청 pager
+     * @param dto SearchProjectVerifyDto
+     * @param pager pager
      * @return 성공 시 200 OK
      * @author by: 조은애
      * @since 2025-09-18
      */
     @Override
-    public ResponseEntity<ResponseDto<PageResult<ReviewListRow>>> getReviewList(SearchReviewDto dto, Pager reqPager) {
-        Pager pager = Pager.ofRequest(
-                reqPager != null ? reqPager.getPage() : 1,
-                reqPager != null ? reqPager.getSize() : 20,
-                reqPager != null ? reqPager.getPerGroup() : 5
-        );
+    public ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchProjectVerifyDto dto, Pager pager) {
+        dto.applyRangeType();
 
-        int total = adminMapper.countReviews(dto);
+        int total = adminMapper.countProjectVerify(dto);
 
-        List<ReviewListRow> items = (total == 0) ? Collections.emptyList() : adminMapper.getReviewList(dto, pager);
-        PageResult<ReviewListRow> result = PageResult.of(items, pager, total);
+        List<ProjectVerifyListDto> items = Collections.emptyList();
+        if (total > 0) {
+            items = adminMapper.getProjectVerifyList(dto, pager);
+        }
+        PageResult<ProjectVerifyListDto> result = PageResult.of(items, pager, total);
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 심사 목록 조회 성공", result));
     }
@@ -231,8 +230,8 @@ public class AdminServiceImpl implements AdminService {
      * @since 2025-09-19
      */
     @Override
-    public ResponseEntity<ResponseDto<ReviewDetailDto>> getReviewDetail(Long projectId) {
-        ReviewDetailDto detail = adminMapper.getReviewDetail(projectId);
+    public ResponseEntity<ResponseDto<ProjectVerifyDetailDto>> getProjectVerifyDetail(Long projectId) {
+        ProjectVerifyDetailDto detail = adminMapper.getProjectVerifyDetail(projectId);
         if (detail == null) {
             throw new IllegalStateException("존재하지 않는 프로젝트입니다.");
         }
@@ -254,8 +253,8 @@ public class AdminServiceImpl implements AdminService {
      * @since 2025-09-19
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> approve(Long projectId) {
-        int result = adminMapper.approve(projectId);
+    public ResponseEntity<ResponseDto<String>> approveProject(Long projectId) {
+        int result = adminMapper.approveProject(projectId);
         if (result == 0) {
             throw new IllegalStateException("승인 처리가 실패되었습니다.");
         }
@@ -273,8 +272,8 @@ public class AdminServiceImpl implements AdminService {
      * @since 2025-09-19
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> reject(Long projectId, String rejectedReason) {
-        int result = adminMapper.reject(projectId, rejectedReason);
+    public ResponseEntity<ResponseDto<String>> rejectProject(Long projectId, String rejectedReason) {
+        int result = adminMapper.rejectProject(projectId, rejectedReason);
         if (result == 0) {
             throw new IllegalStateException("반려 처리가 실패되었습니다.");
         }

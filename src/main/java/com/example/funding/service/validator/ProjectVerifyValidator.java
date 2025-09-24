@@ -13,7 +13,7 @@ import java.util.Locale;
 
 @Component
 @RequiredArgsConstructor
-public class ReviewRequestValidator {
+public class ProjectVerifyValidator {
 
     private final CategoryMapper categoryMapper;
     private final RewardMapper rewardMapper;

@@ -15,22 +15,22 @@
 
     <!-- detail resultMap-->
     <resultMap id="BackingDetailResultMap" type="com.example.funding.dto.response.user.BackingDto">
-        <result property="price" column="price"/>
-        <result property="quantity" column="quantity"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="quantity" column="quantity" jdbcType="NUMERIC"/>
 
         <!-- backingReward -->
         <association property="backingReward" javaType="com.example.funding.dto.response.user.MyPageBackingRewardDto">
-            <id property="rewardId" column="rewardId"/>
+            <id property="rewardId" column="rewardId" jdbcType="NUMERIC"/>
             <result property="rewardName" column="rewardName"/>
             <result property="deliveryDate" column="deliveryDate"/>
 
             <!-- backingProject-->
             <association property="backingProject" javaType="com.example.funding.dto.response.user.MyPageBackingProjectDto">
-                <id property="projectId" column="projectId"/>
+                <id property="projectId" column="projectId" jdbcType="NUMERIC"/>
                 <result property="thumbnail" column="thumbnail"/>
                 <result property="title" column="title"/>
-                <result property="goalAmount" column="goalAmount"/>
-                <result property="currAmount" column="currAmount"/>
+                <result property="goalAmount" column="goalAmount" jdbcType="NUMERIC"/>
+                <result property="currAmount" column="currAmount" jdbcType="NUMERIC"/>
                 <result property="endDate" column="endDate"/>
                 <result property="projectStatus" column="projectStatus"/>
             </association>
@@ -40,8 +40,8 @@
 
         <!--backing -->
         <association property="backing" javaType="com.example.funding.model.Backing">
-            <id property="backingId" column="backingId"/>
-            <result property="amount" column="amount"/>
+            <id property="backingId" column="backingId" jdbcType="NUMERIC"/>
+            <result property="amount" column="amount" jdbcType="NUMERIC"/>
             <result property="createdAt" column="createdAt"/>
             <result property="backingStatus" column="backingStatus"/>
         </association>
@@ -52,27 +52,27 @@
     <select id="getBackingProjectAndUserId" parameterType="map" resultMap="BackingDetailResultMap">
         SELECT
         <!-- 프로젝트 테이블에서 가져올 내용 -->
-        p.projectId,
-        p.title,
-        p.thumbnail,
-        p.endDate,
-        p.projectStatus,
-        p.goalAmount,
-        p.currAmount,
+        p.projectId AS price,
+        p.title AS title,
+        p.thumbnail AS thumbnail,
+        p.endDate AS endDate,
+        p.projectStatus AS projectStatus,
+        p.goalAmount AS goalAmount,
+        p.currAmount AS currAmount,
 
         <!-- 리워드 테이블에서 가져올 내용 -->
-        r.rewardId,
-        r.rewardName,
-        r.deliveryDate,
+        r.rewardId AS rewardId,
+        r.rewardName AS rewardName,
+        r.deliveryDate AS deliveryDate,
 
         <!-- 후원 테이블에서 가져올 내용 -->
-        b.backingId,
-        b.amount,
-        b.createdAt,
-        b.backingStatus,
+        b.backingId AS backingId,
+        b.amount AS amount,
+        b.createdAt AS createdAt,
+        b.backingStatus AS backingStatus,
         <!-- 후원 상세에서 가져올 내용 -->
-        bd.price,
-        bd.quantity
+        bd.price AS price,
+        bd.quantity AS quantity
 
         FROM backingDetail bd
         JOIN backing b ON b.backingId = bd.backingId

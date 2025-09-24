@@ -85,4 +85,7 @@ public class UserController {
         return userService.getQnADetail(userId, projectId);
     }
 
+//    @GetMapping("/userStatus/{userId}")
+//    public ResponseEntity<ResponseDto<>>
+
 }

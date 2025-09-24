@@ -78,7 +78,7 @@ public class BackingServiceImpl implements BackingService {
                 .addrId(requestDto.getAddrId())
                 .newAddress(requestDto.getNewAddress())
                 .build();
-        return ResponseEntity.ok(ResponseDto.success(200, "후원 페이지 추가 성공", /*"추가!!"*/ backingRequest.toString()));
+        return ResponseEntity.ok(ResponseDto.success(200, "후원 추가 성공", /*"추가!!"*/ backingRequest.toString()));
     }
 
     /**

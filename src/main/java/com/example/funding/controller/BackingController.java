@@ -24,13 +24,13 @@ import java.util.List;
 public class BackingController {
     private final BackingService backingService;
 
-    @GetMapping("/{userId}/CreateBacking/{projectId}")
+    @GetMapping("/{userId}/create/{projectId}")
     public ResponseEntity<ResponseDto<BackingResponseDto>>prepareBacking(@PathVariable Long projectId,
                                                                          @PathVariable Long userId) {
         return backingService.prepareBacking(userId, projectId);
     }
 
-    @PostMapping("/CreateBacking/{userId}")
+    @PostMapping("/create/{userId}")
     public ResponseEntity<ResponseDto<String>>CreateBacking(@RequestBody BackingRequestDto requestDto,
                                                             @PathVariable Long userId) {
         return backingService.createBacking(userId, requestDto);
@@ -43,18 +43,19 @@ public class BackingController {
         return backingService.updateBacking(requestDto, backingId, userId);
     }
 
+    //TODO: 결제 취소로 바꾸기
     @DeleteMapping("/{backingId}/delete/{userId}")
     public ResponseEntity<ResponseDto<String>>DeleteBacking(@PathVariable Long backingId,
                                                             @PathVariable Long userId) {
         return backingService.deleteBacking(backingId, userId);
     }
 
-    @GetMapping("/me/backingPage/{userId}")
+    @GetMapping("/page/{userId}")
     public ResponseEntity<ResponseDto<List<BackingDto>>>getBackingList(@PathVariable Long userId) {
         return backingService.getBackingList(userId);
     }
 
-    @GetMapping("/me/backingPage/{userId}/project/{projectId}/reward/{rewardId}")
+    @GetMapping("/page/{userId}/project/{projectId}/reward/{rewardId}")
     public ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(@PathVariable Long userId, @PathVariable Long projectId, @PathVariable Long rewardId){
         return backingService.getBackingDetail(userId,projectId, rewardId);
     }

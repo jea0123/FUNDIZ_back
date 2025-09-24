@@ -366,6 +366,7 @@ public class ProjectServiceImpl implements ProjectService {
      * @since 2025-09-16
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> searchProject(SearchProjectDto dto, Pager pager) {
         int total = projectMapper.countSearchProjects(dto);
 

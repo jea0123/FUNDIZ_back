@@ -207,6 +207,7 @@ public class AdminServiceImpl implements AdminService {
      * @since 2025-09-18
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchProjectVerifyDto dto, Pager pager) {
         dto.applyRangeType();
 
@@ -230,6 +231,7 @@ public class AdminServiceImpl implements AdminService {
      * @since 2025-09-19
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<ProjectVerifyDetailDto>> getProjectVerifyDetail(Long projectId) {
         ProjectVerifyDetailDto detail = adminMapper.getProjectVerifyDetail(projectId);
         if (detail == null) {

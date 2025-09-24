@@ -121,12 +121,12 @@ public class ProjectController {
      * @author by: 조은애
      * @since 2025-09-18
      */
-    @PostMapping("{projectId}/review-request")
-    public ResponseEntity<ResponseDto<String>> requestReview(@PathVariable Long projectId){
+    @PostMapping("{projectId}/verify")
+    public ResponseEntity<ResponseDto<String>> verifyProject(@PathVariable Long projectId){
         //userId -> creatorId
         Long creatorId = 1L;
 
-        return projectService.requestReview(projectId, creatorId);
+        return projectService.verifyProject(projectId, creatorId);
     }
 
     /**
@@ -139,14 +139,14 @@ public class ProjectController {
      * @since 2025-09-16
      */
     @GetMapping("/search")
-    public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> search(SearchProjectDto dto, Pager reqPager) {
+    public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> searchProject(SearchProjectDto dto, Pager reqPager) {
         Pager pager = Pager.ofRequest(
-                reqPager != null ? reqPager.getPage() : null,
-                reqPager != null ? 20 : null,
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 20,
                 reqPager != null ? reqPager.getPerGroup() : null
         );
 
-        return projectService.search(dto, pager);
+        return projectService.searchProject(dto, pager);
     }
 
 }

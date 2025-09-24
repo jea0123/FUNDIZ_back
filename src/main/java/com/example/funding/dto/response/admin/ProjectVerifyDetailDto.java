@@ -1,6 +1,5 @@
 package com.example.funding.dto.response.admin;
 
-import com.example.funding.dto.request.reward.RewardCreateRequestDto;
 import com.example.funding.model.Reward;
 import com.example.funding.model.Tag;
 import lombok.Getter;
@@ -11,7 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ReviewDetailDto {
+public class ProjectVerifyDetailDto {
     private Long projectId;
     private Long creatorId;
     private String title;

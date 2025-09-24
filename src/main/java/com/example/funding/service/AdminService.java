@@ -3,14 +3,14 @@ package com.example.funding.service;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.admin.SearchProjectVerifyDto;
 import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
-import com.example.funding.dto.response.admin.ReviewDetailDto;
-import com.example.funding.dto.request.admin.SearchReviewDto;
+import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
 import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
-import com.example.funding.dto.row.ReviewListRow;
+import com.example.funding.dto.response.admin.ProjectVerifyListDto;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
@@ -29,11 +29,11 @@ public interface AdminService {
 
     ResponseEntity<ResponseDto<String>> updateProject(ProjectUpdateRequestDto dto);
 
-    ResponseEntity<ResponseDto<PageResult<ReviewListRow>>> getReviewList(SearchReviewDto dto, Pager reqPager);
+    ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchProjectVerifyDto dto, Pager pager);
 
-    ResponseEntity<ResponseDto<ReviewDetailDto>> getReviewDetail(Long projectId);
+    ResponseEntity<ResponseDto<ProjectVerifyDetailDto>> getProjectVerifyDetail(Long projectId);
 
-    ResponseEntity<ResponseDto<String>> approve(Long projectId);
+    ResponseEntity<ResponseDto<String>> approveProject(Long projectId);
 
-    ResponseEntity<ResponseDto<String>> reject(Long projectId, String rejectedReason);
+    ResponseEntity<ResponseDto<String>> rejectProject(Long projectId, String rejectedReason);
 }

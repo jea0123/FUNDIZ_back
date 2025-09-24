@@ -15,7 +15,7 @@ import com.example.funding.mapper.*;
 import com.example.funding.model.*;
 import com.example.funding.service.ProjectService;
 import com.example.funding.service.RewardService;
-import com.example.funding.service.validator.ReviewRequestValidator;
+import com.example.funding.service.validator.ProjectVerifyValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +39,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final RewardService rewardService;
     private final NewsMapper newsMapper;
 
-    private final ReviewRequestValidator validator;
+    private final ProjectVerifyValidator validator;
 
     /**
      * <p>프로젝트 상세 페이지 조회</p>
@@ -323,7 +323,7 @@ public class ProjectServiceImpl implements ProjectService {
      * @since 2025-09-18
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> requestReview(Long projectId, Long creatorId) {
+    public ResponseEntity<ResponseDto<String>> verifyProject(Long projectId, Long creatorId) {
 
         //소유자 체크
 
@@ -337,7 +337,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (!"DRAFT".equalsIgnoreCase(project.getProjectStatus())) {
             throw new IllegalStateException("현재 상태에서는 심사 요청을 할 수 없습니다.");
         }
-        if ("Y".equalsIgnoreCase(String.valueOf(project.getIsReqReview()))) {
+        if ("Y".equalsIgnoreCase(String.valueOf(project.getIsVerified()))) {
             throw new IllegalStateException("이미 심사 요청된 프로젝트입니다.");
         }
 
@@ -348,7 +348,7 @@ public class ProjectServiceImpl implements ProjectService {
 //        }
 
         //상태 업데이트
-        int result = projectMapper.markRequestReview(projectId);
+        int result = projectMapper.markVerifyProject(projectId);
         if (result == 0) {
             throw new IllegalStateException("심사 요청 실패");
         }
@@ -360,22 +360,22 @@ public class ProjectServiceImpl implements ProjectService {
      * <p>검색 기능 (제목, 내용, 창작자명, 태그)</p>
      *
      * @param dto SearchProjectDto
-     * @param reqPager 요청 pager
+     * @param pager pager
      * @return 성공 시 200 OK
      * @author by: 조은애
      * @since 2025-09-16
      */
     @Override
-    public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> search(SearchProjectDto dto, Pager reqPager) {
+    public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> searchProject(SearchProjectDto dto, Pager pager) {
         int total = projectMapper.countSearchProjects(dto);
 
         List<FeaturedProjectDto> items = Collections.emptyList();
         if (total > 0) {
-            items = projectMapper.searchProjects(dto, reqPager);
+            items = projectMapper.searchProjects(dto, pager);
         }
-        PageResult<FeaturedProjectDto> result = PageResult.of(items, reqPager, total);
+        PageResult<FeaturedProjectDto> result = PageResult.of(items, pager, total);
 
-        return ResponseEntity.ok(ResponseDto.success(200, "검색 성공", result));
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 검색 성공", result));
     }
 
 }

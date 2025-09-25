@@ -204,17 +204,21 @@
 
     <update id="approveProject">
         UPDATE PROJECT
-        SET PROJECTSTATUS = 'UPCOMING'
+        SET PROJECTSTATUS = 'UPCOMING',
+            ISVERIFIED = 'N'
         WHERE PROJECTID = #{projectId}
           AND PROJECTSTATUS = 'VERIFYING'
+          AND ISVERIFIED = 'Y'
     </update>
 
     <update id="rejectProject">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'REJECTED',
+            ISVERIFIED = 'N',
             REJECTEDREASON = #{rejectedReason}
         WHERE PROJECTID = #{projectId}
-        AND PROJECTSTATUS = 'VERIFYING'
+          AND PROJECTSTATUS = 'VERIFYING'
+          AND ISVERIFIED = 'Y'
     </update>
 
 </mapper>

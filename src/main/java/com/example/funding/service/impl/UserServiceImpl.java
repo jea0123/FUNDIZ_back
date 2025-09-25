@@ -181,8 +181,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<ResponseDto<String>> getMyData(Long userId) {
-        // TODO:계정 정보 수정 구현
+    public ResponseEntity<ResponseDto<String>> userNickname(Long userId) {
         return null;
     }
+
+    @Override
+    public ResponseEntity<ResponseDto<String>> userProfileImg(Long userId) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<String>> userpassword(Long userId) {
+        return null;
+    }
+
 }

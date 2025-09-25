@@ -55,4 +55,22 @@
         ]]>
     </select>
 
+    <update id = "updateNickname">
+        UPDATE USERS
+        SET nickname = #{nickname}
+        WHERE userId = #{userID}
+    </update>
+
+    <update id = "updatePwd">
+        UPDATE USERS
+        SET pwd = #{pwd}
+        WHERE userId = #{userId}
+    </update>
+
+    <update id = "updateProfileImg">
+        UPDATE USERS
+        SET profileImg = #{profileImg}
+        WHERE userId = #{userId}
+    </update>
+
 </mapper>

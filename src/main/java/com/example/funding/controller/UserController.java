@@ -1,6 +1,9 @@
 package com.example.funding.controller;
 
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.user.UserNicknameDto;
+import com.example.funding.dto.request.user.UserPasswordDto;
+import com.example.funding.dto.request.user.UserProfileImgDto;
 import com.example.funding.dto.response.user.*;
 import com.example.funding.service.ProjectService;
 import com.example.funding.service.UserService;
@@ -52,14 +55,22 @@ public class UserController {
      * @author by: 이윤기
      */
 
-    @GetMapping("/me/userPage/{userId}")
+    @GetMapping("/userPage/{userId}")
     public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageUser(@PathVariable Long userId) {
         return userService.getMyPageUser(userId);
     }
 
-    @PostMapping("me/userPage/{userId}")
-    public ResponseEntity<ResponseDto<String>> updateMydata (@PathVariable Long userId, @RequestBody MyPageUserDto myPageUserDto) {
-        return userService.getMyData(userId);
+    @PostMapping("/userPage-nickname/{userId}")
+    public ResponseEntity<ResponseDto<String>> updateNickname (@PathVariable Long userId, @RequestBody UserNicknameDto nickname) {
+        return userService.userNickname(userId);
+    }
+    @PostMapping("/userPage-profile/{userId}")
+    public ResponseEntity<ResponseDto<String>> updateProfileImg(@PathVariable Long userId, @RequestBody UserProfileImgDto profileImg){
+        return userService.userProfileImg(userId);
+    }
+    @PostMapping("/userPage-pass/{userId}")
+    public ResponseEntity<ResponseDto<String>> updatePassword(@PathVariable Long userId, @RequestBody UserPasswordDto password){
+        return userService.userpassword(userId);
     }
 
     /**
@@ -70,17 +81,17 @@ public class UserController {
      * @author by: 이윤기
      */
 
-    @GetMapping("/me/likedList/{userId}")
+    @GetMapping("/likedList/{userId}")
     public ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(@PathVariable Long userId) {
         return userService.getLikedList(userId);
     }
 
-    @GetMapping("/me/QnAList/{userId}")
+    @GetMapping("/QnAList/{userId}")
     public ResponseEntity<ResponseDto<List<MyPageQnADto>>> getQnAList(@PathVariable Long userId) {
         return userService.getQnAList(userId);
     }
 
-    @GetMapping("/me/QnAListDetail/{userId}/project/{projectId}")
+    @GetMapping("/QnAListDetail/{userId}/project/{projectId}")
     public ResponseEntity<ResponseDto<MyPageQnADetailDto>> getQnADetail(@PathVariable Long userId, @PathVariable Long projectId){
         return userService.getQnADetail(userId, projectId);
     }

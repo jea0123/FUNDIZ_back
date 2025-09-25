@@ -20,5 +20,9 @@ public interface UserService {
     //서비스에서구현
     ResponseEntity<ResponseDto<MyPageQnADetailDto>> getQnADetail(Long userId, Long projectId);
 
-    ResponseEntity<ResponseDto<String>> getMyData(Long userId);
+    ResponseEntity<ResponseDto<String>> userNickname(Long userId);
+
+    ResponseEntity<ResponseDto<String>> userProfileImg(Long userId);
+
+    ResponseEntity<ResponseDto<String>> userpassword(Long userId);
 }

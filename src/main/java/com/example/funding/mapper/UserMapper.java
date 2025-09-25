@@ -28,4 +28,10 @@ public interface UserMapper {
 
     List<RecentViewProject> getRecentViewProjects(@Param("userId") Long userId);
 
+    int updateNickname(@Param("userId") Long userId, @Param("nickname") String nickname);
+
+    int updatePwd(@Param("userId") Long userId, @Param("password") String pwd);
+
+    int updateProfile(@Param("userId") Long userId, @Param("profileImg") String profile);
+
 }

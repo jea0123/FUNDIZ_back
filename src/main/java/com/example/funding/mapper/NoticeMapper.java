@@ -1,6 +1,7 @@
 package com.example.funding.mapper;
 
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
 import com.example.funding.model.Notice;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -17,11 +18,10 @@ public interface NoticeMapper {
 
     void add(ResponseEntity<ResponseDto<Notice>> item);
 
-    //Notice update(@Param("noticeId") Notice item);
+    int addNotice(Notice item);
 
-    //Notice delete(@Param("noticeId") Long noticeId);
+    int updateNotice(NoticeUpdateRequestDto ntcDto);
 
-    //Notice item(@Param("noticeId") Long noticeId);
-
+    int deleteNotice(Long noticeId);
 
 }

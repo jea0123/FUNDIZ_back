@@ -28,7 +28,7 @@ public class Project {
     private Integer backerCnt;
     private Integer likeCnt;
     private Integer viewCnt;
-    private Character isReqReview;
+    private Character isVerified;
     private String rejectedReason;
     private LocalDate requestedAt;
 }

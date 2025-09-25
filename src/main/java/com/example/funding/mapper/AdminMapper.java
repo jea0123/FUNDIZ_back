@@ -1,10 +1,10 @@
 package com.example.funding.mapper;
 
 import com.example.funding.common.Pager;
-import com.example.funding.dto.response.admin.ReviewDetailDto;
-import com.example.funding.dto.request.admin.SearchReviewDto;
+import com.example.funding.dto.request.admin.SearchProjectVerifyDto;
+import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
 import com.example.funding.dto.response.admin.analytic.*;
-import com.example.funding.dto.row.ReviewListRow;
+import com.example.funding.dto.response.admin.ProjectVerifyListDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -29,13 +29,13 @@ public interface AdminMapper {
 
     int cancelProject(@Param("projectId") Long projectId);
 
-    int countReviews(@Param("dto") SearchReviewDto dto);
+    int countProjectVerify(@Param("dto") SearchProjectVerifyDto dto);
 
-    List<ReviewListRow> getReviewList(@Param("dto") SearchReviewDto dto, @Param("pager") Pager pager);
+    List<ProjectVerifyListDto> getProjectVerifyList(@Param("dto") SearchProjectVerifyDto dto, @Param("pager") Pager pager);
 
-    ReviewDetailDto getReviewDetail(@Param("projectId") Long projectId);
+    ProjectVerifyDetailDto getProjectVerifyDetail(@Param("projectId") Long projectId);
 
-    int approve(@Param("projectId") Long projectId);
+    int approveProject(@Param("projectId") Long projectId);
 
-    int reject(@Param("projectId") Long projectId, @Param("rejectedReason") String rejectedReason);
+    int rejectProject(@Param("projectId") Long projectId, @Param("rejectedReason") String rejectedReason);
 }

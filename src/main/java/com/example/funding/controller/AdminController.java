@@ -7,12 +7,12 @@ import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.admin.RejectRequestDto;
 import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
-import com.example.funding.dto.response.admin.ReviewDetailDto;
-import com.example.funding.dto.request.admin.SearchReviewDto;
+import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
+import com.example.funding.dto.request.admin.SearchProjectVerifyDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
 import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
-import com.example.funding.dto.row.ReviewListRow;
+import com.example.funding.dto.response.admin.ProjectVerifyListDto;
 import com.example.funding.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -131,15 +131,21 @@ public class AdminController {
     /**
      * <p>프로젝트 심사 목록 조회</p>
      *
-     * @param dto SearchReviewDto
+     * @param dto SearchProjectVerifyDto
      * @param reqPager 요청 pager
      * @return 성공 시 200 OK
      * @author by: 조은애
      * @since 2025-09-18
      */
-    @GetMapping("/review")
-    public ResponseEntity<ResponseDto<PageResult<ReviewListRow>>> getReviewList(SearchReviewDto dto, Pager reqPager) {
-        return adminService.getReviewList(dto, reqPager);
+    @GetMapping("/verify")
+    public ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchProjectVerifyDto dto, Pager reqPager) {
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 5,
+                reqPager != null ? reqPager.getPerGroup() : null
+        );
+
+        return adminService.getProjectVerifyList(dto, pager);
     }
 
     /**
@@ -150,9 +156,9 @@ public class AdminController {
      * @author by: 조은애
      * @since 2025-09-19
      */
-    @GetMapping("/review/{projectId}")
-    public ResponseEntity<ResponseDto<ReviewDetailDto>> getReviewDetail(@PathVariable Long projectId) {
-        return adminService.getReviewDetail(projectId);
+    @GetMapping("/verify/{projectId}")
+    public ResponseEntity<ResponseDto<ProjectVerifyDetailDto>> getProjectVerifyDetail(@PathVariable Long projectId) {
+        return adminService.getProjectVerifyDetail(projectId);
     }
 
     /**
@@ -163,9 +169,9 @@ public class AdminController {
      * @author by: 조은애
      * @since 2025-09-19
      */
-    @PostMapping("/review/{projectId}/approve")
-    public ResponseEntity<ResponseDto<String>> approve(@PathVariable Long projectId) {
-        return adminService.approve(projectId);
+    @PostMapping("/verify/approve/{projectId}")
+    public ResponseEntity<ResponseDto<String>> approveProject(@PathVariable Long projectId) {
+        return adminService.approveProject(projectId);
     }
 
     /**
@@ -177,8 +183,8 @@ public class AdminController {
      * @author by: 조은애
      * @since 2025-09-19
      */
-    @PostMapping("/review/{projectId}/reject")
-    public ResponseEntity<ResponseDto<String>> reject(@PathVariable Long projectId, @RequestBody RejectRequestDto dto) {
-        return adminService.reject(projectId, dto.getRejectedReason());
+    @PostMapping("/verify/reject/{projectId}")
+    public ResponseEntity<ResponseDto<String>> rejectProject(@PathVariable Long projectId, @RequestBody RejectRequestDto dto) {
+        return adminService.rejectProject(projectId, dto.getRejectedReason());
     }
 }

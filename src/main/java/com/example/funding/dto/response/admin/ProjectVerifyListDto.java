@@ -1,4 +1,4 @@
-package com.example.funding.dto.row;
+package com.example.funding.dto.response.admin;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class ReviewListRow {
+public class ProjectVerifyListDto {
     private Long projectId;
     private String title;
     private String creatorName;

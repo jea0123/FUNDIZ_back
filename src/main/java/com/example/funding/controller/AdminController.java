@@ -141,7 +141,7 @@ public class AdminController {
     public ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchProjectVerifyDto dto, Pager reqPager) {
         Pager pager = Pager.ofRequest(
                 reqPager != null ? reqPager.getPage() : 1,
-                reqPager != null ? reqPager.getSize() : 20,
+                reqPager != null ? reqPager.getSize() : 5,
                 reqPager != null ? reqPager.getPerGroup() : null
         );
 
@@ -169,7 +169,7 @@ public class AdminController {
      * @author by: 조은애
      * @since 2025-09-19
      */
-    @PostMapping("/verify/{projectId}/approve")
+    @PostMapping("/verify/approve/{projectId}")
     public ResponseEntity<ResponseDto<String>> approveProject(@PathVariable Long projectId) {
         return adminService.approveProject(projectId);
     }
@@ -183,7 +183,7 @@ public class AdminController {
      * @author by: 조은애
      * @since 2025-09-19
      */
-    @PostMapping("/verify/{projectId}/reject")
+    @PostMapping("/verify/reject/{projectId}")
     public ResponseEntity<ResponseDto<String>> rejectProject(@PathVariable Long projectId, @RequestBody RejectRequestDto dto) {
         return adminService.rejectProject(projectId, dto.getRejectedReason());
     }

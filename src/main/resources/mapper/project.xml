@@ -347,7 +347,7 @@
     <update id="updateProjectsToSuccess">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'SUCCESS',
-        UPDATEDAT = SYSDATE
+            UPDATEDAT = SYSDATE
         WHERE PROJECTSTATUS = 'OPEN'
           AND ENDDATE <![CDATA[ < ]]> TRUNC(SYSDATE)
           AND CURRAMOUNT <![CDATA[ >= ]]> GOALAMOUNT
@@ -356,7 +356,7 @@
     <update id="updateProjectsToFailed">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'FAILED',
-        UPDATEDAT = SYSDATE
+            UPDATEDAT = SYSDATE
         WHERE PROJECTSTATUS = 'OPEN'
           AND ENDDATE <![CDATA[ < ]]> TRUNC(SYSDATE)
           AND CURRAMOUNT <![CDATA[ < ]]> GOALAMOUNT
@@ -364,12 +364,12 @@
 
     <update id="markVerifyProject">
         UPDATE PROJECT
-        SET ISVERIFIED = 'Y',
-            PROJECTSTATUS = 'VERIFYING',
+        SET PROJECTSTATUS = 'VERIFYING',
+            ISVERIFIED = 'Y',
             REQUESTEDAT = SYSDATE
         WHERE PROJECTID = #{projectId}
-          AND UPPER(PROJECTSTATUS) = 'DRAFT'
-          AND UPPER(ISVERIFIED) = 'N'
+          AND PROJECTSTATUS = 'DRAFT'
+          AND ISVERIFIED = 'N'
     </update>
 
 </mapper>

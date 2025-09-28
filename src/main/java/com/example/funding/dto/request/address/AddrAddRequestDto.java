@@ -16,6 +16,6 @@
         private String roadAddr;
         private String detailAddr;
         private String recipientPhone;
-        private Character isDefault;
+        private String isDefault;
 
     }

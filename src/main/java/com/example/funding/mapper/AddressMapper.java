@@ -14,6 +14,8 @@ public interface AddressMapper {
 
     int addAddr(Address addr);
 
+    int resetDefaultAddr(Long userId, Long addrId);
+
     int updateAddr(AddrUpdateRequestDto addrDto);
 
     int deleteAddr(@Param("userId") Long userId, @Param("addrId") Long addrId);

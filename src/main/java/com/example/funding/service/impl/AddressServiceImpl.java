@@ -40,6 +40,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public ResponseEntity<ResponseDto<String>> addAddress(Long userId, AddrAddRequestDto addrDto) {
+
         Address addr = Address.builder()
                 .userId(userId)
                 .addrName(addrDto.getAddrName())
@@ -64,6 +65,14 @@ public class AddressServiceImpl implements AddressService {
     public ResponseEntity<ResponseDto<String>> updateAddr(Long userId, Long addrId, AddrUpdateRequestDto addrDto) {
         addrDto.setAddrId(addrId);
         addrDto.setUserId(userId);
+
+        if (addrDto.getIsDefault() != null) {
+            addrDto.setIsDefault(addrDto.getIsDefault().trim().toUpperCase());
+        }
+
+        if("Y".equals(addrDto.getIsDefault())){
+            addressMapper.resetDefaultAddr(userId, addrId);
+        }
 
         int result = addressMapper.updateAddr(addrDto);
         if(result ==0){

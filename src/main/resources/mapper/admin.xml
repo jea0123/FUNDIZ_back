@@ -186,7 +186,7 @@
                 JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
                 JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
                 <include refid="verifyFilterWhere" />
-                ORDER BY p.REQUESTEDAT DESC
+                ORDER BY p.REQUESTEDAT
                 ) T
             WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
             )

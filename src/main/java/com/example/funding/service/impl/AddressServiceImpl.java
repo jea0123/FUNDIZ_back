@@ -2,6 +2,7 @@ package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.address.AddrAddRequestDto;
+import com.example.funding.dto.request.address.AddrDefaultSetDto;
 import com.example.funding.dto.request.address.AddrUpdateRequestDto;
 import com.example.funding.dto.response.address.AddressResponseDto;
 import com.example.funding.mapper.AddressMapper;
@@ -40,6 +41,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public ResponseEntity<ResponseDto<String>> addAddress(Long userId, AddrAddRequestDto addrDto) {
+
         Address addr = Address.builder()
                 .userId(userId)
                 .addrName(addrDto.getAddrName())
@@ -52,7 +54,7 @@ public class AddressServiceImpl implements AddressService {
                 .build();
 
         int result = addressMapper.addAddr(addr);
-        
+
         if(result ==0){
           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"배송지 추가 실패"));
         }
@@ -65,6 +67,8 @@ public class AddressServiceImpl implements AddressService {
         addrDto.setAddrId(addrId);
         addrDto.setUserId(userId);
 
+        //addressMapper.resetDefaultAddr(userId, addrId);
+
         int result = addressMapper.updateAddr(addrDto);
         if(result ==0){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "주소 수정 실패"));
@@ -72,7 +76,7 @@ public class AddressServiceImpl implements AddressService {
         return ResponseEntity.ok(ResponseDto.success(200,"주소 수정 완료", "주소 수정 "));
     }
 
-    
+
     @Override
     public ResponseEntity<ResponseDto<String>> deleteAddr(Long userId, Long addrId) {
         int deleted = addressMapper.deleteAddr(userId, addrId);
@@ -81,4 +85,22 @@ public class AddressServiceImpl implements AddressService {
         }
         return ResponseEntity.ok(ResponseDto.success(200, "주소 삭제 완료", "주소 삭제"));
     }
+
+    //TODO: 컨트롤러 분리 (기본주소지설정)
+    @Override
+    public ResponseEntity<ResponseDto<String>> defaultAddr(Long userId, Long addrId, AddrDefaultSetDto addrDefaultDto) {
+        addrDefaultDto.setUserId(userId);
+        addrDefaultDto.setAddrId(addrId);
+
+        //기본 값을 'N'으로 바꿈
+        int result = addressMapper.resetDefaultAddr(userId, addrId);
+
+        if(result == 0){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"배송지 기본 설정 실패"));
+        }
+
+        return ResponseEntity.ok(ResponseDto.success(200,"배송지 기본설정 완료", "배송지 기본설정완료 "));
+
+    }
+
 }

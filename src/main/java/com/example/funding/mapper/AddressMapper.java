@@ -1,5 +1,6 @@
 package com.example.funding.mapper;
 
+import com.example.funding.dto.request.address.AddrDefaultSetDto;
 import com.example.funding.dto.request.address.AddrUpdateRequestDto;
 import com.example.funding.dto.response.address.AddressResponseDto;
 import com.example.funding.model.Address;
@@ -13,6 +14,8 @@ public interface AddressMapper {
     List<AddressResponseDto> getAddressList(@Param("userId") Long userId);
 
     int addAddr(Address addr);
+
+    int resetDefaultAddr(@Param("userId") Long userId,@Param("addrId") Long addrId);
 
     int updateAddr(AddrUpdateRequestDto addrDto);
 

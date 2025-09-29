@@ -2,11 +2,13 @@ package com.example.funding.controller;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.address.AddrAddRequestDto;
+import com.example.funding.dto.request.address.AddrDefaultSetDto;
 import com.example.funding.dto.request.address.AddrUpdateRequestDto;
 import com.example.funding.dto.response.address.AddressResponseDto;
 import com.example.funding.service.AddressService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Request;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +33,12 @@ public class AddressController {
         return addressService.addAddress(userId, addrDto);
     }
 
+    @PostMapping("{userId}/defaultAddr/{addrId}")
+    public ResponseEntity<ResponseDto<String>> setDefaultAddr(@PathVariable Long userId, @PathVariable Long addrId, @RequestBody AddrDefaultSetDto addrDefaultDto){
+        return addressService.defaultAddr(userId, addrId, addrDefaultDto);
+    }
+
+    // 주소지 기본설정 컨트롤러 분리필요
     @PostMapping("{userId}/update/{addrId}")
     public ResponseEntity<ResponseDto<String>> updateAddress(@PathVariable Long userId,
                                                              @PathVariable Long addrId,

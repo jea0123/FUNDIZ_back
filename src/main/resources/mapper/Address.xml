@@ -24,15 +24,6 @@
             SELECT ADDRESS_SEQ.NEXTVAL FROM DUAL
         </selectKey>
 
-        <!-- 새 주소를 등록하면
-             기존 기본배송지(Y)를 전부 보조배송지(N)로 변경 -->
-        <if test="isDefault == 'Y'">
-            UPDATE ADDRESS
-            SET ISDEFAULT = 'N'
-            WHERE USERID = #{userId}
-            AND ISDEFAULT = 'Y'
-        </if>
-
         INSERT INTO ADDRESS (
         ADDRID, USERID, ADDRNAME, RECIPIENT, POSTALCODE, ROADADDR,
         DETAILADDR, RECIPIENTPHONE, ISDEFAULT
@@ -44,11 +35,11 @@
 
     <update id="resetDefaultAddr">
         UPDATE ADDRESS
-        SET ISDEFAULT ='N'
+        SET ISDEFAULT =CASE
+                        WHEN ADDRID = #{addrId} THEN 'Y' ELSE 'N' END
         WHERE USERID = #{userId}
-        AND ISDEFAULT ='Y'
-        AND ADDRID != #{addrId}
     </update>
+
 
     <update id="updateAddr" parameterType="com.example.funding.dto.request.address.AddrUpdateRequestDto">
         UPDATE ADDRESS
@@ -57,8 +48,7 @@
             POSTALCODE = #{postalCode},
             ROADADDR = #{roadAddr},
             DETAILADDR = #{detailAddr},
-            RECIPIENTPHONE = #{recipientPhone},
-            ISDEFAULT = CASE WHEN TRIM(#{isDefault}) ='Y' THEN 'Y' ELSE 'N' END
+            RECIPIENTPHONE = #{recipientPhone}
         WHERE USERID = #{userId}
         AND ADDRID = #{addrId}
     </update>

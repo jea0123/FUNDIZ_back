@@ -10,6 +10,8 @@ import java.util.List;
 public interface InquiryMapper {
     List<Inquiry> inquiryList();
 
+    List<Inquiry> myInquiryList(Long userId);
+
     int addInquiry(Inquiry item);
 
 }

@@ -2,6 +2,7 @@ package com.example.funding.mapper;
 
 import com.example.funding.common.Pager;
 import com.example.funding.dto.request.admin.SearchProjectVerifyDto;
+import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
 import com.example.funding.dto.response.admin.analytic.*;
 import com.example.funding.dto.response.admin.ProjectVerifyListDto;
@@ -26,6 +27,10 @@ public interface AdminMapper {
                                           @Param("to") LocalDate to);
 
     List<CategorySuccess> getCategorySuccessByCategory(@Param("ctgrId") Long ctgrId);
+
+    int countProject(@Param("dto") SearchProjectVerifyDto dto);
+
+    List<AdminProjectListDto> getProjectList(@Param("dto") SearchProjectVerifyDto dto, @Param("pager") Pager pager);
 
     int cancelProject(@Param("projectId") Long projectId);
 

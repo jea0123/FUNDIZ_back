@@ -6,6 +6,7 @@ import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.admin.SearchProjectVerifyDto;
 import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
+import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
@@ -24,6 +25,8 @@ public interface AdminService {
     ResponseEntity<ResponseDto<Kpi>> getKpi(int month);
 
     ResponseEntity<ResponseDto<List<RewardSalesTop>>> getRewardSalesTops(LocalDate from, LocalDate to, int limit, String metric);
+
+    ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchProjectVerifyDto dto, Pager pager);
 
     ResponseEntity<ResponseDto<String>> cancelProject(Long projectId, Long adId);
 

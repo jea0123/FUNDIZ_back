@@ -256,10 +256,11 @@
                 OR LOWER(p.CONTENT) LIKE '%' || LOWER(#{dto.keyword}) || '%'
                 OR LOWER(c.CREATORNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
                 OR EXISTS (
-                SELECT 1 FROM TAG t
-                WHERE t.PROJECTID = p.PROJECTID
-                AND LOWER(t.TAGNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
-                )
+                    SELECT 1
+                    FROM TAG t
+                    WHERE t.PROJECTID = p.PROJECTID
+                    AND LOWER(t.TAGNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                    )
                 )
             </if>
             <if test="dto.ctgrId != null">

@@ -2,9 +2,11 @@ package com.example.funding.service.impl;
 
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
+import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
+import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
 import com.example.funding.dto.request.admin.SearchProjectVerifyDto;
 import com.example.funding.dto.response.admin.analytic.*;
@@ -125,6 +127,33 @@ public class AdminServiceImpl implements AdminService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "해당 기간에 대한 리워드 판매 데이터가 없습니다."));
         }
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "리워드 판매 상위 조회 성공", rewardSalesTops));
+    }
+
+    /**
+     * <p>프로젝트 목록 조회</p>
+     *
+     * @param dto SearchProjectVerifyDto
+     * @param pager pager
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-10-01
+     */
+    @Override
+    public ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchProjectVerifyDto dto, Pager pager) {
+        dto.applyRangeType();
+
+        int total = adminMapper.countProject(dto);
+        List<AdminProjectListDto> items = Collections.emptyList();
+
+        if (total > 0) {
+            items = adminMapper.getProjectList(dto, pager);
+            for (AdminProjectListDto item : items) {
+                item.setPercentNow(Utils.getPercentNow(item.getCurrAmount(), item.getGoalAmount()));
+            }
+        }
+        PageResult<AdminProjectListDto> result = PageResult.of(items, pager, total);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 목록 조회 성공", result));
     }
 
     /**

@@ -7,6 +7,7 @@ import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.admin.RejectRequestDto;
 import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
+import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
 import com.example.funding.dto.request.admin.SearchProjectVerifyDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
@@ -91,6 +92,26 @@ public class AdminController {
                                                                                 @RequestParam(defaultValue = "5") int limit) {
         Utils.AnalyticsWindow w = resolveWindow(period, metric, KST);
         return adminService.getRewardSalesTops(w.getFrom(), w.getTo(), limit, metric);
+    }
+
+    /**
+     * <p>프로젝트 목록 조회</p>
+     *
+     * @param dto SearchProjectVerifyDto
+     * @param reqPager 요청 pager
+     * @return 성공 시 200 OK
+     * @author by: 조은애
+     * @since 2025-10-01
+     */
+    @GetMapping("/project")
+    public ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchProjectVerifyDto dto, Pager reqPager) {
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 5,
+                reqPager != null ? reqPager.getPerGroup() : null
+        );
+
+        return adminService.getProjectList(dto, pager);
     }
 
     /**

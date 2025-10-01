@@ -38,6 +38,7 @@ public class CSController {
     //250924
     @PostMapping("/notice/add")
     public ResponseEntity<ResponseDto<String>> addNotice(@RequestBody NoticeAddRequestDto ntcDto){
+
         return csService.addNotice(ntcDto);
     }
 
@@ -57,9 +58,16 @@ public class CSController {
 
     //문의내역 목록
     //250923
-    @GetMapping("/inquiry")
+    @GetMapping("/inquiry/list")
     public ResponseEntity<ResponseDto<List<Inquiry>>> inquiryList() {
         return csService.inquiryList();
+    }
+
+    //내 문의내역 목록
+    //250923
+    @GetMapping("/inquiry/mylist/{userId}")
+    public ResponseEntity<ResponseDto<List<Inquiry>>> myInquiryList(@PathVariable Long userId) {
+        return csService.myInquiryList(userId);
     }
 
     //문의 등록
@@ -71,9 +79,17 @@ public class CSController {
 
     //신고내역 목록
     //250923
-    @GetMapping("/report")
+    @GetMapping("/report/list")
     public ResponseEntity<ResponseDto<List<Report>>> reportList() {
-        return csService.reportList();
+            return csService.reportList();
+        }
+
+
+    //내 신고내역 목록
+    //250923
+    @GetMapping("/report/mylist/{userId}")
+    public ResponseEntity<ResponseDto<List<Report>>> reportList(@PathVariable Long userId) {
+            return csService.myReportList(userId);
     }
 
     //신고 등록

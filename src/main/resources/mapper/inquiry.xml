@@ -9,6 +9,13 @@
         ) sub)
     </select>
 
+    <select id="myInquiryList" resultType="inquiry">
+        SELECT * FROM
+        (SELECT sub.*, ROWNUM rnum FROM (
+        SELECT * FROM inquiry WHERE USERID = #{userId} order by INQID desc
+        ) sub)
+    </select>
+
     <select id="inquiryDetail" resultType="inquiry">
         SELECT * FROM inquiry
         WHERE INQID = #{inqId}
@@ -25,7 +32,7 @@
         </selectKey>
 
         INSERT INTO inquiry (INQID, USERID, ADID, TITLE, CONTENT, CREATEDAT, ISCANCELED, CTGR, ISANSWER)
-        VALUES (inquiry_seq.NEXTVAL, 500, 10, #{title}, #{content}, SYSDATE, 'N', #{ctgr}, 'N')
+        VALUES (inquiry_seq.NEXTVAL, #{userId}, 10, #{title}, #{content}, SYSDATE, 'N', #{ctgr}, 'N')
     </insert>
 
 </mapper>

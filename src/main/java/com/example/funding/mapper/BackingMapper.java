@@ -2,13 +2,10 @@ package com.example.funding.mapper;
 
 import com.example.funding.dto.request.backing.BackingRequestDto;
 import com.example.funding.dto.request.backing.BackingRequestUpdateDto;
-import com.example.funding.dto.response.Backing.BackingResponseDto;
+import com.example.funding.dto.response.backing.BackingResponseDto;
 import com.example.funding.dto.response.user.BackingDto;
-import com.example.funding.dto.response.user.BackingDto;
-import com.example.funding.model.Backing;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 import java.util.List;

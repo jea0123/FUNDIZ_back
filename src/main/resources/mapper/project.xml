@@ -372,4 +372,21 @@
           AND ISVERIFIED = 'N'
     </update>
 
+    <select id = "getCreatorPList" parameterType="long" resultType="com.example.funding.dto.response.creator.CreatorPListDto">
+        SELECT
+            p.creatorId
+            ,p.projectId
+            ,p.title
+            ,p.goalAmount
+            ,p.currAmount
+            ,p.thumbnail
+            ,p.projectStatus
+            ,p.createdAt
+        FROM project p
+        JOIN creator c ON c.creatorId = p.creatorId
+        WHERE p.creatorId=#{creatorId}
+        Order BY p.projectId desc
+
+    </select>
+
 </mapper>

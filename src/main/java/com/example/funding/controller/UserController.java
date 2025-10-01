@@ -1,5 +1,6 @@
 package com.example.funding.controller;
 
+import com.example.funding.common.CustomUserPrincipal;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.user.UserNicknameDto;
 import com.example.funding.dto.request.user.UserPasswordDto;
@@ -31,8 +32,8 @@ public class UserController {
      * @author by: 장민규
      */
     @GetMapping("/loginUser")
-    public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(@AuthenticationPrincipal(expression = "userId") Long userId) {
-        return userService.getLoginUser(userId);
+    public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(@AuthenticationPrincipal CustomUserPrincipal principal) {
+        return userService.getLoginUser(principal.userId());
     }
 
     /**

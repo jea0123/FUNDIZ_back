@@ -33,7 +33,13 @@ public class CommunityController {
      */
     @GetMapping("/community")
     public ResponseEntity<ResponseDto<PageResult<CommunityDto>>> getCommunity(@PathVariable("projectId") Long projectId, Pager reqPager) {
-        return communityService.getCommunity(projectId, "CM", reqPager);
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 10,
+                reqPager != null ? reqPager.getPerGroup() : 5
+        );
+
+        return communityService.getCommunity(projectId, "CM", pager);
     }
 
     /**
@@ -46,6 +52,12 @@ public class CommunityController {
      */
     @GetMapping("/review")
     public ResponseEntity<ResponseDto<PageResult<CommunityDto>>> getReview(@PathVariable("projectId") Long projectId, Pager reqPager) {
-        return communityService.getCommunity(projectId, "RV", reqPager);
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 10,
+                reqPager != null ? reqPager.getPerGroup() : 5
+        );
+
+        return communityService.getCommunity(projectId, "RV", pager);
     }
 }

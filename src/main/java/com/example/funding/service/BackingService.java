@@ -3,7 +3,7 @@ package com.example.funding.service;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.backing.BackingRequestDto;
 import com.example.funding.dto.request.backing.BackingRequestUpdateDto;
-import com.example.funding.dto.response.Backing.BackingResponseDto;
+import com.example.funding.dto.response.backing.BackingResponseDto;
 import com.example.funding.dto.response.user.BackingDto;
 import org.springframework.http.ResponseEntity;
 

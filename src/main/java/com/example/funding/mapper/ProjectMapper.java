@@ -2,6 +2,7 @@ package com.example.funding.mapper;
 
 import com.example.funding.common.Pager;
 import com.example.funding.dto.request.project.SearchProjectDto;
+import com.example.funding.dto.response.creator.CreatorPListDto;
 import com.example.funding.dto.row.ProjectRow;
 import com.example.funding.dto.request.project.ProjectCreateRequestDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
@@ -54,4 +55,6 @@ public interface ProjectMapper {
     int updateProjectsToFailed();
 
     int markVerifyProject(@Param("projectId") Long projectId);
+
+    List<CreatorPListDto> getCreatorPList(@Param("creatorId") Long creatorId);
 }

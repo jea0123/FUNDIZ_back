@@ -1,4 +1,4 @@
-package com.example.funding.dto.response.Backing;
+package com.example.funding.dto.response.backing;
 
 import com.example.funding.dto.response.address.AddressResponseDto;
 import lombok.AllArgsConstructor;

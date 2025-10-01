@@ -1,4 +1,4 @@
-package com.example.funding.dto.response.Backing;
+package com.example.funding.dto.response.backing;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Getter
 @Setter

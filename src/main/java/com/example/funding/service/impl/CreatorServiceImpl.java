@@ -1,6 +1,7 @@
 package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.response.creator.CreatorPDetailDto;
 import com.example.funding.dto.response.creator.CreatorPListDto;
 import com.example.funding.mapper.CreatorMapper;
 import com.example.funding.mapper.ProjectMapper;
@@ -32,5 +33,21 @@ public class CreatorServiceImpl implements CreatorService {
         }
         List<CreatorPListDto> creatorpList = projectMapper.getCreatorPList(creatorId);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "크리에이터의 프로젝트 리스트 불러오기 성공", creatorpList));
+    }
+
+    //TODO: 해야할일
+    @Override
+    public ResponseEntity<ResponseDto<CreatorPDetailDto>> getCreatorDList(Long creatorId, Long projectId) {
+        CreatorPDetailDto creatorPDetail = creatorMapper.getCreatorPDetailDto(creatorId);
+
+        if (creatorPDetail==null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "창작자의 프로젝트 상세보기를 불러오지 못했습니다."));
+        }
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<CreatorPDetailDto>> getCreatorDashBoard(Long creatorId) {
+        return null;
     }
 }

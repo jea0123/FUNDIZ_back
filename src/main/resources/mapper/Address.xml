@@ -59,4 +59,8 @@
         AND ADDRID = #{addrId}
     </delete>
 
+<!--    <select id = "getCreatorPDetailDto" resultMap="Backing">-->
+
+<!--    </select>-->
+
 </mapper>

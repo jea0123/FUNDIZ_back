@@ -16,7 +16,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/Backing")
+@RequestMapping("/api/v1/backing")
 @RequiredArgsConstructor
 public class BackingController {
     private final BackingService backingService;

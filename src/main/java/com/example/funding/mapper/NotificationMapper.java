@@ -1,6 +1,5 @@
 package com.example.funding.mapper;
 
-import com.example.funding.dto.request.notification.CreateNotificationRequestDto;
 import com.example.funding.model.Notification;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -13,7 +12,7 @@ public interface NotificationMapper {
 
     Notification getNotificationById(@Param("notificationId") Long notificationId);
 
-    void insertNotification(CreateNotificationRequestDto dto);
+    Long insertNotification(Notification notification);
 
     void markAsRead(@Param("notificationId") Long notificationId);
 

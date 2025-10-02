@@ -12,11 +12,13 @@ public interface NotificationService {
 
     ResponseEntity<ResponseDto<Notification>> getNotificationById(Long notificationId);
 
-    ResponseEntity<ResponseDto<String>> insertNotification(CreateNotificationRequestDto dto);
+    ResponseEntity<ResponseDto<Notification>> insertNotification(CreateNotificationRequestDto dto);
 
-    ResponseEntity<ResponseDto<String>> markAsRead(Long notificationId);
+    ResponseEntity<ResponseDto<String>> markAsRead(Long notificationId, Long userId);
 
-    ResponseEntity<ResponseDto<String>> deleteNotification(Long notificationId);
+    ResponseEntity<ResponseDto<String>> markAllAsRead(Long userId);
+
+    ResponseEntity<ResponseDto<String>> deleteNotification(Long notificationId, Long userId);
 
     ResponseEntity<ResponseDto<String>> deleteAllNotificationsByUserId(Long userId);
 }

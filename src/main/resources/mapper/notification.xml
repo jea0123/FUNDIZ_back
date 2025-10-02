@@ -13,9 +13,12 @@
         WHERE NOTIFICATIONID = #{notificationId}
     </select>
 
-    <insert id="insertNotification">
-        INSERT INTO notification (NOTIFICATIONID, USERID, TYPE, CODE, MESSAGE)
-        VALUES (NOTIFICATION_SEQ.NEXTVAL, #{userId}, #{type}, #{code}, #{message})
+    <insert id="insertNotification" parameterType="notification">
+        INSERT INTO notification (NOTIFICATIONID, USERID, TYPE, TARGETID, MESSAGE)
+        VALUES (NOTIFICATION_SEQ.NEXTVAL, #{userId}, #{type}, #{targetId}, #{message})
+        <selectKey keyProperty="notificationId" resultType="long" order="AFTER">
+            SELECT NOTIFICATION_SEQ.CURRVAL FROM dual
+        </selectKey>
     </insert>
 
     <update id="markAsRead">

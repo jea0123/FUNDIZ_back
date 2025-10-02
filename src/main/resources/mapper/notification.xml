@@ -5,7 +5,7 @@
     <select id="getNotificationsByUserId" resultType="notification">
         SELECT * FROM notification
         WHERE USERID = #{userId}
-        ORDER BY NOTIFICATIONDATE DESC
+        ORDER BY CREATEDAT DESC
     </select>
 
     <select id="getNotificationById" resultType="notification">

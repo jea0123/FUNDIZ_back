@@ -1,6 +1,5 @@
 package com.example.funding.controller;
 
-import com.example.funding.common.CustomUserPrincipal;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.user.UserNicknameDto;
 import com.example.funding.dto.request.user.UserPasswordDto;
@@ -11,7 +10,6 @@ import com.example.funding.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,8 +30,10 @@ public class UserController {
      * @author by: 장민규
      */
     @GetMapping("/loginUser")
-    public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(@AuthenticationPrincipal CustomUserPrincipal principal) {
-        return userService.getLoginUser(principal.userId());
+    public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(
+//            @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+        return userService.getLoginUser(501L);
     }
 
     /**

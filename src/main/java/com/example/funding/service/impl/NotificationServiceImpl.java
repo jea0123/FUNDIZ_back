@@ -1,5 +1,6 @@
 package com.example.funding.service.impl;
 
+import com.example.funding.common.NotificationSseHub;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.notification.CreateNotificationRequestDto;
 import com.example.funding.mapper.NotificationMapper;
@@ -23,6 +24,7 @@ import java.util.List;
 @Transactional
 public class NotificationServiceImpl implements NotificationService {
 
+    private final NotificationSseHub hub;
     private final NotificationMapper notificationMapper;
     private final UserMapper userMapper;
 
@@ -55,10 +57,13 @@ public class NotificationServiceImpl implements NotificationService {
      * @since 2025-10-02
      */
     @Override
-    public ResponseEntity<ResponseDto<Notification>> getNotificationById(Long notificationId) {
+    public ResponseEntity<ResponseDto<Notification>> getNotificationById(Long notificationId, Long userId) {
         Notification notification = notificationMapper.getNotificationById(notificationId);
         if (notification == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "알림을 찾을 수 없습니다.");
+        }
+        if (!notification.getUserId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인의 알림만 조회할 수 있습니다.");
         }
         return ResponseEntity.ok(ResponseDto.success(200, "알림 조회 성공", notification));
     }
@@ -72,24 +77,27 @@ public class NotificationServiceImpl implements NotificationService {
      * @since 2025-10-02
      */
     @Override
-    public ResponseEntity<ResponseDto<Notification>> insertNotification(CreateNotificationRequestDto dto) {
-        Notification not = Notification.builder()
+    public ResponseEntity<ResponseDto<String>> insertNotification(CreateNotificationRequestDto dto) {
+        Notification noti = Notification.builder()
                 .userId(dto.getUserId())
                 .type(dto.getType())
                 .targetId(dto.getTargetId())
                 .message(dto.getMessage())
                 .isRead('N')
                 .build();
-        Long notificationId = notificationMapper.insertNotification(not);
+        notificationMapper.insertNotification(noti);
+        Long notificationId = noti.getNotificationId();
         Notification notification = notificationMapper.getNotificationById(notificationId);
-        return ResponseEntity.ok(ResponseDto.success(201, "알림 생성 성공", notification));
+        hub.sendToUser(notification);
+
+        return ResponseEntity.ok(ResponseDto.success(201, "알림 생성 성공", dto.getMessage()));
     }
 
     /**
      * 알림 읽음 처리
      *
      * @param notificationId 알림 ID
-     * @param userId 사용자 ID
+     * @param userId         사용자 ID
      * @return 성공 메시지
      * @throws ResponseStatusException 알림 없음(404)
      * @author 장민규
@@ -139,7 +147,7 @@ public class NotificationServiceImpl implements NotificationService {
      * 알림 삭제
      *
      * @param notificationId 알림 ID
-     * @param userId 사용자 ID
+     * @param userId         사용자 ID
      * @return 성공 메시지
      * @throws ResponseStatusException 알림 없음(404)
      * @author 장민규

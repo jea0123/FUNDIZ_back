@@ -10,9 +10,9 @@ import java.util.List;
 public interface NotificationService {
     ResponseEntity<ResponseDto<List<Notification>>> getNotificationsByUserId(Long userId);
 
-    ResponseEntity<ResponseDto<Notification>> getNotificationById(Long notificationId);
+    ResponseEntity<ResponseDto<Notification>> getNotificationById(Long notificationId, Long userId);
 
-    ResponseEntity<ResponseDto<Notification>> insertNotification(CreateNotificationRequestDto dto);
+    ResponseEntity<ResponseDto<String>> insertNotification(CreateNotificationRequestDto dto);
 
     ResponseEntity<ResponseDto<String>> markAsRead(Long notificationId, Long userId);
 

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.funding.mapper.NotificationMapper">
+
+    <select id="getNotificationsByUserId" resultType="notification">
+        SELECT * FROM notification
+        WHERE USERID = #{userId}
+        ORDER BY NOTIFICATIONDATE DESC
+    </select>
+
+    <select id="getNotificationById" resultType="notification">
+        SELECT * FROM notification
+        WHERE NOTIFICATIONID = #{notificationId}
+    </select>
+
+    <insert id="insertNotification">
+        INSERT INTO notification (NOTIFICATIONID, USERID, TYPE, CODE, MESSAGE)
+        VALUES (NOTIFICATION_SEQ.NEXTVAL, #{userId}, #{type}, #{code}, #{message})
+    </insert>
+
+    <update id="markAsRead">
+        UPDATE notification
+        SET ISREAD = 'Y'
+        WHERE NOTIFICATIONID = #{notificationId}
+    </update>
+
+    <delete id="deleteNotification">
+        DELETE FROM notification
+        WHERE NOTIFICATIONID = #{notificationId}
+    </delete>
+
+    <delete id="deleteAllNotificationsByUserId">
+        DELETE FROM notification
+        WHERE USERID = #{userId}
+    </delete>
+
+</mapper>

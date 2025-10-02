@@ -12,6 +12,7 @@ public class AdminProjectListDto {
     private String title;
     private String creatorName;
     private String projectStatus;
+    private LocalDate startDate;
     private LocalDate endDate;
     private Integer goalAmount;
     private Integer currAmount;

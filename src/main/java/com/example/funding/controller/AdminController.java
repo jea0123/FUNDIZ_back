@@ -4,8 +4,8 @@ import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.request.admin.RejectRequestDto;
-import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
+import com.example.funding.dto.request.admin.AdminProjectUpdateDto;
+import com.example.funding.dto.request.admin.RejectProjectDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
@@ -134,13 +134,13 @@ public class AdminController {
      * <p>프로젝트 수정</p>
      *
      * @param projectId 프로젝트 ID
-     * @param dto ProjectUpdateRequestDto
+     * @param dto AdminProjectUpdateDto
      * @return 성공 시 200 OK
      * @author by: 조은애
      * @since 2025-09-17
      */
     @PostMapping("/project/{projectId}")
-    public ResponseEntity<ResponseDto<String>> updateProject(@PathVariable Long projectId, @RequestBody ProjectUpdateRequestDto dto) {
+    public ResponseEntity<ResponseDto<String>> updateProject(@PathVariable Long projectId, @RequestBody AdminProjectUpdateDto dto) {
         //관리자 체크
         Long adId = 1L;
 
@@ -199,13 +199,13 @@ public class AdminController {
      * <p>프로젝트 반려</p>
      *
      * @param projectId 프로젝트 ID
-     * @param dto RejectRequestDto
+     * @param dto RejectProjectDto
      * @return 성공 시 200 OK
      * @author by: 조은애
      * @since 2025-09-19
      */
     @PostMapping("/verify/reject/{projectId}")
-    public ResponseEntity<ResponseDto<String>> rejectProject(@PathVariable Long projectId, @RequestBody RejectRequestDto dto) {
+    public ResponseEntity<ResponseDto<String>> rejectProject(@PathVariable Long projectId, @RequestBody RejectProjectDto dto) {
         return adminService.rejectProject(projectId, dto.getRejectedReason());
     }
 }

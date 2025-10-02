@@ -4,6 +4,7 @@ import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.admin.AdminProjectUpdateDto;
 import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
@@ -184,7 +185,7 @@ public class AdminServiceImpl implements AdminService {
      * @since 2025-09-17
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> updateProject(ProjectUpdateRequestDto dto) {
+    public ResponseEntity<ResponseDto<String>> updateProject(AdminProjectUpdateDto dto) {
         if (dto.getProjectId() == null) {
             throw new IllegalArgumentException("프로젝트 ID가 필요합니다.");
         }
@@ -200,27 +201,13 @@ public class AdminServiceImpl implements AdminService {
                 .projectId(existing.getProjectId())
                 .subctgrId(dto.getSubctgrId())
                 .title(dto.getTitle())
-                .content(dto.getContent())
                 .thumbnail(dto.getThumbnail())
-                .goalAmount(dto.getGoalAmount())
-                .startDate(dto.getStartDate())
-                .endDate(dto.getEndDate())
+                .projectStatus(dto.getProjectStatus())
                 .build();
 
-        int result = projectMapper.updateProject(project);
+        int result = adminMapper.updateProject(project);
         if (result == 0) {
             throw new IllegalStateException("프로젝트 수정 실패");
-        }
-
-        //태그 전체 삭제 후 저장
-        tagMapper.deleteTags(dto.getProjectId());
-        if (dto.getTagList() != null) {
-            for (Tag tag : dto.getTagList()) {
-                int saved = tagMapper.saveTag(dto.getProjectId(), tag.getTagName());
-                if (saved == 0) {
-                    throw new IllegalStateException("태그 저장 실패");
-                }
-            }
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 수정 성공", null));

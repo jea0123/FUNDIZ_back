@@ -3,6 +3,7 @@ package com.example.funding.service;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.admin.AdminProjectUpdateDto;
 import com.example.funding.dto.request.admin.SearchProjectVerifyDto;
 import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
@@ -30,7 +31,7 @@ public interface AdminService {
 
     ResponseEntity<ResponseDto<String>> cancelProject(Long projectId, Long adId);
 
-    ResponseEntity<ResponseDto<String>> updateProject(ProjectUpdateRequestDto dto);
+    ResponseEntity<ResponseDto<String>> updateProject(AdminProjectUpdateDto dto);
 
     ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchProjectVerifyDto dto, Pager pager);
 

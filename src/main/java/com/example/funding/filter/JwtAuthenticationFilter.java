@@ -44,12 +44,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final UserMapper userMapper;
 
-    private static final String[] WHITELIST = {
-            "/api/v1/**",
-            "/public/**", "/swagger-ui/**", "/v3/api-docs/**",
-            "/error", "/favicon.ico"
-    };
-
     /**
      * <p>필터를 적용하지 않을 경로 설정</p>
      * <p>- OPTIONS 메서드 요청과 WHITELIST에 포함된 경로는 필터를 적용하지 않음</p>
@@ -127,4 +121,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return header.substring(7);
         return null;
     }
+
+    private static final String[] WHITELIST = {
+            "/api/v1/shipping/**",
+            "/api/v1/admin/**",
+            "/api/v1/backing/**",
+            "/api/v1/categories/**",
+            "/api/v1/project/**",
+            "/api/v1/creator/**",
+            "/api/v1/cs/**",
+            "/api/v1/notifications/**",
+            "/api/v1/reward/**",
+            "/api/v1/auth/**",
+            "/api/v1/user/**",
+            "/public/**", "/swagger-ui/**", "/v3/api-docs/**",
+            "/error", "/favicon.ico"
+    };
 }

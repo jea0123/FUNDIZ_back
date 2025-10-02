@@ -1,7 +1,9 @@
 package com.example.funding.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.DataAccessException;
@@ -19,12 +21,14 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import java.io.IOException;
 import java.sql.SQLSyntaxErrorException;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -208,6 +212,22 @@ public class GlobalExceptionHandler {
             log.error("[ResponseStatus] {} | {}", status.value(), body, e);
         }
         return ResponseEntity.status(status).body(body);
+    }
+
+    @ExceptionHandler({ AsyncRequestNotUsableException.class, ClientAbortException.class, IOException.class })
+    public ResponseEntity<String> handleClientAbort(Exception e, HttpServletRequest req) {
+        if (isSseRequest(req)) {
+            log.debug("SSE 클라이언트 중단: {}", e.toString());
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        String body = "클라이언트 연결이 중단되었습니다.";
+        log.info("[ClientAbort] {}", body);
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(body);
+    }
+
+    private boolean isSseRequest(HttpServletRequest req) {
+        return "text/event-stream".equalsIgnoreCase(req.getHeader("Accept"))
+                || (req.getRequestURI() != null && req.getRequestURI().contains("/notifications/stream"));
     }
 
     // ========= 마지막 안전망 =========

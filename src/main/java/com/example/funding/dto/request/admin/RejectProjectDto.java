@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RejectRequestDto {
+public class RejectProjectDto {
     private String rejectedReason;
 }

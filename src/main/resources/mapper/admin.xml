@@ -164,6 +164,7 @@
                     p.TITLE AS title,
                     c.CREATORNAME AS creatorName,
                     p.PROJECTSTATUS AS projectStatus,
+                    p.STARTDATE AS startDate,
                     p.ENDDATE AS endDate,
                     p.GOALAMOUNT AS goalAmount,
                     p.CURRAMOUNT AS currAmount,
@@ -185,6 +186,17 @@
             UPDATEDAT = SYSDATE
         WHERE PROJECTID = #{projectId}
           AND PROJECTSTATUS <![CDATA[ <> ]]> 'CANCELED'
+    </update>
+
+    <update id="updateProject">
+        UPDATE PROJECT
+        <set>
+            <if test="subctgrId != null"> SUBCTGRID = #{subctgrId}, </if>
+            <if test="title != null"> TITLE = #{title}, </if>
+            <if test="thumbnail != null"> THUMBNAIL = #{thumbnail}, </if>
+            <if test="projectStatus != null"> PROJECTSTATUS = #{projectStatus} </if>
+        </set>
+        WHERE PROJECTID = #{projectId}
     </update>
     
     <sql id="verifyFilterWhere">

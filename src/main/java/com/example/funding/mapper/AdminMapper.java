@@ -6,6 +6,7 @@ import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
 import com.example.funding.dto.response.admin.analytic.*;
 import com.example.funding.dto.response.admin.ProjectVerifyListDto;
+import com.example.funding.model.Project;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -33,6 +34,8 @@ public interface AdminMapper {
     List<AdminProjectListDto> getProjectList(@Param("dto") SearchProjectVerifyDto dto, @Param("pager") Pager pager);
 
     int cancelProject(@Param("projectId") Long projectId);
+
+    int updateProject(Project project);
 
     int countProjectVerify(@Param("dto") SearchProjectVerifyDto dto);
 

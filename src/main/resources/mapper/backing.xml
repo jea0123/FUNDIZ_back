@@ -141,7 +141,7 @@
         ORDER BY b.createdAt DESC
     </select>
 
-    <resultMap id="BackingResponseMap" type="com.example.funding.dto.response.Backing.BackingResponseDto">
+    <resultMap id="BackingResponseMap" type="com.example.funding.dto.response.backing.BackingResponseDto">
         <!-- 유저 -->
         <result property="userId" column="userId"/>
         <result property="nickname" column="nickname"/>
@@ -170,7 +170,7 @@
         </collection>
 
         <!-- 리워드 리스트 -->
-        <collection property="rewards" ofType="com.example.funding.dto.response.Backing.BackingRewardDto">
+        <collection property="rewards" ofType="com.example.funding.dto.response.backing.BackingRewardDto">
             <id property="rewardId" column="rewardId"/>
             <result property="rewardName" column="rewardName"/>
             <result property="price" column="price"/>

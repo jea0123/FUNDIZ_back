@@ -11,5 +11,8 @@ import java.util.List;
 public interface ReportMapper {
     List<Report> reportList();
 
+    List<Report> myReportList(Long userId);
+
     int addReport(Report item);
+
 }

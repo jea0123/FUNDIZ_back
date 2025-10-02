@@ -1,8 +1,7 @@
 package com.example.funding.dto.request.backing;
 
 import com.example.funding.dto.request.address.AddrAddRequestDto;
-import com.example.funding.dto.response.Backing.BackingRewardDto;
-import com.example.funding.dto.response.address.AddressResponseDto;
+import com.example.funding.dto.response.backing.BackingRewardDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

@@ -133,6 +133,52 @@
         ORDER BY sc.subctgrName
     </select>
 
+    <sql id="projectListWhere">
+        <where>
+            <if test="dto.projectStatus != null and dto.projectStatus != ''">
+                p.PROJECTSTATUS = #{dto.projectStatus}
+            </if>
+            <if test="dto.fromDate != null">
+                AND p.UPDATEDAT <![CDATA[ >= ]]> #{dto.fromDate}
+            </if>
+            <if test="dto.toDate != null">
+                AND p.UPDATEDAT <![CDATA[ < ]]> #{dto.toDateEndExclusive}
+            </if>
+        </where>
+    </sql>
+
+    <select id="countProject" resultType="Integer">
+        SELECT COUNT(*)
+        FROM PROJECT p
+        JOIN CREATOR c ON c.CREATORID = p.CREATORID
+        <include refid="projectListWhere" />
+    </select>
+
+    <select id="getProjectList" resultType="adminProjectListDto">
+        SELECT *
+        FROM (
+            SELECT T.*, ROWNUM rnum
+            FROM (
+                SELECT
+                    p.PROJECTID AS projectId,
+                    p.TITLE AS title,
+                    c.CREATORNAME AS creatorName,
+                    p.PROJECTSTATUS AS projectStatus,
+                    p.ENDDATE AS endDate,
+                    p.GOALAMOUNT AS goalAmount,
+                    p.CURRAMOUNT AS currAmount,
+                    p.BACKERCNT AS backerCnt,
+                    p.UPDATEDAT AS updatedAt
+                FROM PROJECT p
+                JOIN CREATOR c ON c.CREATORID = p.CREATORID
+                <include refid="projectListWhere" />
+                ORDER BY p.UPDATEDAT DESC, p.PROJECTID DESC
+            ) T
+            WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
+        )
+        WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
+    </select>
+
     <update id="cancelProject">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'CANCELED',

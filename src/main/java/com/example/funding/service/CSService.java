@@ -22,9 +22,16 @@ public interface CSService {
 
     ResponseEntity<ResponseDto<List<Inquiry>>> inquiryList();
 
-    ResponseEntity<ResponseDto<List<Report>>> reportList();
+    ResponseEntity<ResponseDto<List<Inquiry>>> myInquiryList(Long userId);
 
     ResponseEntity<ResponseDto<String>> addInquiry(Long userId, IqrAddRequestDto iqrDto);
 
+    ResponseEntity<ResponseDto<List<Report>>> reportList();
+
+    ResponseEntity<ResponseDto<List<Report>>> myReportList(Long userId);
+
     ResponseEntity<ResponseDto<String>> addReport(Long userId, RpAddRequestDto rpDto);
+
+
+
 }

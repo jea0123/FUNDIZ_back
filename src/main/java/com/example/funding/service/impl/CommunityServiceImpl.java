@@ -35,19 +35,13 @@ public class CommunityServiceImpl implements CommunityService {
      *
      * @param projectId 프로젝트 ID
      * @param code CM 또는 RV
-     * @param reqPager 요청 pager
+     * @param pager pager
      * @return 성공 시 200 OK
      * @author by: 조은애
      * @since 2025-09-03
      */
     @Override
-    public ResponseEntity<ResponseDto<PageResult<CommunityDto>>> getCommunity(Long projectId, String code, Pager reqPager) {
-        Pager pager = Pager.ofRequest(
-                reqPager != null ? reqPager.getPage() : 1,
-                reqPager != null ? reqPager.getSize() : 10,
-                reqPager != null ? reqPager.getPerGroup() : 5
-        );
-
+    public ResponseEntity<ResponseDto<PageResult<CommunityDto>>> getCommunity(Long projectId, String code, Pager pager) {
         int total = communityMapper.countTotal(projectId, code);
 
         List<Community> items = Collections.emptyList();

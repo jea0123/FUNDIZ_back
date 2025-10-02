@@ -256,10 +256,11 @@
                 OR LOWER(p.CONTENT) LIKE '%' || LOWER(#{dto.keyword}) || '%'
                 OR LOWER(c.CREATORNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
                 OR EXISTS (
-                SELECT 1 FROM TAG t
-                WHERE t.PROJECTID = p.PROJECTID
-                AND LOWER(t.TAGNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
-                )
+                    SELECT 1
+                    FROM TAG t
+                    WHERE t.PROJECTID = p.PROJECTID
+                    AND LOWER(t.TAGNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                    )
                 )
             </if>
             <if test="dto.ctgrId != null">
@@ -371,5 +372,22 @@
           AND PROJECTSTATUS = 'DRAFT'
           AND ISVERIFIED = 'N'
     </update>
+
+    <select id = "getCreatorPList" parameterType="long" resultType="com.example.funding.dto.response.creator.CreatorPListDto">
+        SELECT
+            p.creatorId
+            ,p.projectId
+            ,p.title
+            ,p.goalAmount
+            ,p.currAmount
+            ,p.thumbnail
+            ,p.projectStatus
+            ,p.createdAt
+        FROM project p
+        JOIN creator c ON c.creatorId = p.creatorId
+        WHERE p.creatorId=#{creatorId}
+        Order BY p.projectId desc
+
+    </select>
 
 </mapper>

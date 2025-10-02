@@ -9,6 +9,13 @@
         ) sub)
     </select>
 
+    <select id="myReportList" resultType="report">
+        SELECT * FROM
+        (SELECT sub.*, ROWNUM rnum FROM (
+        SELECT * FROM report WHERE USERID = #{userId} order by REPORTID desc
+        ) sub)
+    </select>
+
     <select id="reportDetail" resultType="report">
         SELECT * FROM report
         WHERE REPORTID = #{reportId}
@@ -25,7 +32,7 @@
         </selectKey>
 
         INSERT INTO report (REPORTID, USERID, TARGET, REASON, REPORTDATE, REPORTSTATUS, REPORTTYPE)
-        VALUES (report_seq.NEXTVAL, 500, 200, #{reason}, SYSDATE, 'RECEIVED', #{reportType})
+        VALUES (report_seq.NEXTVAL, #{userId}, #{target}, #{reason}, SYSDATE, 'RECEIVED', #{reportType})
     </insert>
 
 </mapper>

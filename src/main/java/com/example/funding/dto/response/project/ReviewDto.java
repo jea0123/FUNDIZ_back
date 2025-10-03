@@ -10,12 +10,13 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CommunityDto {
+public class ReviewDto {
     private Long cmId;
     private Long projectId;
     private String cmContent;
     private LocalDateTime createdAt;
     private String code;
+    private Integer rating;
 
     private String nickname;
     private String profileImg;

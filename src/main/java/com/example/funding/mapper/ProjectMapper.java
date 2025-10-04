@@ -36,25 +36,17 @@ public interface ProjectMapper {
 
     int getProjectCnt(@Param("creatorId") Long creatorId);
 
-    int saveProject(ProjectCreateRequestDto dto);
-
     String getStatus(@Param("projectId") Long projectId);
-
-    int updateProject(Project project);
 
     List<FeaturedProjectDto> searchProjects(@Param("dto") SearchProjectDto dto, @Param("pager") Pager pager);
 
     int countSearchProjects(@Param("dto") SearchProjectDto dto);
-
-    int deleteProject(@Param("projectId") Long projectId);
 
     int updateProjectsToOpen();
 
     int updateProjectsToSuccess();
 
     int updateProjectsToFailed();
-
-    int markVerifyProject(@Param("projectId") Long projectId);
 
     List<CreatorPListDto> getCreatorPList(@Param("creatorId") Long creatorId);
 }

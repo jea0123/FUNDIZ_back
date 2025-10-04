@@ -29,7 +29,7 @@ public interface AdminService {
 
     ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchProjectVerifyDto dto, Pager pager);
 
-    ResponseEntity<ResponseDto<String>> cancelProject(Long projectId, Long adId);
+    ResponseEntity<ResponseDto<String>> cancelProject(Long projectId);
 
     ResponseEntity<ResponseDto<String>> updateProject(AdminProjectUpdateDto dto);
 

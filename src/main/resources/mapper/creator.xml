@@ -17,40 +17,40 @@
         WHERE creatorId = #{creatorId}
     </select>
 
-    <select id="">
-        SELECT
-            (
-            SELECT count(*)
-            FROM project
-            WHERE creatorId = #{creatorId}
-            ) AS totalProject,
+<!--    <select id="">-->
+<!--        SELECT-->
+<!--            (-->
+<!--            SELECT count(*)-->
+<!--            FROM project-->
+<!--            WHERE creatorId = #{creatorId}-->
+<!--            ) AS totalProject,-->
 
-            (
-            SELECT sum(s.*)
-            FROM settlement s
-            JOIN project p ON p.projectId = s.projectId
-            JOIN creator c ON c.creatorId = p.creatorId
-            WHERE creatorId = #{creatorId}
-            ) AS totalAmount,
+<!--            (-->
+<!--            SELECT sum(s.*)-->
+<!--            FROM settlement s-->
+<!--            JOIN project p ON p.projectId = s.projectId-->
+<!--            JOIN creator c ON c.creatorId = p.creatorId-->
+<!--            WHERE creatorId = #{creatorId}-->
+<!--            ) AS totalAmount,-->
 
-            (
-            SELECT count(b.backingId)
-            FROM backing b
-            JOIN backingDetail bd ON b.backingId = bd.backingId
-            JOIN reward r ON bd.rewardId = r.rewardId
-            JOIN project p ON r.projectId = p.projectId
-            WHERE p.creatorId = #{creatorId}
-            ) AS totalBackers,
+<!--            (-->
+<!--            SELECT count(b.backingId)-->
+<!--            FROM backing b-->
+<!--            JOIN backingDetail bd ON b.backingId = bd.backingId-->
+<!--            JOIN reward r ON bd.rewardId = r.rewardId-->
+<!--            JOIN project p ON r.projectId = p.projectId-->
+<!--            WHERE p.creatorId = #{creatorId}-->
+<!--            ) AS totalBackers,-->
 
-            (
-            select count(*)
-            from project p
-            where p.creatorId = 96
-            and p.projectStatus ='VERIFYING';
-            ) AS pendingApproval
-        FROM dual;
+<!--            (-->
+<!--            select count(*)-->
+<!--            from project p-->
+<!--            where p.creatorId = 96-->
+<!--            and p.projectStatus ='VERIFYING';-->
+<!--            ) AS pendingApproval-->
+<!--        FROM dual;-->
 
-    </select>
+<!--    </select>-->
 
 
     <select id="CreatorPDetailDto" parameterType="Long" resultType="com.example.funding.dto.response.creator.CreatorPDetailDto">
@@ -94,4 +94,50 @@
 
 
     </select>
+
+    <insert id="saveProject">
+        <selectKey keyProperty="projectId" resultType="Long" order="BEFORE">
+            SELECT PROJECT_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO PROJECT (
+            PROJECTID, CREATORID, SUBCTGRID, TITLE, GOALAMOUNT,
+            STARTDATE, ENDDATE, CONTENT, THUMBNAIL
+        ) VALUES (
+            #{projectId}, #{creatorId}, #{subctgrId}, #{title}, #{goalAmount},
+            #{startDate}, #{endDate}, #{content}, #{thumbnail}
+        )
+    </insert>
+
+    <update id="updateProject">
+        UPDATE PROJECT
+        <set>
+            <if test="subctgrId != null"> SUBCTGRID = #{subctgrId}, </if>
+            <if test="title != null"> TITLE = #{title}, </if>
+            <if test="content != null"> CONTENT = #{content}, </if>
+            <if test="thumbnail != null"> THUMBNAIL = #{thumbnail}, </if>
+            <if test="goalAmount != null"> GOALAMOUNT = #{goalAmount}, </if>
+            <if test="startDate != null"> STARTDATE = #{startDate}, </if>
+            <if test="endDate != null"> ENDDATE = #{endDate}, </if>
+            UPDATEDAT = SYSDATE
+        </set>
+        WHERE PROJECTID = #{projectId}
+        AND PROJECTSTATUS IN ('DRAFT')
+    </update>
+
+    <delete id="deleteProject">
+        DELETE FROM PROJECT
+        WHERE PROJECTID = #{projectId}
+    </delete>
+
+    <update id="markVerifyProject">
+        UPDATE PROJECT
+        SET PROJECTSTATUS = 'VERIFYING',
+            ISVERIFIED = 'Y',
+            REQUESTEDAT = SYSDATE
+        WHERE PROJECTID = #{projectId}
+        AND PROJECTSTATUS = 'DRAFT'
+        AND ISVERIFIED = 'N'
+    </update>
+
 </mapper>

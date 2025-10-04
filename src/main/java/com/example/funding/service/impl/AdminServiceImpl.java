@@ -140,6 +140,7 @@ public class AdminServiceImpl implements AdminService {
      * @since 2025-10-01
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchProjectVerifyDto dto, Pager pager) {
         dto.applyRangeType();
 
@@ -161,16 +162,15 @@ public class AdminServiceImpl implements AdminService {
      * <p>프로젝트 취소</p>
      *
      * @param projectId 프로젝트 ID
-     * @param adId 관리자번호
      * @return 성공 시 200 OK
      * @author by: 조은애
      * @since 2025-09-17
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> cancelProject(Long projectId, Long adId) {
+    public ResponseEntity<ResponseDto<String>> cancelProject(Long projectId) {
         int result = adminMapper.cancelProject(projectId);
         if (result == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "이미 취소되었거나 존재하지 않는 프로젝트입니다."));
+            throw new IllegalStateException("이미 취소되었거나 존재하지 않는 프로젝트입니다.");
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 취소 성공", null));
@@ -195,7 +195,7 @@ public class AdminServiceImpl implements AdminService {
             throw new IllegalStateException("존재하지 않는 프로젝트입니다.");
         }
 
-        //목표금액, 종료일 무결성 체크
+        //TODO: 목표금액, 종료일 무결성 체크
 
         Project project = Project.builder()
                 .projectId(existing.getProjectId())

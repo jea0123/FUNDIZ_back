@@ -124,10 +124,9 @@ public class AdminController {
      */
     @PostMapping("/project/{projectId}/cancel")
     public ResponseEntity<ResponseDto<String>> cancelProject(@PathVariable Long projectId) {
-        //관리자 체크
-        Long adId = 1L;
+        //TODO: 관리자 체크
 
-        return adminService.cancelProject(projectId, adId);
+        return adminService.cancelProject(projectId);
     }
 
     /**
@@ -141,8 +140,7 @@ public class AdminController {
      */
     @PostMapping("/project/{projectId}")
     public ResponseEntity<ResponseDto<String>> updateProject(@PathVariable Long projectId, @RequestBody AdminProjectUpdateDto dto) {
-        //관리자 체크
-        Long adId = 1L;
+        //TODO: 관리자 체크
 
         dto.setProjectId(projectId);
 
@@ -192,6 +190,8 @@ public class AdminController {
      */
     @PostMapping("/verify/approve/{projectId}")
     public ResponseEntity<ResponseDto<String>> approveProject(@PathVariable Long projectId) {
+        //TODO: 관리자 체크
+
         return adminService.approveProject(projectId);
     }
 
@@ -206,6 +206,8 @@ public class AdminController {
      */
     @PostMapping("/verify/reject/{projectId}")
     public ResponseEntity<ResponseDto<String>> rejectProject(@PathVariable Long projectId, @RequestBody RejectProjectDto dto) {
+        //TODO: 관리자 체크
+
         return adminService.rejectProject(projectId, dto.getRejectedReason());
     }
 }

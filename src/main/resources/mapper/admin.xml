@@ -182,8 +182,7 @@
 
     <update id="cancelProject">
         UPDATE PROJECT
-        SET PROJECTSTATUS = 'CANCELED',
-            UPDATEDAT = SYSDATE
+        SET PROJECTSTATUS = 'CANCELED'
         WHERE PROJECTID = #{projectId}
           AND PROJECTSTATUS <![CDATA[ <> ]]> 'CANCELED'
     </update>

@@ -21,13 +21,5 @@ public interface ProjectService {
 
     ResponseEntity<ResponseDto<List<FeaturedProjectDto>>> getFeatured(int days, int limit);
 
-    ResponseEntity<ResponseDto<String>> createProject(ProjectCreateRequestDto dto, Long creatorId);
-
     ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> searchProject(SearchProjectDto dto, Pager pager);
-
-    ResponseEntity<ResponseDto<String>> updateProject(ProjectUpdateRequestDto dto, Long creatorId);
-
-    ResponseEntity<ResponseDto<String>> deleteByCreator(Long projectId, Long creatorId);
-
-    ResponseEntity<ResponseDto<String>> verifyProject(Long projectId, Long creatorId);
 }

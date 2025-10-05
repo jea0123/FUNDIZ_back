@@ -7,6 +7,7 @@ import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.creator.ProjectUpdateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
 import com.example.funding.dto.response.creator.CreatorPDetailDto;
+import com.example.funding.dto.response.creator.CreatorProjectDetailDto;
 import com.example.funding.dto.response.creator.CreatorProjectListDto;
 import org.springframework.http.ResponseEntity;
 
@@ -18,6 +19,8 @@ public interface CreatorService {
     ResponseEntity<ResponseDto<CreatorPDetailDto>> getCreatorDashBoard(Long creatorId);
 
     ResponseEntity<ResponseDto<PageResult<CreatorProjectListDto>>> getProjectList(Long creatorId, SearchCreatorProjectDto dto, Pager pager);
+
+    ResponseEntity<ResponseDto<CreatorProjectDetailDto>> getProjectDetail(Long projectId, Long creatorId);
 
     ResponseEntity<ResponseDto<String>> createProject(ProjectCreateRequestDto dto, Long creatorId);
 

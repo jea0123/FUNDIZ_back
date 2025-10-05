@@ -188,7 +188,7 @@ public class AdminController {
      * @author by: 조은애
      * @since 2025-09-19
      */
-    @PostMapping("/verify/approve/{projectId}")
+    @PostMapping("/verify/{projectId}/approve")
     public ResponseEntity<ResponseDto<String>> approveProject(@PathVariable Long projectId) {
         //TODO: 관리자 체크
 
@@ -204,7 +204,7 @@ public class AdminController {
      * @author by: 조은애
      * @since 2025-09-19
      */
-    @PostMapping("/verify/reject/{projectId}")
+    @PostMapping("/verify/{projectId}/reject")
     public ResponseEntity<ResponseDto<String>> rejectProject(@PathVariable Long projectId, @RequestBody RejectProjectDto dto) {
         //TODO: 관리자 체크
 

@@ -8,6 +8,7 @@ import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.creator.ProjectUpdateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
 import com.example.funding.dto.response.creator.CreatorPDetailDto;
+import com.example.funding.dto.response.creator.CreatorProjectDetailDto;
 import com.example.funding.dto.response.creator.CreatorProjectListDto;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Project;
@@ -17,6 +18,7 @@ import com.example.funding.service.CreatorService;
 import com.example.funding.service.RewardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,6 +66,16 @@ public class CreatorServiceImpl implements CreatorService {
         return null;
     }
 
+    /**
+     * <p>프로젝트 목록 조회</p>
+     *
+     * @param creatorId 창작자 ID
+     * @param dto SearchCreatorProjectDto
+     * @param pager pager
+     * @return 성공 시 200 OK
+     * @since 2025-10-05
+     * @author 조은애
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<CreatorProjectListDto>>> getProjectList(Long creatorId, SearchCreatorProjectDto dto, Pager pager) {
@@ -81,6 +93,29 @@ public class CreatorServiceImpl implements CreatorService {
         PageResult<CreatorProjectListDto> result = PageResult.of(items, pager, total);
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 목록 조회 성공", result));
+    }
+
+    /**
+     * <p>프로젝트 상세 조회</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param creatorId 창작자 ID
+     * @return 성공 시 200 OK
+     * @since 2025-10-05
+     * @author 조은애
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<CreatorProjectDetailDto>> getProjectDetail(Long projectId, Long creatorId) {
+        CreatorProjectDetailDto dto = creatorMapper.getProjectDetail(projectId, creatorId);
+        if (dto == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트를 찾을 수 없습니다."));
+        }
+
+        dto.setTagList(tagMapper.getTagList(projectId));
+        dto.setRewardList(rewardMapper.getRewardList(projectId));
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 상세 조회 성공", dto));
     }
 
     /**
@@ -158,6 +193,12 @@ public class CreatorServiceImpl implements CreatorService {
             throw new IllegalArgumentException("프로젝트 ID가 필요합니다.");
         }
 
+        Project existing = projectMapper.findById(dto.getProjectId());
+        if (existing == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트를 찾을 수 없습니다."));
+        }
+
+
         //TODO: 소유자 체크
 
         //프로젝트 상태 조회
@@ -177,7 +218,7 @@ public class CreatorServiceImpl implements CreatorService {
             .endDate(dto.getEndDate())
             .build();
 
-        int result = creatorMapper.updateProject(project);
+        int result = creatorMapper.updateProject(creatorId, project);
         if (result == 0) {
             throw new IllegalStateException("프로젝트 수정 실패");
         }

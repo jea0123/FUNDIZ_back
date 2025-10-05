@@ -150,6 +150,16 @@
         WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
 
+    <select id="getProjectDetail" resultType="creatorProjectDetailDto">
+        SELECT p.*, c.*, sc.*, cg.*
+        FROM PROJECT p
+        JOIN CREATOR c ON c.CREATORID = p.CREATORID
+        JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
+        JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
+        WHERE p.PROJECTID = #{projectId}
+        AND p.CREATORID = #{creatorId}
+    </select>
+
     <insert id="saveProject">
         <selectKey keyProperty="projectId" resultType="Long" order="BEFORE">
             SELECT PROJECT_SEQ.NEXTVAL FROM DUAL
@@ -177,6 +187,7 @@
             UPDATEDAT = SYSDATE
         </set>
         WHERE PROJECTID = #{projectId}
+        AND CREATORID = #{creatorId}
         AND PROJECTSTATUS IN ('DRAFT')
     </update>
 

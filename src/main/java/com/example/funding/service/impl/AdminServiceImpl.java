@@ -5,11 +5,10 @@ import com.example.funding.common.Pager;
 import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.admin.AdminProjectUpdateDto;
-import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
-import com.example.funding.dto.request.admin.SearchProjectVerifyDto;
+import com.example.funding.dto.request.admin.SearchAdminProjectDto;
 import com.example.funding.dto.response.admin.analytic.*;
 import com.example.funding.dto.response.admin.ProjectVerifyListDto;
 import com.example.funding.mapper.AdminMapper;
@@ -141,7 +140,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchProjectVerifyDto dto, Pager pager) {
+    public ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchAdminProjectDto dto, Pager pager) {
         dto.applyRangeType();
 
         int total = adminMapper.countProject(dto);
@@ -224,7 +223,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchProjectVerifyDto dto, Pager pager) {
+    public ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchAdminProjectDto dto, Pager pager) {
         dto.applyRangeType();
 
         int total = adminMapper.countProjectVerify(dto);

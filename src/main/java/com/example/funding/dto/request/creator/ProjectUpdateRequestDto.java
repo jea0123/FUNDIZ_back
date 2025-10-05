@@ -1,4 +1,4 @@
-package com.example.funding.dto.request.project;
+package com.example.funding.dto.request.creator;
 
 import com.example.funding.model.Tag;
 import lombok.Getter;

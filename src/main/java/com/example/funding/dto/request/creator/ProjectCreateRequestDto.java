@@ -1,7 +1,6 @@
-package com.example.funding.dto.request.project;
+package com.example.funding.dto.request.creator;
 
 import com.example.funding.dto.request.reward.RewardCreateRequestDto;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 

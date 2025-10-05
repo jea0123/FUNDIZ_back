@@ -4,8 +4,7 @@ import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.admin.AdminProjectUpdateDto;
-import com.example.funding.dto.request.admin.SearchProjectVerifyDto;
-import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
+import com.example.funding.dto.request.admin.SearchAdminProjectDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
@@ -27,13 +26,13 @@ public interface AdminService {
 
     ResponseEntity<ResponseDto<List<RewardSalesTop>>> getRewardSalesTops(LocalDate from, LocalDate to, int limit, String metric);
 
-    ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchProjectVerifyDto dto, Pager pager);
+    ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchAdminProjectDto dto, Pager pager);
 
     ResponseEntity<ResponseDto<String>> cancelProject(Long projectId);
 
     ResponseEntity<ResponseDto<String>> updateProject(AdminProjectUpdateDto dto);
 
-    ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchProjectVerifyDto dto, Pager pager);
+    ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchAdminProjectDto dto, Pager pager);
 
     ResponseEntity<ResponseDto<ProjectVerifyDetailDto>> getProjectVerifyDetail(Long projectId);
 

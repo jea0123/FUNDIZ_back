@@ -53,46 +53,101 @@
 <!--    </select>-->
 
 
-    <select id="CreatorPDetailDto" parameterType="Long" resultType="com.example.funding.dto.response.creator.CreatorPDetailDto">
-        SELECT
-        p.projectId
-        , p.creatorId
-        , p.subctgrId
-        , p.title
-        , p.goalAmount
-        , p.currAmount
-        , p.startDate
-        , p.endDate
-        , p.thumbnail
-        , p.createdAt AS createdAt
-        , p.updateAt
-        , p.projectStatus
-        , p.backerCnt
-        , p.likeCnt
-        , p.viewCnt
-        , p.isVerified
-        , p.rejectedReason
-        , p.requestedAt
+<!--    <select id="CreatorPDetailDto" parameterType="Long" resultType="com.example.funding.dto.response.creator.CreatorPDetailDto">-->
+<!--        SELECT-->
+<!--        p.projectId-->
+<!--        , p.creatorId-->
+<!--        , p.subctgrId-->
+<!--        , p.title-->
+<!--        , p.goalAmount-->
+<!--        , p.currAmount-->
+<!--        , p.startDate-->
+<!--        , p.endDate-->
+<!--        , p.thumbnail-->
+<!--        , p.createdAt AS createdAt-->
+<!--        , p.updateAt-->
+<!--        , p.projectStatus-->
+<!--        , p.backerCnt-->
+<!--        , p.likeCnt-->
+<!--        , p.viewCnt-->
+<!--        , p.isVerified-->
+<!--        , p.rejectedReason-->
+<!--        , p.requestedAt-->
 
-        , r.rewardId
-        , r.rewardName
-        , r.price
-        , r.rewardContent
-        , r.deliveryDate
-        , r.rewardCnt
-        , r.createdAt AS createdAtR
-        , r.isPosting
-        , r.remain
+<!--        , r.rewardId-->
+<!--        , r.rewardName-->
+<!--        , r.price-->
+<!--        , r.rewardContent-->
+<!--        , r.deliveryDate-->
+<!--        , r.rewardCnt-->
+<!--        , r.createdAt AS createdAtR-->
+<!--        , r.isPosting-->
+<!--        , r.remain-->
 
-        , c.creatorName
+<!--        , c.creatorName-->
 
-        FROM project p
-        JOIN creator c ON c.creatorId = p.creatorId
-        JOIN Reward r ON p.projectId = r.projectId
-        WHERE p.creatorId = #{creatorId}
-        Order BY p.projectId desc
+<!--        FROM project p-->
+<!--        JOIN creator c ON c.creatorId = p.creatorId-->
+<!--        JOIN Reward r ON p.projectId = r.projectId-->
+<!--        WHERE p.creatorId = #{creatorId}-->
+<!--        Order BY p.projectId desc-->
 
 
+<!--    </select>-->
+
+    <sql id="projectListWhere">
+        <where>
+            p.CREATORID = #{creatorId}
+            <if test="dto.projectStatus != null and dto.projectStatus != ''">
+                AND p.PROJECTSTATUS = #{dto.projectStatus}
+            </if>
+            <if test="dto.fromDate != null">
+                AND p.UPDATEDAT <![CDATA[ >= ]]> #{dto.fromDate}
+            </if>
+            <if test="dto.toDate != null">
+                AND p.UPDATEDAT <![CDATA[ < ]]> #{dto.toDateEndExclusive}
+            </if>
+        </where>
+    </sql>
+
+    <select id="countProject" resultType="Integer">
+        SELECT COUNT(*)
+        FROM PROJECT p
+        JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
+        JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
+        <include refid="projectListWhere" />
+    </select>
+
+    <select id="getProjectList" resultType="creatorProjectListDto">
+        SELECT *
+        FROM (
+            SELECT T.*, ROWNUM rnum
+            FROM (
+                SELECT
+                    p.PROJECTID AS projectId,
+                    p.TITLE AS title,
+                    p.PROJECTSTATUS AS projectStatus,
+                    p.STARTDATE AS startDate,
+                    p.ENDDATE AS endDate,
+                    p.GOALAMOUNT AS goalAmount,
+                    p.CURRAMOUNT AS currAmount,
+                    p.BACKERCNT AS backerCnt,
+                    cg.CTGRNAME AS ctgrName,
+                    sc.SUBCTGRNAME AS subctgrName,
+                    CASE
+                        WHEN p.PROJECTSTATUS = 'VERIFYING'
+                        THEN p.REQUESTEDAT
+                        ELSE NULL
+                    END AS requestedAt
+                FROM PROJECT p
+                JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
+                JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
+                <include refid="projectListWhere" />
+                ORDER BY p.PROJECTID DESC
+            ) T
+            WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
+        )
+        WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
 
     <insert id="saveProject">

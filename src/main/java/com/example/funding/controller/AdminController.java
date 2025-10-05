@@ -9,7 +9,7 @@ import com.example.funding.dto.request.admin.RejectProjectDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
-import com.example.funding.dto.request.admin.SearchProjectVerifyDto;
+import com.example.funding.dto.request.admin.SearchAdminProjectDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
 import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
@@ -104,7 +104,7 @@ public class AdminController {
      * @since 2025-10-01
      */
     @GetMapping("/project")
-    public ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchProjectVerifyDto dto, Pager reqPager) {
+    public ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchAdminProjectDto dto, Pager reqPager) {
         Pager pager = Pager.ofRequest(
                 reqPager != null ? reqPager.getPage() : 1,
                 reqPager != null ? reqPager.getSize() : 5,
@@ -157,7 +157,7 @@ public class AdminController {
      * @since 2025-09-18
      */
     @GetMapping("/verify")
-    public ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchProjectVerifyDto dto, Pager reqPager) {
+    public ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchAdminProjectDto dto, Pager reqPager) {
         Pager pager = Pager.ofRequest(
                 reqPager != null ? reqPager.getPage() : 1,
                 reqPager != null ? reqPager.getSize() : 5,

@@ -1,12 +1,15 @@
 package com.example.funding.service.impl;
 
+import com.example.funding.common.PageResult;
+import com.example.funding.common.Pager;
+import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.request.project.ProjectCreateRequestDto;
-import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
+import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
+import com.example.funding.dto.request.creator.ProjectUpdateRequestDto;
+import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
 import com.example.funding.dto.response.creator.CreatorPDetailDto;
-import com.example.funding.dto.response.creator.CreatorPListDto;
+import com.example.funding.dto.response.creator.CreatorProjectListDto;
 import com.example.funding.mapper.*;
-import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
 import com.example.funding.model.Subcategory;
 import com.example.funding.model.Tag;
@@ -14,11 +17,11 @@ import com.example.funding.service.CreatorService;
 import com.example.funding.service.RewardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,31 +37,50 @@ public class CreatorServiceImpl implements CreatorService {
     private final RewardService rewardService;
     private final RewardMapper rewardMapper;
 
-    @Override
-    public ResponseEntity<ResponseDto<List<CreatorPListDto>>> getCreatorPList(Long creatorId) {
-        Creator creator =creatorMapper.findById(creatorId);
-
-        if(creator==null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "크리에이터의 프로젝트 목록을 찾을 수 없습니다."));
-        }
-        List<CreatorPListDto> creatorpList = projectMapper.getCreatorPList(creatorId);
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "크리에이터의 프로젝트 리스트 불러오기 성공", creatorpList));
-    }
-
-    //TODO: 해야할일
-    @Override
-    public ResponseEntity<ResponseDto<CreatorPDetailDto>> getCreatorDList(Long creatorId, Long projectId) {
-        CreatorPDetailDto creatorPDetail = creatorMapper.getCreatorPDetailDto(creatorId);
-
-        if (creatorPDetail==null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "창작자의 프로젝트 상세보기를 불러오지 못했습니다."));
-        }
-        return null;
-    }
+//    @Override
+//    public ResponseEntity<ResponseDto<List<CreatorPListDto>>> getCreatorPList(Long creatorId) {
+//        Creator creator =creatorMapper.findById(creatorId);
+//
+//        if(creator==null){
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "크리에이터의 프로젝트 목록을 찾을 수 없습니다."));
+//        }
+//        List<CreatorPListDto> creatorpList = projectMapper.getCreatorPList(creatorId);
+//        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "크리에이터의 프로젝트 리스트 불러오기 성공", creatorpList));
+//    }
+//
+//    //TODO: 해야할일
+//    @Override
+//    public ResponseEntity<ResponseDto<CreatorPDetailDto>> getCreatorDList(Long creatorId, Long projectId) {
+//        CreatorPDetailDto creatorPDetail = creatorMapper.getCreatorPDetailDto(creatorId);
+//
+//        if (creatorPDetail==null) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "창작자의 프로젝트 상세보기를 불러오지 못했습니다."));
+//        }
+//        return null;
+//    }
 
     @Override
     public ResponseEntity<ResponseDto<CreatorPDetailDto>> getCreatorDashBoard(Long creatorId) {
         return null;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<PageResult<CreatorProjectListDto>>> getProjectList(Long creatorId, SearchCreatorProjectDto dto, Pager pager) {
+        dto.applyRangeType();
+
+        int total = creatorMapper.countProject(creatorId, dto);
+        List<CreatorProjectListDto> items = Collections.emptyList();
+        if (total > 0) {
+            items = creatorMapper.getProjectList(creatorId, dto, pager);
+            for (CreatorProjectListDto item : items) {
+                item.setPercentNow(Utils.getPercentNow(item.getCurrAmount(), item.getGoalAmount()));
+            }
+        }
+
+        PageResult<CreatorProjectListDto> result = PageResult.of(items, pager, total);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 목록 조회 성공", result));
     }
 
     /**
@@ -184,7 +206,7 @@ public class CreatorServiceImpl implements CreatorService {
      * @since 2025-09-16
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> deleteByCreator(Long projectId, Long creatorId) {
+    public ResponseEntity<ResponseDto<String>> deleteProject(Long projectId, Long creatorId) {
 
         //소유자 체크
 

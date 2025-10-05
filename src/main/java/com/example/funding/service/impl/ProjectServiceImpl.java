@@ -3,18 +3,15 @@ package com.example.funding.service.impl;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.common.Utils;
-import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.request.project.SearchProjectDto;
 import com.example.funding.dto.row.ProjectRow;
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.request.project.ProjectCreateRequestDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
 import com.example.funding.mapper.*;
 import com.example.funding.model.*;
 import com.example.funding.service.ProjectService;
-import com.example.funding.service.RewardService;
 import com.example.funding.service.validator.ProjectVerifyValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -33,10 +29,8 @@ import java.util.Objects;
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectMapper projectMapper;
-    private final CategoryMapper categoryMapper;
     private final TagMapper tagMapper;
     private final RewardMapper rewardMapper;
-    private final RewardService rewardService;
     private final NewsMapper newsMapper;
 
     private final ProjectVerifyValidator validator;

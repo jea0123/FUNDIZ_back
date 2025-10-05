@@ -3,8 +3,6 @@ package com.example.funding.service;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.request.project.ProjectCreateRequestDto;
-import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;

@@ -4,7 +4,6 @@ import com.example.funding.common.Pager;
 import com.example.funding.dto.request.project.SearchProjectDto;
 import com.example.funding.dto.response.creator.CreatorPListDto;
 import com.example.funding.dto.row.ProjectRow;
-import com.example.funding.dto.request.project.ProjectCreateRequestDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
 import com.example.funding.model.Project;

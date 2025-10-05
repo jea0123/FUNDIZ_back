@@ -1,7 +1,7 @@
 package com.example.funding.mapper;
 
 import com.example.funding.common.Pager;
-import com.example.funding.dto.request.admin.SearchProjectVerifyDto;
+import com.example.funding.dto.request.admin.SearchAdminProjectDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
 import com.example.funding.dto.response.admin.analytic.*;
@@ -29,17 +29,17 @@ public interface AdminMapper {
 
     List<CategorySuccess> getCategorySuccessByCategory(@Param("ctgrId") Long ctgrId);
 
-    int countProject(@Param("dto") SearchProjectVerifyDto dto);
+    int countProject(@Param("dto") SearchAdminProjectDto dto);
 
-    List<AdminProjectListDto> getProjectList(@Param("dto") SearchProjectVerifyDto dto, @Param("pager") Pager pager);
+    List<AdminProjectListDto> getProjectList(@Param("dto") SearchAdminProjectDto dto, @Param("pager") Pager pager);
 
     int cancelProject(@Param("projectId") Long projectId);
 
     int updateProject(Project project);
 
-    int countProjectVerify(@Param("dto") SearchProjectVerifyDto dto);
+    int countProjectVerify(@Param("dto") SearchAdminProjectDto dto);
 
-    List<ProjectVerifyListDto> getProjectVerifyList(@Param("dto") SearchProjectVerifyDto dto, @Param("pager") Pager pager);
+    List<ProjectVerifyListDto> getProjectVerifyList(@Param("dto") SearchAdminProjectDto dto, @Param("pager") Pager pager);
 
     ProjectVerifyDetailDto getProjectVerifyDetail(@Param("projectId") Long projectId);
 

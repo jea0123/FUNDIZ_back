@@ -9,7 +9,7 @@ import com.example.funding.dto.request.admin.RejectProjectDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
-import com.example.funding.dto.request.admin.SearchProjectVerifyDto;
+import com.example.funding.dto.request.admin.SearchAdminProjectDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
 import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
@@ -104,7 +104,7 @@ public class AdminController {
      * @since 2025-10-01
      */
     @GetMapping("/project")
-    public ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchProjectVerifyDto dto, Pager reqPager) {
+    public ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchAdminProjectDto dto, Pager reqPager) {
         Pager pager = Pager.ofRequest(
                 reqPager != null ? reqPager.getPage() : 1,
                 reqPager != null ? reqPager.getSize() : 5,
@@ -124,10 +124,9 @@ public class AdminController {
      */
     @PostMapping("/project/{projectId}/cancel")
     public ResponseEntity<ResponseDto<String>> cancelProject(@PathVariable Long projectId) {
-        //관리자 체크
-        Long adId = 1L;
+        //TODO: 관리자 체크
 
-        return adminService.cancelProject(projectId, adId);
+        return adminService.cancelProject(projectId);
     }
 
     /**
@@ -141,8 +140,7 @@ public class AdminController {
      */
     @PostMapping("/project/{projectId}")
     public ResponseEntity<ResponseDto<String>> updateProject(@PathVariable Long projectId, @RequestBody AdminProjectUpdateDto dto) {
-        //관리자 체크
-        Long adId = 1L;
+        //TODO: 관리자 체크
 
         dto.setProjectId(projectId);
 
@@ -159,7 +157,7 @@ public class AdminController {
      * @since 2025-09-18
      */
     @GetMapping("/verify")
-    public ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchProjectVerifyDto dto, Pager reqPager) {
+    public ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchAdminProjectDto dto, Pager reqPager) {
         Pager pager = Pager.ofRequest(
                 reqPager != null ? reqPager.getPage() : 1,
                 reqPager != null ? reqPager.getSize() : 5,
@@ -192,6 +190,8 @@ public class AdminController {
      */
     @PostMapping("/verify/approve/{projectId}")
     public ResponseEntity<ResponseDto<String>> approveProject(@PathVariable Long projectId) {
+        //TODO: 관리자 체크
+
         return adminService.approveProject(projectId);
     }
 
@@ -206,6 +206,8 @@ public class AdminController {
      */
     @PostMapping("/verify/reject/{projectId}")
     public ResponseEntity<ResponseDto<String>> rejectProject(@PathVariable Long projectId, @RequestBody RejectProjectDto dto) {
+        //TODO: 관리자 체크
+
         return adminService.rejectProject(projectId, dto.getRejectedReason());
     }
 }

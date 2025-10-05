@@ -151,6 +151,8 @@
         SELECT COUNT(*)
         FROM PROJECT p
         JOIN CREATOR c ON c.CREATORID = p.CREATORID
+        JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
+        JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
         <include refid="projectListWhere" />
     </select>
 
@@ -169,9 +171,13 @@
                     p.GOALAMOUNT AS goalAmount,
                     p.CURRAMOUNT AS currAmount,
                     p.BACKERCNT AS backerCnt,
-                    p.UPDATEDAT AS updatedAt
+                    p.UPDATEDAT AS updatedAt,
+                    cg.CTGRNAME AS ctgrName,
+                    sc.SUBCTGRNAME AS subctgrName
                 FROM PROJECT p
                 JOIN CREATOR c ON c.CREATORID = p.CREATORID
+                JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
+                JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
                 <include refid="projectListWhere" />
                 ORDER BY p.UPDATEDAT DESC, p.PROJECTID DESC
             ) T
@@ -182,8 +188,7 @@
 
     <update id="cancelProject">
         UPDATE PROJECT
-        SET PROJECTSTATUS = 'CANCELED',
-            UPDATEDAT = SYSDATE
+        SET PROJECTSTATUS = 'CANCELED'
         WHERE PROJECTID = #{projectId}
           AND PROJECTSTATUS <![CDATA[ <> ]]> 'CANCELED'
     </update>

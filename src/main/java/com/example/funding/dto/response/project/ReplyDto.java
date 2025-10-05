@@ -5,20 +5,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class CommunityDto {
+public class ReplyDto {
+    private Long replyId;
     private Long cmId;
-    private Long projectId;
-    private String cmContent;
+    private Long userId;
+    private String content;
     private LocalDateTime createdAt;
-    private String code;
-
-    private String nickname;
-    private String profileImg;
-
-    private List<ReplyDto> replyList;
 }

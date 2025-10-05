@@ -3,8 +3,6 @@ package com.example.funding.controller;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.request.project.ProjectCreateRequestDto;
-import com.example.funding.dto.request.project.ProjectUpdateRequestDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
@@ -61,72 +59,6 @@ public class ProjectController {
     public ResponseEntity<ResponseDto<List<FeaturedProjectDto>>> getFeatured(@RequestParam(defaultValue = "30") int days,
                                                                              @RequestParam(defaultValue = "8") int limit) {
         return projectService.getFeatured(days, limit);
-    }
-
-    /**
-     * <p>프로젝트 생성</p>
-     *
-     * @param dto ProjectCreateRequestDto
-     * @return 성공 시 200 OK
-     * @author by: 조은애
-     * @since 2025-09-09
-     */
-    @PostMapping
-    public ResponseEntity<ResponseDto<String>> createProject(@RequestBody ProjectCreateRequestDto dto) {
-        //userId -> creatorId
-        Long creatorId = 1L;
-
-        return projectService.createProject(dto, creatorId);
-    }
-
-    /**
-     * <p>프로젝트 수정</p>
-     *
-     * @param projectId 프로젝트 ID
-     * @param dto ProjectUpdateRequestDto
-     * @return 성공 시 200 OK
-     * @author by: 조은애
-     * @since 2025-09-16
-     */
-    @PostMapping("/{projectId}")
-    public ResponseEntity<ResponseDto<String>> updateProject(@PathVariable Long projectId, @RequestBody ProjectUpdateRequestDto dto) {
-        //userId -> creatorId
-        Long creatorId = 1L;
-
-        dto.setProjectId(projectId);
-        return projectService.updateProject(dto, creatorId);
-    }
-
-    /**
-     * <p>프로젝트 삭제</p>
-     *
-     * @param projectId 프로젝트 ID
-     * @return 성공 시 200 OK
-     * @author by: 조은애
-     * @since 2025-09-16
-     */
-    @DeleteMapping("/{projectId}")
-    public ResponseEntity<ResponseDto<String>> deleteByCreator(@PathVariable Long projectId) {
-        //userId -> creatorId
-        Long creatorId = 1L;
-
-        return projectService.deleteByCreator(projectId, creatorId);
-    }
-
-    /**
-     * <p>프로젝트 심사 요청</p>
-     *
-     * @param projectId 프로젝트 ID
-     * @return 성공 시 200 OK
-     * @author by: 조은애
-     * @since 2025-09-18
-     */
-    @PostMapping("{projectId}/verify")
-    public ResponseEntity<ResponseDto<String>> verifyProject(@PathVariable Long projectId){
-        //userId -> creatorId
-        Long creatorId = 1L;
-
-        return projectService.verifyProject(projectId, creatorId);
     }
 
     /**

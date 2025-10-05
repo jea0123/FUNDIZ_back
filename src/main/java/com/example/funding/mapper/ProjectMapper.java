@@ -4,7 +4,6 @@ import com.example.funding.common.Pager;
 import com.example.funding.dto.request.project.SearchProjectDto;
 import com.example.funding.dto.response.creator.CreatorPListDto;
 import com.example.funding.dto.row.ProjectRow;
-import com.example.funding.dto.request.project.ProjectCreateRequestDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
 import com.example.funding.model.Project;
@@ -36,25 +35,17 @@ public interface ProjectMapper {
 
     int getProjectCnt(@Param("creatorId") Long creatorId);
 
-    int saveProject(ProjectCreateRequestDto dto);
-
     String getStatus(@Param("projectId") Long projectId);
-
-    int updateProject(Project project);
 
     List<FeaturedProjectDto> searchProjects(@Param("dto") SearchProjectDto dto, @Param("pager") Pager pager);
 
     int countSearchProjects(@Param("dto") SearchProjectDto dto);
-
-    int deleteProject(@Param("projectId") Long projectId);
 
     int updateProjectsToOpen();
 
     int updateProjectsToSuccess();
 
     int updateProjectsToFailed();
-
-    int markVerifyProject(@Param("projectId") Long projectId);
 
     List<CreatorPListDto> getCreatorPList(@Param("creatorId") Long creatorId);
 }

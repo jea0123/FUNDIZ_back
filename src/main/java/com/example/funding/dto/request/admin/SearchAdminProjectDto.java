@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class SearchAdminProjectDto {
-    private String projectStatus;
+    private String projectStatus = "VERIFYING";
     private LocalDate fromDate;
     private LocalDate toDate;
     private String rangeType;

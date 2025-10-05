@@ -38,6 +38,7 @@ public class NotificationServiceImpl implements NotificationService {
      * @since 2025-10-02
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<Notification>>> getNotificationsByUserId(Long userId) {
         User user = userMapper.getUserById(userId);
         if (user == null) {
@@ -57,6 +58,7 @@ public class NotificationServiceImpl implements NotificationService {
      * @since 2025-10-02
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<Notification>> getNotificationById(Long notificationId, Long userId) {
         Notification notification = notificationMapper.getNotificationById(notificationId);
         if (notification == null) {

@@ -5,12 +5,12 @@ import com.example.funding.common.Pager;
 import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.admin.AdminProjectUpdateDto;
+import com.example.funding.dto.request.admin.SearchAdminProjectDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
-import com.example.funding.dto.request.admin.SearchAdminProjectDto;
-import com.example.funding.dto.response.admin.analytic.*;
 import com.example.funding.dto.response.admin.ProjectVerifyListDto;
+import com.example.funding.dto.response.admin.analytic.*;
 import com.example.funding.mapper.AdminMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.RewardMapper;
@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -43,6 +44,7 @@ public class AdminServiceImpl implements AdminService {
 
     /**
      * 관리자 대시보드 분석 데이터 조회
+     *
      * @param from   조회 시작 날짜
      * @param to     조회 종료 날짜
      * @param limit  상위 N개 리워드 조회 제한
@@ -62,8 +64,8 @@ public class AdminServiceImpl implements AdminService {
         List<PaymentMethod> paymentMethods = adminMapper.getPaymentMethods(from, to);
         List<CategorySuccess> categorySuccesses = adminMapper.getCategorySuccessByCategory(ctgrId);
 
-        if(kpi == null || revenueTrends.isEmpty() || rewardSalesTops.isEmpty() || paymentMethods.isEmpty() || categorySuccesses.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "해당 기간에 대한 분석 데이터가 없습니다."));
+        if (kpi == null || revenueTrends.isEmpty() || rewardSalesTops.isEmpty() || paymentMethods.isEmpty() || categorySuccesses.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 기간에 대한 일부 분석 데이터가 없습니다.");
         }
 
         AdminAnalyticsDto analytics = AdminAnalyticsDto.builder()
@@ -78,6 +80,7 @@ public class AdminServiceImpl implements AdminService {
 
     /**
      * 카테고리별 성공률 조회
+     *
      * @param ctgrId 카테고리 ID
      * @return 카테고리별 성공률 데이터 리스트
      * @author 장민규
@@ -87,14 +90,15 @@ public class AdminServiceImpl implements AdminService {
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(Long ctgrId) {
         List<CategorySuccess> categorySuccesses = adminMapper.getCategorySuccessByCategory(ctgrId);
-        if(categorySuccesses.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "해당 카테고리에 대한 데이터가 없습니다."));
+        if (categorySuccesses.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 카테고리에 대한 성공률 데이터가 없습니다.");
         }
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "카테고리별 성공률 조회 성공", categorySuccesses));
     }
 
     /**
      * KPI 조회
+     *
      * @param months 조회 기간 (개월 단위)
      * @return KPI 데이터
      * @author 장민규
@@ -104,14 +108,15 @@ public class AdminServiceImpl implements AdminService {
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<Kpi>> getKpi(int months) {
         Kpi kpi = adminMapper.getKpiByMonths(months);
-        if(kpi == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "해당 기간에 대한 KPI 데이터가 없습니다."));
+        if (kpi == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 기간에 대한 KPI 데이터가 없습니다.");
         }
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "KPI 조회 성공", kpi));
     }
 
     /**
      * 상위 리워드 판매량/매출 조회
+     *
      * @param from   조회 시작 날짜
      * @param to     조회 종료 날짜
      * @param limit  상위 N개 리워드 조회 제한
@@ -123,8 +128,8 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public ResponseEntity<ResponseDto<List<RewardSalesTop>>> getRewardSalesTops(LocalDate from, LocalDate to, int limit, String metric) {
         List<RewardSalesTop> rewardSalesTops = adminMapper.getRewardSalesTops(from, to, limit, metric);
-        if(rewardSalesTops.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "해당 기간에 대한 리워드 판매 데이터가 없습니다."));
+        if (rewardSalesTops.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 기간에 대한 리워드 판매량/매출 데이터가 없습니다.");
         }
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "리워드 판매 상위 조회 성공", rewardSalesTops));
     }
@@ -132,7 +137,7 @@ public class AdminServiceImpl implements AdminService {
     /**
      * <p>프로젝트 목록 조회</p>
      *
-     * @param dto SearchProjectVerifyDto
+     * @param dto   SearchProjectVerifyDto
      * @param pager pager
      * @return 성공 시 200 OK
      * @author by: 조은애
@@ -215,7 +220,7 @@ public class AdminServiceImpl implements AdminService {
     /**
      * <p>프로젝트 심사 목록 조회</p>
      *
-     * @param dto SearchProjectVerifyDto
+     * @param dto   SearchProjectVerifyDto
      * @param pager pager
      * @return 성공 시 200 OK
      * @author by: 조은애
@@ -282,7 +287,7 @@ public class AdminServiceImpl implements AdminService {
     /**
      * <p>프로젝트 반려</p>
      *
-     * @param projectId 프로젝트 ID
+     * @param projectId      프로젝트 ID
      * @param rejectedReason 반려 사유
      * @return 성공 시 200 OK
      * @author by: 조은애

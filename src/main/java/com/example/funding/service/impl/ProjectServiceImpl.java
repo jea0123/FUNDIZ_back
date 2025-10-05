@@ -3,14 +3,19 @@ package com.example.funding.service.impl;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.common.Utils;
-import com.example.funding.dto.request.project.SearchProjectDto;
-import com.example.funding.dto.row.ProjectRow;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.project.SearchProjectDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
-import com.example.funding.mapper.*;
-import com.example.funding.model.*;
+import com.example.funding.dto.row.ProjectRow;
+import com.example.funding.mapper.NewsMapper;
+import com.example.funding.mapper.ProjectMapper;
+import com.example.funding.mapper.RewardMapper;
+import com.example.funding.mapper.TagMapper;
+import com.example.funding.model.News;
+import com.example.funding.model.Reward;
+import com.example.funding.model.Tag;
 import com.example.funding.service.ProjectService;
 import com.example.funding.service.validator.ProjectVerifyValidator;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -67,32 +73,32 @@ public class ProjectServiceImpl implements ProjectService {
 
         //응답Dto 조립
         ProjectDetailDto detail = ProjectDetailDto.builder()
-            .projectId(row.getProjectId())
-            .creatorId(row.getCreatorId())
-            .subctgrId(row.getSubctgrId())
-            .title(row.getTitle())
-            .goalAmount(row.getGoalAmount())
-            .currAmount(row.getCurrAmount())
-            .startDate(row.getStartDate())
-            .endDate(row.getEndDate())
-            .content(row.getContent())
-            .thumbnail(row.getThumbnail())
-            .projectStatus(row.getProjectStatus())
-            .backerCnt(row.getBackerCnt())
-            .likeCnt(row.getLikeCnt())
-            .viewCnt(row.getViewCnt())
-            .percentNow(percentNow)
-            .projectCnt(projectCnt)
-            .paymentDate(paymentDate)
-            .creatorName(row.getCreatorName())
-            .followerCnt(row.getFollowerCnt())
-            .profileImg(row.getProfileImg())
-            .ctgrName(row.getCtgrName())
-            .subctgrName(row.getSubctgrName())
-            .tagList(tagList)
-            .rewardList(rewardList)
-            .newsList(newsList)
-            .build();
+                .projectId(row.getProjectId())
+                .creatorId(row.getCreatorId())
+                .subctgrId(row.getSubctgrId())
+                .title(row.getTitle())
+                .goalAmount(row.getGoalAmount())
+                .currAmount(row.getCurrAmount())
+                .startDate(row.getStartDate())
+                .endDate(row.getEndDate())
+                .content(row.getContent())
+                .thumbnail(row.getThumbnail())
+                .projectStatus(row.getProjectStatus())
+                .backerCnt(row.getBackerCnt())
+                .likeCnt(row.getLikeCnt())
+                .viewCnt(row.getViewCnt())
+                .percentNow(percentNow)
+                .projectCnt(projectCnt)
+                .paymentDate(paymentDate)
+                .creatorName(row.getCreatorName())
+                .followerCnt(row.getFollowerCnt())
+                .profileImg(row.getProfileImg())
+                .ctgrName(row.getCtgrName())
+                .subctgrName(row.getSubctgrName())
+                .tagList(tagList)
+                .rewardList(rewardList)
+                .newsList(newsList)
+                .build();
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 상세 조회 성공", detail));
     }
@@ -126,7 +132,7 @@ public class ProjectServiceImpl implements ProjectService {
         List<RecentTop10ProjectDto> ranked = projectMapper.findRecentTopProjectsJoined(since, startDays, limit);
 
         if (ranked == null || ranked.isEmpty()) {
-            return ResponseEntity.ok(ResponseDto.fail(200, "최근 24시간 내 결제된 프로젝트가 없습니다."));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "최근 24시간 내 결제된 프로젝트 TOP10이 없습니다.");
         }
         return ResponseEntity.ok(ResponseDto.success(200, "최근 24시간 내 결제된 프로젝트 TOP10 조회 성공", ranked));
     }
@@ -157,8 +163,7 @@ public class ProjectServiceImpl implements ProjectService {
     public ResponseEntity<ResponseDto<List<FeaturedProjectDto>>> getFeatured(int days, int limit) {
         List<FeaturedProjectDto> result = projectMapper.findFeaturedJoinedWithRecent(days, limit);
         if (result == null || result.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ResponseDto.fail(404, "추천 프로젝트가 없습니다."));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "추천 프로젝트가 없습니다.");
         }
         return ResponseEntity.ok(ResponseDto.success(200, "추천 프로젝트 조회 성공", result));
     }
@@ -166,7 +171,7 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * <p>검색 기능 (제목, 내용, 창작자명, 태그)</p>
      *
-     * @param dto SearchProjectDto
+     * @param dto   SearchProjectDto
      * @param pager pager
      * @return 성공 시 200 OK
      * @author by: 조은애

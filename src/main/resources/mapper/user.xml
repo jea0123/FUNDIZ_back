@@ -8,17 +8,17 @@
         (USERS_SEQ.NEXTVAL, #{email}, #{password}, #{nickname})
     </insert>
 
-    
+
     <update id="updateLastLogin" parameterType="Long">
         UPDATE USERS
         SET LASTLOGINAT = SYSDATE
         WHERE USERID = #{userId}
     </update>
 
-    <select id ="getUserById" parameterType="long" resultType="com.example.funding.model.User">
-            SELECT *
-            FROM users
-            WHERE userId=#{userId, jdbcType=NUMERIC}
+    <select id="getUserById" parameterType="long" resultType="com.example.funding.model.User">
+        SELECT *
+        FROM users
+        WHERE userId=#{userId, jdbcType=NUMERIC}
 
     </select>
 
@@ -33,17 +33,17 @@
     <select id="getRecentViewProjects" resultType="recentViewProject">
         SELECT *
         FROM (
-            SELECT
-            pr.projectId,
-            NVL2(TRIM(c.creatorName), c.creatorName, 'Unknown Creator') AS creatorName,
-            pr.Title,
-            pr.Thumbnail,
-            CASE WHEN NVL(pr.goalAmount,0) > 0
-                THEN ROUND(NVL(pr.currAmount,0) / NULLIF(pr.goalAmount,0) * 100)
-                ELSE 0 END AS percentNow,
-            pr.currAmount,
-            pr.endDate,
-            rv.viewedAt
+        SELECT
+        pr.projectId,
+        NVL2(TRIM(c.creatorName), c.creatorName, 'Unknown Creator') AS creatorName,
+        pr.Title,
+        pr.Thumbnail,
+        CASE WHEN NVL(pr.goalAmount,0) > 0
+        THEN ROUND(NVL(pr.currAmount,0) / NULLIF(pr.goalAmount,0) * 100)
+        ELSE 0 END AS percentNow,
+        pr.currAmount,
+        pr.endDate,
+        rv.viewedAt
         FROM recentview rv
         JOIN project pr ON rv.projectId = pr.projectId
         JOIN creator c ON pr.creatorId = c.creatorId
@@ -55,19 +55,25 @@
         ]]>
     </select>
 
-    <update id = "updateNickname">
+    <select id="getCreatorIdByUserId" resultType="long">
+        SELECT creatorId
+        FROM creator
+        WHERE userId = #{userId}
+    </select>
+
+    <update id="updateNickname">
         UPDATE USERS
         SET nickname = #{nickname}
         WHERE userId = #{userID}
     </update>
 
-    <update id = "updatePwd">
+    <update id="updatePwd">
         UPDATE USERS
         SET pwd = #{pwd}
         WHERE userId = #{userId}
     </update>
 
-    <update id = "updateProfileImg">
+    <update id="updateProfileImg">
         UPDATE USERS
         SET profileImg = #{profileImg}
         WHERE userId = #{userId}

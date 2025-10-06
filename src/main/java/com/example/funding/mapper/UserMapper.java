@@ -1,6 +1,5 @@
 package com.example.funding.mapper;
 
-import com.example.funding.dto.response.address.AddressResponseDto;
 import com.example.funding.dto.response.user.MyPageLikedDto;
 import com.example.funding.dto.response.user.MyPageQnADto;
 import com.example.funding.dto.response.user.RecentViewProject;
@@ -34,4 +33,5 @@ public interface UserMapper {
 
     int updateProfile(@Param("userId") Long userId, @Param("profileImg") String profile);
 
+    Long getCreatorIdByUserId(Long userId);
 }

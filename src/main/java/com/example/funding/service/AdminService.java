@@ -12,6 +12,7 @@ import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
 import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
 import com.example.funding.dto.response.admin.ProjectVerifyListDto;
+import com.example.funding.model.User;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
@@ -39,4 +40,6 @@ public interface AdminService {
     ResponseEntity<ResponseDto<String>> approveProject(Long projectId);
 
     ResponseEntity<ResponseDto<String>> rejectProject(Long projectId, String rejectedReason);
+
+    ResponseEntity<ResponseDto<PageResult<User>>> userList(Pager pager);
 }

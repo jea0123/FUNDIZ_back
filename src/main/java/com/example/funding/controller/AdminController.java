@@ -14,6 +14,8 @@ import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
 import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
 import com.example.funding.dto.response.admin.ProjectVerifyListDto;
+import com.example.funding.model.Notice;
+import com.example.funding.model.User;
 import com.example.funding.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -209,5 +211,18 @@ public class AdminController {
         //TODO: 관리자 체크
 
         return adminService.rejectProject(projectId, dto.getRejectedReason());
+    }
+
+    //회원관리
+    //251006
+    @GetMapping("/user/list")
+    public ResponseEntity<ResponseDto<PageResult<User>>> userList(Pager reqPager) {
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 10,
+                reqPager != null ? reqPager.getPerGroup() : 10
+        );
+
+        return adminService.userList(pager);
     }
 }

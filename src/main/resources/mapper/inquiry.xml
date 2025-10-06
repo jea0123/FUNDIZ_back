@@ -2,18 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.funding.mapper.InquiryMapper">
 
+    <select id="inquiryTotal" resultType="Integer">
+        SELECT COUNT(*) FROM inquiry
+    </select>
+
+    <select id="myInquiryTotal" resultType="Integer">
+        SELECT COUNT(*) FROM inquiry
+        WHERE USERID = #{userId}
+    </select>
+
     <select id="inquiryList" resultType="inquiry">
         SELECT * FROM
         (SELECT sub.*, ROWNUM rnum FROM (
         SELECT * FROM inquiry order by INQID desc
-        ) sub)
+        ) sub WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow})
+        WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
 
     <select id="myInquiryList" resultType="inquiry">
         SELECT * FROM
         (SELECT sub.*, ROWNUM rnum FROM (
         SELECT * FROM inquiry WHERE USERID = #{userId} order by INQID desc
-        ) sub)
+        ) sub WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow})
+        WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
 
     <select id="inquiryDetail" resultType="inquiry">

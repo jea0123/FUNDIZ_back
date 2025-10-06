@@ -1,5 +1,7 @@
 package com.example.funding.controller;
 
+import com.example.funding.common.PageResult;
+import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.cs.*;
 import com.example.funding.model.Inquiry;
@@ -22,9 +24,15 @@ public class CSController {
 
     //공지사항 목록
     //250919
-    @GetMapping("/notice")
-    public ResponseEntity<ResponseDto<List<Notice>>> noticeList() {
-        return csService.noticeList();
+    @GetMapping("/notice/list")
+    public ResponseEntity<ResponseDto<PageResult<Notice>>> noticeList(Pager reqPager) {
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 10,
+                reqPager != null ? reqPager.getPerGroup() : 10
+        );
+
+        return csService.noticeList(pager);
     }
 
     //공지사항 상세
@@ -59,15 +67,27 @@ public class CSController {
     //문의내역 목록
     //250923
     @GetMapping("/inquiry/list")
-    public ResponseEntity<ResponseDto<List<Inquiry>>> inquiryList() {
-        return csService.inquiryList();
+    public ResponseEntity<ResponseDto<PageResult<Inquiry>>> inquiryList(Pager reqPager) {
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 10,
+                reqPager != null ? reqPager.getPerGroup() : 10
+        );
+
+        return csService.inquiryList(pager);
     }
 
     //내 문의내역 목록
     //250923
     @GetMapping("/inquiry/mylist/{userId}")
-    public ResponseEntity<ResponseDto<List<Inquiry>>> myInquiryList(@PathVariable Long userId) {
-        return csService.myInquiryList(userId);
+    public ResponseEntity<ResponseDto<PageResult<Inquiry>>> myInquiryList(@PathVariable Long userId, Pager reqPager) {
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 10,
+                reqPager != null ? reqPager.getPerGroup() : 10
+        );
+
+        return csService.myInquiryList(userId, pager);
     }
 
     //문의 등록
@@ -80,16 +100,28 @@ public class CSController {
     //신고내역 목록
     //250923
     @GetMapping("/report/list")
-    public ResponseEntity<ResponseDto<List<Report>>> reportList() {
-            return csService.reportList();
-        }
+    public ResponseEntity<ResponseDto<PageResult<Report>>> reportList(Pager reqPager) {
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 10,
+                reqPager != null ? reqPager.getPerGroup() : 10
+        );
+
+        return csService.reportList(pager);
+    }
 
 
     //내 신고내역 목록
     //250923
     @GetMapping("/report/mylist/{userId}")
-    public ResponseEntity<ResponseDto<List<Report>>> reportList(@PathVariable Long userId) {
-            return csService.myReportList(userId);
+    public ResponseEntity<ResponseDto<PageResult<Report>>> reportList(@PathVariable Long userId, Pager reqPager) {
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 10,
+                reqPager != null ? reqPager.getPerGroup() : 10
+        );
+
+        return csService.myReportList(userId, pager);
     }
 
     //신고 등록

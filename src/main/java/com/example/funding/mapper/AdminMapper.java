@@ -6,6 +6,7 @@ import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
 import com.example.funding.dto.response.admin.analytic.*;
 import com.example.funding.dto.response.admin.ProjectVerifyListDto;
+import com.example.funding.model.User;
 import com.example.funding.model.Project;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -46,4 +47,8 @@ public interface AdminMapper {
     int approveProject(@Param("projectId") Long projectId);
 
     int rejectProject(@Param("projectId") Long projectId, @Param("rejectedReason") String rejectedReason);
+
+    int userTotal();
+
+    List<User> userList(@Param("pager") Pager pager);
 }

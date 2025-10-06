@@ -2,11 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.funding.mapper.NoticeMapper">
 
+    <select id="noticeTotal" resultType="Integer">
+        SELECT COUNT(*) FROM notice
+    </select>
+
     <select id="noticeList" resultType="notice">
         SELECT * FROM
         (SELECT sub.*, ROWNUM rnum FROM (
         SELECT * FROM notice order by NOTICEID desc
-        ) sub)
+        ) sub WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow})
+        WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
 
     <update id="updateViewCnt">

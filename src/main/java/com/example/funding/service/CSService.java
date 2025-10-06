@@ -1,5 +1,7 @@
 package com.example.funding.service;
 
+import com.example.funding.common.PageResult;
+import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.cs.*;
 import com.example.funding.model.Inquiry;
@@ -10,7 +12,8 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface CSService {
-    ResponseEntity<ResponseDto<List<Notice>>> noticeList();
+
+    ResponseEntity<ResponseDto<PageResult<Notice>>> noticeList(Pager pager);
 
     ResponseEntity<ResponseDto<Notice>> item(Long noticeId);
 
@@ -20,18 +23,16 @@ public interface CSService {
 
     ResponseEntity<ResponseDto<String>> deleteNotice(Long noticeId);
 
-    ResponseEntity<ResponseDto<List<Inquiry>>> inquiryList();
+    ResponseEntity<ResponseDto<PageResult<Inquiry>>> inquiryList(Pager pager);
 
-    ResponseEntity<ResponseDto<List<Inquiry>>> myInquiryList(Long userId);
+    ResponseEntity<ResponseDto<PageResult<Inquiry>>> myInquiryList(Long userId, Pager pager);
 
     ResponseEntity<ResponseDto<String>> addInquiry(Long userId, IqrAddRequestDto iqrDto);
 
-    ResponseEntity<ResponseDto<List<Report>>> reportList();
+    ResponseEntity<ResponseDto<PageResult<Report>>> reportList(Pager pager);
 
-    ResponseEntity<ResponseDto<List<Report>>> myReportList(Long userId);
+    ResponseEntity<ResponseDto<PageResult<Report>>> myReportList(Long userId, Pager pager);
 
     ResponseEntity<ResponseDto<String>> addReport(Long userId, RpAddRequestDto rpDto);
-
-
 
 }

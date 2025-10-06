@@ -1,4 +1,4 @@
-package com.example.funding.dto.request.admin;
+package com.example.funding.dto.request.creator;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,8 +7,8 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class SearchProjectVerifyDto {
-    private String projectStatus = "VERIFYING";
+public class SearchCreatorProjectDto {
+    private String projectStatus;
     private LocalDate fromDate;
     private LocalDate toDate;
     private String rangeType;

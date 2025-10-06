@@ -1,7 +1,7 @@
-package com.example.funding.dto.request.project;
+package com.example.funding.dto.response.creator;
 
-import com.example.funding.dto.request.reward.RewardCreateRequestDto;
-import lombok.AllArgsConstructor;
+import com.example.funding.model.Reward;
+import com.example.funding.model.Tag;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,12 +10,9 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ProjectCreateRequestDto {
+public class CreatorProjectDetailDto {
     private Long projectId;
-    private Long subctgrId;
     private Long creatorId;
-
-    //프로젝트
     private String title;
     private String content;
     private String thumbnail;
@@ -23,15 +20,16 @@ public class ProjectCreateRequestDto {
     private LocalDate startDate;
     private LocalDate endDate;
 
-    //태그
-    private List<String> tagList;
+    private Long ctgrId;
+    private String ctgrName;
+    private Long subctgrId;
+    private String subctgrName;
 
-    //리워드
-    private List<RewardCreateRequestDto> rewardList;
-
-    //창작자
     private String creatorName;
     private String businessNum;
     private String email;
     private String phone;
+
+    private List<Tag> tagList;
+    private List<Reward> rewardList;
 }

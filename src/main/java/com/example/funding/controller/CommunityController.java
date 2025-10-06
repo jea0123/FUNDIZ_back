@@ -1,19 +1,17 @@
 package com.example.funding.controller;
 
-import com.example.funding.common.PageResult;
-import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.response.project.CommunityDto;
+import com.example.funding.dto.response.project.CursorPage;
+import com.example.funding.dto.response.project.ReviewDto;
 import com.example.funding.service.CommunityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Slf4j
 @RestController
@@ -26,38 +24,38 @@ public class CommunityController {
     /**
      * <p>프로젝트 상세 페이지 내 커뮤니티 목록 조회</p>
      * @param projectId 프로젝트 ID
-     * @param reqPager 요청 pager
+     * @param lastCreatedAt 마지막 항목의 생성일시
+     * @param lastId 마지막 항목의 cmId
+     * @param size 한 번에 가져올 항목 수
      * @return 성공 시 200 OK
      * @author by: 조은애
-     * @since 2025-09-03
+     * @since 2025-10-03
      */
     @GetMapping("/community")
-    public ResponseEntity<ResponseDto<PageResult<CommunityDto>>> getCommunity(@PathVariable("projectId") Long projectId, Pager reqPager) {
-        Pager pager = Pager.ofRequest(
-                reqPager != null ? reqPager.getPage() : 1,
-                reqPager != null ? reqPager.getSize() : 10,
-                reqPager != null ? reqPager.getPerGroup() : 5
-        );
+    public ResponseEntity<ResponseDto<CursorPage<CommunityDto>>> getCommunityList(@PathVariable("projectId") Long projectId,
+                                                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastCreatedAt,
+                                                                                  @RequestParam(required = false) Long lastId,
+                                                                                  @RequestParam(defaultValue = "10") int size) {
 
-        return communityService.getCommunity(projectId, "CM", pager);
+        return communityService.getCommunityList(projectId, "CM", lastCreatedAt, lastId, size);
     }
 
     /**
      * <p>프로젝트 상세 페이지 내 후기 목록 조회</p>
      * @param projectId 프로젝트 ID
-     * @param reqPager 요청 pager
+     * @param lastCreatedAt 마지막 항목의 생성일시
+     * @param lastId 마지막 항목의 cmId
+     * @param size 한 번에 가져올 항목 수
      * @return 성공 시 200 OK
      * @author by: 조은애
-     * @since 2025-09-03
+     * @since 2025-10-03
      */
     @GetMapping("/review")
-    public ResponseEntity<ResponseDto<PageResult<CommunityDto>>> getReview(@PathVariable("projectId") Long projectId, Pager reqPager) {
-        Pager pager = Pager.ofRequest(
-                reqPager != null ? reqPager.getPage() : 1,
-                reqPager != null ? reqPager.getSize() : 10,
-                reqPager != null ? reqPager.getPerGroup() : 5
-        );
+    public ResponseEntity<ResponseDto<CursorPage<ReviewDto>>> getReviewList(@PathVariable("projectId") Long projectId,
+                                                                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastCreatedAt,
+                                                                            @RequestParam(required = false) Long lastId,
+                                                                            @RequestParam(defaultValue = "10") int size) {
 
-        return communityService.getCommunity(projectId, "RV", pager);
+        return communityService.getReviewList(projectId, "RV", lastCreatedAt, lastId, size);
     }
 }

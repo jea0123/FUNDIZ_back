@@ -28,20 +28,33 @@ import java.util.List;
 /**
  * <p>JWT 인증 필터</p>
  * <p>- 매 요청마다 JWT 토큰의 유효성을 검사하고, 유효한 경우 SecurityContext에 인증 정보를 저장</p>
- * @since 2028-08-26
+ *
  * @author 장민규
+ * @since 2028-08-26
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private static final String[] WHITELIST = {
+            "/api/v1/shipping/**",
+            "/api/v1/admin/**",
+            "/api/v1/backing/**",
+            "/api/v1/categories/**",
+            "/api/v1/project/**",
+            "/api/v1/creator/**",
+            "/api/v1/cs/**",
+            "/api/v1/notifications/**",
+            "/api/v1/reward/**",
+            "/api/v1/auth/**",
+            "/api/v1/user/**",
+            "/public/**", "/swagger-ui/**", "/v3/api-docs/**",
+            "/error", "/favicon.ico"
+    };
     private final JwtAuthenticationEntryPoint entryPoint;
-
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
-
     private final JwtProvider jwtProvider;
-
     private final UserMapper userMapper;
 
     /**
@@ -68,6 +81,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
+        //TODO: CORS 프리플라이트 무조건 통과 (임시)
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String token = resolveToken(request);
         if (token == null) {
             request.setAttribute("authError", "TOKEN_MISSING");
@@ -86,8 +105,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String role = claims.get("role", String.class);
             GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.toUpperCase());
             Long userId = ((Number) claims.get("userId")).longValue();
+            Long creatorId = userMapper.getCreatorIdByUserId(userId);
 
-            CustomUserPrincipal principal = new CustomUserPrincipal(userId, email, List.of(authority));
+            CustomUserPrincipal principal = new CustomUserPrincipal(userId, creatorId, email, List.of(authority));
             Authentication auth =
                     new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
@@ -112,6 +132,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     /**
      * <p>HTTP 요청에서 JWT 토큰 추출</p>
      * <p>- Authorization 헤더에서 "Bearer " 접두사를 제거한 토큰 반환</p>
+     *
      * @param req HTTP 요청
      * @return JWT 토큰 또는 null
      */
@@ -121,20 +142,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return header.substring(7);
         return null;
     }
-
-    private static final String[] WHITELIST = {
-            "/api/v1/shipping/**",
-            "/api/v1/admin/**",
-            "/api/v1/backing/**",
-            "/api/v1/categories/**",
-            "/api/v1/project/**",
-            "/api/v1/creator/**",
-            "/api/v1/cs/**",
-            "/api/v1/notifications/**",
-            "/api/v1/reward/**",
-            "/api/v1/auth/**",
-            "/api/v1/user/**",
-            "/public/**", "/swagger-ui/**", "/v3/api-docs/**",
-            "/error", "/favicon.ico"
-    };
 }

@@ -151,6 +151,8 @@
         SELECT COUNT(*)
         FROM PROJECT p
         JOIN CREATOR c ON c.CREATORID = p.CREATORID
+        JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
+        JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
         <include refid="projectListWhere" />
     </select>
 
@@ -164,13 +166,18 @@
                     p.TITLE AS title,
                     c.CREATORNAME AS creatorName,
                     p.PROJECTSTATUS AS projectStatus,
+                    p.STARTDATE AS startDate,
                     p.ENDDATE AS endDate,
                     p.GOALAMOUNT AS goalAmount,
                     p.CURRAMOUNT AS currAmount,
                     p.BACKERCNT AS backerCnt,
-                    p.UPDATEDAT AS updatedAt
+                    p.UPDATEDAT AS updatedAt,
+                    cg.CTGRNAME AS ctgrName,
+                    sc.SUBCTGRNAME AS subctgrName
                 FROM PROJECT p
                 JOIN CREATOR c ON c.CREATORID = p.CREATORID
+                JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
+                JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
                 <include refid="projectListWhere" />
                 ORDER BY p.UPDATEDAT DESC, p.PROJECTID DESC
             ) T
@@ -181,10 +188,20 @@
 
     <update id="cancelProject">
         UPDATE PROJECT
-        SET PROJECTSTATUS = 'CANCELED',
-            UPDATEDAT = SYSDATE
+        SET PROJECTSTATUS = 'CANCELED'
         WHERE PROJECTID = #{projectId}
           AND PROJECTSTATUS <![CDATA[ <> ]]> 'CANCELED'
+    </update>
+
+    <update id="updateProject">
+        UPDATE PROJECT
+        <set>
+            <if test="subctgrId != null"> SUBCTGRID = #{subctgrId}, </if>
+            <if test="title != null"> TITLE = #{title}, </if>
+            <if test="thumbnail != null"> THUMBNAIL = #{thumbnail}, </if>
+            <if test="projectStatus != null"> PROJECTSTATUS = #{projectStatus} </if>
+        </set>
+        WHERE PROJECTID = #{projectId}
     </update>
     
     <sql id="verifyFilterWhere">

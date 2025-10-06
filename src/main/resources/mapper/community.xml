@@ -2,42 +2,69 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.funding.mapper.CommunityMapper">
 
-    <select id="countTotal" resultType="Integer">
-        SELECT COUNT(*)
-        FROM COMMUNITY
-        WHERE PROJECTID = #{projectId}
-          AND CODE = #{code}
-    </select>
-
-    <select id="getCommunityById" resultType="community">
-        SELECT
-            CMID,
-            USERID,
-            PROJECTID,
-            CMCONTENT,
-            NVL(RATING, 0) AS rating,
-            CREATEDAT,
-            CODE
-        FROM
-        (
-            SELECT ROWNUM rnum, T.*
-            FROM
-            (
+    <sql id="foldedQuery">
+        WITH base AS (
+            SELECT /*+ MATERIALIZE */
+                CMID, USERID, PROJECTID, CMCONTENT, NVL(RATING, 0) AS RATING, CREATEDAT, CODE
+            FROM (
                 SELECT
-                    CMID,
-                    USERID,
-                    PROJECTID,
-                    CMCONTENT,
-                    NVL(RATING, 0) AS rating,
-                    CREATEDAT,
-                    CODE
+                    CMID, USERID, PROJECTID, CMCONTENT, NVL(RATING, 0) AS RATING, CREATEDAT, CODE
                 FROM COMMUNITY
                 WHERE PROJECTID = #{projectId}
-                  AND TRIM(CODE) = 'CM'
-                ORDER BY CREATEDAT DESC
-            ) T
+                  AND TRIM(CODE) = #{code}
+                <if test="lastCreatedAt != null">
+                <![CDATA[
+                    AND (
+                        CREATEDAT < #{lastCreatedAt}
+                        OR (CREATEDAT = #{lastCreatedAt} AND CMID < #{lastId})
+                    )
+                ]]>
+                </if>
+                ORDER BY CREATEDAT DESC, CMID DESC
+            )
+            WHERE ROWNUM <![CDATA[ <= ]]> #{size}
         )
-        WHERE rnum BETWEEN (#{pager.page} - 1) * #{pager.size} + 1 AND (#{pager.page} * #{pager.size})
+        SELECT
+            b.CMID AS cmId,
+            b.PROJECTID AS projectId,
+            b.CMCONTENT AS cmContent,
+            b.CREATEDAT AS createdAt,
+            b.CODE AS code,
+            b.RATING AS rating,
+            u.NICKNAME AS nickname,
+            u.PROFILEIMG AS profileImg,
+            r.REPLYID AS r_replyId,
+            r.USERID AS r_userId,
+            r.CONTENT AS r_content,
+            r.CREATEDAT AS r_createdAt
+        FROM base b
+        LEFT JOIN USERS u ON u.USERID = b.USERID
+        LEFT JOIN REPLY r ON r.CMID = b.CMID AND TRIM(r.CODE) = #{code}
+        ORDER BY b.CREATEDAT DESC, b.CMID DESC, r.CREATEDAT ASC, r.REPLYID ASC
+    </sql>
+
+    <resultMap id="communityMap" type="communityDto" autoMapping="true">
+        <id property="cmId" column="cmId" jdbcType="NUMERIC" />
+
+        <collection property="replyList" ofType="replyDto" columnPrefix="r_" autoMapping="true">
+            <id property="replyId" column="r_replyId" jdbcType="NUMERIC" />
+        </collection>
+    </resultMap>
+
+    <resultMap id="reviewMap" type="reviewDto" autoMapping="true">
+        <id property="cmId" column="cmId" jdbcType="NUMERIC" />
+
+        <collection property="replyList" ofType="replyDto" columnPrefix="r_" autoMapping="true">
+            <id property="replyId" column="r_replyId" jdbcType="NUMERIC" />
+        </collection>
+    </resultMap>
+
+    <select id="getCommunityList" resultMap="communityMap" resultOrdered="true">
+        <include refid="foldedQuery" />
+    </select>
+
+    <select id="getReviewList" resultMap="reviewMap" resultOrdered="true">
+        <include refid="foldedQuery" />
     </select>
 
 </mapper>

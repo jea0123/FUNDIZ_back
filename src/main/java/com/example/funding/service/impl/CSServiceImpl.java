@@ -1,5 +1,7 @@
 package com.example.funding.service.impl;
 
+import com.example.funding.common.PageResult;
+import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.cs.*;
 import com.example.funding.mapper.InquiryMapper;
@@ -31,12 +33,14 @@ public class CSServiceImpl implements CSService {
     //공지사항 목록
     //250919
     @Override
-    public ResponseEntity<ResponseDto<List<Notice>>> noticeList() {
-        List<Notice> noticeList = noticeMapper.noticeList();
-        if (noticeList == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(409, "공지사항 목록 조회 불가"));
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "공지사항 목록 조회 성공", noticeList));
+    public ResponseEntity<ResponseDto<PageResult<Notice>>> noticeList(Pager pager) {
+        int total = noticeMapper.noticeTotal();
+
+        List<Notice> noticeList = noticeMapper.noticeList(pager);
+
+        PageResult<Notice> result = PageResult.of(noticeList, pager, total);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "공지사항 목록 조회 성공", result));
     }
 
     //조회수 업데이트
@@ -100,21 +104,27 @@ public class CSServiceImpl implements CSService {
     //문의내역 목록
     //250923
     @Override
-    public ResponseEntity<ResponseDto<List<Inquiry>>> inquiryList() {
-        List<Inquiry> inquiryList = inquiryMapper.inquiryList();
-        if (inquiryList == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(409, "문의내역 목록 조회 불가"));
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "문의내역 목록 조회 성공", inquiryList));
+    public ResponseEntity<ResponseDto<PageResult<Inquiry>>> inquiryList(Pager pager) {
+        int total = inquiryMapper.inquiryTotal();
+
+        List<Inquiry> inquiryList = inquiryMapper.inquiryList(pager);
+
+        PageResult<Inquiry> result = PageResult.of(inquiryList, pager, total);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "문의내역 목록 조회 성공", result));
     }
 
+    //내 문의내역 목록
+    //250923
     @Override
-    public ResponseEntity<ResponseDto<List<Inquiry>>> myInquiryList(Long userId) {
-        List<Inquiry> myInquiryList = inquiryMapper.myInquiryList(userId);
-        if (myInquiryList == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(409, "문의내역 목록 조회 불가"));
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "문의내역 목록 조회 성공", myInquiryList));
+    public ResponseEntity<ResponseDto<PageResult<Inquiry>>> myInquiryList(Long userId, Pager pager) {
+        int total = inquiryMapper.myInquiryTotal(userId);
+
+        List<Inquiry> myInquiryList = inquiryMapper.myInquiryList(userId, pager);
+
+        PageResult<Inquiry> result = PageResult.of(myInquiryList, pager, total);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "문의내역 목록 조회 성공", result));
     }
 
     //문의 등록
@@ -141,21 +151,23 @@ public class CSServiceImpl implements CSService {
     //신고내역 목록
     //250923
     @Override
-    public ResponseEntity<ResponseDto<List<Report>>> reportList() {
-        List<Report> reportList = reportMapper.reportList();
-        if (reportList == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(409, "신고내역 목록 조회 불가"));
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "신고내역 목록 조회 성공", reportList));
+    public ResponseEntity<ResponseDto<PageResult<Report>>> reportList(Pager pager) {
+        int total = reportMapper.reportTotal();
+        List<Report> reportList = reportMapper.reportList(pager);
+
+        PageResult<Report> result = PageResult.of(reportList, pager, total);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "신고내역 목록 조회 성공", result));
     }
 
+    //내 신고내역 목록
+    //250923
     @Override
-    public ResponseEntity<ResponseDto<List<Report>>> myReportList(Long userId) {
-        List<Report> myReportList = reportMapper.myReportList(userId);
-        if (myReportList == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(409, "신고내역 목록 조회 불가"));
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "신고내역 목록 조회 성공", myReportList));
+    public ResponseEntity<ResponseDto<PageResult<Report>>> myReportList(Long userId, Pager pager) {
+        int total = reportMapper.myReportTotal(userId);
+        List<Report> myReportList = reportMapper.myReportList(userId, pager);
+        PageResult<Report> result = PageResult.of(myReportList, pager, total);
+        return ResponseEntity.ok(ResponseDto.success(200, "신고내역 목록 조회 성공", result));
     }
 
 

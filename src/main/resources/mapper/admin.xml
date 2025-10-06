@@ -267,4 +267,16 @@
           AND ISVERIFIED = 'Y'
     </update>
 
+    <select id="userTotal" resultType="Integer">
+        SELECT COUNT(*) FROM users
+    </select>
+
+    <select id="userList" resultType="user">
+        SELECT * FROM
+        (SELECT sub.*, ROWNUM rnum FROM (
+        SELECT * FROM users order by USERID desc
+        ) sub WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow})
+        WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
+    </select>
+
 </mapper>

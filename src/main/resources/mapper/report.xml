@@ -2,18 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.funding.mapper.ReportMapper">
 
+    <select id="reportTotal" resultType="Integer">
+        SELECT COUNT(*) FROM report
+    </select>
+
+    <select id="myReportTotal" resultType="Integer">
+        SELECT COUNT(*) FROM report
+        WHERE USERID = #{userId}
+    </select>
+
     <select id="reportList" resultType="report">
         SELECT * FROM
         (SELECT sub.*, ROWNUM rnum FROM (
         SELECT * FROM report order by REPORTID desc
-        ) sub)
+        ) sub WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow})
+        WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
 
     <select id="myReportList" resultType="report">
         SELECT * FROM
         (SELECT sub.*, ROWNUM rnum FROM (
         SELECT * FROM report WHERE USERID = #{userId} order by REPORTID desc
-        ) sub)
+        ) sub WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow})
+        WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
 
     <select id="reportDetail" resultType="report">

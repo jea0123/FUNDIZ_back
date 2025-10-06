@@ -15,9 +15,7 @@ import com.example.funding.mapper.AdminMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.RewardMapper;
 import com.example.funding.mapper.TagMapper;
-import com.example.funding.model.Project;
-import com.example.funding.model.Reward;
-import com.example.funding.model.Tag;
+import com.example.funding.model.*;
 import com.example.funding.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -310,5 +308,18 @@ public class AdminServiceImpl implements AdminService {
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트가 성공적으로 반려되었습니다.", null));
+    }
+
+    //회원관리 목록
+    //251006
+    @Override
+    public ResponseEntity<ResponseDto<PageResult<User>>> userList(Pager pager) {
+        int total = adminMapper.userTotal();
+
+        List<User> userList = adminMapper.userList(pager);
+
+        PageResult<User> result = PageResult.of(userList, pager, total);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "회원 목록 조회 성공", result));
     }
 }

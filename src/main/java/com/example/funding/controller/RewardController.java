@@ -21,7 +21,7 @@ public class RewardController {
      * @param projectId 프로젝트 ID
      * @param dto RewardCreateRequestDto
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-11
      */
     @PostMapping
@@ -37,7 +37,7 @@ public class RewardController {
      * @param rewardId 리워드 ID
      * @param dto RewardUpdateRequestDto
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-11
      */
     @PostMapping("/{rewardId}")
@@ -53,7 +53,7 @@ public class RewardController {
      * @param projectId 프로젝트 ID
      * @param rewardId 리워드 ID
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-11
      */
     @DeleteMapping("/{rewardId}")

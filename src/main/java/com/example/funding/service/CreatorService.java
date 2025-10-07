@@ -4,7 +4,6 @@ import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
-import com.example.funding.dto.request.creator.ProjectUpdateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
 import com.example.funding.dto.response.creator.CreatorPDetailDto;
 import com.example.funding.dto.response.creator.CreatorProjectDetailDto;
@@ -24,7 +23,7 @@ public interface CreatorService {
 
     ResponseEntity<ResponseDto<String>> createProject(ProjectCreateRequestDto dto, Long creatorId);
 
-    ResponseEntity<ResponseDto<String>> updateProject(ProjectUpdateRequestDto dto, Long creatorId);
+    ResponseEntity<ResponseDto<String>> updateProject(ProjectCreateRequestDto dto, Long creatorId);
 
     ResponseEntity<ResponseDto<String>> deleteProject(Long projectId, Long creatorId);
 

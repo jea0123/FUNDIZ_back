@@ -177,18 +177,18 @@
     <update id="updateProject">
         UPDATE PROJECT
         <set>
-            <if test="subctgrId != null"> SUBCTGRID = #{subctgrId}, </if>
-            <if test="title != null"> TITLE = #{title}, </if>
-            <if test="content != null"> CONTENT = #{content}, </if>
-            <if test="thumbnail != null"> THUMBNAIL = #{thumbnail}, </if>
-            <if test="goalAmount != null"> GOALAMOUNT = #{goalAmount}, </if>
-            <if test="startDate != null"> STARTDATE = #{startDate}, </if>
-            <if test="endDate != null"> ENDDATE = #{endDate}, </if>
+            <if test="project.subctgrId != null"> SUBCTGRID = #{project.subctgrId}, </if>
+            <if test="project.title != null"> TITLE = #{project.title}, </if>
+            <if test="project.content != null"> CONTENT = #{project.content}, </if>
+            <if test="project.thumbnail != null"> THUMBNAIL = #{project.thumbnail}, </if>
+            <if test="project.goalAmount != null"> GOALAMOUNT = #{project.goalAmount}, </if>
+            <if test="project.startDate != null"> STARTDATE = #{project.startDate}, </if>
+            <if test="project.endDate != null"> ENDDATE = #{project.endDate}, </if>
             UPDATEDAT = SYSDATE
         </set>
-        WHERE PROJECTID = #{projectId}
+        WHERE PROJECTID = #{project.projectId}
         AND CREATORID = #{creatorId}
-        AND PROJECTSTATUS IN ('DRAFT')
+        AND PROJECTSTATUS = 'DRAFT'
     </update>
 
     <delete id="deleteProject">

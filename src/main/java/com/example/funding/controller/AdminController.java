@@ -102,7 +102,7 @@ public class AdminController {
      * @param dto SearchProjectVerifyDto
      * @param reqPager 요청 pager
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-10-01
      */
     @GetMapping("/project")
@@ -121,7 +121,7 @@ public class AdminController {
      *
      * @param projectId 프로젝트 ID
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-17
      */
     @PostMapping("/project/{projectId}/cancel")
@@ -137,7 +137,7 @@ public class AdminController {
      * @param projectId 프로젝트 ID
      * @param dto AdminProjectUpdateDto
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-17
      */
     @PostMapping("/project/{projectId}")
@@ -155,7 +155,7 @@ public class AdminController {
      * @param dto SearchProjectVerifyDto
      * @param reqPager 요청 pager
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-18
      */
     @GetMapping("/verify")
@@ -174,7 +174,7 @@ public class AdminController {
      *
      * @param projectId 프로젝트 ID
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-19
      */
     @GetMapping("/verify/{projectId}")
@@ -187,7 +187,7 @@ public class AdminController {
      *
      * @param projectId 프로젝트 ID
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-19
      */
     @PostMapping("/verify/{projectId}/approve")
@@ -203,7 +203,7 @@ public class AdminController {
      * @param projectId 프로젝트 ID
      * @param dto RejectProjectDto
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-19
      */
     @PostMapping("/verify/{projectId}/reject")

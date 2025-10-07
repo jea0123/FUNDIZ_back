@@ -5,7 +5,6 @@ import com.example.funding.common.Pager;
 import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
-import com.example.funding.dto.request.creator.ProjectUpdateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
 import com.example.funding.dto.response.creator.CreatorPDetailDto;
 import com.example.funding.dto.response.creator.CreatorProjectDetailDto;
@@ -13,19 +12,19 @@ import com.example.funding.dto.response.creator.CreatorProjectListDto;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Project;
 import com.example.funding.model.Subcategory;
-import com.example.funding.model.Tag;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.RewardService;
+import com.example.funding.service.validator.ProjectValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.text.Normalizer;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -38,6 +37,7 @@ public class CreatorServiceImpl implements CreatorService {
     private final TagMapper tagMapper;
     private final RewardService rewardService;
     private final RewardMapper rewardMapper;
+    private final ProjectValidator projectValidator;
 
 //    @Override
 //    public ResponseEntity<ResponseDto<List<CreatorPListDto>>> getCreatorPList(Long creatorId) {
@@ -73,8 +73,8 @@ public class CreatorServiceImpl implements CreatorService {
      * @param dto SearchCreatorProjectDto
      * @param pager pager
      * @return 성공 시 200 OK
-     * @since 2025-10-05
      * @author 조은애
+     * @since 2025-10-05
      */
     @Override
     @Transactional(readOnly = true)
@@ -101,8 +101,8 @@ public class CreatorServiceImpl implements CreatorService {
      * @param projectId 프로젝트 ID
      * @param creatorId 창작자 ID
      * @return 성공 시 200 OK
-     * @since 2025-10-05
      * @author 조은애
+     * @since 2025-10-05
      */
     @Override
     @Transactional(readOnly = true)
@@ -124,7 +124,7 @@ public class CreatorServiceImpl implements CreatorService {
      * @param dto ProjectCreateRequestDto
      * @param creatorId 사용자 ID
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-09
      */
     @Override
@@ -147,32 +147,18 @@ public class CreatorServiceImpl implements CreatorService {
             throw new IllegalStateException("프로젝트 생성 실패");
         }
 
-        Long projectId = dto.getProjectId();
-
         //태그 저장
-        List<String> tagList = dto.getTagList();
-        if (tagList != null && !tagList.isEmpty()) {
-            //정규화, 중복 제거, 최대 10개 제한
-            List<String> normalized = tagList.stream()
-                .filter(Objects::nonNull)
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .map(s-> s.length() > 20 ? s.substring(0, 20) : s)
-                .distinct()
-                .limit(10)
-                .toList();
-
-            for (String tagName : normalized) {
-                int saved = tagMapper.saveTag(projectId, tagName);
-                if (saved == 0) {
-                    throw new IllegalStateException("태그 저장 실패");
-                }
+        List<String> normalized = normalizeTags(dto.getTagList());
+        for (String tagName : normalized) {
+            int saved = tagMapper.saveTag(dto.getProjectId(), tagName);
+            if (saved == 0) {
+                throw new IllegalStateException("태그 저장 실패");
             }
         }
 
         //리워드 생성
         if (dto.getRewardList() != null && !dto.getRewardList().isEmpty()) {
-            rewardService.createReward(projectId, dto.getRewardList());
+            rewardService.createReward(dto.getProjectId(), dto.getRewardList());
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 생성 성공", null));
@@ -181,30 +167,32 @@ public class CreatorServiceImpl implements CreatorService {
     /**
      * <p>프로젝트 수정</p>
      *
-     * @param dto ProjectUpdateRequestDto
+     * @param dto ProjectCreateRequestDto
      * @param creatorId 사용자 ID
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-16
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> updateProject(ProjectUpdateRequestDto dto, Long creatorId) {
+    public ResponseEntity<ResponseDto<String>> updateProject(ProjectCreateRequestDto dto, Long creatorId) {
         if (dto.getProjectId() == null) {
-            throw new IllegalArgumentException("프로젝트 ID가 필요합니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "프로젝트 ID가 필요합니다.");
         }
 
         Project existing = projectMapper.findById(dto.getProjectId());
         if (existing == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트를 찾을 수 없습니다."));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다.");
         }
 
-
         //TODO: 소유자 체크
+//        if (!Objects.equals(existing.getCreatorId(), creatorId)) {
+//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인 프로젝트만 수정할 수 있습니다.");
+//        }
 
         //프로젝트 상태 조회
         String status = projectMapper.getStatus(dto.getProjectId());
         if (!"DRAFT".equalsIgnoreCase(status)) {
-            throw new IllegalStateException("DRAFT 상태에서만 프로젝트를 수정할 수 있습니다.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "DRAFT 상태에서만 프로젝트를 수정할 수 있습니다.");
         }
 
         Project project = Project.builder()
@@ -220,19 +208,21 @@ public class CreatorServiceImpl implements CreatorService {
 
         int result = creatorMapper.updateProject(creatorId, project);
         if (result == 0) {
-            throw new IllegalStateException("프로젝트 수정 실패");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "프로젝트 수정 실패");
         }
 
         //태그 전체 삭제 후 저장
         tagMapper.deleteTags(dto.getProjectId());
-        if (dto.getTagList() != null) {
-            for (Tag tag : dto.getTagList()) {
-                int saved = tagMapper.saveTag(dto.getProjectId(), tag.getTagName());
-                if (saved == 0) {
-                    throw new IllegalStateException("태그 저장 실패");
-                }
+        List<String> normalized = normalizeTags(dto.getTagList());
+        for (String tagName : normalized) {
+            int saved = tagMapper.saveTag(dto.getProjectId(), tagName);
+            if (saved == 0) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "태그 저장 실패");
             }
         }
+
+        //리워드 전체 삭제 후 저장
+        rewardService.replaceRewards(dto.getProjectId(), dto.getRewardList());
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 수정 성공", null));
     }
@@ -243,7 +233,7 @@ public class CreatorServiceImpl implements CreatorService {
      * @param projectId 프로젝트 ID
      * @param creatorId 창작자 ID
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-16
      */
     @Override
@@ -274,7 +264,7 @@ public class CreatorServiceImpl implements CreatorService {
      * @param projectId 프로젝트 ID
      * @param creatorId 창작자 ID
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-18
      */
     @Override
@@ -297,7 +287,7 @@ public class CreatorServiceImpl implements CreatorService {
         }
 
         //검증
-//        List<String> errors = validator.validateAll(projectId, project);
+//        List<String> errors = projectValidator.validateAll(projectId, project);
 //        if (!errors.isEmpty()) {
 //            throw new IllegalArgumentException("심사 요청 검증 실패 : " + String.join(", ", errors));
 //        }
@@ -309,6 +299,41 @@ public class CreatorServiceImpl implements CreatorService {
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 심사 요청 성공", null));
+    }
+
+    private static final int MAX_TAGS = 10;
+    private static final int MAX_LENGTH = 20;
+
+    private static List<String> normalizeTags(List<String> tagList) {
+        //불변 빈 리스트
+        if (tagList == null) return List.of();
+
+        Map<String, String> dedup = new LinkedHashMap<>();
+        for (String tag : tagList) {
+            if (tag == null) continue;
+
+            //트림, 내부 공백 압축
+            String normalized = tag.trim().replaceAll("\\s+", " ");
+            if (normalized.isEmpty()) continue;
+
+            //유니코드 NFC 정규화
+            normalized = Normalizer.normalize(normalized, Normalizer.Form.NFC);
+
+            //길이 제한
+            if (normalized.length() > MAX_LENGTH) {
+                normalized = normalized.substring(0, MAX_LENGTH);
+            }
+
+            //중복 제거
+            String key = normalized.toLowerCase(Locale.ROOT);
+            dedup.putIfAbsent(key, normalized);
+
+            //최대 개수 제한
+            if (dedup.size() == MAX_TAGS) break;
+        }
+
+        //불변 리스트로 반환
+        return List.copyOf(dedup.values());
     }
 
 }

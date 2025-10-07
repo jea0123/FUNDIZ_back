@@ -26,7 +26,7 @@ public class ProjectController {
      *
      * @param projectId 프로젝트 ID
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-08-31
      */
     @GetMapping("/{projectId}")
@@ -67,7 +67,7 @@ public class ProjectController {
      * @param dto SearchProjectDto
      * @param reqPager 요청 pager
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-16
      */
     @GetMapping("/search")

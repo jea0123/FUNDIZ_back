@@ -97,7 +97,7 @@ public class CreatorController {
      * @author 조은애
      * @since 2025-10-05
      */
-    @GetMapping("/project/{projectId}")
+    @GetMapping("/projects/{projectId}")
     public ResponseEntity<ResponseDto<CreatorProjectDetailDto>> getProjectDetail(@PathVariable Long projectId,
                                                                                  @RequestAttribute Long creatorId) {
         return creatorService.getProjectDetail(projectId, creatorId);

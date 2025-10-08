@@ -1,9 +1,7 @@
 package com.example.funding.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.DataAccessException;
@@ -21,7 +19,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
@@ -44,7 +41,9 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    /** 루트 원인 메시지 추출 */
+    /**
+     * 루트 원인 메시지 추출
+     */
     private String getRootCauseMessage(Throwable e) {
         Throwable cause = e;
         while (cause.getCause() != null) {
@@ -53,7 +52,9 @@ public class GlobalExceptionHandler {
         return Optional.ofNullable(cause.getMessage()).orElse(cause.toString());
     }
 
-    /** "###" 제거 + "Cause" 이전까지만 남김 (예: JDBC/MyBatis 오류 포맷 정리) */
+    /**
+     * "###" 제거 + "Cause" 이전까지만 남김 (예: JDBC/MyBatis 오류 포맷 정리)
+     */
     private String beforeCauseWithoutHashes(String msg) {
         if (msg == null) return null;
         String trimmed = msg.replace("###", "").trim();
@@ -214,20 +215,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(body);
     }
 
-    @ExceptionHandler({ AsyncRequestNotUsableException.class, ClientAbortException.class, IOException.class })
-    public ResponseEntity<String> handleClientAbort(Exception e, HttpServletRequest req) {
-        if (isSseRequest(req)) {
-            log.debug("SSE 클라이언트 중단: {}", e.toString());
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        String body = "클라이언트 연결이 중단되었습니다.";
-        log.info("[ClientAbort] {}", body);
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(body);
-    }
-
-    private boolean isSseRequest(HttpServletRequest req) {
-        return "text/event-stream".equalsIgnoreCase(req.getHeader("Accept"))
-                || (req.getRequestURI() != null && req.getRequestURI().contains("/notifications/stream"));
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<String> handleIO(IOException e) {
+        String body = "입출력 처리 중 오류가 발생했습니다.";
+        log.error("[IO] {}", body, e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
     // ========= 마지막 안전망 =========

@@ -22,4 +22,6 @@ public interface RewardMapper {
     int deleteReward(@Param("projectId") Long projectId, @Param("rewardId") Long rewardId);
 
     void deleteRewards(@Param("projectId") Long projectId);
+
+    List<Reward> getCreatorRewardList(@Param("projectId") Long projectId, @Param("creatorId") Long creatorId);
 }

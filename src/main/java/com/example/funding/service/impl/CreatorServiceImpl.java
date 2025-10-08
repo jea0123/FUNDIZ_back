@@ -9,6 +9,7 @@ import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
 import com.example.funding.dto.response.creator.CreatorPDetailDto;
 import com.example.funding.dto.response.creator.CreatorProjectDetailDto;
 import com.example.funding.dto.response.creator.CreatorProjectListDto;
+import com.example.funding.dto.response.creator.CreatorProjectSummaryDto;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Project;
 import com.example.funding.model.Subcategory;
@@ -70,8 +71,8 @@ public class CreatorServiceImpl implements CreatorService {
      * <p>프로젝트 목록 조회</p>
      *
      * @param creatorId 창작자 ID
-     * @param dto SearchCreatorProjectDto
-     * @param pager pager
+     * @param dto       SearchCreatorProjectDto
+     * @param pager     pager
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-10-05
@@ -121,7 +122,7 @@ public class CreatorServiceImpl implements CreatorService {
     /**
      * <p>프로젝트 생성</p>
      *
-     * @param dto ProjectCreateRequestDto
+     * @param dto       ProjectCreateRequestDto
      * @param creatorId 사용자 ID
      * @return 성공 시 200 OK
      * @author 조은애
@@ -167,7 +168,7 @@ public class CreatorServiceImpl implements CreatorService {
     /**
      * <p>프로젝트 수정</p>
      *
-     * @param dto ProjectCreateRequestDto
+     * @param dto       ProjectCreateRequestDto
      * @param creatorId 사용자 ID
      * @return 성공 시 200 OK
      * @author 조은애
@@ -299,6 +300,32 @@ public class CreatorServiceImpl implements CreatorService {
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 심사 요청 성공", null));
+    }
+
+    /**
+     * <p>프로젝트 요약</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param creatorId 창작자 ID
+     * @return 성공 시 200 Ok
+     * @author 조은애
+     * @since 2025-10-08
+     */
+    @Override
+    public ResponseEntity<ResponseDto<CreatorProjectSummaryDto>> getProjectSummary(Long projectId, Long creatorId) {
+        Project project = projectMapper.findById(projectId);
+        if (project == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다.");
+        }
+
+        CreatorProjectSummaryDto dto = new CreatorProjectSummaryDto(
+            project.getProjectId(),
+            project.getTitle(),
+            project.getEndDate(),
+            project.getProjectStatus()
+        );
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 요약 조회 성공", dto));
     }
 
     private static final int MAX_TAGS = 10;

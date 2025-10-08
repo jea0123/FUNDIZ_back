@@ -7,27 +7,27 @@ import com.example.funding.model.Notification;
 import com.example.funding.service.NotificationService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/notifications")
 @RequiredArgsConstructor
 public class NotificationController {
 
     private final NotificationSseHub hub;
-    private static final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
-    private static final Map<Long, ScheduledFuture<?>> heartbeats = new ConcurrentHashMap<>();
     private final NotificationService notificationService;
 
-    @GetMapping(value="/stream", produces=MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter stream(@RequestParam Long userId, HttpServletResponse response) {
         return hub.register(userId, response);
     }
@@ -66,5 +66,11 @@ public class NotificationController {
     @DeleteMapping("/deleteAll")
     public ResponseEntity<ResponseDto<String>> deleteAllNotifications() {
         return notificationService.deleteAllNotificationsByUserId(501L);
+    }
+
+    @ExceptionHandler({AsyncRequestNotUsableException.class, ClientAbortException.class, IOException.class})
+    public ResponseEntity<Void> handleClientDisconnect(Exception ex) {
+        log.debug("클라이언트 연결이 끊어짐: {}", ex.getMessage());
+        return ResponseEntity.noContent().build();
     }
 }

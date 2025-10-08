@@ -26,7 +26,7 @@ public interface CreatorMapper {
 
     int saveProject(ProjectCreateRequestDto dto);
 
-    int updateProject(@Param("creatorId") Long creatorId, Project project);
+    int updateProject(@Param("creatorId") Long creatorId, @Param("project") Project project);
 
     int deleteProject(@Param("projectId") Long projectId);
 

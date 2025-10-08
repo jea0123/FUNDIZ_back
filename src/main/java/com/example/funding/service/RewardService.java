@@ -14,5 +14,7 @@ public interface RewardService {
 
     ResponseEntity<ResponseDto<String>> updateReward(Long projectId, Long rewardId, RewardUpdateRequestDto dto);
 
+    void replaceRewards(Long projectId, List<RewardCreateRequestDto> rewardList);
+
     ResponseEntity<ResponseDto<String>> deleteReward(Long projectId, Long rewardId);
 }

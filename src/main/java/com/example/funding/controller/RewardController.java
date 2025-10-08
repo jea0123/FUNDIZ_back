@@ -16,21 +16,6 @@ public class RewardController {
     private final RewardService rewardService;
 
     /**
-     * <p>리워드 추가</p>
-     *
-     * @param projectId 프로젝트 ID
-     * @param dto RewardCreateRequestDto
-     * @return 성공 시 200 OK
-     * @author 조은애
-     * @since 2025-09-11
-     */
-    @PostMapping
-    public ResponseEntity<ResponseDto<String>> addReward(@PathVariable Long projectId,
-                                                         @RequestBody RewardCreateRequestDto dto) {
-        return rewardService.addReward(projectId, dto);
-    }
-
-    /**
      * <p>리워드 수정</p>
      *
      * @param projectId 프로젝트 ID

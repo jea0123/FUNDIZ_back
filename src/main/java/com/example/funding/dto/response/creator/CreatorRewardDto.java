@@ -1,27 +1,23 @@
-package com.example.funding.dto.request.reward;
+package com.example.funding.dto.response.creator;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @Builder
-public class RewardCreateRequestDto {
+public class CreatorRewardDto {
+    private Long rewardId;
     private Long projectId;
     private String rewardName;
     private Long price;
     private String rewardContent;
-
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate deliveryDate;
-
     private Integer rewardCnt;
     private Character isPosting;
 }

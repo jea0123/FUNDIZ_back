@@ -18,5 +18,4 @@ public class RewardUpdateRequestDto {
     private LocalDate deliveryDate;
     private Integer rewardCnt;
     private Character isPosting;
-    private Integer remain;
 }

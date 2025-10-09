@@ -173,9 +173,8 @@ public class RewardServiceImpl implements RewardService {
             .price(dto.getPrice())
             .rewardContent(dto.getRewardContent().trim())
             .deliveryDate(dto.getDeliveryDate())
-            .rewardCnt((dto.getRewardCnt() == null) ? Integer.MAX_VALUE : dto.getRewardCnt()) // 무제한 처리
+            .rewardCnt(dto.getRewardCnt())
             .isPosting(dto.getIsPosting())
-            .remain((dto.getRewardCnt() == null) ? Integer.MAX_VALUE : dto.getRewardCnt()) // 초기 remain = rewardCnt
             .build();
 
         int result = rewardMapper.saveReward(reward);

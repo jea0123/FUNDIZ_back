@@ -125,7 +125,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<String> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
-        String required = e.getRequiredType() != null ? e.getRequiredType().getSimpleName() : "알 수 없음";
+        Class<?> requiredType = e.getRequiredType();
+        String required = requiredType != null ? requiredType.getSimpleName() : "알 수 없음";
         String body = String.format("파라미터 타입 불일치: %s (요구 타입: %s)", e.getName(), required);
         log.warn("[TypeMismatch] {}", body);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
@@ -140,8 +141,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<String> handleMethodNotSupported(HttpRequestMethodNotSupportedException e) {
-        String supported = (e.getSupportedHttpMethods() == null || e.getSupportedHttpMethods().isEmpty())
-                ? "없음" : e.getSupportedHttpMethods().toString();
+        java.util.Set<?> methods = e.getSupportedHttpMethods();
+        String supported = (methods == null || methods.isEmpty())
+                ? "없음" : methods.toString();
         String body = String.format("허용되지 않은 HTTP 메서드입니다. 지원 메서드: %s", supported);
         log.warn("[MethodNotSupported] {}", body);
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(body);

@@ -41,24 +41,27 @@ public class RewardServiceImpl implements RewardService {
         for (RewardCreateRequestDto dto : rewardList) {
             Reward reward = Reward.builder()
                 .projectId(projectId)
-                .rewardName(dto.getRewardName())
+                .rewardName(dto.getRewardName().trim())
                 .price(dto.getPrice())
-                .rewardContent(dto.getRewardContent())
+                .rewardContent(dto.getRewardContent().trim())
                 .deliveryDate(dto.getDeliveryDate())
                 .rewardCnt(dto.getRewardCnt())
                 .isPosting(dto.getIsPosting())
-                .remain(dto.getRewardCnt())
                 .build();
 
-            rewardMapper.saveReward(reward);
+            int result = rewardMapper.saveReward(reward);
+            if (result == 0) {
+                throw new IllegalStateException("리워드 생성 실패");
+            }
         }
     }
 
     /**
-     * <p>리워드 전체 삭제 후 저장</p>
+     * <p>프로젝트 리워드 교체</p>
+     * <p>기존 리워드 모두 삭제한 뒤, 전달받은 리스트로 새로 저장</p>
      *
      * @param projectId  프로젝트 ID
-     * @param rewardList 리워드 리스트
+     * @param rewardList 새로 등록할 리워드 리스트
      * @author 조은애
      * @since 2025-10-07
      */
@@ -86,9 +89,8 @@ public class RewardServiceImpl implements RewardService {
                 .price(dto.getPrice())
                 .rewardContent(dto.getRewardContent().trim())
                 .deliveryDate(dto.getDeliveryDate())
-                .rewardCnt((dto.getRewardCnt() == null) ? Integer.MAX_VALUE : dto.getRewardCnt()) // 무제한 처리
+                .rewardCnt(dto.getRewardCnt())
                 .isPosting(dto.getIsPosting())
-                .remain((dto.getRewardCnt() == null) ? Integer.MAX_VALUE : dto.getRewardCnt()) // 초기 remain = rewardCnt
                 .build();
 
             int saved = rewardMapper.saveReward(reward);

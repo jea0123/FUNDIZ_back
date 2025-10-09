@@ -194,13 +194,23 @@ public class ProjectValidator {
                 errors.add("리워드 금액은 최소 " + MIN_REWARD_PRICE + "원 이상이어야 합니다.");
             }
 
-            String posting = nvl(String.valueOf(reward.getIsPosting())).trim();
-            if (!posting.equalsIgnoreCase("Y") && !posting.equalsIgnoreCase("N")) {
-                errors.add("배송 필요 여부는 Y 또는 N 이어야 합니다.");
+            Integer cnt = reward.getRewardCnt();
+            if (cnt != null && cnt < 0) errors.add("리워드 수량은 0 이상이어야 합니다."); // 수량 0 이면 품절
+
+            Character posting = reward.getIsPosting();
+            if (posting == null) {
+                errors.add("배송 필요 여부는 필수입니다.");
+            } else {
+                char upper = Character.toUpperCase(posting);
+                if (upper != 'Y' && upper != 'N') {
+                    errors.add("배송 필요 여부는 Y 또는 N 이어야 합니다.");
+                } else {
+                    reward.setIsPosting(upper);
+                }
             }
 
             if (reward.getDeliveryDate() != null && reward.getDeliveryDate().isBefore(LocalDate.now())) {
-                errors.add("리워드 예정 배송일은 과거일 수 없습니다.");
+                errors.add("배송 예정일은 펀딩 종료일 이후여야 합니다.");
             }
         }
     }

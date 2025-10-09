@@ -62,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * <p>- OPTIONS 메서드 요청과 WHITELIST에 포함된 경로는 필터를 적용하지 않음</p>
      */
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest req) {
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest req) {
         if ("OPTIONS".equalsIgnoreCase(req.getMethod()))
             return true;
         String path = req.getRequestURI();

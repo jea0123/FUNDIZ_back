@@ -18,10 +18,7 @@ public class RewardCreateRequestDto {
     private String rewardName;
     private Long price;
     private String rewardContent;
-
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate deliveryDate;
-
     private Integer rewardCnt;
     private Character isPosting;
 }

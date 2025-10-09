@@ -2,7 +2,6 @@ package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.reward.RewardCreateRequestDto;
-import com.example.funding.dto.request.reward.RewardUpdateRequestDto;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.RewardMapper;
 import com.example.funding.model.Reward;
@@ -53,40 +52,6 @@ public class RewardServiceImpl implements RewardService {
 
             rewardMapper.saveReward(reward);
         }
-    }
-
-    /**
-     * <p>리워드 수정</p>
-     *
-     * @param projectId 프로젝트 ID
-     * @param rewardId  리워드 ID
-     * @param dto       RewardUpdateRequestDto
-     * @return 성공 시 200 OK
-     * @author 조은애
-     * @since 2025-09-11
-     */
-    @Override
-    public ResponseEntity<ResponseDto<String>> updateReward(Long projectId, Long rewardId, RewardUpdateRequestDto dto) {
-        dto.setProjectId(projectId);
-        dto.setRewardId(rewardId);
-
-        //프로젝트 상태 조회
-        String status = projectMapper.getStatus(projectId);
-        if (!"DRAFT".equals(status)) {
-            throw new IllegalStateException("현재 상태에서는 리워드를 수정할 수 없습니다.");
-        }
-
-        //무제한 처리
-        Integer reqCnt = dto.getRewardCnt();
-        int newCnt = (reqCnt == null) ? Integer.MAX_VALUE : reqCnt;
-        dto.setRewardCnt(newCnt);
-
-        //리워드 수정 처리
-        int result = rewardMapper.updateReward(dto);
-        if (result == 0) {
-            throw new IllegalStateException("리워드 수정 실패");
-        }
-        return ResponseEntity.ok(ResponseDto.success(200, "리워드 수정 성공", null));
     }
 
     /**

@@ -167,10 +167,10 @@
 
         INSERT INTO PROJECT (
             PROJECTID, CREATORID, SUBCTGRID, TITLE, GOALAMOUNT,
-            STARTDATE, ENDDATE, CONTENT, THUMBNAIL
+            STARTDATE, ENDDATE, CONTENT, THUMBNAIL, ISPOSTING
         ) VALUES (
             #{projectId}, #{creatorId}, #{subctgrId}, #{title}, #{goalAmount},
-            #{startDate}, #{endDate}, #{content}, #{thumbnail}
+            #{startDate}, #{endDate}, #{content}, #{thumbnail}, #{isPosting}
         )
     </insert>
 

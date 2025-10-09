@@ -58,18 +58,6 @@
         )
     </insert>
 
-    <update id="updateReward" parameterType="rewardUpdateRequestDto">
-        UPDATE REWARD
-        SET REWARDNAME = #{rewardName},
-            PRICE = #{price},
-            REWARDCONTENT = #{rewardContent},
-            DELIVERYDATE = #{deliveryDate},
-            REWARDCNT = #{rewardCnt},
-            ISPOSTING = #{isPosting},
-        WHERE REWARDID = #{rewardId}
-          AND PROJECTID = #{projectId}
-    </update>
-
     <delete id="deleteReward">
         DELETE FROM REWARD
         WHERE PROJECTID = #{projectId}
@@ -108,7 +96,7 @@
         JOIN PROJECT p ON p.PROJECTID = r.PROJECTID
         WHERE r.PROJECTID = #{projectId}
         AND p.CREATORID = #{creatorId}
-        ORDER BY r.PRICE
+        ORDER BY r.CREATEDAT
     </select>
 
 </mapper>

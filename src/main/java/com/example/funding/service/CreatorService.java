@@ -8,6 +8,8 @@ import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
 import com.example.funding.dto.response.creator.CreatorPDetailDto;
 import com.example.funding.dto.response.creator.CreatorProjectDetailDto;
 import com.example.funding.dto.response.creator.CreatorProjectListDto;
+import com.example.funding.dto.response.creator.CreatorQnaDto;
+import com.example.funding.model.Qna;
 import com.example.funding.dto.response.creator.CreatorProjectSummaryDto;
 import org.springframework.http.ResponseEntity;
 
@@ -30,5 +32,7 @@ public interface CreatorService {
 
     ResponseEntity<ResponseDto<String>> verifyProject(Long projectId, Long creatorId);
 
+    ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfCreator(Long creatorId, Pager pager);
+  
     ResponseEntity<ResponseDto<CreatorProjectSummaryDto>> getProjectSummary(Long projectId, Long creatorId);
 }

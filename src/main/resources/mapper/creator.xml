@@ -206,4 +206,27 @@
         AND ISVERIFIED = 'N'
     </update>
 
+    <select id="getQnaListOfCreator" resultType="CreatorQnaDto">
+        SELECT * FROM
+        (SELECT sub.*, ROWNUM rnum FROM (
+        SELECT
+        q.QNAID AS qnaId,
+        q.PROJECTID AS projectId,
+        q.USERID AS userId,
+        q.CREATORID AS creatorId,
+        q.CONTENT AS content,
+        CAST(q.CREATEDAT AS DATE) AS createdAt,
+        p.TITLE AS title
+        from qna q
+        join project p on q.projectid = p.projectid
+        WHERE q.CREATORID = #{creatorId} order by q.QNAID desc
+        ) sub  WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow})
+        WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
+    </select>
+
+    <select id="qnaTotalOfCreator" resultType="Integer">
+        SELECT COUNT(*) FROM qna
+        WHERE CREATORID = #{creatorId}
+    </select>
+
 </mapper>

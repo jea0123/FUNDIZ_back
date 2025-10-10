@@ -8,6 +8,7 @@ import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
 import com.example.funding.dto.request.reward.RewardCreateRequestDto;
 import com.example.funding.dto.response.creator.*;
 import com.example.funding.model.Reward;
+import com.example.funding.model.Qna;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.RewardService;
 import lombok.RequiredArgsConstructor;
@@ -223,5 +224,18 @@ public class CreatorController {
         dto.setProjectId(projectId);
 
         return rewardService.addReward(projectId, creatorId, dto);
+    }
+  
+    //창작자 QnA 목록 조회
+    //251008
+    @GetMapping("/qna")
+    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfCreator(@RequestAttribute("creatorId") Long creatorId, Pager reqPager) {
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 10,
+                reqPager != null ? reqPager.getPerGroup() : 10
+        );
+
+        return creatorService.getQnaListOfCreator(creatorId, pager);
     }
 }

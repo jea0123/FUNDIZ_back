@@ -9,9 +9,11 @@ import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
 import com.example.funding.dto.response.creator.CreatorPDetailDto;
 import com.example.funding.dto.response.creator.CreatorProjectDetailDto;
 import com.example.funding.dto.response.creator.CreatorProjectListDto;
+import com.example.funding.dto.response.creator.CreatorQnaDto;
 import com.example.funding.dto.response.creator.CreatorProjectSummaryDto;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Project;
+import com.example.funding.model.Qna;
 import com.example.funding.model.Subcategory;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.RewardService;
@@ -361,6 +363,19 @@ public class CreatorServiceImpl implements CreatorService {
 
         //불변 리스트로 반환
         return List.copyOf(dedup.values());
+    }
+  
+    //창작자 QnA 목록 조회
+    //251008
+    @Override
+    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfCreator(Long creatorId, Pager pager) {
+        int total = creatorMapper.qnaTotalOfCreator(creatorId);
+
+        List<CreatorQnaDto> qnaList = creatorMapper.getQnaListOfCreator(creatorId, pager);
+
+        PageResult<CreatorQnaDto> result = PageResult.of(qnaList, pager, total);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "Q&A 목록 조회 성공", result));
     }
 
 }

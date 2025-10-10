@@ -1,9 +1,13 @@
 package com.example.funding.controller;
 
+import com.example.funding.common.PageResult;
+import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.project.QnaAddRequestDto;
 import com.example.funding.dto.response.project.CommunityDto;
 import com.example.funding.dto.response.project.CursorPage;
 import com.example.funding.dto.response.project.ReviewDto;
+import com.example.funding.model.Qna;
 import com.example.funding.service.CommunityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,5 +61,25 @@ public class CommunityController {
                                                                             @RequestParam(defaultValue = "10") int size) {
 
         return communityService.getReviewList(projectId, "RV", lastCreatedAt, lastId, size);
+    }
+
+    //QnA 목록 조회
+    //251007
+    @GetMapping("/qna")
+    public ResponseEntity<ResponseDto<PageResult<Qna>>> getQnaListOfPJ(@PathVariable("projectId") Long projectId, Pager reqPager) {
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 10,
+                reqPager != null ? reqPager.getPerGroup() : 10
+        );
+
+        return communityService.getQnaListOfPJ(projectId, pager);
+    }
+
+    //QnA 질문 작성
+    //251008
+    @PostMapping("/qna/{userId}/add")
+    public ResponseEntity<ResponseDto<String>> addQuestion(@PathVariable Long userId, @RequestBody QnaAddRequestDto qnaDto){
+        return communityService.addQuestion(userId, qnaDto);
     }
 }

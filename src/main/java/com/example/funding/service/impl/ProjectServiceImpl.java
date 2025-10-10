@@ -17,7 +17,6 @@ import com.example.funding.model.News;
 import com.example.funding.model.Reward;
 import com.example.funding.model.Tag;
 import com.example.funding.service.ProjectService;
-import com.example.funding.service.validator.ProjectVerifyValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,14 +38,12 @@ public class ProjectServiceImpl implements ProjectService {
     private final RewardMapper rewardMapper;
     private final NewsMapper newsMapper;
 
-    private final ProjectVerifyValidator validator;
-
     /**
      * <p>프로젝트 상세 페이지 조회</p>
      *
      * @param projectId 프로젝트 ID
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-08-31
      */
     @Override
@@ -171,10 +168,10 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * <p>검색 기능 (제목, 내용, 창작자명, 태그)</p>
      *
-     * @param dto   SearchProjectDto
+     * @param dto SearchProjectDto
      * @param pager pager
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-16
      */
     @Override

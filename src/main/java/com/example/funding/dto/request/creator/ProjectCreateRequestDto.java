@@ -1,6 +1,7 @@
 package com.example.funding.dto.request.creator;
 
 import com.example.funding.dto.request.reward.RewardCreateRequestDto;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 

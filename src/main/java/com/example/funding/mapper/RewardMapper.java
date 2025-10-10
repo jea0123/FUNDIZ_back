@@ -1,6 +1,5 @@
 package com.example.funding.mapper;
 
-import com.example.funding.dto.request.reward.RewardUpdateRequestDto;
 import com.example.funding.model.Reward;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -17,9 +16,9 @@ public interface RewardMapper {
 
     int saveReward(Reward reward);
 
-    int updateReward(RewardUpdateRequestDto dto);
-
     int deleteReward(@Param("projectId") Long projectId, @Param("rewardId") Long rewardId);
 
     void deleteRewards(@Param("projectId") Long projectId);
+
+    List<Reward> getCreatorRewardList(@Param("projectId") Long projectId, @Param("creatorId") Long creatorId);
 }

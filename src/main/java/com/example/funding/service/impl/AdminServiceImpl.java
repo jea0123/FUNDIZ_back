@@ -135,10 +135,10 @@ public class AdminServiceImpl implements AdminService {
     /**
      * <p>프로젝트 목록 조회</p>
      *
-     * @param dto   SearchProjectVerifyDto
+     * @param dto SearchProjectVerifyDto
      * @param pager pager
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-10-01
      */
     @Override
@@ -165,7 +165,7 @@ public class AdminServiceImpl implements AdminService {
      *
      * @param projectId 프로젝트 ID
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-17
      */
     @Override
@@ -181,9 +181,9 @@ public class AdminServiceImpl implements AdminService {
     /**
      * <p>프로젝트 수정</p>
      *
-     * @param dto ProjectUpdateRequestDto
+     * @param dto ProjectCreateRequestDto
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-17
      */
     @Override
@@ -218,10 +218,10 @@ public class AdminServiceImpl implements AdminService {
     /**
      * <p>프로젝트 심사 목록 조회</p>
      *
-     * @param dto   SearchProjectVerifyDto
+     * @param dto SearchProjectVerifyDto
      * @param pager pager
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-18
      */
     @Override
@@ -245,7 +245,7 @@ public class AdminServiceImpl implements AdminService {
      *
      * @param projectId 프로젝트 ID
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-19
      */
     @Override
@@ -269,7 +269,7 @@ public class AdminServiceImpl implements AdminService {
      *
      * @param projectId 프로젝트 ID
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-19
      */
     @Override
@@ -285,10 +285,10 @@ public class AdminServiceImpl implements AdminService {
     /**
      * <p>프로젝트 반려</p>
      *
-     * @param projectId      프로젝트 ID
+     * @param projectId 프로젝트 ID
      * @param rejectedReason 반려 사유
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-09-19
      */
     @Override

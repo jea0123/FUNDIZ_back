@@ -4,28 +4,30 @@ import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
-import com.example.funding.dto.request.creator.ProjectUpdateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
-import com.example.funding.dto.response.creator.CreatorPDetailDto;
-import com.example.funding.dto.response.creator.CreatorProjectDetailDto;
-import com.example.funding.dto.response.creator.CreatorProjectListDto;
-import com.example.funding.dto.response.creator.CreatorQnaDto;
+import com.example.funding.dto.request.reward.RewardCreateRequestDto;
+import com.example.funding.dto.response.creator.*;
+import com.example.funding.model.Reward;
 import com.example.funding.model.Qna;
 import com.example.funding.service.CreatorService;
+import com.example.funding.service.RewardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/creator")
 @RequiredArgsConstructor
 public class CreatorController {
+
     private final CreatorService creatorService;
+    private final RewardService rewardService;
 
     /**
      * <p>창작자의 프로젝트 목록 조회</p>
@@ -73,8 +75,8 @@ public class CreatorController {
      * @param dto SearchCreatorProjectDto
      * @param reqPager 요청 pager
      * @return 성공 시 200 OK
-     * @since 2025-10-05
      * @author 조은애
+     * @since 2025-10-05
      */
     @GetMapping("/projects")
     public ResponseEntity<ResponseDto<PageResult<CreatorProjectListDto>>> getProjectList(@RequestAttribute Long creatorId,
@@ -95,10 +97,10 @@ public class CreatorController {
      * @param projectId 프로젝트 ID
      * @param creatorId 창작자 ID
      * @return 성공 시 200 OK
-     * @since 2025-10-05
      * @author 조은애
+     * @since 2025-10-05
      */
-    @GetMapping("/project/{projectId}")
+    @GetMapping("/projects/{projectId}")
     public ResponseEntity<ResponseDto<CreatorProjectDetailDto>> getProjectDetail(@PathVariable Long projectId,
                                                                                  @RequestAttribute Long creatorId) {
         return creatorService.getProjectDetail(projectId, creatorId);
@@ -124,7 +126,7 @@ public class CreatorController {
      * <p>프로젝트 수정</p>
      *
      * @param projectId 프로젝트 ID
-     * @param dto ProjectUpdateRequestDto
+     * @param dto ProjectCreateRequestDto
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-09-16
@@ -132,10 +134,14 @@ public class CreatorController {
     @PostMapping("/project/{projectId}")
     public ResponseEntity<ResponseDto<String>> updateProject(@PathVariable Long projectId,
                                                              @RequestAttribute Long creatorId,
-                                                             @RequestBody ProjectUpdateRequestDto dto) {
+                                                             @RequestBody ProjectCreateRequestDto dto) {
         //TODO: userId -> creatorId
 
+        if (dto.getProjectId() != null && !dto.getProjectId().equals(projectId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 프로젝트 ID 입니다.");
+        }
         dto.setProjectId(projectId);
+
         return creatorService.updateProject(dto, creatorId);
     }
 
@@ -171,6 +177,55 @@ public class CreatorController {
         return creatorService.verifyProject(projectId, creatorId);
     }
 
+    /**
+     * <p>프로젝트 요약</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param creatorId 창작자 ID
+     * @return 성공 시 200 Ok
+     * @author 조은애
+     * @since 2025-10-08
+     */
+    @GetMapping("/projects/{projectId}/summary")
+    public ResponseEntity<ResponseDto<CreatorProjectSummaryDto>> getProjectSummary(@PathVariable Long projectId,
+                                                                            @RequestAttribute Long creatorId) {
+        return creatorService.getProjectSummary(projectId, creatorId);
+    }
+
+    /**
+     * <p>리워드 목록 조회</p>
+     *
+     * @param projectId 프로젝트 Id
+     * @param creatorId 창작자 ID
+     * @return 성공 시 200 Ok
+     * @author 조은애
+     * @since 2025-10-08
+     */
+    @GetMapping("/projects/{projectId}/reward")
+    public ResponseEntity<ResponseDto<List<Reward>>> getCreatorRewardList(@PathVariable Long projectId,
+                                                                          @RequestAttribute Long creatorId) {
+        return rewardService.getCreatorRewardList(projectId, creatorId);
+    }
+
+    /**
+     * <p>리워드 단건 추가</p>
+     *
+     * @param projectId 프로젝트 Id
+     * @param creatorId 창작자 ID
+     * @param dto RewardCreateRequestDto
+     * @return 성공 시 200 Ok
+     * @author 조은애
+     * @since 2025-10-08
+     */
+    @PostMapping("/projects/{projectId}/reward")
+    public ResponseEntity<ResponseDto<String>> addReward(@PathVariable Long projectId,
+                                                         @RequestAttribute Long creatorId,
+                                                         @RequestBody RewardCreateRequestDto dto) {
+        dto.setProjectId(projectId);
+
+        return rewardService.addReward(projectId, creatorId, dto);
+    }
+  
     //창작자 QnA 목록 조회
     //251008
     @GetMapping("/qna")

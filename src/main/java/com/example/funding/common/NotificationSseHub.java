@@ -4,6 +4,7 @@ import com.example.funding.model.Notification;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -21,6 +22,7 @@ import java.util.concurrent.*;
  * @author by: 장민규
  * @since 2025-10-02
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class NotificationSseHub {
@@ -51,6 +53,7 @@ public class NotificationSseHub {
             try {
                 emitter.send(":\n\n");
             } catch (IOException e) {
+                log.debug("SSE 하트비트가 중지됨 {}: {}", userId, e.getMessage());
                 cleanup(userId, emitter);
             }
         }, 15, 15, TimeUnit.SECONDS);
@@ -83,6 +86,7 @@ public class NotificationSseHub {
             String json = objectMapper.writeValueAsString(noti);
             emitter.send(SseEmitter.event().name("NOTIFICATION").data(json));
         } catch (IOException e) {
+            log.debug("SSE 알림 전송 실패 {}: {}", noti.getUserId(), e.getMessage());
             cleanup(noti.getUserId(), emitter);
         }
     }

@@ -32,7 +32,7 @@ public class CommunityController {
      * @param lastId 마지막 항목의 cmId
      * @param size 한 번에 가져올 항목 수
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-10-03
      */
     @GetMapping("/community")
@@ -51,7 +51,7 @@ public class CommunityController {
      * @param lastId 마지막 항목의 cmId
      * @param size 한 번에 가져올 항목 수
      * @return 성공 시 200 OK
-     * @author by: 조은애
+     * @author 조은애
      * @since 2025-10-03
      */
     @GetMapping("/review")

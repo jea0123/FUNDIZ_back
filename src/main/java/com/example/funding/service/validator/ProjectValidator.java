@@ -1,5 +1,6 @@
 package com.example.funding.service.validator;
 
+import com.example.funding.dto.request.reward.RewardCreateRequestDto;
 import com.example.funding.mapper.*;
 import com.example.funding.model.*;
 import lombok.RequiredArgsConstructor;
@@ -7,18 +8,29 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class ProjectVerifyValidator {
+public class ProjectValidator {
 
     private final CategoryMapper categoryMapper;
     private final RewardMapper rewardMapper;
     private final TagMapper tagMapper;
     private final CreatorMapper creatorMapper;
+
+    private static final int MIN_TITLE_LEN = 2;
+    private static final int MAX_TITLE_LEN = 255;
+    private static final int MIN_CONTENT_LEN = 30;
+    private static final int MAX_CONTENT_LEN = 3000;
+    private static final int MAX_THUMBNAIL_LEN = 500;
+    private static final int MAX_TAGS = 10;
+    private static final int MIN_GOAL = 10_000;
+    private static final int MAX_GOAL = 1_000_000_000;
+    private static final int MAX_REWARD_NAME_LEN = 255;
+    private static final int MAX_REWARD_CONTENT_LEN = 255;
+    private static final int MIN_REWARD_PRICE = 1_000;
 
     public List<String> validateAll(Long projectId, Project project) {
         List<String> errors = new ArrayList<>();
@@ -46,18 +58,6 @@ public class ProjectVerifyValidator {
         if (project.getThumbnail() == null) errors.add("thumbnail 는 필수입니다.");
     }
 
-    private static final int MIN_TITLE_LEN = 2;
-    private static final int MAX_TITLE_LEN = 255;
-    private static final int MIN_CONTENT_LEN = 30;
-    private static final int MAX_CONTENT_LEN = 3000;
-    private static final int MAX_THUMBNAIL_LEN = 500;
-    private static final int MAX_TAGS = 10;
-    private static final int MIN_GOAL = 10_000;
-    private static final int MAX_GOAL = 1_000_000_000;
-    private static final int MAX_REWARD_NAME_LEN = 255;
-    private static final int MAX_REWARD_CONTENT_LEN = 255;
-    private static final int MIN_REWARD_PRICE = 1_000;
-
     private static void validateBasics(Project project, List<String> errors) {
         String title = nvl(project.getTitle());
         if (title.length() < MIN_TITLE_LEN) errors.add("제목이 너무 짧습니다.");
@@ -76,12 +76,9 @@ public class ProjectVerifyValidator {
         LocalDate start = project.getStartDate();
         LocalDate end = project.getEndDate();
 
-        if (!start.isBefore(end)) {
-            errors.add("시작일은 종료일 이전이어야 합니다.");
-        }
-        if (start.isBefore(LocalDate.now())) {
-            errors.add("시작일은 오늘 이후여야 합니다.");
-        }
+        if (!start.isBefore(end)) errors.add("시작일은 종료일 이전이어야 합니다.");
+        if (start.isBefore(LocalDate.now()))  errors.add("시작일은 오늘 이후여야 합니다.");
+
         long days = ChronoUnit.DAYS.between(start, end);
         if (days < 7) errors.add("펀딩 기간은 최소 7일입니다.");
         if (days > 60) errors.add("펀딩 기간은 최대 60일입니다.");
@@ -93,7 +90,7 @@ public class ProjectVerifyValidator {
             errors.add("대표 이미지가 필요합니다.");
         } else {
             if (thumb.length() > MAX_THUMBNAIL_LEN) errors.add("대표 이미지 경로가 500자를 초과합니다.");
-            String lower = thumb.toLowerCase();
+            String lower = thumb.toLowerCase(Locale.ROOT);
             if (!(lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png"))) {
                 errors.add("대표 이미지는 jpg/jpeg/png를 권장합니다.");
             }
@@ -102,17 +99,14 @@ public class ProjectVerifyValidator {
 
     private static void validateContent(Project project, List<String> errors) {
         String content = nvl(project.getContent().trim());
-        if (content.length() < MIN_CONTENT_LEN) {
-            errors.add("프로젝트 소개 글이 너무 짧습니다.(최소 " + MIN_CONTENT_LEN + "자)");
-        }
-        if (content.length() > MAX_CONTENT_LEN) {
-            errors.add("프로젝트 소개 글이 3000자를 초과합니다.");
-        }
+        if (content.length() < MIN_CONTENT_LEN) errors.add("프로젝트 소개 글이 너무 짧습니다.(최소 " + MIN_CONTENT_LEN + "자)");
+        if (content.length() > MAX_CONTENT_LEN) errors.add("프로젝트 소개 글이 3000자를 초과합니다.");
     }
 
     private void validateCategory(Project project, List<String> errors) {
         if (project.getSubctgrId() == null) {
             errors.add("서브카테고리가 선택되지 않았습니다.");
+            return;
         }
         Subcategory existing = categoryMapper.findSubcategoryById(project.getSubctgrId());
         if (existing == null) errors.add("존재하지 않는 서브카테고리 입니다.");
@@ -135,17 +129,56 @@ public class ProjectVerifyValidator {
         List<Tag> tags = tagMapper.getTagList(projectId);
         if (tags == null) return;
         if (tags.size() > MAX_TAGS) errors.add("태그는 최대 " + MAX_TAGS + "개까지 등록 가능합니다.");
-        long distinct = tags.stream().map(t -> nvl(t.getTagName()).trim().toLowerCase()).distinct().count();
+        long distinct = tags.stream()
+            .map(t -> nvl(t.getTagName())
+            .trim().toLowerCase()).distinct()
+            .count();
         if (distinct != tags.size()) errors.add("중복된 태그가 있습니다.");
     }
 
+    //DB 기준 리워드 검증
     private void validateRewards(Long projectId, List<String> errors) {
         List<Reward> rewards = rewardMapper.findByProjectId(projectId);
         if (rewards == null || rewards.isEmpty()) {
             errors.add("최소 1개 이상의 리워드가 필요합니다.");
             return;
         }
-        long distinct = rewards.stream().map(r -> nvl(r.getRewardName()).trim().toLowerCase(Locale.ROOT)).distinct().count();
+        validateRewardFields(rewards, errors);
+    }
+
+    //DTO용 오버로드 : 필드 검증만 수행(DB 조회 없음)
+    public List<String> validateRewardsDtos(List<RewardCreateRequestDto> dtos) {
+        List<String> errors = new ArrayList<>();
+        if (dtos == null || dtos.isEmpty()) {
+            return errors;
+        }
+
+        List<Reward> rewards = dtos.stream()
+            .filter(Objects::nonNull)
+            .map(dto -> Reward.builder()
+                .rewardName(safeTrim(dto.getRewardName()))
+                .price(dto.getPrice())
+                .rewardContent(safeTrim(dto.getRewardContent()))
+                .deliveryDate(dto.getDeliveryDate())
+                .rewardCnt(dto.getRewardCnt())
+                .isPosting(dto.getIsPosting())
+                .build())
+            .toList();
+
+        validateRewardFields(rewards, errors);
+        return errors;
+    }
+
+    public List<String> validateRewardDto(RewardCreateRequestDto dto) {
+        return validateRewardsDtos(Collections.singletonList(dto));
+    }
+
+    //리워드 리스트 자체의 중복/필드 제약 검증 (DB 비의존)
+    private void validateRewardFields(List<Reward> rewards, List<String> errors) {
+        long distinct = rewards.stream()
+            .map(r -> nvl(r.getRewardName()).trim().toLowerCase(Locale.ROOT))
+            .distinct()
+            .count();
         if (distinct != rewards.size()) errors.add("중복된 리워드명이 있습니다.");
 
         for (Reward reward : rewards) {
@@ -161,22 +194,28 @@ public class ProjectVerifyValidator {
                 errors.add("리워드 금액은 최소 " + MIN_REWARD_PRICE + "원 이상이어야 합니다.");
             }
 
-            String posting = nvl(String.valueOf(reward.getIsPosting())).trim();
-            if (!posting.equalsIgnoreCase("Y") && !posting.equalsIgnoreCase("N")) {
-                errors.add("배송 필요 여부는 Y 또는 N 이어야 합니다.");
-            }
-
             Integer cnt = reward.getRewardCnt();
-            if (cnt != null && cnt <= 0) {
-                errors.add("리워드 제한 개수는 1 이상이어야 합니다.");
+            if (cnt != null && cnt < 0) errors.add("리워드 수량은 0 이상이어야 합니다."); // 수량 0 이면 품절
+
+            Character posting = reward.getIsPosting();
+            if (posting == null) {
+                errors.add("배송 필요 여부는 필수입니다.");
+            } else {
+                char upper = Character.toUpperCase(posting);
+                if (upper != 'Y' && upper != 'N') {
+                    errors.add("배송 필요 여부는 Y 또는 N 이어야 합니다.");
+                } else {
+                    reward.setIsPosting(upper);
+                }
             }
 
             if (reward.getDeliveryDate() != null && reward.getDeliveryDate().isBefore(LocalDate.now())) {
-                errors.add("리워드 예정 배송일은 과거일 수 없습니다.");
+                errors.add("배송 예정일은 펀딩 종료일 이후여야 합니다.");
             }
         }
     }
 
     private static String nvl(String s) { return s == null ? "" : s; }
     private static boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
+    private static String safeTrim(String s) { return s == null ? null : s.trim(); }
 }

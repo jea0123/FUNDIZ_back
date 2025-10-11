@@ -3,6 +3,7 @@ package com.example.funding.controller;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.creator.NewsCreateRequestDto;
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
 import com.example.funding.dto.request.reward.RewardCreateRequestDto;
@@ -16,6 +17,7 @@ import com.example.funding.dto.response.creator.CreatorProjectListDto;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
 import com.example.funding.service.CreatorService;
+import com.example.funding.service.NewsService;
 import com.example.funding.service.RewardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,7 @@ public class CreatorController {
 
     private final CreatorService creatorService;
     private final RewardService rewardService;
+    private final NewsService newsService;
 
     /**
      * <p>프로젝트 목록 조회</p>
@@ -253,6 +256,22 @@ public class CreatorController {
         return creatorService.getShippingBackerList(creatorId, projectId);
     }
 
+    /**
+     * <p>프로젝트 새소식 등록</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param dto NewsCreateRequestDto
+     * @param creatorId 창작자 ID
+     * @return 성공 시 200 Ok
+     * @author 조은애
+     * @since 2025-10-11
+     */
+    @PostMapping("/projects/{projectId}/news")
+    public ResponseEntity<ResponseDto<Long>> createNews(@PathVariable Long projectId,
+                                                        @RequestBody NewsCreateRequestDto dto,
+                                                        @RequestAttribute Long creatorId) {
 
+        return newsService.createNews(projectId, creatorId, dto);
+    }
 
 }

@@ -13,7 +13,6 @@ import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
 import com.example.funding.dto.response.creator.CreatorDashboardDto;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
-import com.example.funding.model.Qna;
 import com.example.funding.dto.response.creator.CreatorProjectSummaryDto;
 import org.springframework.http.ResponseEntity;
 

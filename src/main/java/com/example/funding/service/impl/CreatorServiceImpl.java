@@ -19,8 +19,6 @@ import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Project;
-import com.example.funding.model.Qna;
-import com.example.funding.model.Subcategory;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.RewardService;
 import com.example.funding.service.validator.ProjectInputValidator;

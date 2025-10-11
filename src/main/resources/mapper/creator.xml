@@ -17,84 +17,6 @@
         WHERE creatorId = #{creatorId}
     </select>
 
-<!--    <select id="">-->
-<!--        SELECT-->
-<!--            (-->
-<!--            SELECT count(*)-->
-<!--            FROM project-->
-<!--            WHERE creatorId = #{creatorId}-->
-<!--            ) AS totalProject,-->
-
-<!--            (-->
-<!--            SELECT sum(s.*)-->
-<!--            FROM settlement s-->
-<!--            JOIN project p ON p.projectId = s.projectId-->
-<!--            JOIN creator c ON c.creatorId = p.creatorId-->
-<!--            WHERE creatorId = #{creatorId}-->
-<!--            ) AS totalAmount,-->
-
-<!--            (-->
-<!--            SELECT count(b.backingId)-->
-<!--            FROM backing b-->
-<!--            JOIN backingDetail bd ON b.backingId = bd.backingId-->
-<!--            JOIN reward r ON bd.rewardId = r.rewardId-->
-<!--            JOIN project p ON r.projectId = p.projectId-->
-<!--            WHERE p.creatorId = #{creatorId}-->
-<!--            ) AS totalBackers,-->
-
-<!--            (-->
-<!--            select count(*)-->
-<!--            from project p-->
-<!--            where p.creatorId = 96-->
-<!--            and p.projectStatus ='VERIFYING';-->
-<!--            ) AS pendingApproval-->
-<!--        FROM dual;-->
-
-<!--    </select>-->
-
-
-<!--    <select id="CreatorPDetailDto" parameterType="Long" resultType="com.example.funding.dto.response.creator.CreatorPDetailDto">-->
-<!--        SELECT-->
-<!--        p.projectId-->
-<!--        , p.creatorId-->
-<!--        , p.subctgrId-->
-<!--        , p.title-->
-<!--        , p.goalAmount-->
-<!--        , p.currAmount-->
-<!--        , p.startDate-->
-<!--        , p.endDate-->
-<!--        , p.thumbnail-->
-<!--        , p.createdAt AS createdAt-->
-<!--        , p.updateAt-->
-<!--        , p.projectStatus-->
-<!--        , p.backerCnt-->
-<!--        , p.likeCnt-->
-<!--        , p.viewCnt-->
-<!--        , p.isVerified-->
-<!--        , p.rejectedReason-->
-<!--        , p.requestedAt-->
-
-<!--        , r.rewardId-->
-<!--        , r.rewardName-->
-<!--        , r.price-->
-<!--        , r.rewardContent-->
-<!--        , r.deliveryDate-->
-<!--        , r.rewardCnt-->
-<!--        , r.createdAt AS createdAtR-->
-<!--        , r.isPosting-->
-<!--        , r.remain-->
-
-<!--        , c.creatorName-->
-
-<!--        FROM project p-->
-<!--        JOIN creator c ON c.creatorId = p.creatorId-->
-<!--        JOIN Reward r ON p.projectId = r.projectId-->
-<!--        WHERE p.creatorId = #{creatorId}-->
-<!--        Order BY p.projectId desc-->
-
-
-<!--    </select>-->
-
     <sql id="projectListWhere">
         <where>
             p.CREATORID = #{creatorId}
@@ -205,5 +127,26 @@
         AND PROJECTSTATUS = 'DRAFT'
         AND ISVERIFIED = 'N'
     </update>
+
+    <select id = "getProjectRankDate" parameterType="long" resultType="com.example.funding.dto.response.creator.CreatorDashboardRankDto">
+        SELECT
+            creatorId,
+            title,
+            backerCnt,
+            likeCnt,
+            viewCnt
+        FROM PROJECT
+        WHERE CREATORID = #{creatorId}
+    </select>
+
+    <select id ="creatorDashboardDto" parameterType="long" resultType="com.example.funding.dto.response.creator.CreatorDashboardDto">
+        SELECT
+            count(*) AS totalProjectCnt,
+            count(CASE WHEN projectStatus = 'FAILED' THEN creatorId END) AS projectFailedCnt
+        FROM
+            project
+        WHERE CREATORID = #{creatorId}
+        GROUP BY creatorId
+    </select>
 
 </mapper>

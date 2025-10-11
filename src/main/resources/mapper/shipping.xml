@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.funding.mapper.ShippingMapper">
+
+    <select id ="creatorShippingBackerList" parameterType = "long" resultType = "com.example.funding.dto.response.shipping.CreatorShippingBackerList">
+        SELECT
+            <!-- 유저 테이블 -->
+            u.userId,
+            u.email,
+
+            <!-- 창작자 -->
+            c.creatorId,
+
+            <!-- 리워드 -->
+            r.rewardName,
+
+            <!-- 배송지 -->
+            a.recipient,
+            a.postalCode,
+            a.roadAddr,
+            a.detailAddr,
+            a.recipientPhone,
+
+            <!-- 배송 -->
+            s.shippingStatus,
+            s.trackingNum,
+            s.shippedAt,
+            s.deliveredAt,
+
+            <!-- 후원상세 -->
+            bd.quantity,
+
+            <!-- 프로젝트 -->
+            p.projectId,
+            p.title
+
+        FROM project p
+        JOIN creator c ON p.creatorId = c.creatorId
+        JOIN reward r ON r.projectId = p.projectId
+        JOIN backingDetail bd ON bd.rewardId = r.rewardId
+        JOIN backing b ON b.backingId = bd.backingId
+        JOIN users u ON u.userId = b.userId
+        JOIN shipping s ON s.backingId = b.backingId
+        JOIN address a ON s.addrId = a.addrId
+        WHERE c.creatorId = #{creatorId}
+        AND p.projectId = #{projectId}
+    </select>
+</mapper>

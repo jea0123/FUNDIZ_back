@@ -5,9 +5,12 @@ import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
-import com.example.funding.dto.response.creator.CreatorPDetailDto;
+import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
+import com.example.funding.dto.response.creator.CreatorDashboardDto;
 import com.example.funding.dto.response.creator.CreatorProjectDetailDto;
 import com.example.funding.dto.response.creator.CreatorProjectListDto;
+import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
+import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
 import com.example.funding.service.CreatorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,8 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -27,43 +29,17 @@ public class CreatorController {
     private final CreatorService creatorService;
 
     /**
-     * <p>창작자의 프로젝트 목록 조회</p>
+     * <p>창작자의 대시보드</p>
      * @param creatorId
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-     * @since 202510-02
+     * @since 2025-10-02
      * @author by: 이윤기
      */
-//   @GetMapping("/{creatorId}/dashBoard") // DEV 프로필 추가: creatorId 프런트에서 헤더 주입
+
    @GetMapping("/dashBoard")
-   public ResponseEntity<ResponseDto<CreatorPDetailDto>> getCreatorDashBoard(@PathVariable Long creatorId){
+   public ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(@RequestAttribute Long creatorId){
        return creatorService.getCreatorDashBoard(creatorId);
    }
-
-//    /**
-//     * <p>창작자의 프로젝트 목록 조회</p>
-//     * @param creatorId
-//     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-//     * @since 202510-02
-//     * @author by: 이윤기
-//     */
-//
-//    @GetMapping("/{creatorId}/list")
-//    public ResponseEntity<ResponseDto<List<CreatorPListDto>>>getCreatorPList(@PathVariable Long creatorId){
-//        return creatorService.getCreatorPList(creatorId);
-//    }
-//
-//    /**
-//     * <p>창작자의 프로젝트 상세</p>
-//     * @param creatorId
-//     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-//     * @since 2025-10-02
-//     * @author by: 이윤기
-//     */
-//
-//    @GetMapping("/{creatorId}/detail/{projectId}")
-//    public ResponseEntity<ResponseDto<CreatorPDetailDto>>getCreatorDList(@PathVariable Long creatorId, @PathVariable Long projectId){
-//        return creatorService.getCreatorDList(creatorId, projectId);
-//    }
 
     /**
      * <p>프로젝트 목록 조회</p>
@@ -173,4 +149,21 @@ public class CreatorController {
 
         return creatorService.verifyProject(projectId, creatorId);
     }
+
+    @GetMapping("/backingList")
+    public ResponseEntity<ResponseDto<List<BackingCreatorProjectListDto>>> getBackingList(@RequestAttribute Long creatorId){
+        return creatorService.getCreatorProjectList(creatorId);
+    }
+
+    @GetMapping("/shippingList")
+    public ResponseEntity<ResponseDto<List<CreatorShippingProjectList>>> getShippingList(@RequestAttribute Long creatorId){
+        return creatorService.getCreatorShippingList(creatorId);
+    }
+
+    @GetMapping("/shippingBackerList/{projectId}")
+        public ResponseEntity<ResponseDto<List<CreatorShippingBackerList>>> getShippingBackerList(@RequestAttribute Long creatorId, @PathVariable Long projectId){
+        return creatorService.getShippingBackerList(creatorId, projectId);
+        }
+
+
 }

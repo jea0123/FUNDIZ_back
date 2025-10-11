@@ -95,8 +95,9 @@ public class CommunityServiceImpl implements CommunityService {
     //QnA 질문 등록
     //251008
     @Override
-    public ResponseEntity<ResponseDto<String>> addQuestion(Long userId, QnaAddRequestDto qnaDto) {
+    public ResponseEntity<ResponseDto<String>> addQuestion(Long projectId, Long userId, QnaAddRequestDto qnaDto) {
         Qna item = Qna.builder()
+                .projectId(projectId)
                 .userId(userId)
                 .content(qnaDto.getContent())
                 .createdAt(qnaDto.getCreatedAt())

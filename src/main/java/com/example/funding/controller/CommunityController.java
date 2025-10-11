@@ -79,7 +79,7 @@ public class CommunityController {
     //QnA 질문 작성
     //251008
     @PostMapping("/qna/{userId}/add")
-    public ResponseEntity<ResponseDto<String>> addQuestion(@PathVariable Long userId, @RequestBody QnaAddRequestDto qnaDto){
-        return communityService.addQuestion(userId, qnaDto);
+    public ResponseEntity<ResponseDto<String>> addQuestion(@PathVariable Long projectId, @PathVariable Long userId, @RequestBody QnaAddRequestDto qnaDto){
+        return communityService.addQuestion(projectId, userId, qnaDto);
     }
 }

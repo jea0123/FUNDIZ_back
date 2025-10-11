@@ -67,4 +67,35 @@
         <include refid="foldedQuery" />
     </select>
 
+    <select id="getQnaListOfPJ" resultType="Qna">
+        SELECT * FROM
+        (SELECT sub.*, ROWNUM rnum FROM (
+        SELECT * FROM qna WHERE PROJECTID = #{projectId} order by QNAID desc
+        ) sub WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow})
+        WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
+    </select>
+
+    <select id="qnaTotalOfPJ" resultType="Integer">
+        SELECT COUNT(*) FROM qna
+        WHERE PROJECTID = #{projectId}
+    </select>
+
+    <insert id="addQuestion" parameterType="com.example.funding.dto.request.project.QnaAddRequestDto">
+        <selectKey keyProperty="qnaId" resultType="Long" order="BEFORE">
+            SELECT QNA_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO QNA (QNAID, PROJECTID, USERID, CREATORID, TITLE, CONTENT, CREATEDAT)
+        SELECT QNA_SEQ.NEXTVAL, #{projectId}, #{userId}, P.CREATORID AS creatorId, 'Y', 'CON', SYSDATE
+        FROM QNA Q, PROJECT P
+        WHERE EXISTS (
+        SELECT 1
+        FROM PROJECT P
+        WHERE Q.PROJECTID = P.PROJECTID
+        AND P.PROJECTID = #{projectId}
+        )
+        AND ROWNUM = 1
+
+    </insert>
+
 </mapper>

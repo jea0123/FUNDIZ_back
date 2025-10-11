@@ -3,12 +3,15 @@ package com.example.funding.mapper;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
-import com.example.funding.dto.response.creator.CreatorDashboardDto;
-import com.example.funding.dto.response.creator.CreatorDashboardRankDto;
 import com.example.funding.dto.response.creator.CreatorProjectDetailDto;
 import com.example.funding.dto.response.creator.CreatorProjectListDto;
+import com.example.funding.dto.response.creator.CreatorQnaDto;
+import com.example.funding.dto.response.creator.CreatorDashboardDto;
+import com.example.funding.dto.response.creator.CreatorDashboardRankDto;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
+import com.example.funding.model.Qna;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -19,6 +22,8 @@ public interface CreatorMapper {
     List<Creator> findByIds(@Param("ids") List<Long> ids);
 
     Creator findById(@Param("creatorId") Long creatorId);
+
+//    CreatorPDetailDto getCreatorPDetailDto(@Param("creatorId") Long creatorId);
 
     int countProject(@Param("creatorId") Long creatorId, @Param("dto") SearchCreatorProjectDto dto);
 
@@ -34,9 +39,11 @@ public interface CreatorMapper {
 
     CreatorProjectDetailDto getProjectDetail(@Param("projectId") Long projectId, @Param("creatorId") Long creatorId);
 
+    int qnaTotalOfCreator(Long creatorId);
+
+    List<CreatorQnaDto> getQnaListOfCreator(Long creatorId, @Param("pager") Pager pager);
+
     List<CreatorDashboardRankDto> getProjectRankDate(Long creatorId);
 
     CreatorDashboardDto creatorDashboardDto(Long creatorId);
-
-
 }

@@ -50,26 +50,25 @@
         </selectKey>
 
         INSERT INTO REWARD (
-            REWARDID, PROJECTID, REWARDNAME, PRICE, REWARDCONTENT,
-            DELIVERYDATE, REWARDCNT, ISPOSTING, REMAIN
+            REWARDID,
+            PROJECTID,
+            REWARDNAME,
+            PRICE,
+            REWARDCONTENT,
+            DELIVERYDATE,
+            <if test="rewardCnt != null">REWARDCNT,</if>
+            ISPOSTING
         ) VALUES (
-            #{rewardId}, #{projectId}, #{rewardName}, #{price}, #{rewardContent},
-            #{deliveryDate}, #{rewardCnt}, #{isPosting}, #{remain}
+            #{rewardId},
+            #{projectId},
+            #{rewardName},
+            #{price},
+            #{rewardContent},
+            #{deliveryDate},
+            <if test="rewardCnt != null">#{rewardCnt},</if>
+            #{isPosting}
         )
     </insert>
-
-    <update id="updateReward" parameterType="rewardUpdateRequestDto">
-        UPDATE REWARD
-        SET REWARDNAME = #{rewardName},
-            PRICE = #{price},
-            REWARDCONTENT = #{rewardContent},
-            DELIVERYDATE = #{deliveryDate},
-            REWARDCNT = #{rewardCnt},
-            ISPOSTING = #{isPosting},
-            REMAIN = #{remain}
-        WHERE REWARDID = #{rewardId}
-          AND PROJECTID = #{projectId}
-    </update>
 
     <delete id="deleteReward">
         DELETE FROM REWARD
@@ -81,5 +80,35 @@
         DELETE FROM REWARD
         WHERE PROJECTID = #{projectId}
     </delete>
+
+    <select id="getCreatorRewardList" resultType="reward">
+        SELECT
+            r.REWARDID,
+            r.PROJECTID,
+            r.REWARDNAME,
+            r.PRICE,
+            r.REWARDCONTENT,
+            r.DELIVERYDATE,
+            r.REWARDCNT,
+            r.CREATEDAT,
+            r.ISPOSTING,
+            CASE
+                WHEN r.REWARDCNT IS NULL THEN NULL
+                ELSE GREATEST(r.REWARDCNT - NVL(s.qty, 0), 0)
+            END AS REMAIN
+        FROM reward r
+        LEFT JOIN (
+            SELECT
+                d.REWARDID, SUM(d.QUANTITY) AS qty
+            FROM BACKINGDETAIL d
+            JOIN BACKING b ON b.BACKINGID = d.BACKINGID
+                AND b.BACKINGSTATUS = 'COMPLETED'
+            GROUP BY d.REWARDID
+        ) s ON s.REWARDID = r.REWARDID
+        JOIN PROJECT p ON p.PROJECTID = r.PROJECTID
+        WHERE r.PROJECTID = #{projectId}
+        AND p.CREATORID = #{creatorId}
+        ORDER BY r.CREATEDAT
+    </select>
 
 </mapper>

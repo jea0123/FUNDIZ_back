@@ -5,6 +5,10 @@ import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
+import com.example.funding.dto.request.reward.RewardCreateRequestDto;
+import com.example.funding.dto.response.creator.*;
+import com.example.funding.model.Reward;
+import com.example.funding.model.Qna;
 import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
 import com.example.funding.dto.response.creator.CreatorDashboardDto;
 import com.example.funding.dto.response.creator.CreatorProjectDetailDto;
@@ -12,6 +16,7 @@ import com.example.funding.dto.response.creator.CreatorProjectListDto;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
 import com.example.funding.service.CreatorService;
+import com.example.funding.service.RewardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,20 +31,9 @@ import java.util.List;
 @RequestMapping("/api/v1/creator")
 @RequiredArgsConstructor
 public class CreatorController {
+
     private final CreatorService creatorService;
-
-    /**
-     * <p>창작자의 대시보드</p>
-     * @param creatorId
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-     * @since 2025-10-02
-     * @author by: 이윤기
-     */
-
-   @GetMapping("/dashBoard")
-   public ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(@RequestAttribute Long creatorId){
-       return creatorService.getCreatorDashBoard(creatorId);
-   }
+    private final RewardService rewardService;
 
     /**
      * <p>프로젝트 목록 조회</p>
@@ -55,10 +49,10 @@ public class CreatorController {
     public ResponseEntity<ResponseDto<PageResult<CreatorProjectListDto>>> getProjectList(@RequestAttribute Long creatorId,
                                                                                          SearchCreatorProjectDto dto,
                                                                                          Pager reqPager) {
-       Pager pager = Pager.ofRequest(
-            reqPager != null ? reqPager.getPage() : 1,
-            reqPager != null ? reqPager.getSize() : 5,
-            reqPager != null ? reqPager.getPerGroup() : null
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 5,
+                reqPager != null ? reqPager.getPerGroup() : null
         );
 
         return creatorService.getProjectList(creatorId, dto, pager);
@@ -150,6 +144,81 @@ public class CreatorController {
         return creatorService.verifyProject(projectId, creatorId);
     }
 
+    /**
+     * <p>프로젝트 요약</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param creatorId 창작자 ID
+     * @return 성공 시 200 Ok
+     * @author 조은애
+     * @since 2025-10-08
+     */
+    @GetMapping("/projects/{projectId}/summary")
+    public ResponseEntity<ResponseDto<CreatorProjectSummaryDto>> getProjectSummary(@PathVariable Long projectId,
+                                                                                   @RequestAttribute Long creatorId) {
+        return creatorService.getProjectSummary(projectId, creatorId);
+    }
+
+    /**
+     * <p>리워드 목록 조회</p>
+     *
+     * @param projectId 프로젝트 Id
+     * @param creatorId 창작자 ID
+     * @return 성공 시 200 Ok
+     * @author 조은애
+     * @since 2025-10-08
+     */
+    @GetMapping("/projects/{projectId}/reward")
+    public ResponseEntity<ResponseDto<List<Reward>>> getCreatorRewardList(@PathVariable Long projectId,
+                                                                          @RequestAttribute Long creatorId) {
+        return rewardService.getCreatorRewardList(projectId, creatorId);
+    }
+
+    /**
+     * <p>리워드 단건 추가</p>
+     *
+     * @param projectId 프로젝트 Id
+     * @param creatorId 창작자 ID
+     * @param dto RewardCreateRequestDto
+     * @return 성공 시 200 Ok
+     * @author 조은애
+     * @since 2025-10-08
+     */
+    @PostMapping("/projects/{projectId}/reward")
+    public ResponseEntity<ResponseDto<String>> addReward(@PathVariable Long projectId,
+                                                         @RequestAttribute Long creatorId,
+                                                         @RequestBody RewardCreateRequestDto dto) {
+        dto.setProjectId(projectId);
+
+        return rewardService.addReward(projectId, creatorId, dto);
+    }
+
+    //창작자 QnA 목록 조회
+    //251008
+    @GetMapping("/qna")
+    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfCreator(@RequestAttribute("creatorId") Long creatorId, Pager reqPager) {
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 10,
+                reqPager != null ? reqPager.getPerGroup() : 10
+        );
+
+        return creatorService.getQnaListOfCreator(creatorId, pager);
+    }
+
+    /**
+     * <p>창작자의 대시보드</p>
+     * @param creatorId
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @since 2025-10-02
+     * @author by: 이윤기
+     */
+
+    @GetMapping("/dashBoard")
+    public ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(@RequestAttribute Long creatorId){
+        return creatorService.getCreatorDashBoard(creatorId);
+    }
+
     @GetMapping("/backingList")
     public ResponseEntity<ResponseDto<List<BackingCreatorProjectListDto>>> getBackingList(@RequestAttribute Long creatorId){
         return creatorService.getCreatorProjectList(creatorId);
@@ -161,9 +230,10 @@ public class CreatorController {
     }
 
     @GetMapping("/shippingBackerList/{projectId}")
-        public ResponseEntity<ResponseDto<List<CreatorShippingBackerList>>> getShippingBackerList(@RequestAttribute Long creatorId, @PathVariable Long projectId){
+    public ResponseEntity<ResponseDto<List<CreatorShippingBackerList>>> getShippingBackerList(@RequestAttribute Long creatorId, @PathVariable Long projectId){
         return creatorService.getShippingBackerList(creatorId, projectId);
-        }
+    }
+
 
 
 }

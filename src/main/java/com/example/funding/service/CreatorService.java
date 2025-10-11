@@ -5,20 +5,20 @@ import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
-import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
-import com.example.funding.dto.response.creator.CreatorDashboardDto;
-
 import com.example.funding.dto.response.creator.CreatorProjectDetailDto;
 import com.example.funding.dto.response.creator.CreatorProjectListDto;
+import com.example.funding.dto.response.creator.CreatorQnaDto;
+import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
+import com.example.funding.dto.response.creator.CreatorDashboardDto;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
+import com.example.funding.model.Qna;
+import com.example.funding.dto.response.creator.CreatorProjectSummaryDto;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface CreatorService {
-
-    ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(Long creatorId);
 
     ResponseEntity<ResponseDto<PageResult<CreatorProjectListDto>>> getProjectList(Long creatorId, SearchCreatorProjectDto dto, Pager pager);
 
@@ -31,6 +31,12 @@ public interface CreatorService {
     ResponseEntity<ResponseDto<String>> deleteProject(Long projectId, Long creatorId);
 
     ResponseEntity<ResponseDto<String>> verifyProject(Long projectId, Long creatorId);
+
+    ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfCreator(Long creatorId, Pager pager);
+
+    ResponseEntity<ResponseDto<CreatorProjectSummaryDto>> getProjectSummary(Long projectId, Long creatorId);
+
+    ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(Long creatorId);
 
     ResponseEntity<ResponseDto<List<BackingCreatorProjectListDto>>> getCreatorProjectList(Long creatorId);
 

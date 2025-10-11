@@ -53,7 +53,7 @@ public class NotificationSseHub {
             try {
                 emitter.send(":\n\n");
             } catch (IOException e) {
-                log.debug("SSE 하트비트가 중지됨 {}: {}", userId, e.getMessage());
+//                log.debug("SSE 하트비트가 중지됨 {}: {}", userId, e.getMessage());
                 cleanup(userId, emitter);
             }
         }, 15, 15, TimeUnit.SECONDS);

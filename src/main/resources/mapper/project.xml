@@ -333,20 +333,45 @@
         WHERE PROJECTID = #{projectId}
     </select>
 
-    <select id = "getCreatorPList" parameterType="long" resultType="com.example.funding.dto.response.creator.CreatorPListDto">
+    <select id ="getVerifyingCnt" parameterType="long" resultType="long">
         SELECT
-            p.creatorId
-            ,p.projectId
-            ,p.title
-            ,p.goalAmount
-            ,p.currAmount
-            ,p.thumbnail
-            ,p.projectStatus
-            ,p.createdAt
+            count(*)
+        FROM
+            project
+        WHERE CREATORID = #{creatorId}
+        AND PROJECTSTATUS = 'VERIFYING'
+    </select>
+
+    <select id ="getBackingCreatorProjectList" parameterType="long" resultType ="com.example.funding.dto.response.backing.BackingCreatorProjectListDto">
+        SELECT
+            projectId,
+            creatorId,
+            title,
+            goalAmount,
+            currAmount,
+            thumbnail,
+            backerCnt
+        FROM
+            project
+        WHERE
+            CREATORID = #{creatorId}
+    </select>
+
+    <!-- TODO : 학교컴 데이터로 확인해보기 (조건 변경 여지 있음)-->
+    <select id ="getCShippingList" parameterType="long" resultType = "com.example.funding.dto.response.shipping.CreatorShippingProjectList">
+        SELECT
+        p.creatorId,
+        p.projectId,
+        p.title,
+        p.backerCnt,
+        count(case when s.shippingStatus = 'DELIVERED' THEN b.userId END) AS completedShippingCnt
         FROM project p
-        JOIN creator c ON c.creatorId = p.creatorId
-        WHERE p.creatorId=#{creatorId}
-        Order BY p.projectId desc
+        JOIN creator c ON p.creatorId = c.creatorId
+        JOIN users u ON u.userId = c.userId
+        JOIN backing b ON b.userId = u.userId
+        JOIN shipping s ON b.backingId = s.backingId
+        where c.creatorId = #{creatorId}
+        group by p.projectId, p.creatorId, p.title, p.backerCnt
     </select>
 
 </mapper>

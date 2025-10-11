@@ -2,7 +2,9 @@ package com.example.funding.mapper;
 
 import com.example.funding.common.Pager;
 import com.example.funding.dto.request.project.SearchProjectDto;
-import com.example.funding.dto.response.creator.CreatorPListDto;
+import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
+import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
+import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
 import com.example.funding.dto.row.ProjectRow;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
@@ -47,7 +49,12 @@ public interface ProjectMapper {
 
     int updateProjectsToFailed();
 
-    List<CreatorPListDto> getCreatorPList(@Param("creatorId") Long creatorId);
-
     LocalDate getProjectEndDate(@Param("projectId") Long projectId);
+
+    long getVerifyingCnt(Long creatorId);
+
+    List<BackingCreatorProjectListDto> getBackingCreatorProjectList(Long creatorId);
+
+    List<CreatorShippingProjectList> getCShippingList(Long creatorId);
+
 }

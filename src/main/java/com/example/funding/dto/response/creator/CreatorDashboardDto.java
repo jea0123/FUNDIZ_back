@@ -1,29 +1,30 @@
 package com.example.funding.dto.response.creator;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class CreatorDashboardDto {
     private Long creatorId;
-    //총 프로젝트 개수
-    private Long totalProject;
-    //모든 프로젝트 후원 금액 합계
-    private Long totalAmount;
-    // 모든 프로젝트의 후원받은수의 합계
-    private Long totalBackers;
-    //프로젝트 승인대기 개수
-    private Long pendingApproval;
 
-    //내프로젝트 성공률 (파이차트)
-    private Long successRate;
-    //월별수익
-    private Long monthAmount;
-    //내가한 프로젝트 랭킹
-    private Long projectRank;
+    private Long projectTotal;
+    private Long totalAmount;
+    private Long totalBackingCnt;
+    private Long totalVerifyingCnt;
+
+    //내프로젝트 성공률 (파이차트 계산용)
+    private Double totalProjectCnt; // 전체 프로젝트 개수
+    private Double projectFailedCnt; // 실패한 프로젝트 개수
+    private Double projectFailedPercentage; // 실패한 프로젝트 퍼센트
+    private Double projectSuccessPercentage; // 성공한 프로젝트 퍼센트
+
+    private List<CreatorDashboardRankDto> top3BackerCnt;
+    private List<CreatorDashboardRankDto> top3LikeCnt;
+    private List<CreatorDashboardRankDto> top3ViewCnt;
+
 }

@@ -1,7 +1,9 @@
 package com.example.funding.mapper;
 
+import com.example.funding.common.Pager;
 import com.example.funding.dto.response.project.CommunityDto;
 import com.example.funding.dto.response.project.ReviewDto;
+import com.example.funding.model.Qna;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,4 +23,10 @@ public interface CommunityMapper {
                                   @Param("lastCreatedAt") LocalDateTime lastCreatedAt,
                                   @Param("lastId") Long lastId,
                                   @Param("size") int size);
+
+    int qnaTotalOfPJ(Long projectId);
+
+    List<Qna> getQnaListOfPJ(Long projectId, @Param("pager") Pager pager);
+
+    int addQuestion(Qna item);
 }

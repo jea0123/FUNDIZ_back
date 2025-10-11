@@ -7,8 +7,20 @@ import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
 import com.example.funding.dto.response.creator.*;
+import com.example.funding.dto.response.backing.BackingCreatorBackerList;
+import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
+import com.example.funding.dto.response.creator.CreatorProjectDetailDto;
+import com.example.funding.dto.response.creator.CreatorProjectListDto;
+import com.example.funding.dto.response.creator.CreatorQnaDto;
+import com.example.funding.dto.response.creator.CreatorProjectSummaryDto;
+import com.example.funding.dto.response.creator.CreatorDashboardDto;
+import com.example.funding.dto.response.creator.CreatorDashboardRankDto;
+import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
+import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Project;
+import com.example.funding.model.Qna;
+import com.example.funding.model.Subcategory;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.RewardService;
 import com.example.funding.service.validator.ProjectInputValidator;
@@ -65,6 +77,10 @@ public class CreatorServiceImpl implements CreatorService {
     public ResponseEntity<ResponseDto<CreatorPDetailDto>> getCreatorDashBoard(Long creatorId) {
         return null;
     }
+    private final ProjectValidator projectValidator;
+    private final SettlementMapper settlementMapper;
+    private final BackingMapper backingMapper;
+    private final ShippingMapper shippingMapper;
 
     /**
      * <p>프로젝트 목록 조회</p>
@@ -339,4 +355,166 @@ public class CreatorServiceImpl implements CreatorService {
 
         return List.copyOf(out);
     }
+
+    //창작자 QnA 목록 조회
+    //251008
+    @Override
+    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfCreator(Long creatorId, Pager pager) {
+        int total = creatorMapper.qnaTotalOfCreator(creatorId);
+
+        List<CreatorQnaDto> qnaList = creatorMapper.getQnaListOfCreator(creatorId, pager);
+
+        PageResult<CreatorQnaDto> result = PageResult.of(qnaList, pager, total);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "Q&A 목록 조회 성공", result));
+    }
+
+    /**
+     * <p>프로젝트 목록 조회</p>
+     *
+     * @param creatorId 창작자 ID
+     * 대시보드
+     * @return 성공 시 200 OK
+     * @author 이윤기
+     * @since 2025-10-08
+     */
+    @Override
+    public ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(Long creatorId) {
+        long projectTotal = projectMapper.getProjectCnt(creatorId);
+        long totalAmount = settlementMapper.getTotalAmountCreatorId(creatorId);
+        long totalBackingCnt = backingMapper.getBackerCnt(creatorId);
+        long totalVerifyingCnt = projectMapper.getVerifyingCnt(creatorId);
+
+        CreatorDashboardDto dashboardPie = creatorMapper.creatorDashboardDto(creatorId);
+        double totalProjectCnt = dashboardPie.getTotalProjectCnt();
+        double failedProjectCnt = dashboardPie.getProjectFailedCnt();
+
+        //달성률 계산 (실패)
+        double failedProject = (failedProjectCnt / totalProjectCnt) * 100;
+        failedProject = Math.round(failedProject* 100.0) / 100.0;
+
+        //달성률 계산(성공)
+        double successProject = 100.0 - failedProject;
+
+        List<CreatorDashboardRankDto>  DashboardRank= creatorMapper.getProjectRankDate(creatorId);
+
+        //내 프로젝트 후원자 랭킹
+        List<CreatorDashboardRankDto> top3Backer = DashboardRank.stream()
+                .sorted(Comparator.comparingLong(CreatorDashboardRankDto::getBackerCnt)
+                        .reversed()).limit(3).toList();
+
+        //내 프로젝트 좋아요 랭킹
+        List<CreatorDashboardRankDto> top3Like = DashboardRank.stream()
+                .sorted(Comparator.comparingLong(CreatorDashboardRankDto::getLikeCnt)
+                        .reversed()).limit(3).toList();
+
+        //내 프로젝트 조회수 랭킹
+        List<CreatorDashboardRankDto> top3View = DashboardRank.stream()
+                .sorted(Comparator.comparingLong(CreatorDashboardRankDto::getViewCnt)
+                        .reversed()).limit(3).toList();
+
+        //TODO : 추가 대시보드(2개) 리스트 구현을위해서는 컬럼을 추가할 필요가있음 상의 후 구현
+
+        CreatorDashboardDto result = CreatorDashboardDto.builder()
+                .creatorId(creatorId)
+                .projectTotal(projectTotal)
+                .totalAmount(totalAmount)
+                .totalBackingCnt(totalBackingCnt)
+                .totalVerifyingCnt(totalVerifyingCnt)
+                .totalProjectCnt(totalProjectCnt)
+                .projectFailedCnt(failedProjectCnt)
+                .projectFailedPercentage(failedProject)
+                .projectSuccessPercentage(successProject)
+                .top3BackerCnt(top3Backer)
+                .top3LikeCnt(top3Like)
+                .top3ViewCnt(top3View)
+                .build();
+
+        return ResponseEntity.ok(ResponseDto.success(200, "대시보드 불러오기 성공", result));
+    }
+
+    /**
+     * <p>창작자의 후원 리스트</p>
+     *
+     * @param creatorId 창작자 ID
+     * @return 성공 시 200 OK
+     * @author 이윤기
+     * @since 2025-10-09
+     */
+    // 컨트롤러 하나에서 구현
+    @Override
+    public ResponseEntity<ResponseDto<List<BackingCreatorProjectListDto>>> getCreatorProjectList(Long creatorId) {
+        //창작자의 모든 프로젝트 리스트
+        List<BackingCreatorProjectListDto> backingCProjectList = projectMapper.getBackingCreatorProjectList(creatorId);
+
+        //창작자의 모든 후원자 리스트
+        List<BackingCreatorBackerList> backingCBackerList = backingMapper.getCBackerList(creatorId);
+
+        //프로젝트별로 후원자 + 달성률
+        List<BackingCreatorProjectListDto> result = backingCProjectList.stream().map(project -> {
+
+            // 프로젝트별 달성률 계산
+            double completionRate = 0;
+            if (project.getGoalAmount() != null && project.getGoalAmount() > 0) {
+                completionRate = ((double) project.getCurrAmount() / project.getGoalAmount()) * 100;
+                completionRate = Math.round(completionRate * 100.0) / 100.0;
+            }
+
+            // 프로젝트별 후원자 리스트
+            List<BackingCreatorBackerList> projectBackers = backingCBackerList.stream()
+                    .filter(backer -> backer.getProjectId().equals(project.getProjectId()))
+                    .toList();
+
+            return BackingCreatorProjectListDto.builder()
+                    .projectId(project.getProjectId())
+                    .creatorId(project.getCreatorId())
+                    .title(project.getTitle())
+                    .goalAmount(project.getGoalAmount())
+                    .currAmount(project.getCurrAmount())
+                    .thumbnail(project.getThumbnail())
+                    .backerCnt(project.getBackerCnt())
+                    .backerList(projectBackers)
+                    .completionRate(completionRate)
+                    .build();
+        }).toList();
+
+        return ResponseEntity.ok(ResponseDto.success(200, "창작자의 프로젝트 후원 리스트 조회 성공", result));
+    }
+
+    /**
+     * <p>창작자의 배송 (프로젝트)리스트</p>
+     *
+     * @param creatorId 창작자 ID
+     * @return 성공 시 200 OK
+     * @author 이윤기
+     * @since 2025-10-10
+     */
+
+    // 컨트롤러 나눠서 구현 -1
+
+    @Override
+    public ResponseEntity<ResponseDto<List<CreatorShippingProjectList>>> getCreatorShippingList(Long creatorId) {
+        List<CreatorShippingProjectList> shippingProjectLists = projectMapper.getCShippingList(creatorId);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "창작자의 배송(프로젝트) 리스트 조회 성공", shippingProjectLists));
+    }
+
+    /**
+     * <p>창작자의 배송 (후원자)리스트</p>
+     *
+     * @param creatorId 창작자 ID
+     * @return 성공 시 200 OK
+     * @author 이윤기
+     * @since 2025-10-10
+     */
+    // 컨트롤러 나눠서 구현 - 2
+    @Override
+    public ResponseEntity<ResponseDto<List<CreatorShippingBackerList>>> getShippingBackerList(Long creatorId, Long projectId) {
+
+        List<CreatorShippingBackerList> shippingBackerLists = shippingMapper.creatorShippingBackerList(creatorId, projectId);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "창작자의 배송(후원자) 리스트 조회 성공", shippingBackerLists));
+    }
+
+
 }

@@ -6,8 +6,13 @@ import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
 import com.example.funding.dto.response.creator.CreatorProfileSummaryDto;
 import com.example.funding.dto.response.creator.CreatorProjectDetailDto;
 import com.example.funding.dto.response.creator.CreatorProjectListDto;
+import com.example.funding.dto.response.creator.CreatorQnaDto;
+import com.example.funding.dto.response.creator.CreatorDashboardDto;
+import com.example.funding.dto.response.creator.CreatorDashboardRankDto;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
+import com.example.funding.model.Qna;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -40,4 +45,12 @@ public interface CreatorMapper {
     boolean hasRequiredCreatorProfile(@Param("creatorId") Long creatorId);
 
     CreatorProfileSummaryDto getCreatorProfileSummary(@Param("creatorId") Long creatorId);
+
+    int qnaTotalOfCreator(Long creatorId);
+
+    List<CreatorQnaDto> getQnaListOfCreator(Long creatorId, @Param("pager") Pager pager);
+
+    List<CreatorDashboardRankDto> getProjectRankDate(Long creatorId);
+
+    CreatorDashboardDto creatorDashboardDto(Long creatorId);
 }

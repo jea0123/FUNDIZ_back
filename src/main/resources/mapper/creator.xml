@@ -83,24 +83,68 @@
             SELECT T.*, ROWNUM rnum
             FROM (
                 SELECT
-                    p.PROJECTID AS projectId,
-                    p.TITLE AS title,
-                    p.PROJECTSTATUS AS projectStatus,
-                    p.STARTDATE AS startDate,
-                    p.ENDDATE AS endDate,
-                    p.GOALAMOUNT AS goalAmount,
-                    p.CURRAMOUNT AS currAmount,
-                    p.BACKERCNT AS backerCnt,
-                    cg.CTGRNAME AS ctgrName,
-                    sc.SUBCTGRNAME AS subctgrName,
-                    CASE
-                        WHEN p.PROJECTSTATUS = 'VERIFYING'
+                    p.PROJECTID,
+                    p.TITLE,
+                    p.PROJECTSTATUS,
+                    p.STARTDATE,
+                    p.ENDDATE,
+                    p.GOALAMOUNT,
+                    p.CURRAMOUNT,
+                    p.BACKERCNT,
+                    cg.CTGRNAME,
+                    sc.SUBCTGRNAME,
+
+                    <!-- 심사요청일(VERIFYING) -->
+                    CASE WHEN p.PROJECTSTATUS = 'VERIFYING'
                         THEN p.REQUESTEDAT
                         ELSE NULL
-                    END AS requestedAt
+                    END AS requestedAt,
+
+                    <!-- 새소식 집계: 개수/최근 작성일 -->
+                    NVL(n.newsCount, 0) AS newsCount,
+                    n.lastNewsAt,
+
+                    <!-- 후기 집계: 총 후기 수, 미답글 수, 최근 작성일 -->
+                    NVL(rv.reviewNewCount, 0) AS reviewNewCount,
+                    NVL(rv.reviewPendingCount, 0) AS reviewPendingCount,
+                    rv.lastReviewAt
+
                 FROM PROJECT p
                 JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
                 JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
+
+                <!-- 새소식 집계 -->
+                LEFT JOIN (
+                    SELECT
+                        PROJECTID,
+                        COUNT(*) AS newsCount,
+                        MAX(TRUNC(CREATEDAT)) AS lastNewsAt
+                    FROM NEWS
+                    GROUP BY PROJECTID
+                ) n ON n.PROJECTID = p.PROJECTID
+
+                <!-- 후기 집계: COMMUNITY(code='RV') + REPLY(code='RV') -->
+                LEFT JOIN (
+                    SELECT
+                        r.PROJECTID,
+                        COUNT(*) AS reviewNewCount,
+
+                        <!-- reply가 전혀 없는 후기만 1로 집계 -->
+                        SUM(CASE WHEN rp.CMID IS NULL THEN 1 ELSE 0 END) AS reviewPendingCount,
+
+                        MAX(TRUNC(r.CREATEDAT)) AS lastReviewAt
+                    FROM COMMUNITY r
+
+                    <!-- 후기 글만 -->
+                    LEFT JOIN (
+                        SELECT CMID
+                        FROM REPLY
+                        WHERE CODE = 'RV'
+                        GROUP BY CMID
+                    ) rp ON rp.CMID = r.CMID
+                    WHERE r.CODE = 'RV'
+                    GROUP BY r.PROJECTID
+                ) rv ON rv.PROJECTID = p.PROJECTID
                 <include refid="projectListWhere" />
                 ORDER BY p.PROJECTID DESC
             ) T

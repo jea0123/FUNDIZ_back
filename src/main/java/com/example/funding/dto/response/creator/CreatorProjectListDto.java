@@ -24,4 +24,11 @@ public class CreatorProjectListDto {
 
     //VERIFYING
     private LocalDate requestedAt;
+
+    //프론트
+    private Integer newsCount;
+    private LocalDate lastNewsAt;
+    private Integer reviewNewCount; // 새 후기 수
+    private Integer reviewPendingCount; // 미답글 수
+    private LocalDate lastReviewAt;
 }

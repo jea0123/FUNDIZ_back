@@ -9,4 +9,17 @@
         ORDER BY CREATEDAT DESC
     </select>
 
+    <insert id="createNews">
+        <selectKey keyProperty="newsId" resultType="Long" order="BEFORE">
+            SELECT NEWS_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO NEWS (
+            NEWSID, PROJECTID, CONTENT, CREATEDAT
+        )
+        VALUES (
+            #{newsId}, #{projectId}, #{content}, SYSDATE
+        )
+    </insert>
+
 </mapper>

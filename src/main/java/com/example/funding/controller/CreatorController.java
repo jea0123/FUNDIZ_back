@@ -9,6 +9,12 @@ import com.example.funding.dto.request.reward.RewardCreateRequestDto;
 import com.example.funding.dto.response.creator.*;
 import com.example.funding.model.Reward;
 import com.example.funding.model.Qna;
+import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
+import com.example.funding.dto.response.creator.CreatorDashboardDto;
+import com.example.funding.dto.response.creator.CreatorProjectDetailDto;
+import com.example.funding.dto.response.creator.CreatorProjectListDto;
+import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
+import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.RewardService;
 import lombok.RequiredArgsConstructor;
@@ -30,45 +36,6 @@ public class CreatorController {
     private final RewardService rewardService;
 
     /**
-     * <p>창작자의 프로젝트 목록 조회</p>
-     * @param creatorId
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-     * @since 202510-02
-     * @author by: 이윤기
-     */
-//   @GetMapping("/{creatorId}/dashBoard") // DEV 프로필 추가: creatorId 프런트에서 헤더 주입
-   @GetMapping("/dashBoard")
-   public ResponseEntity<ResponseDto<CreatorPDetailDto>> getCreatorDashBoard(@PathVariable Long creatorId){
-       return creatorService.getCreatorDashBoard(creatorId);
-   }
-
-//    /**
-//     * <p>창작자의 프로젝트 목록 조회</p>
-//     * @param creatorId
-//     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-//     * @since 202510-02
-//     * @author by: 이윤기
-//     */
-//
-//    @GetMapping("/{creatorId}/list")
-//    public ResponseEntity<ResponseDto<List<CreatorPListDto>>>getCreatorPList(@PathVariable Long creatorId){
-//        return creatorService.getCreatorPList(creatorId);
-//    }
-//
-//    /**
-//     * <p>창작자의 프로젝트 상세</p>
-//     * @param creatorId
-//     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-//     * @since 2025-10-02
-//     * @author by: 이윤기
-//     */
-//
-//    @GetMapping("/{creatorId}/detail/{projectId}")
-//    public ResponseEntity<ResponseDto<CreatorPDetailDto>>getCreatorDList(@PathVariable Long creatorId, @PathVariable Long projectId){
-//        return creatorService.getCreatorDList(creatorId, projectId);
-//    }
-
-    /**
      * <p>프로젝트 목록 조회</p>
      *
      * @param creatorId 창작자 ID
@@ -82,10 +49,10 @@ public class CreatorController {
     public ResponseEntity<ResponseDto<PageResult<CreatorProjectListDto>>> getProjectList(@RequestAttribute Long creatorId,
                                                                                          SearchCreatorProjectDto dto,
                                                                                          Pager reqPager) {
-       Pager pager = Pager.ofRequest(
-            reqPager != null ? reqPager.getPage() : 1,
-            reqPager != null ? reqPager.getSize() : 5,
-            reqPager != null ? reqPager.getPerGroup() : null
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 5,
+                reqPager != null ? reqPager.getPerGroup() : null
         );
 
         return creatorService.getProjectList(creatorId, dto, pager);
@@ -188,7 +155,7 @@ public class CreatorController {
      */
     @GetMapping("/projects/{projectId}/summary")
     public ResponseEntity<ResponseDto<CreatorProjectSummaryDto>> getProjectSummary(@PathVariable Long projectId,
-                                                                            @RequestAttribute Long creatorId) {
+                                                                                   @RequestAttribute Long creatorId) {
         return creatorService.getProjectSummary(projectId, creatorId);
     }
 
@@ -225,7 +192,7 @@ public class CreatorController {
 
         return rewardService.addReward(projectId, creatorId, dto);
     }
-  
+
     //창작자 QnA 목록 조회
     //251008
     @GetMapping("/qna")
@@ -238,4 +205,35 @@ public class CreatorController {
 
         return creatorService.getQnaListOfCreator(creatorId, pager);
     }
+
+    /**
+     * <p>창작자의 대시보드</p>
+     * @param creatorId
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @since 2025-10-02
+     * @author by: 이윤기
+     */
+
+    @GetMapping("/dashBoard")
+    public ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(@RequestAttribute Long creatorId){
+        return creatorService.getCreatorDashBoard(creatorId);
+    }
+
+    @GetMapping("/backingList")
+    public ResponseEntity<ResponseDto<List<BackingCreatorProjectListDto>>> getBackingList(@RequestAttribute Long creatorId){
+        return creatorService.getCreatorProjectList(creatorId);
+    }
+
+    @GetMapping("/shippingList")
+    public ResponseEntity<ResponseDto<List<CreatorShippingProjectList>>> getShippingList(@RequestAttribute Long creatorId){
+        return creatorService.getCreatorShippingList(creatorId);
+    }
+
+    @GetMapping("/shippingBackerList/{projectId}")
+    public ResponseEntity<ResponseDto<List<CreatorShippingBackerList>>> getShippingBackerList(@RequestAttribute Long creatorId, @PathVariable Long projectId){
+        return creatorService.getShippingBackerList(creatorId, projectId);
+    }
+
+
+
 }

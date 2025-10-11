@@ -2,7 +2,9 @@ package com.example.funding.mapper;
 
 import com.example.funding.dto.request.backing.BackingRequestDto;
 import com.example.funding.dto.request.backing.BackingRequestUpdateDto;
+import com.example.funding.dto.response.backing.BackingCreatorBackerList;
 import com.example.funding.dto.response.backing.BackingResponseDto;
+import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.user.BackingDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -24,4 +26,9 @@ public interface BackingMapper {
     int updateBacking(BackingRequestUpdateDto updateDto);
 
     int deleteBacking(@Param("backingId") Long backingId, @Param("userId") Long userId);
+
+    long getBackerCnt(Long creatorId);
+
+    List<BackingCreatorBackerList> getCBackerList(Long creatorId);
+
 }

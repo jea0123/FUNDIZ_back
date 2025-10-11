@@ -255,5 +255,31 @@
         WHERE BACKINGID =#{backingId}
         AND USERID =#{userId}
     </delete>
+
+    <select id = "getBackerCnt" parameterType="long" resultType="long">
+        SELECT
+            sum(backerCnt)
+        FROM
+            project
+        WHERE
+            CREATORID = #{creatorId}
+    </select>
+    <!-- 후원날짜가 다를 경우도있기때문에 중복으로 나올 수도 있음 -->
+    <select id = "getCBackerList" parameterType = "long" resultType="com.example.funding.dto.response.backing.BackingCreatorBackerList">
+        SELECT
+            u.userId,
+            u.nickname,
+
+            b.amount,
+            b.createdAt,
+            p.projectId
+        FROM
+            users u
+        JOIN backing b ON u.userId = b.userId
+        JOIN creator c ON c.userId = u.userId
+        JOIN project p ON p.creatorId = c.creatorId
+        WHERE c.CREATORID = #{creatorId}
+        <!--AND p.PROJECTID = #{projectId}-->
+    </select>
 </mapper>
 

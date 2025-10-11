@@ -19,5 +19,5 @@ public interface CommunityService {
 
     ResponseEntity<ResponseDto<PageResult<Qna>>> getQnaListOfPJ(Long projectId, Pager pager);
 
-    ResponseEntity<ResponseDto<String>> addQuestion(Long userId, QnaAddRequestDto qnaDto);
+    ResponseEntity<ResponseDto<String>> addQuestion(Long projectId, Long userId, QnaAddRequestDto qnaDto);
 }

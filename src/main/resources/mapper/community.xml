@@ -86,7 +86,7 @@
         </selectKey>
 
         INSERT INTO QNA (QNAID, PROJECTID, USERID, CREATORID, TITLE, CONTENT, CREATEDAT)
-        SELECT QNA_SEQ.NEXTVAL, #{projectId}, #{userId}, P.CREATORID AS creatorId, 'Y', 'CON', SYSDATE
+        SELECT QNA_SEQ.NEXTVAL, #{projectId}, #{userId}, P.CREATORID AS creatorId, 'Y', #{content}, SYSDATE
         FROM QNA Q, PROJECT P
         WHERE EXISTS (
         SELECT 1

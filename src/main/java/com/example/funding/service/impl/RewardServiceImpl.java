@@ -6,7 +6,8 @@ import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.RewardMapper;
 import com.example.funding.model.Reward;
 import com.example.funding.service.RewardService;
-import com.example.funding.service.validator.ProjectValidator;
+import com.example.funding.service.validator.ProjectInputValidator;
+import com.example.funding.service.validator.ProjectTransitionGuard;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,8 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Service
@@ -26,7 +27,8 @@ public class RewardServiceImpl implements RewardService {
 
     private final RewardMapper rewardMapper;
     private final ProjectMapper projectMapper;
-    private final ProjectValidator projectValidator;
+    private final ProjectInputValidator inputValidator;
+    private final ProjectTransitionGuard transitionGuard;
 
     /**
      * <p>리워드 생성</p>
@@ -37,7 +39,18 @@ public class RewardServiceImpl implements RewardService {
      * @since 2025-09-09
      */
     @Override
-    public void createReward(Long projectId, List<RewardCreateRequestDto> rewardList) {
+    public void createReward(Long projectId, List<RewardCreateRequestDto> rewardList, LocalDate endDate, boolean validated) {
+        // Guard
+        transitionGuard.requireDraft(projectId);
+
+        // Validator
+        if (!validated) {
+            List<String> errors = inputValidator.validateRewards(rewardList, endDate);
+            if (!errors.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.join("; ", errors));
+            }
+        }
+
         for (RewardCreateRequestDto dto : rewardList) {
             Reward reward = Reward.builder()
                 .projectId(projectId)
@@ -50,8 +63,8 @@ public class RewardServiceImpl implements RewardService {
                 .build();
 
             int result = rewardMapper.saveReward(reward);
-            if (result == 0) {
-                throw new IllegalStateException("리워드 생성 실패");
+            if (result != 1) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "리워드 생성 실패");
             }
         }
     }
@@ -66,21 +79,17 @@ public class RewardServiceImpl implements RewardService {
      * @since 2025-10-07
      */
     @Override
-    public void replaceRewards(Long projectId, List<RewardCreateRequestDto> rewardList) {
-        //프로젝트 상태 조회
-        String status = projectMapper.getStatus(projectId);
-        if (!"DRAFT".equalsIgnoreCase(status)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "DRAFT 상태에서만 리워드를 교체할 수 있습니다.");
-        }
+    public void replaceRewards(Long projectId, List<RewardCreateRequestDto> rewardList, LocalDate endDate) {
+        // Guard
+        transitionGuard.requireDraft(projectId);
 
-        List<String> errors = projectValidator.validateRewardsDtos(rewardList);
+        // Validator
+        List<String> errors = inputValidator.validateRewards(rewardList, endDate);
         if (!errors.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.join("; ", errors));
         }
 
         rewardMapper.deleteRewards(projectId);
-
-        if (rewardList == null || rewardList.isEmpty()) return;
 
         for (RewardCreateRequestDto dto : rewardList) {
             Reward reward = Reward.builder()
@@ -94,7 +103,7 @@ public class RewardServiceImpl implements RewardService {
                 .build();
 
             int saved = rewardMapper.saveReward(reward);
-            if (saved == 0) {
+            if (saved != 1) {
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "리워드 저장 실패");
             }
         }
@@ -111,15 +120,12 @@ public class RewardServiceImpl implements RewardService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> deleteReward(Long projectId, Long rewardId) {
-        //프로젝트 상태 조회
-        String status = projectMapper.getStatus(projectId);
-        if (!"DRAFT".equalsIgnoreCase(status)) {
-            throw new IllegalStateException("현재 상태에서는 리워드를 삭제할 수 없습니다.");
-        }
+        // Guard
+        transitionGuard.requireDraft(projectId);
 
         int result = rewardMapper.deleteReward(projectId, rewardId);
-        if (result == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "존재하지 않는 리워드입니다."));
+        if (result != 1) {
+            throw new  ResponseStatusException(HttpStatus.NOT_FOUND, "리워드를 찾을 수 없습니다.");
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "리워드 삭제 성공", null));
@@ -137,6 +143,9 @@ public class RewardServiceImpl implements RewardService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<Reward>>> getCreatorRewardList(Long projectId, Long creatorId) {
+        // Guard
+        transitionGuard.ensureProjectOwner(projectId, creatorId);
+
         List<Reward> rewardList = rewardMapper.getCreatorRewardList(projectId, creatorId);
 
         return ResponseEntity.ok(ResponseDto.success(200, "창작자 리워드 목록 조회 성공", rewardList));
@@ -154,17 +163,13 @@ public class RewardServiceImpl implements RewardService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> addReward(Long projectId, Long creatorId, RewardCreateRequestDto dto) {
-        if (!Objects.equals(projectId, dto.getProjectId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "프로젝트 ID가 일치하지 않습니다.");
-        }
+        // Guard
+        transitionGuard.ensureProjectOwner(projectId, creatorId);
+        transitionGuard.requireStatusIn(projectId, "UPCOMING", "OPEN");
 
-        //프로젝트 상태 조회
-        String status = projectMapper.getStatus(projectId);
-        if (!("UPCOMING".equalsIgnoreCase(status) || "OPEN".equalsIgnoreCase(status))) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "해당 상태에서는 리워드를 추가할 수 없습니다.");
-        }
-
-        List<String> errors = projectValidator.validateRewardDto(dto);
+        // Validator
+        LocalDate endDate = projectMapper.getProjectEndDate(projectId);
+        List<String> errors = inputValidator.validateRewardFields(dto, endDate);
         if (!errors.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.join("; ", errors));
         }
@@ -180,8 +185,8 @@ public class RewardServiceImpl implements RewardService {
             .build();
 
         int result = rewardMapper.saveReward(reward);
-        if (result == 0) {
-            throw new IllegalStateException("리워드 추가 실패");
+        if (result != 1) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "리워드 추가 실패");
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "리워드 추가 성공", null));

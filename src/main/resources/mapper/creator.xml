@@ -80,31 +80,31 @@
     <select id="getProjectList" resultType="creatorProjectListDto">
         SELECT *
         FROM (
-        SELECT T.*, ROWNUM rnum
-        FROM (
-        SELECT
-        p.PROJECTID AS projectId,
-        p.TITLE AS title,
-        p.PROJECTSTATUS AS projectStatus,
-        p.STARTDATE AS startDate,
-        p.ENDDATE AS endDate,
-        p.GOALAMOUNT AS goalAmount,
-        p.CURRAMOUNT AS currAmount,
-        p.BACKERCNT AS backerCnt,
-        cg.CTGRNAME AS ctgrName,
-        sc.SUBCTGRNAME AS subctgrName,
-        CASE
-        WHEN p.PROJECTSTATUS = 'VERIFYING'
-        THEN p.REQUESTEDAT
-        ELSE NULL
-        END AS requestedAt
-        FROM PROJECT p
-        JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
-        JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
-        <include refid="projectListWhere" />
-        ORDER BY p.PROJECTID DESC
-        ) T
-        WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
+            SELECT T.*, ROWNUM rnum
+            FROM (
+                SELECT
+                    p.PROJECTID AS projectId,
+                    p.TITLE AS title,
+                    p.PROJECTSTATUS AS projectStatus,
+                    p.STARTDATE AS startDate,
+                    p.ENDDATE AS endDate,
+                    p.GOALAMOUNT AS goalAmount,
+                    p.CURRAMOUNT AS currAmount,
+                    p.BACKERCNT AS backerCnt,
+                    cg.CTGRNAME AS ctgrName,
+                    sc.SUBCTGRNAME AS subctgrName,
+                    CASE
+                        WHEN p.PROJECTSTATUS = 'VERIFYING'
+                        THEN p.REQUESTEDAT
+                        ELSE NULL
+                    END AS requestedAt
+                FROM PROJECT p
+                JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
+                JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
+                <include refid="projectListWhere" />
+                ORDER BY p.PROJECTID DESC
+            ) T
+            WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
         )
         WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
@@ -125,11 +125,11 @@
         </selectKey>
 
         INSERT INTO PROJECT (
-        PROJECTID, CREATORID, SUBCTGRID, TITLE, GOALAMOUNT,
-        STARTDATE, ENDDATE, CONTENT, THUMBNAIL, ISPOSTING
+            PROJECTID, CREATORID, SUBCTGRID, TITLE, GOALAMOUNT,
+            STARTDATE, ENDDATE, CONTENT, THUMBNAIL, ISPOSTING
         ) VALUES (
-        #{projectId}, #{creatorId}, #{subctgrId}, #{title}, #{goalAmount},
-        #{startDate}, #{endDate}, #{content}, #{thumbnail}, #{isPosting}
+            #{projectId}, #{creatorId}, #{subctgrId}, #{title}, #{goalAmount},
+            #{startDate}, #{endDate}, #{content}, #{thumbnail}, #{isPosting}
         )
     </insert>
 
@@ -158,12 +158,44 @@
     <update id="markVerifyProject">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'VERIFYING',
-        ISVERIFIED = 'Y',
-        REQUESTEDAT = SYSDATE
+            ISVERIFIED = 'Y',
+            REQUESTEDAT = SYSDATE
         WHERE PROJECTID = #{projectId}
         AND PROJECTSTATUS = 'DRAFT'
         AND ISVERIFIED = 'N'
     </update>
+
+    <select id="existsCreator" resultType="Integer">
+        SELECT 1
+        FROM CREATOR
+        WHERE CREATORID = #{creatorId}
+        AND ROWNUM = 1
+    </select>
+
+    <select id="hasRequiredCreatorProfile" resultType="boolean">
+        <![CDATA[
+            SELECT CASE
+                WHEN NVL(TRIM(CREATORNAME), '') <> ''
+                 AND NVL(TRIM(BUSINESSNUM), '') <> ''
+                 AND NVL(TRIM(EMAIL), '') <> ''
+                 AND NVL(TRIM(PHONE), '') <> ''
+                THEN 1 ELSE 0
+                END
+            FROM CREATOR
+            WHERE CREATORID = #{creatorId}
+        ]]>
+    </select>
+
+    <select id="getCreatorProfileSummary" resultType="creatorProfileSummaryDto">
+        SELECT
+            CREATORID,
+            CREATORNAME,
+            BUSINESSNUM,
+            EMAIL,
+            PHONE
+        FROM CREATOR
+        WHERE CREATORID = #{creatorId}
+    </select>
 
     <select id="getQnaListOfCreator" resultType="CreatorQnaDto">
         SELECT * FROM

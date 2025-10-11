@@ -14,5 +14,14 @@
         SELECT * FROM SUBCATEGORY
         WHERE SUBCTGRID = #{subctgrId}
     </select>
+
+    <select id="getSubcategoryWithParent" resultType="subcategoryWithParentDto">
+        SELECT
+            SUBCTGRID,
+            CTGRID
+        FROM SUBCATEGORY sc
+        LEFT JOIN CATEGORY c ON c.CTGRID = sc.CTGRID
+        WHERE sc.SUBCTGRID = #{subctgrId}
+    </select>
     
 </mapper>

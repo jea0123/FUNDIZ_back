@@ -193,6 +193,25 @@ public class CreatorController {
         return rewardService.addReward(projectId, creatorId, dto);
     }
 
+    /**
+     * <p>창작자 프로필 조회</p>
+     *
+     * <li>창작자명</li>
+     * <li>사업자번호</li>
+     * <li>이메일</li>
+     * <li>전화번호</li>
+     * <li>정지 여부</li>
+     *
+     * @param creatorId 창작자 ID
+     * @return 성공 시 200 Ok
+     * @author 조은애
+     * @since 2025-10-11
+     */
+    @GetMapping("/info")
+    public ResponseEntity<ResponseDto<CreatorProfileSummaryDto>> getCreatorProfileSummary(@RequestAttribute Long creatorId) {
+        return creatorService.getCreatorProfileSummary(creatorId);
+    }
+
     //창작자 QnA 목록 조회
     //251008
     @GetMapping("/qna")

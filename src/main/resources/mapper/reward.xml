@@ -111,4 +111,18 @@
         ORDER BY r.CREATEDAT
     </select>
 
+    <select id="existsByProjectIdAndNameNormalized" resultType="boolean">
+        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+        FROM REWARD
+        WHERE PROJECTID = #{projectId}
+        AND LOWER(REGEXP_REPLACE(TRIM(REWARDNAME), '\s+', ' ')) = #{normalizedName}
+        AND NVL(DEL_YN,'N') = 'N'
+    </select>
+
+    <select id="getProjectIdByRewardId" resultType="long">
+        SELECT PROJECTID
+        FROM REWARD
+        WHERE REWARDID = #{rewardId}
+    </select>
+
 </mapper>

@@ -48,4 +48,6 @@ public interface ProjectMapper {
     int updateProjectsToFailed();
 
     List<CreatorPListDto> getCreatorPList(@Param("creatorId") Long creatorId);
+
+    LocalDate getProjectEndDate(@Param("projectId") Long projectId);
 }

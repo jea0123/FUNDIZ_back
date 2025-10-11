@@ -34,4 +34,6 @@ public interface UserMapper {
     int updateProfile(@Param("userId") Long userId, @Param("profileImg") String profile);
 
     Long getCreatorIdByUserId(Long userId);
+
+    Boolean suspendedCreator(@Param("creatorId") Long creatorId);
 }

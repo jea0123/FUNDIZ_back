@@ -17,6 +17,7 @@ import com.example.funding.mapper.RewardMapper;
 import com.example.funding.mapper.TagMapper;
 import com.example.funding.model.*;
 import com.example.funding.service.AdminService;
+import com.example.funding.service.validator.ProjectTransitionGuard;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,8 @@ public class AdminServiceImpl implements AdminService {
     private final ProjectMapper projectMapper;
     private final TagMapper tagMapper;
     private final RewardMapper rewardMapper;
+
+    private final ProjectTransitionGuard transitionGuard;
 
     /**
      * 관리자 대시보드 분석 데이터 조회
@@ -274,9 +277,12 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> approveProject(Long projectId) {
+        // Guard
+        transitionGuard.assertCanApprove(projectId);
+
         int result = adminMapper.approveProject(projectId);
-        if (result == 0) {
-            throw new IllegalStateException("승인 처리가 실패되었습니다.");
+        if (result != 1) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 처리되었거나 현재 상태에서 승인할 수 없습니다.");
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트가 성공적으로 승인되었습니다.", null));
@@ -293,9 +299,12 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> rejectProject(Long projectId, String rejectedReason) {
+        // Guard
+        transitionGuard.requireVerifying(projectId);
+
         int result = adminMapper.rejectProject(projectId, rejectedReason);
-        if (result == 0) {
-            throw new IllegalStateException("반려 처리가 실패되었습니다.");
+        if (result != 1) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 처리되었거나 현재 상태에서 반려할 수 없습니다.");
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트가 성공적으로 반려되었습니다.", null));

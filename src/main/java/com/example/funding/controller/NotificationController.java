@@ -69,8 +69,8 @@ public class NotificationController {
     }
 
     @ExceptionHandler({AsyncRequestNotUsableException.class, ClientAbortException.class, IOException.class})
-    public ResponseEntity<Void> handleClientDisconnect(Exception ex) {
-        log.debug("클라이언트 연결이 끊어짐: {}", ex.getMessage());
+    public ResponseEntity<Void> handleClientDisconnect(Exception ignored) {
+//        log.debug("클라이언트 연결이 끊어짐: {}", ex.getMessage());
         return ResponseEntity.noContent().build();
     }
 }

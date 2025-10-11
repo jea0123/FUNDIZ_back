@@ -15,7 +15,10 @@ import com.example.funding.mapper.AdminMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.RewardMapper;
 import com.example.funding.mapper.TagMapper;
-import com.example.funding.model.*;
+import com.example.funding.model.Project;
+import com.example.funding.model.Reward;
+import com.example.funding.model.Tag;
+import com.example.funding.model.User;
 import com.example.funding.service.AdminService;
 import com.example.funding.service.validator.ProjectTransitionGuard;
 import lombok.RequiredArgsConstructor;
@@ -79,14 +82,6 @@ public class AdminServiceImpl implements AdminService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "관리자 대시보드 분석 데이터 조회 성공", analytics));
     }
 
-    /**
-     * 카테고리별 성공률 조회
-     *
-     * @param ctgrId 카테고리 ID
-     * @return 카테고리별 성공률 데이터 리스트
-     * @author 장민규
-     * @since 2025-09-11
-     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(Long ctgrId) {
@@ -97,14 +92,6 @@ public class AdminServiceImpl implements AdminService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "카테고리별 성공률 조회 성공", categorySuccesses));
     }
 
-    /**
-     * KPI 조회
-     *
-     * @param months 조회 기간 (개월 단위)
-     * @return KPI 데이터
-     * @author 장민규
-     * @since 2025-09-11
-     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<Kpi>> getKpi(int months) {
@@ -115,17 +102,6 @@ public class AdminServiceImpl implements AdminService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "KPI 조회 성공", kpi));
     }
 
-    /**
-     * 상위 리워드 판매량/매출 조회
-     *
-     * @param from   조회 시작 날짜
-     * @param to     조회 종료 날짜
-     * @param limit  상위 N개 리워드 조회 제한
-     * @param metric 정렬 기준 (qty: 판매 수량, revenue: 매출)
-     * @return 상위 리워드 판매량/매출 데이터 리스트
-     * @author 장민규
-     * @since 2025-09-11
-     */
     @Override
     public ResponseEntity<ResponseDto<List<RewardSalesTop>>> getRewardSalesTops(LocalDate from, LocalDate to, int limit, String metric) {
         List<RewardSalesTop> rewardSalesTops = adminMapper.getRewardSalesTops(from, to, limit, metric);
@@ -138,7 +114,7 @@ public class AdminServiceImpl implements AdminService {
     /**
      * <p>프로젝트 목록 조회</p>
      *
-     * @param dto SearchProjectVerifyDto
+     * @param dto   SearchProjectVerifyDto
      * @param pager pager
      * @return 성공 시 200 OK
      * @author 조은애
@@ -221,7 +197,7 @@ public class AdminServiceImpl implements AdminService {
     /**
      * <p>프로젝트 심사 목록 조회</p>
      *
-     * @param dto SearchProjectVerifyDto
+     * @param dto   SearchProjectVerifyDto
      * @param pager pager
      * @return 성공 시 200 OK
      * @author 조은애
@@ -291,7 +267,7 @@ public class AdminServiceImpl implements AdminService {
     /**
      * <p>프로젝트 반려</p>
      *
-     * @param projectId 프로젝트 ID
+     * @param projectId      프로젝트 ID
      * @param rejectedReason 반려 사유
      * @return 성공 시 200 OK
      * @author 조은애

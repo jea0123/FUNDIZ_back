@@ -1,5 +1,6 @@
 package com.example.funding.controller;
 
+import com.example.funding.common.CustomUserPrincipal;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.user.UserNicknameDto;
 import com.example.funding.dto.request.user.UserPasswordDto;
@@ -10,6 +11,7 @@ import com.example.funding.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,61 +27,68 @@ public class UserController {
 
     /**
      * <p>로그인 사용자 정보 조회</p>
-     * @param userId 인증된 사용자의 ID
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     *
+     * @param principal 인증된 사용자의 정보
+     * @return 로그인 사용자 정보
      * @author by: 장민규
      */
     @GetMapping("/loginUser")
-    public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(
-//            @AuthenticationPrincipal CustomUserPrincipal principal
-    ) {
-        return userService.getLoginUser(501L);
+    public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(@AuthenticationPrincipal CustomUserPrincipal principal) {
+        Long userId = principal.userId();
+        userId = 501L; // TODO: 임시
+        return userService.getLoginUser(userId);
     }
 
     /**
      * <p>최근 본 프로젝트 목록 조회</p>
-     * @param userId 인증된 사용자의 ID
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-     * @since 2025-09-05
+     *
+     * @param principal 인증된 사용자의 정보
+     * @return 최근 본 프로젝트 목록
      * @author by: 장민규
+     * @since 2025-09-05
      */
-    @GetMapping("/recentViewProjects/{userId}")
-    public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(@PathVariable Long userId) {
+    @GetMapping("/recentViewProjects")
+    public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(@AuthenticationPrincipal CustomUserPrincipal principal) {
+        Long userId = principal.userId();
+        userId = 501L; // TODO: 임시
         return userService.getRecentViewProjects(userId);
     }
 
     /**
      * <p>마이페이지 구현</p>
+     *
      * @param userId 에 따른 MyPage 프로필 조회
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-     * @since 2025-09-02
      * @author by: 이윤기
+     * @since 2025-09-02
      */
-
     @GetMapping("/userPage/{userId}")
     public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageUser(@PathVariable Long userId) {
         return userService.getMyPageUser(userId);
     }
 
     @PostMapping("/userPage-nickname/{userId}")
-    public ResponseEntity<ResponseDto<String>> updateNickname (@PathVariable Long userId, @RequestBody UserNicknameDto nickname) {
+    public ResponseEntity<ResponseDto<String>> updateNickname(@PathVariable Long userId, @RequestBody UserNicknameDto nickname) {
         return userService.userNickname(userId);
     }
+
     @PostMapping("/userPage-profile/{userId}")
-    public ResponseEntity<ResponseDto<String>> updateProfileImg(@PathVariable Long userId, @RequestBody UserProfileImgDto profileImg){
+    public ResponseEntity<ResponseDto<String>> updateProfileImg(@PathVariable Long userId, @RequestBody UserProfileImgDto profileImg) {
         return userService.userProfileImg(userId);
     }
+
     @PostMapping("/userPage-pass/{userId}")
-    public ResponseEntity<ResponseDto<String>> updatePassword(@PathVariable Long userId, @RequestBody UserPasswordDto password){
+    public ResponseEntity<ResponseDto<String>> updatePassword(@PathVariable Long userId, @RequestBody UserPasswordDto password) {
         return userService.userpassword(userId);
     }
 
     /**
      * <p>마이페이지 구현</p>
+     *
      * @param userId 에 따른 MyPage 후원한 프로젝트 목록 조회
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-     * @since 2025-09-02
      * @author by: 이윤기
+     * @since 2025-09-02
      */
 
     @GetMapping("/likedList/{userId}")
@@ -93,7 +102,7 @@ public class UserController {
     }
 
     @GetMapping("/QnAListDetail/{userId}/project/{projectId}")
-    public ResponseEntity<ResponseDto<MyPageQnADetailDto>> getQnADetail(@PathVariable Long userId, @PathVariable Long projectId){
+    public ResponseEntity<ResponseDto<MyPageQnADetailDto>> getQnADetail(@PathVariable Long userId, @PathVariable Long projectId) {
         return userService.getQnADetail(userId, projectId);
     }
 

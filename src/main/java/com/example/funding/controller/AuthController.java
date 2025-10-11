@@ -9,7 +9,10 @@ import com.example.funding.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -21,11 +24,11 @@ public class AuthController {
 
     /**
      * <p>회원가입</p>
-     * <p>- 이미 존재하는 이메일인지 확인, 비밀번호 암호화, 회원 정보 저장</p>
-     * @param dto SignUpRequestDto
-     * @return : 성공 시 200 OK, 실패 시 409 CONFLICT
-     * @since 2025-08-26
+     *
+     * @param dto 가입 정보
+     * @return 이메일
      * @author by: 장민규
+     * @since 2025-08-26
      */
     @PostMapping("/signUp")
     public ResponseEntity<ResponseDto<String>> signUp(@RequestBody SignUpRequestDto dto) {
@@ -34,11 +37,11 @@ public class AuthController {
 
     /**
      * <p>로그인</p>
-     * <p>- 이메일과 비밀번호 확인, JWT 토큰 생성 및 반환</p>
-     * @param dto SignInRequestDto
-     * @return : 성공 시 200 OK, 실패 시 400 BAD REQUEST
-     * @since 2025-08-26
+     *
+     * @param dto 로그인 정보
+     * @return JWT 토큰
      * @author by: 장민규
+     * @since 2025-08-26
      */
     @PostMapping("/signIn")
     public ResponseEntity<ResponseDto<String>> signIn(@RequestBody SignInRequestDto dto) {
@@ -47,10 +50,11 @@ public class AuthController {
 
     /**
      * <p>이메일 중복 확인</p>
+     *
      * @param dto CheckEmailRequestDto
      * @return : 성공 시 200 OK, 실패 시 409 CONFLICT
-     * @since 2025-08-27
      * @author by: 장민규
+     * @since 2025-08-27
      */
     @PostMapping("/checkEmail")
     public ResponseEntity<ResponseDto<String>> checkEmail(@RequestBody CheckEmailRequestDto dto) {
@@ -59,10 +63,11 @@ public class AuthController {
 
     /**
      * <p>닉네임 중복 확인</p>
+     *
      * @param dto CheckNicknameRequestDto
      * @return : 성공 시 200 OK, 실패 시 409 CONFLICT
-     * @since 2025-08-27
      * @author by: 장민규
+     * @since 2025-08-27
      */
     @PostMapping("/checkNickname")
     public ResponseEntity<ResponseDto<String>> checkNickname(@RequestBody CheckNicknameRequestDto dto) {

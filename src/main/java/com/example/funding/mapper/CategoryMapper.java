@@ -1,5 +1,6 @@
 package com.example.funding.mapper;
 
+import com.example.funding.dto.response.category.SubcategoryWithParentDto;
 import com.example.funding.model.Category;
 import com.example.funding.model.Subcategory;
 import org.apache.ibatis.annotations.Mapper;
@@ -14,4 +15,6 @@ public interface CategoryMapper {
     List<Subcategory> getAllSubcategories();
 
     Subcategory findSubcategoryById(@Param("subctgrId") Long subctgrId);
+
+    SubcategoryWithParentDto getSubcategoryWithParent(@Param("subctgrId") Long subctgrId);
 }

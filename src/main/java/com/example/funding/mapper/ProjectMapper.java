@@ -49,6 +49,8 @@ public interface ProjectMapper {
 
     int updateProjectsToFailed();
 
+    LocalDate getProjectEndDate(@Param("projectId") Long projectId);
+
     long getVerifyingCnt(Long creatorId);
 
     List<BackingCreatorProjectListDto> getBackingCreatorProjectList(Long creatorId);

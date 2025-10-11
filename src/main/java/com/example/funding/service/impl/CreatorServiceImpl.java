@@ -6,6 +6,7 @@ import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
+import com.example.funding.dto.response.creator.*;
 import com.example.funding.dto.response.backing.BackingCreatorBackerList;
 import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
 import com.example.funding.dto.response.creator.CreatorProjectDetailDto;
@@ -22,7 +23,9 @@ import com.example.funding.model.Qna;
 import com.example.funding.model.Subcategory;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.RewardService;
-import com.example.funding.service.validator.ProjectValidator;
+import com.example.funding.service.validator.ProjectInputValidator;
+import com.example.funding.service.validator.ProjectTransitionGuard;
+import com.example.funding.service.validator.ValidationRules;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,7 +34,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.text.Normalizer;
 import java.util.*;
 
 @Slf4j
@@ -41,14 +43,16 @@ import java.util.*;
 public class CreatorServiceImpl implements CreatorService {
     private final CreatorMapper creatorMapper;
     private final ProjectMapper projectMapper;
-    private final CategoryMapper categoryMapper;
     private final TagMapper tagMapper;
     private final RewardService rewardService;
     private final RewardMapper rewardMapper;
-    private final ProjectValidator projectValidator;
+    private final UserMapper userMapper;
     private final SettlementMapper settlementMapper;
     private final BackingMapper backingMapper;
     private final ShippingMapper shippingMapper;
+
+    private final ProjectInputValidator inputValidator;
+    private final ProjectTransitionGuard transitionGuard;
 
     /**
      * <p>프로젝트 목록 조회</p>
@@ -91,11 +95,10 @@ public class CreatorServiceImpl implements CreatorService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CreatorProjectDetailDto>> getProjectDetail(Long projectId, Long creatorId) {
-        CreatorProjectDetailDto dto = creatorMapper.getProjectDetail(projectId, creatorId);
-        if (dto == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "프로젝트를 찾을 수 없습니다."));
-        }
+        // Guard: 소유자
+        transitionGuard.ensureProjectOwner(projectId, creatorId);
 
+        CreatorProjectDetailDto dto = creatorMapper.getProjectDetail(projectId, creatorId);
         dto.setTagList(tagMapper.getTagList(projectId));
         dto.setRewardList(rewardMapper.getRewardList(projectId));
 
@@ -113,36 +116,35 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> createProject(ProjectCreateRequestDto dto, Long creatorId) {
-        if (dto.getSubctgrId() == null) {
-            throw new IllegalArgumentException("유효하지 않은 서브카테고리 ID 입니다.");
-        }
-
-        Subcategory subcategory = categoryMapper.findSubcategoryById(dto.getSubctgrId());
-        if (subcategory == null) {
-            throw new IllegalArgumentException("존재하지 않는 서브카테고리 입니다.");
-        }
-
-        //TODO: 소유자 체크
         dto.setCreatorId(creatorId);
 
-        //프로젝트 생성
-        int result = creatorMapper.saveProject(dto);
-        if (result == 0) {
-            throw new IllegalStateException("프로젝트 생성 실패");
+        // Guard
+        transitionGuard.assertCanCreate(creatorId);
+
+        // Validator
+        List<String> errors = inputValidator.validateProjectCreate(dto);
+        if (!errors.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.join("; ", errors));
         }
 
-        //태그 저장
+        // 프로젝트 생성
+        int result = creatorMapper.saveProject(dto);
+        if (result == 0) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "프로젝트 생성 실패");
+        }
+
+        // 태그 저장
         List<String> normalized = normalizeTags(dto.getTagList());
         for (String tagName : normalized) {
             int saved = tagMapper.saveTag(dto.getProjectId(), tagName);
             if (saved == 0) {
-                throw new IllegalStateException("태그 저장 실패");
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "태그 저장 실패");
             }
         }
 
-        //리워드 생성
+        // 리워드 생성
         if (dto.getRewardList() != null && !dto.getRewardList().isEmpty()) {
-            rewardService.createReward(dto.getProjectId(), dto.getRewardList());
+            rewardService.createReward(dto.getProjectId(), dto.getRewardList(), dto.getEndDate(), true);
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 생성 성공", null));
@@ -163,39 +165,32 @@ public class CreatorServiceImpl implements CreatorService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "프로젝트 ID가 필요합니다.");
         }
 
-        Project existing = projectMapper.findById(dto.getProjectId());
-        if (existing == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다.");
-        }
+        // Guard
+        transitionGuard.assertCanUpdate(dto.getProjectId(), creatorId);
 
-        //TODO: 소유자 체크
-//        if (!Objects.equals(existing.getCreatorId(), creatorId)) {
-//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인 프로젝트만 수정할 수 있습니다.");
-//        }
-
-        //프로젝트 상태 조회
-        String status = projectMapper.getStatus(dto.getProjectId());
-        if (!"DRAFT".equalsIgnoreCase(status)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "DRAFT 상태에서만 프로젝트를 수정할 수 있습니다.");
+        // Validator
+        List<String> errors = inputValidator.validateProjectUpdate(dto);
+        if (!errors.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.join("; ", errors));
         }
 
         Project project = Project.builder()
-                .projectId(dto.getProjectId())
-                .subctgrId(dto.getSubctgrId())
-                .title(dto.getTitle())
-                .content(dto.getContent())
-                .thumbnail(dto.getThumbnail())
-                .goalAmount(dto.getGoalAmount())
-                .startDate(dto.getStartDate())
-                .endDate(dto.getEndDate())
-                .build();
+            .projectId(dto.getProjectId())
+            .subctgrId(dto.getSubctgrId())
+            .title(dto.getTitle())
+            .content(dto.getContent())
+            .thumbnail(dto.getThumbnail())
+            .goalAmount(dto.getGoalAmount())
+            .startDate(dto.getStartDate())
+            .endDate(dto.getEndDate())
+            .build();
 
         int result = creatorMapper.updateProject(creatorId, project);
         if (result == 0) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "프로젝트 수정 실패");
         }
 
-        //태그 전체 삭제 후 저장
+        // 태그 전체 삭제 후 저장
         tagMapper.deleteTags(dto.getProjectId());
         List<String> normalized = normalizeTags(dto.getTagList());
         for (String tagName : normalized) {
@@ -206,7 +201,7 @@ public class CreatorServiceImpl implements CreatorService {
         }
 
         //리워드 전체 삭제 후 저장
-        rewardService.replaceRewards(dto.getProjectId(), dto.getRewardList());
+        rewardService.replaceRewards(dto.getProjectId(), dto.getRewardList(), dto.getEndDate());
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 수정 성공", null));
     }
@@ -222,21 +217,15 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> deleteProject(Long projectId, Long creatorId) {
-
-        //소유자 체크
-
-        //프로젝트 상태 조회
-        String status = projectMapper.getStatus(projectId);
-        if (!"DRAFT".equalsIgnoreCase(status)) {
-            throw new IllegalStateException("DRAFT 상태에서만 프로젝트를 삭제할 수 있습니다.");
-        }
+        // Guard
+        transitionGuard.assertCanDelete(projectId, creatorId);
 
         rewardMapper.deleteRewards(projectId);
         tagMapper.deleteTags(projectId);
 
         int result = creatorMapper.deleteProject(projectId);
         if (result == 0) {
-            throw new IllegalStateException("프로젝트 삭제 실패");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "프로젝트 삭제 실패");
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 삭제 성공", null));
@@ -253,33 +242,13 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> verifyProject(Long projectId, Long creatorId) {
-
-        //소유자 체크
-
-        Project project = projectMapper.findById(projectId);
-        if (project == null) {
-            throw new IllegalStateException("존재하지 않는 프로젝트입니다.");
-        }
-//        if (!project.getCreatorId().equals(creatorId)) {
-//            throw new IllegalStateException("심사 요청 권한이 없습니다.");
-//        }
-        if (!"DRAFT".equalsIgnoreCase(project.getProjectStatus())) {
-            throw new IllegalStateException("현재 상태에서는 심사 요청을 할 수 없습니다.");
-        }
-        if ("Y".equalsIgnoreCase(String.valueOf(project.getIsVerified()))) {
-            throw new IllegalStateException("이미 심사 요청된 프로젝트입니다.");
-        }
-
-        //검증
-//        List<String> errors = projectValidator.validateAll(projectId, project);
-//        if (!errors.isEmpty()) {
-//            throw new IllegalArgumentException("심사 요청 검증 실패 : " + String.join(", ", errors));
-//        }
+        // Guard
+        transitionGuard.assertCanSubmit(projectId, creatorId);
 
         //상태 업데이트
         int result = creatorMapper.markVerifyProject(projectId);
         if (result == 0) {
-            throw new IllegalStateException("심사 요청 실패");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "심사 요청 실패");
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 심사 요청 성공", null));
@@ -302,13 +271,44 @@ public class CreatorServiceImpl implements CreatorService {
         }
 
         CreatorProjectSummaryDto dto = new CreatorProjectSummaryDto(
-                project.getProjectId(),
-                project.getTitle(),
-                project.getEndDate(),
-                project.getProjectStatus()
+            project.getProjectId(),
+            project.getTitle(),
+            project.getEndDate(),
+            project.getProjectStatus()
         );
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 요약 조회 성공", dto));
+    }
+
+    /**
+     * <p>창작자 프로필 조회</p>
+     *
+     * <li>창작자명</li>
+     * <li>사업자번호</li>
+     * <li>이메일</li>
+     * <li>전화번호</li>
+     * <li>정지 여부</li>
+     *
+     * @param creatorId 창작자 ID
+     * @return 성공 시 200 Ok
+     * @author 조은애
+     * @since 2025-10-11
+     */
+    public ResponseEntity<ResponseDto<CreatorProfileSummaryDto>> getCreatorProfileSummary(Long creatorId) {
+        // Guard
+        transitionGuard.ensureCreatorExistsOrThrow(creatorId);
+
+        boolean isComplete = creatorMapper.hasRequiredCreatorProfile(creatorId);
+        boolean isSuspended = Boolean.TRUE.equals(userMapper.suspendedCreator(creatorId));
+
+        CreatorProfileSummaryDto summary = creatorMapper.getCreatorProfileSummary(creatorId);
+        if (summary == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "창작자 프로필을 찾을 수 없습니다.");
+        }
+        summary.setIsComplete(isComplete);
+        summary.setIsSuspended(isSuspended);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "창작자 프로필 조회 성공", summary));
     }
 
     private static final int MAX_TAGS = 10;
@@ -318,32 +318,14 @@ public class CreatorServiceImpl implements CreatorService {
         //불변 빈 리스트
         if (tagList == null) return List.of();
 
-        Map<String, String> dedup = new LinkedHashMap<>();
+        List<String> out = new ArrayList<>(tagList.size());
         for (String tag : tagList) {
             if (tag == null) continue;
-
-            //트림, 내부 공백 압축
-            String normalized = tag.trim().replaceAll("\\s+", " ");
-            if (normalized.isEmpty()) continue;
-
-            //유니코드 NFC 정규화
-            normalized = Normalizer.normalize(normalized, Normalizer.Form.NFC);
-
-            //길이 제한
-            if (normalized.length() > MAX_LENGTH) {
-                normalized = normalized.substring(0, MAX_LENGTH);
-            }
-
-            //중복 제거
-            String key = normalized.toLowerCase(Locale.ROOT);
-            dedup.putIfAbsent(key, normalized);
-
-            //최대 개수 제한
-            if (dedup.size() == MAX_TAGS) break;
+            String display = ValidationRules.normTagDisplay(tag);
+            if (!display.isEmpty()) out.add(display);
         }
 
-        //불변 리스트로 반환
-        return List.copyOf(dedup.values());
+        return List.copyOf(out);
     }
 
     //창작자 QnA 목록 조회

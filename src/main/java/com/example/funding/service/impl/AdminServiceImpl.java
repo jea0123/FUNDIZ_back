@@ -20,6 +20,7 @@ import com.example.funding.model.Reward;
 import com.example.funding.model.Tag;
 import com.example.funding.model.User;
 import com.example.funding.service.AdminService;
+import com.example.funding.service.validator.ProjectTransitionGuard;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -43,6 +44,21 @@ public class AdminServiceImpl implements AdminService {
     private final TagMapper tagMapper;
     private final RewardMapper rewardMapper;
 
+    private final ProjectTransitionGuard transitionGuard;
+
+    /**
+     * 관리자 대시보드 분석 데이터 조회
+     *
+     * @param from   조회 시작 날짜
+     * @param to     조회 종료 날짜
+     * @param limit  상위 N개 리워드 조회 제한
+     * @param metric 정렬 기준 (qty: 판매 수량, revenue: 매출)
+     * @param months 조회 기간 (개월 단위)
+     * @param ctgrId 카테고리 ID
+     * @return 관리자 대시보드 분석 데이터
+     * @author 장민규
+     * @since 2025-09-11
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<AdminAnalyticsDto>> getAdminAnalytics(LocalDate from, LocalDate to, int limit, String metric, int months, Long ctgrId) {
@@ -237,9 +253,12 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> approveProject(Long projectId) {
+        // Guard
+        transitionGuard.assertCanApprove(projectId);
+
         int result = adminMapper.approveProject(projectId);
-        if (result == 0) {
-            throw new IllegalStateException("승인 처리가 실패되었습니다.");
+        if (result != 1) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 처리되었거나 현재 상태에서 승인할 수 없습니다.");
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트가 성공적으로 승인되었습니다.", null));
@@ -256,9 +275,12 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> rejectProject(Long projectId, String rejectedReason) {
+        // Guard
+        transitionGuard.requireVerifying(projectId);
+
         int result = adminMapper.rejectProject(projectId, rejectedReason);
-        if (result == 0) {
-            throw new IllegalStateException("반려 처리가 실패되었습니다.");
+        if (result != 1) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 처리되었거나 현재 상태에서 반려할 수 없습니다.");
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트가 성공적으로 반려되었습니다.", null));

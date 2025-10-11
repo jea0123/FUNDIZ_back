@@ -31,15 +31,6 @@ public class UserServiceImpl implements UserService {
     private final CreatorMapper creatorMapper;
     private final QnADetailMapper qnaMapper;
 
-
-    /**
-     * <p>로그인 사용자 정보 조회</p>
-     *
-     * @param userId 인증된 사용자의 ID
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-     * @author by: 장민규
-     * @since 2025-08-28
-     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(Long userId) {
@@ -68,7 +59,6 @@ public class UserServiceImpl implements UserService {
      * @author by: 이윤기
      * @since 2025-09-03
      */
-
     @Override
     public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageUser(Long userId) {
         User user = userMapper.getUserById(userId);
@@ -125,15 +115,6 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "QnA 리스트 조회 성공", QnAList));
     }
 
-
-    /**
-     * <p>최근 본 프로젝트 목록 조회</p>
-     *
-     * @param userId 인증된 사용자의 ID
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-     * @author by: 장민규
-     * @since 2025-09-05
-     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(Long userId) {

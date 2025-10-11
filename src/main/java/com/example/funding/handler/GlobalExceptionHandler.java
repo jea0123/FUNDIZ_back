@@ -33,6 +33,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.IOException;
+import java.nio.file.attribute.UserPrincipalNotFoundException;
 import java.sql.*;
 import java.time.Instant;
 import java.util.List;
@@ -378,6 +379,13 @@ public class GlobalExceptionHandler {
         String body = "외부 서비스와의 통신에 실패했습니다.";
         log.error("[504 ResourceAccess] {} | raw: {}", body, clean(e));
         return json(HttpStatus.GATEWAY_TIMEOUT, body, req);
+    }
+
+    @ExceptionHandler(UserPrincipalNotFoundException.class)
+    public ResponseEntity<ApiError> handleUserPrincipalNotFound(UserPrincipalNotFoundException e, HttpServletRequest req) {
+        String body = "사용자 정보를 찾을 수 없습니다.";
+        log.warn("[404 UserPrincipalNotFound] {} | raw: {}", body, clean(e));
+        return json(HttpStatus.NOT_FOUND, body, req);
     }
 
     /* ========= ResponseStatusException 패스스루 ========= */

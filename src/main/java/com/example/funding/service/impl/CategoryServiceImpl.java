@@ -22,21 +22,16 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryMapper categoryMapper;
 
-    /**
-     * 모든 카테고리 조회
-     * @return 모든 카테고리 리스트
-     * @author 장민규
-     * @since 2025-09-11
-     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<Category>>> getAllCategories() {
         List<Category> categories = categoryMapper.getAllCategories();
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200,"카테고리 조회 성공", categories));
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "카테고리 조회 성공", categories));
     }
 
     /**
      * 모든 세부카테고리 조회
+     *
      * @return 모든 세부 카테고리 리스트
      * @author 조은애
      * @since 2025-09-12

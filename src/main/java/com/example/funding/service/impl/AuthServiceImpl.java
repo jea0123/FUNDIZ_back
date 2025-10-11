@@ -28,15 +28,6 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
-    /**
-     * <p>회원가입</p>
-     * <p>- 이미 존재하는 이메일인지 확인, 비밀번호 암호화, 회원 정보 저장</p>
-     *
-     * @param dto SignUpRequestDto
-     * @return : 성공 시 200 OK, 실패 시 409 CONFLICT
-     * @author by: 장민규
-     * @since 2025-08-27
-     */
     @Override
     public ResponseEntity<ResponseDto<String>> signUp(SignUpRequestDto dto) {
         User existingUser = userMapper.findByEmail(dto.getEmail());
@@ -51,15 +42,6 @@ public class AuthServiceImpl implements AuthService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "회원가입 성공", dto.getEmail()));
     }
 
-    /**
-     * <p>로그인</p>
-     * <p>- 이메일과 비밀번호 확인, JWT 토큰 생성 및 반환</p>
-     *
-     * @param dto SignInRequestDto
-     * @return : 성공 시 200 OK, 실패 시 400 BAD REQUEST
-     * @author by: 장민규
-     * @since 2025-08-27
-     */
     @Override
     public ResponseEntity<ResponseDto<String>> signIn(SignInRequestDto dto) {
         User user = userMapper.findByEmail(dto.getEmail());
@@ -73,15 +55,6 @@ public class AuthServiceImpl implements AuthService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "로그인 성공", token));
     }
 
-    /**
-     * <p>이메일 중복 확인</p>
-     * <p>- 이미 존재하는 이메일인지 확인</p>
-     *
-     * @param dto CheckEmailRequestDto
-     * @return : 사용 가능 시 200 OK, 이미 존재 시 409 CONFLICT
-     * @author by: 장민규
-     * @since 2025-08-27
-     */
     @Override
     public ResponseEntity<ResponseDto<String>> checkEmail(CheckEmailRequestDto dto) {
         User existingUser = userMapper.findByEmail(dto.getEmail());
@@ -91,15 +64,6 @@ public class AuthServiceImpl implements AuthService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "사용 가능한 이메일입니다.", dto.getEmail()));
     }
 
-    /**
-     * <p>닉네임 중복 확인</p>
-     * <p>- 이미 존재하는 닉네임인지 확인</p>
-     *
-     * @param dto CheckNicknameRequestDto
-     * @return : 사용 가능 시 200 OK, 이미 존재 시 409 CONFLICT
-     * @author by: 장민규
-     * @since 2025-08-27
-     */
     @Override
     public ResponseEntity<ResponseDto<String>> checkNickname(CheckNicknameRequestDto dto) {
         User existingUser = userMapper.findByNickname(dto.getNickname());

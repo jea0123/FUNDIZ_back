@@ -5,5 +5,5 @@ import com.example.funding.dto.request.creator.NewsCreateRequestDto;
 import org.springframework.http.ResponseEntity;
 
 public interface NewsService {
-    ResponseEntity<ResponseDto<Long>> createNews(Long projectId, Long creatorId, NewsCreateRequestDto dto);
+    ResponseEntity<ResponseDto<String>> createNews(Long projectId, Long creatorId, NewsCreateRequestDto dto);
 }

@@ -197,7 +197,7 @@ public class CreatorController {
     }
 
     /**
-     * <p>창작자 프로필 조회</p>
+     * <p>창작자 프로필 요약 조회</p>
      *
      * <li>창작자명</li>
      * <li>사업자번호</li>
@@ -210,7 +210,7 @@ public class CreatorController {
      * @author 조은애
      * @since 2025-10-11
      */
-    @GetMapping("/info")
+    @GetMapping("/summary")
     public ResponseEntity<ResponseDto<CreatorProfileSummaryDto>> getCreatorProfileSummary(@RequestAttribute Long creatorId) {
         return creatorService.getCreatorProfileSummary(creatorId);
     }
@@ -274,10 +274,9 @@ public class CreatorController {
      * @since 2025-10-11
      */
     @PostMapping("/projects/{projectId}/news")
-    public ResponseEntity<ResponseDto<Long>> createNews(@PathVariable Long projectId,
-                                                        @RequestBody NewsCreateRequestDto dto,
-                                                        @RequestAttribute Long creatorId) {
-
+    public ResponseEntity<ResponseDto<String>> createNews(@PathVariable Long projectId,
+                                                          @RequestBody NewsCreateRequestDto dto,
+                                                          @RequestAttribute Long creatorId) {
         return newsService.createNews(projectId, creatorId, dto);
     }
 

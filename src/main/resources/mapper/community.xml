@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.funding.mapper.CommunityMapper">
 
+    <!-- START 커뮤니티/후기 목록 -->
     <sql id="foldedQuery">
         WITH base AS (
             SELECT /*+ MATERIALIZE */
@@ -66,5 +67,14 @@
     <select id="getReviewList" resultMap="reviewMap" resultOrdered="true">
         <include refid="foldedQuery" />
     </select>
+    <!-- END 커뮤니티/후기 목록 -->
 
+    <insert id="createCommunity">
+        <selectKey keyProperty="cmId" resultType="Long" order="BEFORE">
+            SELECT COMMUNITY_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO COMMUNITY (CMID, USERID, PROJECTID, CMCONTENT, CODE)
+        VALUES (#{cmId}, #{userId}, #{projectId}, #{cmContent}, 'CM')
+    </insert>
 </mapper>

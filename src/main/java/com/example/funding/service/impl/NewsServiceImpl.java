@@ -19,7 +19,7 @@ public class NewsServiceImpl implements NewsService {
     private final NewsMapper newsMapper;
 
     @Override
-    public ResponseEntity<ResponseDto<Long>> createNews(Long projectId, Long creatorId, NewsCreateRequestDto dto) {
+    public ResponseEntity<ResponseDto<String>> createNews(Long projectId, Long creatorId, NewsCreateRequestDto dto) {
         //TODO: guard, validator
 
         News news = News.builder()
@@ -28,7 +28,7 @@ public class NewsServiceImpl implements NewsService {
             .build();
 
         int result = newsMapper.createNews(news);
-        if (result == 0 || news.getNewsId() == null) {
+        if (result != 1 || news.getNewsId() == null) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "새소식 등록 실패");
         }
 

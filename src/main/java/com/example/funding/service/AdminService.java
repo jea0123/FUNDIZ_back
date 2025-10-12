@@ -12,6 +12,10 @@ import com.example.funding.dto.response.admin.ProjectVerifyListDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
 import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
+import com.example.funding.exception.AnalyticsNotFoundException;
+import com.example.funding.exception.CategorySuccessNotFoundException;
+import com.example.funding.exception.KPINotFoundException;
+import com.example.funding.exception.RewardSalesNotFoundException;
 import com.example.funding.model.User;
 import org.springframework.http.ResponseEntity;
 
@@ -29,6 +33,7 @@ public interface AdminService {
      * @param month  조회 기간 (개월 단위)
      * @param ctgrId 카테고리 ID
      * @return 관리자 대시보드 분석 데이터
+     * @throws AnalyticsNotFoundException 데이터가 존재하지 않을 경우
      * @author 장민규
      * @since 2025-09-11
      */
@@ -39,6 +44,7 @@ public interface AdminService {
      *
      * @param ctgrId 카테고리 ID
      * @return 카테고리별 성공률 데이터 리스트
+     * @throws CategorySuccessNotFoundException 데이터가 존재하지 않을 경우
      * @author 장민규
      * @since 2025-09-11
      */
@@ -49,6 +55,7 @@ public interface AdminService {
      *
      * @param month 조회 기간 (개월 단위)
      * @return KPI 데이터
+     * @throws KPINotFoundException 데이터가 존재하지 않을 경우
      * @author 장민규
      * @since 2025-09-11
      */
@@ -62,6 +69,7 @@ public interface AdminService {
      * @param limit  상위 N개 리워드 조회 제한
      * @param metric 정렬 기준 (qty: 판매 수량, revenue: 매출)
      * @return 상위 리워드 판매량/매출 데이터 리스트
+     * @throws RewardSalesNotFoundException 데이터가 존재하지 않을 경우
      * @author 장민규
      * @since 2025-09-11
      */

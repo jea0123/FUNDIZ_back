@@ -11,6 +11,10 @@ import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
 import com.example.funding.dto.response.admin.ProjectVerifyListDto;
 import com.example.funding.dto.response.admin.analytic.*;
+import com.example.funding.exception.AnalyticsNotFoundException;
+import com.example.funding.exception.CategorySuccessNotFoundException;
+import com.example.funding.exception.KPINotFoundException;
+import com.example.funding.exception.RewardSalesNotFoundException;
 import com.example.funding.mapper.AdminMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.RewardMapper;
@@ -46,19 +50,6 @@ public class AdminServiceImpl implements AdminService {
 
     private final ProjectTransitionGuard transitionGuard;
 
-    /**
-     * 관리자 대시보드 분석 데이터 조회
-     *
-     * @param from   조회 시작 날짜
-     * @param to     조회 종료 날짜
-     * @param limit  상위 N개 리워드 조회 제한
-     * @param metric 정렬 기준 (qty: 판매 수량, revenue: 매출)
-     * @param months 조회 기간 (개월 단위)
-     * @param ctgrId 카테고리 ID
-     * @return 관리자 대시보드 분석 데이터
-     * @author 장민규
-     * @since 2025-09-11
-     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<AdminAnalyticsDto>> getAdminAnalytics(LocalDate from, LocalDate to, int limit, String metric, int months, Long ctgrId) {
@@ -69,7 +60,7 @@ public class AdminServiceImpl implements AdminService {
         List<CategorySuccess> categorySuccesses = adminMapper.getCategorySuccessByCategory(ctgrId);
 
         if (kpi == null || revenueTrends.isEmpty() || rewardSalesTops.isEmpty() || paymentMethods.isEmpty() || categorySuccesses.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 기간에 대한 일부 분석 데이터가 없습니다.");
+            throw new AnalyticsNotFoundException();
         }
 
         AdminAnalyticsDto analytics = AdminAnalyticsDto.builder()
@@ -87,7 +78,7 @@ public class AdminServiceImpl implements AdminService {
     public ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(Long ctgrId) {
         List<CategorySuccess> categorySuccesses = adminMapper.getCategorySuccessByCategory(ctgrId);
         if (categorySuccesses.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 카테고리에 대한 성공률 데이터가 없습니다.");
+            throw new CategorySuccessNotFoundException();
         }
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "카테고리별 성공률 조회 성공", categorySuccesses));
     }
@@ -97,7 +88,7 @@ public class AdminServiceImpl implements AdminService {
     public ResponseEntity<ResponseDto<Kpi>> getKpi(int months) {
         Kpi kpi = adminMapper.getKpiByMonths(months);
         if (kpi == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 기간에 대한 KPI 데이터가 없습니다.");
+            throw new KPINotFoundException();
         }
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "KPI 조회 성공", kpi));
     }
@@ -106,7 +97,7 @@ public class AdminServiceImpl implements AdminService {
     public ResponseEntity<ResponseDto<List<RewardSalesTop>>> getRewardSalesTops(LocalDate from, LocalDate to, int limit, String metric) {
         List<RewardSalesTop> rewardSalesTops = adminMapper.getRewardSalesTops(from, to, limit, metric);
         if (rewardSalesTops.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 기간에 대한 리워드 판매량/매출 데이터가 없습니다.");
+            throw new RewardSalesNotFoundException();
         }
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "리워드 판매 상위 조회 성공", rewardSalesTops));
     }

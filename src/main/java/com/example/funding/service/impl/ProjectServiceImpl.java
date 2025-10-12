@@ -9,6 +9,8 @@ import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
 import com.example.funding.dto.row.ProjectRow;
+import com.example.funding.exception.FeaturedProjectNotFoundException;
+import com.example.funding.exception.RecentPaidProjectNotFoundException;
 import com.example.funding.mapper.NewsMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.RewardMapper;
@@ -22,7 +24,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -100,24 +101,6 @@ public class ProjectServiceImpl implements ProjectService {
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 상세 조회 성공", detail));
     }
 
-    /**
-     * <p>최근 24시간 내 결제된 프로젝트 TOP10 조회</p>
-     * <p>트렌드 점수 산정 기준 (가중치)</p>
-     * <ul>
-     *     <li>최근 24시간 결제금액/목표금액 비중: 70%</li>
-     *     <li>좋아요 수: 20%</li>
-     *     <li>조회수: 10%</li>
-     * </ul>
-     * <p>조건</p>
-     * <ul>
-     *     <li>프로젝트 상태: OPEN</li>
-     *     <li>프로젝트 시작일: 최근 30일 이내</li>
-     * </ul>
-     *
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-     * @author by: 장민규
-     * @since 2025-09-03
-     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<RecentTop10ProjectDto>>> getRecentTop10() {
@@ -129,38 +112,17 @@ public class ProjectServiceImpl implements ProjectService {
         List<RecentTop10ProjectDto> ranked = projectMapper.findRecentTopProjectsJoined(since, startDays, limit);
 
         if (ranked == null || ranked.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "최근 24시간 내 결제된 프로젝트 TOP10이 없습니다.");
+            throw new RecentPaidProjectNotFoundException();
         }
         return ResponseEntity.ok(ResponseDto.success(200, "최근 24시간 내 결제된 프로젝트 TOP10 조회 성공", ranked));
     }
 
-    /**
-     * <p>추천 프로젝트 조회</p>
-     * <p>추천 알고리즘 점수 산정 기준 (가중치)</p>
-     * <ul>
-     *     <li>달성률: 50%</li>
-     *     <li>후원자 수: 20%</li>
-     *     <li>좋아요 수: 20%</li>
-     *     <li>조회수: 10%</li>
-     * </ul>
-     * <p>조건</p>
-     * <ul>
-     *     <li>프로젝트 상태: OPEN</li>
-     *     <li>프로젝트 시작일: 최근 N일 이내</li>
-     * </ul>
-     *
-     * @param days  최근 N일 이내 시작한 프로젝트
-     * @param limit 최대 조회 개수
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-     * @author by: 장민규
-     * @since 2025-09-04
-     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<FeaturedProjectDto>>> getFeatured(int days, int limit) {
         List<FeaturedProjectDto> result = projectMapper.findFeaturedJoinedWithRecent(days, limit);
         if (result == null || result.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "추천 프로젝트가 없습니다.");
+            throw new FeaturedProjectNotFoundException();
         }
         return ResponseEntity.ok(ResponseDto.success(200, "추천 프로젝트 조회 성공", result));
     }
@@ -168,7 +130,7 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * <p>검색 기능 (제목, 내용, 창작자명, 태그)</p>
      *
-     * @param dto SearchProjectDto
+     * @param dto   SearchProjectDto
      * @param pager pager
      * @return 성공 시 200 OK
      * @author 조은애

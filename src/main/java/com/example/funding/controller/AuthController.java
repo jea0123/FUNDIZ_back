@@ -5,6 +5,9 @@ import com.example.funding.dto.request.auth.CheckEmailRequestDto;
 import com.example.funding.dto.request.auth.CheckNicknameRequestDto;
 import com.example.funding.dto.request.auth.SignInRequestDto;
 import com.example.funding.dto.request.auth.SignUpRequestDto;
+import com.example.funding.exception.DuplicatedEmailException;
+import com.example.funding.exception.DuplicatedNicknameException;
+import com.example.funding.exception.InvalidCredentialsException;
 import com.example.funding.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +30,7 @@ public class AuthController {
      *
      * @param dto 가입 정보
      * @return 이메일
+     * @throws DuplicatedEmailException 이미 존재하는 이메일인 경우
      * @author by: 장민규
      * @since 2025-08-26
      */
@@ -40,6 +44,7 @@ public class AuthController {
      *
      * @param dto 로그인 정보
      * @return JWT 토큰
+     * @throws InvalidCredentialsException 이메일 또는 비밀번호가 올바르지 않은 경우
      * @author by: 장민규
      * @since 2025-08-26
      */
@@ -51,8 +56,9 @@ public class AuthController {
     /**
      * <p>이메일 중복 확인</p>
      *
-     * @param dto CheckEmailRequestDto
-     * @return : 성공 시 200 OK, 실패 시 409 CONFLICT
+     * @param dto 이메일 정보
+     * @return 이메일
+     * @throws DuplicatedEmailException 이미 존재하는 이메일인 경우
      * @author by: 장민규
      * @since 2025-08-27
      */
@@ -64,8 +70,9 @@ public class AuthController {
     /**
      * <p>닉네임 중복 확인</p>
      *
-     * @param dto CheckNicknameRequestDto
-     * @return : 성공 시 200 OK, 실패 시 409 CONFLICT
+     * @param dto 닉네임 정보
+     * @return 닉네임
+     * @throws DuplicatedNicknameException 이미 존재하는 닉네임인 경우
      * @author by: 장민규
      * @since 2025-08-27
      */

@@ -2,6 +2,7 @@ package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.response.user.*;
+import com.example.funding.exception.UserNotFoundException;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
@@ -14,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(Long userId) {
         User user = userMapper.getUserById(userId);
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.");
+            throw new UserNotFoundException();
         }
         LoginUserDto loginUserDto = LoginUserDto.builder()
                 .userId(user.getUserId())
@@ -120,7 +120,7 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(Long userId) {
         User user = userMapper.getUserById(userId);
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.");
+            throw new UserNotFoundException();
         }
         List<RecentViewProject> recentViewProjects = userMapper.getRecentViewProjects(userId);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "최근 본 프로젝트 조회 성공", recentViewProjects));

@@ -6,15 +6,18 @@ import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.admin.AdminProjectUpdateDto;
 import com.example.funding.dto.request.admin.RejectProjectDto;
+import com.example.funding.dto.request.admin.SearchAdminProjectDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
-import com.example.funding.dto.request.admin.SearchAdminProjectDto;
+import com.example.funding.dto.response.admin.ProjectVerifyListDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
 import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
-import com.example.funding.dto.response.admin.ProjectVerifyListDto;
-import com.example.funding.model.Notice;
+import com.example.funding.exception.AnalyticsNotFoundException;
+import com.example.funding.exception.CategorySuccessNotFoundException;
+import com.example.funding.exception.KPINotFoundException;
+import com.example.funding.exception.RewardSalesNotFoundException;
 import com.example.funding.model.User;
 import com.example.funding.service.AdminService;
 import lombok.RequiredArgsConstructor;
@@ -39,11 +42,13 @@ public class AdminController {
 
     /**
      * 관리자 대시보드 분석 데이터 조회
+     *
      * @param period 조회 기간 (1m, 3m, 6m, 1y, all)
      * @param metric 정렬 기준 (qty: 판매 수량, revenue: 매출)
      * @param limit  상위 N개 리워드 조회 제한
      * @param ctgrId 카테고리 ID
      * @return 관리자 대시보드 분석 데이터
+     * @throws AnalyticsNotFoundException 데이터가 존재하지 않을 경우 (기간 내 데이터가 없을 때)
      * @author 장민규
      * @since 2025-09-11
      */
@@ -57,8 +62,10 @@ public class AdminController {
 
     /**
      * 특정 카테고리의 성공률 분석 데이터 조회
+     *
      * @param ctgrId 카테고리 ID
      * @return 특정 카테고리의 성공률 분석 데이터
+     * @throws CategorySuccessNotFoundException 데이터가 존재하지 않을 경우 (해당 카테고리에 속한 프로젝트가 없을 때)
      * @author 장민규
      * @since 2025-09-11
      */
@@ -69,8 +76,10 @@ public class AdminController {
 
     /**
      * 주요 성과 지표(KPI) 조회
+     *
      * @param period 조회 기간 (1m, 3m, 6m, 1y, all)
      * @return 주요 성과 지표(KPI) 데이터
+     * @throws KPINotFoundException 데이터가 존재하지 않을 경우 (기간 내 데이터가 없을 때)
      * @author 장민규
      * @since 2025-09-11
      */
@@ -82,15 +91,17 @@ public class AdminController {
 
     /**
      * 상위 리워드 판매량/매출 조회
+     *
      * @param period 조회 기간 (1m, 3m, 6m, 1y, all)
      * @param metric 정렬 기준 (qty: 판매 수량, revenue: 매출)
      * @param limit  상위 N개 리워드 조회 제한
      * @return 상위 리워드 판매량/매출 데이터 리스트
+     * @throws RewardSalesNotFoundException 데이터가 존재하지 않을 경우 (기간 내 데이터가 없을 때)
      * @author 장민규
      * @since 2025-09-11
      */
     @GetMapping("/reward-sales-top")
-    public ResponseEntity<ResponseDto<List<RewardSalesTop>>> getRewardSalesTops(@RequestParam (defaultValue = "6m") String period, @RequestParam(defaultValue = "qty") String metric,
+    public ResponseEntity<ResponseDto<List<RewardSalesTop>>> getRewardSalesTops(@RequestParam(defaultValue = "6m") String period, @RequestParam(defaultValue = "qty") String metric,
                                                                                 @RequestParam(defaultValue = "5") int limit) {
         Utils.AnalyticsWindow w = resolveWindow(period, metric, KST);
         return adminService.getRewardSalesTops(w.getFrom(), w.getTo(), limit, metric);
@@ -99,7 +110,7 @@ public class AdminController {
     /**
      * <p>프로젝트 목록 조회</p>
      *
-     * @param dto SearchProjectVerifyDto
+     * @param dto      SearchProjectVerifyDto
      * @param reqPager 요청 pager
      * @return 성공 시 200 OK
      * @author 조은애
@@ -135,7 +146,7 @@ public class AdminController {
      * <p>프로젝트 수정</p>
      *
      * @param projectId 프로젝트 ID
-     * @param dto AdminProjectUpdateDto
+     * @param dto       AdminProjectUpdateDto
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-09-17
@@ -152,7 +163,7 @@ public class AdminController {
     /**
      * <p>프로젝트 심사 목록 조회</p>
      *
-     * @param dto SearchProjectVerifyDto
+     * @param dto      SearchProjectVerifyDto
      * @param reqPager 요청 pager
      * @return 성공 시 200 OK
      * @author 조은애
@@ -201,7 +212,7 @@ public class AdminController {
      * <p>프로젝트 반려</p>
      *
      * @param projectId 프로젝트 ID
-     * @param dto RejectProjectDto
+     * @param dto       RejectProjectDto
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-09-19

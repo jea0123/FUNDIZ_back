@@ -187,14 +187,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<ApiError> handleUnsupportedMediaType(HttpMediaTypeNotSupportedException e, HttpServletRequest req) {
         String body = "지원하지 않는 Content-Type 입니다.";
-        log.warn("[415 UnsupportedMediaType] {}", body);
+        log.warn("[415 UnsupportedMediaType] {} {}", body, clean(e));
         return json(HttpStatus.UNSUPPORTED_MEDIA_TYPE, body, req);
     }
 
     @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
     public ResponseEntity<ApiError> handleNotAcceptable(HttpMediaTypeNotAcceptableException e, HttpServletRequest req) {
         String body = "응답 Content-Type 협상이 실패했습니다.";
-        log.warn("[406 NotAcceptable] {}", body);
+        log.warn("[406 NotAcceptable] {} {}", body, clean(e));
         return json(HttpStatus.NOT_ACCEPTABLE, body, req);
     }
 
@@ -377,7 +377,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ApiError> handleMaxUpload(MaxUploadSizeExceededException e, HttpServletRequest req) {
         String body = "업로드 용량 제한을 초과했습니다.";
-        log.warn("[413 PayloadTooLarge] {}", body);
+        log.warn("[413 PayloadTooLarge] {} {}", body, clean(e));
         return json(HttpStatus.PAYLOAD_TOO_LARGE, body, req);
     }
 
@@ -404,14 +404,6 @@ public class GlobalExceptionHandler {
         else log.error("[ResponseStatus {}] {} | raw: {}", status.value(), body, clean(e));
         return json(status, body, req);
     }
-
-    /* ========= 마지막 안전망 ========= */
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<ApiError> handleUnknown(Exception e, HttpServletRequest req) {
-//        String body = "일시적인 오류가 발생했습니다.";
-//        log.error("[500 Unknown] {} | raw: {}", body, clean(e));
-//        return json(HttpStatus.INTERNAL_SERVER_ERROR, body, req);
-//    }
 
     /* ===== 공통 응답 모델 ===== */
     public record ApiError(

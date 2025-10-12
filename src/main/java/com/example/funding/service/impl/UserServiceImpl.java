@@ -38,6 +38,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new UserNotFoundException();
         }
+        Long creatorId = userMapper.getCreatorIdByUserId(userId);
         LoginUserDto loginUserDto = LoginUserDto.builder()
                 .userId(user.getUserId())
                 .email(user.getEmail())
@@ -46,6 +47,7 @@ public class UserServiceImpl implements UserService {
                 .joinedAt(user.getJoinedAt())
                 .followCnt(user.getFollowCnt())
                 .isCreator(user.getIsCreator())
+                .creatorId(creatorId)
                 .role(user.getRole().toString())
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "사용자 정보 조회 성공", loginUserDto));

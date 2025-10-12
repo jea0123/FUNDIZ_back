@@ -1,6 +1,9 @@
 package com.example.funding.service;
 
+import com.example.funding.common.PageResult;
+import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.response.creator.CreatorQnaDto;
 import com.example.funding.dto.response.user.*;
 import com.example.funding.exception.UserNotFoundException;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +26,7 @@ public interface UserService {
 
     ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(Long userId);
 
-    ResponseEntity<ResponseDto<List<MyPageQnADto>>> getQnAList(Long userId);
+    ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfUser(Long userId, Pager pager);
 
     /**
      * <p>최근 본 프로젝트 목록 조회</p>

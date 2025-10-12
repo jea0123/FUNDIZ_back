@@ -7,6 +7,7 @@ import com.example.funding.dto.response.project.CursorPage;
 import com.example.funding.dto.response.project.QnaDto;
 import com.example.funding.mapper.QnaMapper;
 import com.example.funding.mapper.ReplyMapper;
+import com.example.funding.mapper.UserMapper;
 import com.example.funding.model.Qna;
 import com.example.funding.service.QnaService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import java.util.List;
 public class QnaServiceImpl implements QnaService {
 
     private final QnaMapper qnaMapper;
+    private final UserMapper userMapper;
     private final ReplyMapper replyMapper;
 
     /**

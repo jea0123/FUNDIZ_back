@@ -1,10 +1,13 @@
 package com.example.funding.controller;
 
 import com.example.funding.common.CustomUserPrincipal;
+import com.example.funding.common.PageResult;
+import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.user.UserNicknameDto;
 import com.example.funding.dto.request.user.UserPasswordDto;
 import com.example.funding.dto.request.user.UserProfileImgDto;
+import com.example.funding.dto.response.creator.CreatorQnaDto;
 import com.example.funding.dto.response.user.*;
 import com.example.funding.exception.UserNotFoundException;
 import com.example.funding.service.ProjectService;
@@ -99,9 +102,15 @@ public class UserController {
         return userService.getLikedList(userId);
     }
 
-    @GetMapping("/QnAList/{userId}")
-    public ResponseEntity<ResponseDto<List<MyPageQnADto>>> getQnAList(@PathVariable Long userId) {
-        return userService.getQnAList(userId);
+    @GetMapping("/qna/{userId}")
+    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfUser(@PathVariable Long userId, Pager reqPager) {
+        Pager pager = Pager.ofRequest(
+                reqPager != null ? reqPager.getPage() : 1,
+                reqPager != null ? reqPager.getSize() : 10,
+                reqPager != null ? reqPager.getPerGroup() : 5
+        );
+
+        return userService.getQnaListOfUser(userId, pager);
     }
 
     @GetMapping("/QnAListDetail/{userId}/project/{projectId}")

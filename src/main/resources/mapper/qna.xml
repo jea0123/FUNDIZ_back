@@ -1,8 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.example.funding.mapper.UserMapper">
+<mapper namespace="com.example.funding.mapper.QnaMapper">
 
-    <select id="getQnAList" parameterType="long" resultType="Qna">
+    <select id="getQnaListOfUser" parameterType="long" resultType="CreatorQnaDto">
+        SELECT * FROM
+        (SELECT sub.*, ROWNUM rnum FROM (
+        SELECT
+        q.QNAID AS qnaId,
+        q.PROJECTID AS projectId,
+        q.USERID AS userId,
+        q.CREATORID AS creatorId,
+        q.CONTENT AS content,
+        CAST(q.CREATEDAT AS DATE) AS createdAt,
+        p.TITLE AS title
+        from qna q
+        join project p on q.projectid = p.projectid
+        WHERE q.USERID = #{userId} order by q.QNAID desc
+        ) sub  WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow})
+        WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
+
+    </select>
+
+    <select id="qnaTotalOfUser" resultType="Integer">
+        SELECT COUNT(*) FROM qna
+        WHERE USERID = #{userId}
+    </select>
+
+    <select id="getQnAById" parameterType="map" resultType="com.example.funding.model.Qna">
         SELECT
         <!-- QnA 테이블-->
         q.qnaId,
@@ -10,18 +34,104 @@
         q.userId,
         q.creatorId,
         q.title,
-        q.createdAt,
-        <!-- 창작자 테이블 -->
-        c.creatorName
+        q.content,
+        q.createdAt
+
+
+        <!--창작자 테이블-->
+        <!--c.creatorName,-->
+
+        <!-- 프로젝트 테이블-->
+        <!--p.title AS projectTitle,-->
+        <!--유저 테이블-->
+        <!--u.nickName-->
 
         FROM qna q
         <!-- 테이블 조인 -->
-        JOIN creator c ON q.creatorId = c.creatorId
-        JOIN users u ON q.userId = q.userId
-        JOIN project p ON p.projectId = q.projectId
-        WHERE u.userId=#{userId}
+        <!--JOIN creator c ON q.creatorId = c.creatorId
+        JOIN users u ON q.userId = u.userId
+        JOIN project p ON p.projectId = q.projectId-->
+        WHERE userId=#{userId}
+        AND projectId =#{projectId}
         ORDER BY createdAt
 
     </select>
+
+    <sql id="foldedQuery">
+        WITH base AS (
+        SELECT /*+ MATERIALIZE */
+        QNAID, PROJECTID, USERID, CREATORID, TITLE, CONTENT, CREATEDAT
+        FROM (
+        SELECT
+        QNAID, PROJECTID, USERID, CREATORID, TITLE, CONTENT, CREATEDAT
+        FROM QNA
+        WHERE PROJECTID = #{projectId}
+        <if test="lastCreatedAt != null">
+            <![CDATA[
+                    AND (
+                        CREATEDAT < #{lastCreatedAt}
+                        OR (CREATEDAT = #{lastCreatedAt} AND QNAID < #{lastId})
+                    )
+                ]]>
+        </if>
+        ORDER BY CREATEDAT DESC, QNAID DESC
+        )
+        WHERE ROWNUM <![CDATA[ <= ]]> #{size}
+        )
+        SELECT
+        b.QNAID AS qnaId,
+        b.PROJECTID AS projectId,
+        b.USERID AS userId,
+        b.CREATORID AS creatorId,
+        b.TITLE AS title,
+        b.CONTENT AS content,
+        b.CREATEDAT AS createdAt,
+        u.NICKNAME AS nickname,
+        u.PROFILEIMG AS profileImg,
+        r.REPLYID AS r_replyId,
+        r.USERID AS r_userId,
+        r.CONTENT AS r_content,
+        r.CREATEDAT AS r_createdAt
+        FROM base b
+        LEFT JOIN USERS u ON u.USERID = b.USERID
+        LEFT JOIN REPLY r ON r.QNAID = b.QNAID
+        ORDER BY b.CREATEDAT DESC, b.QNAID DESC, r.CREATEDAT ASC, r.REPLYID ASC
+    </sql>
+
+    <resultMap id="qnaMap" type="qnaDto" autoMapping="true">
+        <id property="qnaId" column="qnaId" jdbcType="NUMERIC" />
+        <result property="content" column="CONTENT" jdbcType="VARCHAR"/>
+
+        <collection property="replyList" ofType="replyDto" columnPrefix="r_" autoMapping="true">
+            <id property="replyId" column="r_replyId" jdbcType="NUMERIC" />
+        </collection>
+    </resultMap>
+
+    <select id="getQnaListOfProject" resultMap="qnaMap" resultOrdered="true">
+        <include refid="foldedQuery" />
+    </select>
+
+    <select id="qnaTotalOfProject" resultType="Integer">
+        SELECT COUNT(*) FROM qna
+        WHERE PROJECTID = #{projectId}
+    </select>
+
+    <insert id="addQuestion" parameterType="com.example.funding.dto.request.project.QnaAddRequestDto">
+        <selectKey keyProperty="qnaId" resultType="Long" order="BEFORE">
+            SELECT QNA_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO QNA (QNAID, PROJECTID, USERID, CREATORID, TITLE, CONTENT, CREATEDAT)
+        SELECT QNA_SEQ.NEXTVAL, #{projectId}, #{userId}, P.CREATORID AS creatorId, 'Y', #{content}, SYSDATE
+        FROM QNA Q, PROJECT P
+        WHERE EXISTS (
+        SELECT 1
+        FROM PROJECT P
+        WHERE Q.PROJECTID = P.PROJECTID
+        AND P.PROJECTID = #{projectId}
+        )
+        AND ROWNUM = 1
+
+    </insert>
 
 </mapper>

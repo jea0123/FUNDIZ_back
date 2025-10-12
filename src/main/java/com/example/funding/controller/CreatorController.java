@@ -279,6 +279,8 @@ public class CreatorController {
     public ResponseEntity<ResponseDto<List<CreatorShippingBackerList>>> getShippingBackerList(@RequestAttribute Long creatorId, @PathVariable Long projectId) {
         return creatorService.getShippingBackerList(creatorId, projectId);
     }
+    
+    // TODO: 이윤기 - 창작자 배송 리스트에서 배송상태 변경을 위한 @PostMapping 필요
 
     /**
      * <p>프로젝트 새소식 등록</p>

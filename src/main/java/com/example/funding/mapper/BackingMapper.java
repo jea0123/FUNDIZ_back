@@ -17,10 +17,13 @@ public interface BackingMapper {
     //후원한 프로젝트 리스트
     List<BackingDto> getBackingListUserId(@Param("userId") Long userId);
 
+    //후원한 목록의 상세 리스트
     BackingDto getBackingProjectAndUserId( @Param("userId") Long userId,@Param("projectId")Long projectId, @Param("rewardId") Long rewardId);
 
+    //후원하기 페이지에서 이미 저장되있는 데이터를 가져오기 위한 dto
     BackingResponseDto prepareBacking(@Param("userId") Long userId, @Param("projectId") Long projectId);
 
+    //
     int addBacking(BackingRequestDto backingRequestDto);
 
     int updateBacking(BackingRequestUpdateDto updateDto);

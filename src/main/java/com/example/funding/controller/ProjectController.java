@@ -1,19 +1,24 @@
 package com.example.funding.controller;
 
+import com.example.funding.common.CursorPage;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.project.CommunityCreateRequestDto;
+import com.example.funding.dto.request.project.ReplyCreateRequestDto;
 import com.example.funding.dto.request.project.SearchProjectDto;
-import com.example.funding.dto.response.project.FeaturedProjectDto;
-import com.example.funding.dto.response.project.ProjectDetailDto;
-import com.example.funding.dto.response.project.RecentTop10ProjectDto;
+import com.example.funding.dto.response.project.*;
 import com.example.funding.exception.FeaturedProjectNotFoundException;
 import com.example.funding.exception.RecentPaidProjectNotFoundException;
+import com.example.funding.service.CommunityService;
 import com.example.funding.service.ProjectService;
+import com.example.funding.service.ReplyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -22,6 +27,8 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
+    private final CommunityService communityService;
+    private final ReplyService replyService;
 
     /**
      * <p>프로젝트 상세 페이지 조회</p>
@@ -83,6 +90,101 @@ public class ProjectController {
         );
 
         return projectService.searchProject(dto, pager);
+    }
+
+    /**
+     * <p>프로젝트 상세 페이지 - 커뮤니티 목록 조회</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param lastCreatedAt 마지막 항목의 생성일시
+     * @param lastId 마지막 항목의 cmId
+     * @param size 한 번에 가져올 항목 수
+     * @return 성공 시 200 OK
+     * @author 조은애
+     * @since 2025-10-03
+     */
+    @GetMapping("/{projectId}/community")
+    public ResponseEntity<ResponseDto<CursorPage<CommunityDto>>> getCommunityList(@PathVariable Long projectId,
+                                                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastCreatedAt,
+                                                                                  @RequestParam(required = false) Long lastId,
+                                                                                  @RequestParam(defaultValue = "10") int size) {
+
+        return communityService.getCommunityList(projectId, "CM", lastCreatedAt, lastId, size);
+    }
+
+    /**
+     * <p>프로젝트 상세 페이지 - 후기 목록 조회</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param lastCreatedAt 마지막 항목의 생성일시
+     * @param lastId 마지막 항목의 cmId
+     * @param size 한 번에 가져올 항목 수
+     * @return 성공 시 200 OK
+     * @author 조은애
+     * @since 2025-10-03
+     */
+    @GetMapping("/{projectId}/review")
+    public ResponseEntity<ResponseDto<CursorPage<ReviewDto>>> getReviewList(@PathVariable Long projectId,
+                                                                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastCreatedAt,
+                                                                            @RequestParam(required = false) Long lastId,
+                                                                            @RequestParam(defaultValue = "10") int size) {
+
+        return communityService.getReviewList(projectId, "RV", lastCreatedAt, lastId, size);
+    }
+
+    /**
+     * <p>프로젝트 상세 페이지 - 커뮤니티 등록</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param dto CommunityCreateRequestDto
+     * @return 성공 시 200 OK
+     * @author 조은애
+     * @since 2025-10-12
+     */
+    @PostMapping("{projectId}/community/new")
+    public ResponseEntity<ResponseDto<String>> createCommunity(@PathVariable Long projectId,
+                                                               @RequestBody CommunityCreateRequestDto dto) {
+        //TODO: 임시 id
+        Long userId = 22L;
+
+        return communityService.createCommunity(projectId, dto, userId);
+    }
+
+    /**
+     * <p>프로젝트 상세 페이지 - 커뮤니티 댓글 목록 조회</p>
+     *
+     * @param cmId 커뮤니티 ID
+     * @param lastCreatedAt 마지막 항목의 생성일시
+     * @param lastId 마지막 항목의 id
+     * @param size 한 번에 가져올 항목 수
+     * @return 성공 시 200 OK
+     * @author 조은애
+     * @since 2025-10-12
+     */
+    @GetMapping("/community/{cmId}/reply")
+    public ResponseEntity<ResponseDto<CursorPage<ReplyDto>>> getReplyList(@PathVariable Long cmId,
+                                                                          @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastCreatedAt,
+                                                                          @RequestParam(required = false) Long lastId,
+                                                                          @RequestParam(defaultValue = "10") int size) {
+        return replyService.getReplyList(cmId, lastCreatedAt, lastId, size);
+    }
+
+    /**
+     * <p>프로젝트 상세 페이지 - 커뮤니티 댓글 등록</p>
+     *
+     * @param cmId 커뮤니티 ID
+     * @param dto ReplyCreateRequestDto
+     * @return 성공 시 200 OK
+     * @author 조은애
+     * @since 2025-10-13
+     */
+    @PostMapping("/community/{cmId}/reply")
+    public ResponseEntity<ResponseDto<ReplyDto>> createCommunityReply(@PathVariable Long cmId,
+                                                                      @RequestBody ReplyCreateRequestDto dto) {
+        //TODO: 임시 id
+        Long userId = 12L;
+
+        return replyService.createCommunityReply(cmId, dto, userId);
     }
 
 }

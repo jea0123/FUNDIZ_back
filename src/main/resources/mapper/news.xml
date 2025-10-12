@@ -15,10 +15,10 @@
         </selectKey>
 
         INSERT INTO NEWS (
-            NEWSID, PROJECTID, CONTENT, CREATEDAT
+            NEWSID, PROJECTID, CONTENT
         )
         VALUES (
-            #{newsId}, #{projectId}, #{content}, SYSDATE
+            #{newsId}, #{projectId}, #{content}
         )
     </insert>
 

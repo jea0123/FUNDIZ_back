@@ -3,20 +3,46 @@
 <mapper namespace="com.example.funding.mapper.ReplyMapper">
 
     <select id="getReplyListById" resultType="reply">
-        SELECT
-            REPLYID,
-            USERID,
-            QNAID,
-            CMID,
-            INQID,
-            CONTENT,
-            ISSECRET,
-            CREATEDAT,
-            DELETEDAT,
-            CODE
-        FROM REPLY
+        SELECT * FROM REPLY
         WHERE CMID = #{cmId}
-           AND TRIM(CODE) = #{code}
+        AND TRIM(CODE) = #{code}
     </select>
 
+    <select id="getReplyList" resultType="replyDto">
+        SELECT *
+        FROM (
+            SELECT
+                r.REPLYID,
+                r.CMID,
+                r.USERID,
+                r.CONTENT,
+                r.ISSECRET,
+                r.CREATEDAT,
+                u.NICKNAME,
+                u.PROFILEIMG
+            FROM REPLY r
+            LEFT JOIN USERS u ON u.USERID = r.USERID
+            WHERE r.CMID = #{cmId}
+            AND r.CODE = 'CM'
+        <if test="lastCreatedAt != null">
+            <![CDATA[
+                AND (
+                    r.CREATEDAT < #{lastCreatedAt}
+                    OR (r.CREATEDAT = #{lastCreatedAt} AND r.REPLYID < #{lastId})
+                )
+            ]]>
+        </if>
+        ORDER BY r.CREATEDAT DESC, r.REPLYID DESC
+        )
+        WHERE ROWNUM <![CDATA[ <= ]]> #{size}
+    </select>
+
+    <insert id="createCommunityReply">
+        <selectKey keyProperty="replyId" resultType="Long" order="BEFORE">
+            SELECT REPLY_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO REPLY (REPLYID, CMID, USERID, CONTENT, ISSECRET, CODE)
+        VALUES (#{replyId}, #{cmId}, #{userId}, #{content}, #{isSecret}, #{code})
+    </insert>
 </mapper>

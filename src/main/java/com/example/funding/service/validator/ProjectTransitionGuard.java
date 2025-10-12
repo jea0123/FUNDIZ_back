@@ -129,7 +129,7 @@ public class ProjectTransitionGuard {
         if (creatorId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "창작자 ID가 필요합니다.");
         }
-        if (!creatorMapper.existsCreator(creatorId)) {
+        if (creatorMapper.existsCreator(creatorId) <= 0) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "유효하지 않은 창작자입니다.");
         }
     }

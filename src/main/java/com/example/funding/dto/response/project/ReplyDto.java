@@ -14,5 +14,9 @@ public class ReplyDto {
     private Long cmId;
     private Long userId;
     private String content;
+    private Character isSecret;
     private LocalDateTime createdAt;
+
+    private String nickname;
+    private String profileImg;
 }

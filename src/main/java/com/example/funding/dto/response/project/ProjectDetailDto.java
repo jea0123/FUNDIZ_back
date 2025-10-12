@@ -49,4 +49,8 @@ public class ProjectDetailDto {
     private List<Reward> rewardList;
     //새소식
     private List<News> newsList;
+
+    //프론트
+    private Boolean isBackedByMe; // 내가 이 프로젝트 후원했는지
+    private Boolean canWriteReview; // 내가 후기 작성할 수 있는지
 }

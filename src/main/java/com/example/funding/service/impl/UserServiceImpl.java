@@ -1,6 +1,9 @@
 package com.example.funding.service.impl;
 
+import com.example.funding.common.PageResult;
+import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.response.creator.CreatorQnaDto;
 import com.example.funding.dto.response.user.*;
 import com.example.funding.exception.UserNotFoundException;
 import com.example.funding.mapper.*;
@@ -29,7 +32,7 @@ public class UserServiceImpl implements UserService {
     private final BackingMapper backingMapper;
 
     private final CreatorMapper creatorMapper;
-    private final QnADetailMapper qnaMapper;
+    private final QnaMapper qnaMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -38,6 +41,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new UserNotFoundException();
         }
+        Long creatorId = userMapper.getCreatorIdByUserId(userId);
         LoginUserDto loginUserDto = LoginUserDto.builder()
                 .userId(user.getUserId())
                 .email(user.getEmail())
@@ -46,6 +50,7 @@ public class UserServiceImpl implements UserService {
                 .joinedAt(user.getJoinedAt())
                 .followCnt(user.getFollowCnt())
                 .isCreator(user.getIsCreator())
+                .creatorId(creatorId)
                 .role(user.getRole().toString())
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "사용자 정보 조회 성공", loginUserDto));
@@ -103,16 +108,20 @@ public class UserServiceImpl implements UserService {
      * @since 2025-09-05
      */
     @Override
-    public ResponseEntity<ResponseDto<List<MyPageQnADto>>> getQnAList(Long userId) {
+    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfUser(Long userId, Pager pager) {
         User user = userMapper.getUserById(userId);
 
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "QnA 리스트가 보이지 않습니다."));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "QnA 리스트 조회 불가"));
         }
 
-        List<MyPageQnADto> QnAList = userMapper.getQnAList(userId);
+        int total = qnaMapper.qnaTotalOfUser(userId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "QnA 리스트 조회 성공", QnAList));
+        List<CreatorQnaDto> qnaList = qnaMapper.getQnaListOfUser(userId, pager);
+
+        PageResult<CreatorQnaDto> result = PageResult.of(qnaList, pager, total);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "Q&A 목록 조회 성공", result));
     }
 
     @Override

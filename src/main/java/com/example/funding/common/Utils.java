@@ -3,28 +3,21 @@ package com.example.funding.common;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.propertyeditors.StringTrimmerEditor;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.ZoneId;
 
 public class Utils {
-    public static int getPercentNow(int currAmount, int goalAmount){
-        if(goalAmount == 0) {
+    public static int getPercentNow(int currAmount, int goalAmount) {
+        if (goalAmount == 0) {
             return 0;
         } else {
             return (int) Math.floor((currAmount * 100.0) / goalAmount);
         }
-    }
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    public static class AnalyticsWindow {
-        private LocalDate from;
-        private LocalDate to;
-        private int months;
-        private String metric;
     }
 
     private static String normalizeMetric(String metric) {
@@ -52,5 +45,20 @@ public class Utils {
             case "all" -> 0;
             default -> 6;
         };
+    }
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class AnalyticsWindow {
+        private LocalDate from;
+        private LocalDate to;
+        private int months;
+        private String metric;
     }
 }

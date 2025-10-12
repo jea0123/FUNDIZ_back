@@ -19,7 +19,6 @@ public class LoginUserDto {
     private LocalDate joinedAt;
     private Integer followCnt;
     private Character isCreator;
+    private Long creatorId;
     private String role;
-
-
 }

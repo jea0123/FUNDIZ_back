@@ -1,18 +1,12 @@
 package com.example.funding.mapper;
 
 import com.example.funding.common.Pager;
+import com.example.funding.dto.request.creator.CreatorRegisterRequestDto;
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
-import com.example.funding.dto.response.creator.CreatorProfileSummaryDto;
-import com.example.funding.dto.response.creator.CreatorProjectDetailDto;
-import com.example.funding.dto.response.creator.CreatorProjectListDto;
-import com.example.funding.dto.response.creator.CreatorQnaDto;
-import com.example.funding.dto.response.creator.CreatorDashboardDto;
-import com.example.funding.dto.response.creator.CreatorDashboardRankDto;
+import com.example.funding.dto.response.creator.*;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
-import com.example.funding.model.Qna;
-
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -20,6 +14,8 @@ import java.util.List;
 
 @Mapper
 public interface CreatorMapper {
+    void insertCreator(CreatorRegisterRequestDto dto);
+
     List<Creator> findByIds(@Param("ids") List<Long> ids);
 
     Creator findById(@Param("creatorId") Long creatorId);

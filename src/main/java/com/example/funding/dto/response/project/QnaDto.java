@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,4 +20,9 @@ public class QnaDto {
     private String title;
     private String content;
     private LocalDateTime createdAt;
+
+    private String nickname;
+    private String profileImg;
+
+    private List<ReplyDto> replyList;
 }

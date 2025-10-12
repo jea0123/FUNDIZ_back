@@ -23,6 +23,7 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -103,11 +104,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
             String role = claims.get("role", String.class);
-            GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.toUpperCase());
+            List<GrantedAuthority> auths = new ArrayList<>();
+            auths.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
             Long userId = ((Number) claims.get("userId")).longValue();
             Long creatorId = userMapper.getCreatorIdByUserId(userId);
+            if (creatorId != null) {
+                auths.add(new SimpleGrantedAuthority("ROLE_CREATOR"));
+            }
 
-            CustomUserPrincipal principal = new CustomUserPrincipal(userId, creatorId, email, List.of(authority));
+            CustomUserPrincipal principal = new CustomUserPrincipal(userId, creatorId, email, auths);
             Authentication auth =
                     new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);

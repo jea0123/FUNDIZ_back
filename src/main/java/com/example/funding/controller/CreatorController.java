@@ -1,29 +1,31 @@
 package com.example.funding.controller;
 
+import com.example.funding.common.CustomUserPrincipal;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.creator.CreatorRegisterRequestDto;
 import com.example.funding.dto.request.creator.NewsCreateRequestDto;
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
 import com.example.funding.dto.request.reward.RewardCreateRequestDto;
-import com.example.funding.dto.response.creator.*;
-import com.example.funding.model.Reward;
-import com.example.funding.model.Qna;
 import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
-import com.example.funding.dto.response.creator.CreatorDashboardDto;
-import com.example.funding.dto.response.creator.CreatorProjectDetailDto;
-import com.example.funding.dto.response.creator.CreatorProjectListDto;
+import com.example.funding.dto.response.creator.*;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
+import com.example.funding.enums.CreatorType;
+import com.example.funding.model.Reward;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.NewsService;
 import com.example.funding.service.RewardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -38,12 +40,26 @@ public class CreatorController {
     private final RewardService rewardService;
     private final NewsService newsService;
 
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseDto<String>> registerCreator(@ModelAttribute CreatorRegisterRequestDto dto, @AuthenticationPrincipal CustomUserPrincipal principal) {
+        MultipartFile file = dto.getProfileImg();
+        if (file != null && file.isEmpty()) {
+            file = null;
+        }
+        CreatorType type = dto.getCreatorType() != null ? dto.getCreatorType() : CreatorType.GENERAL;
+        dto.setProfileImg(file);
+        dto.setCreatorType(type);
+        Long userId = principal.userId();
+        userId = 1L; // TODO: 임시
+        return creatorService.registerCreator(dto, userId);
+    }
+
     /**
      * <p>프로젝트 목록 조회</p>
      *
      * @param creatorId 창작자 ID
-     * @param dto SearchCreatorProjectDto
-     * @param reqPager 요청 pager
+     * @param dto       SearchCreatorProjectDto
+     * @param reqPager  요청 pager
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-10-05
@@ -96,7 +112,7 @@ public class CreatorController {
      * <p>프로젝트 수정</p>
      *
      * @param projectId 프로젝트 ID
-     * @param dto ProjectCreateRequestDto
+     * @param dto       ProjectCreateRequestDto
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-09-16
@@ -182,7 +198,7 @@ public class CreatorController {
      *
      * @param projectId 프로젝트 Id
      * @param creatorId 창작자 ID
-     * @param dto RewardCreateRequestDto
+     * @param dto       RewardCreateRequestDto
      * @return 성공 시 200 Ok
      * @author 조은애
      * @since 2025-10-08
@@ -219,7 +235,7 @@ public class CreatorController {
      * <p>QnA 내역 목록 조회(창작자 기준)</p>
      *
      * @param creatorId 창작자 ID
-     * @param reqPager Pager
+     * @param reqPager  Pager
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-10-08
@@ -237,29 +253,30 @@ public class CreatorController {
 
     /**
      * <p>창작자의 대시보드</p>
+     *
      * @param creatorId
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-     * @since 2025-10-02
      * @author by: 이윤기
+     * @since 2025-10-02
      */
 
     @GetMapping("/dashBoard")
-    public ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(@RequestAttribute Long creatorId){
+    public ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(@RequestAttribute Long creatorId) {
         return creatorService.getCreatorDashBoard(creatorId);
     }
 
     @GetMapping("/backingList")
-    public ResponseEntity<ResponseDto<List<BackingCreatorProjectListDto>>> getBackingList(@RequestAttribute Long creatorId){
+    public ResponseEntity<ResponseDto<List<BackingCreatorProjectListDto>>> getBackingList(@RequestAttribute Long creatorId) {
         return creatorService.getCreatorProjectList(creatorId);
     }
 
     @GetMapping("/shippingList")
-    public ResponseEntity<ResponseDto<List<CreatorShippingProjectList>>> getShippingList(@RequestAttribute Long creatorId){
+    public ResponseEntity<ResponseDto<List<CreatorShippingProjectList>>> getShippingList(@RequestAttribute Long creatorId) {
         return creatorService.getCreatorShippingList(creatorId);
     }
 
     @GetMapping("/shippingBackerList/{projectId}")
-    public ResponseEntity<ResponseDto<List<CreatorShippingBackerList>>> getShippingBackerList(@RequestAttribute Long creatorId, @PathVariable Long projectId){
+    public ResponseEntity<ResponseDto<List<CreatorShippingBackerList>>> getShippingBackerList(@RequestAttribute Long creatorId, @PathVariable Long projectId) {
         return creatorService.getShippingBackerList(creatorId, projectId);
     }
 
@@ -267,7 +284,7 @@ public class CreatorController {
      * <p>프로젝트 새소식 등록</p>
      *
      * @param projectId 프로젝트 ID
-     * @param dto NewsCreateRequestDto
+     * @param dto       NewsCreateRequestDto
      * @param creatorId 창작자 ID
      * @return 성공 시 200 Ok
      * @author 조은애

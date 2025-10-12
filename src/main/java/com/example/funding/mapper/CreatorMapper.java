@@ -40,7 +40,7 @@ public interface CreatorMapper {
 
     CreatorProjectDetailDto getProjectDetail(@Param("projectId") Long projectId, @Param("creatorId") Long creatorId);
 
-    boolean existsCreator(@Param("creatorId") Long creatorId);
+    int existsCreator(@Param("creatorId") Long creatorId);
 
     boolean hasRequiredCreatorProfile(@Param("creatorId") Long creatorId);
 

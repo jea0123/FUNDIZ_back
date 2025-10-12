@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -42,6 +43,7 @@ public class CommunityServiceImpl implements CommunityService {
      * @since 2025-10-03
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CursorPage<CommunityDto>>> getCommunityList(Long projectId, String code, LocalDateTime lastCreatedAt, Long lastId, int size) {
         List<CommunityDto> communityList = communityMapper.getCommunityList(projectId, "CM", lastCreatedAt, lastId, size);
 
@@ -55,10 +57,14 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     /**
+     * <p>프로젝트 상세 페이지 - 커뮤니티 등록</p>
      *
-     * @param projectId
-     * @param dto
-     * @return
+     * @param projectId 프로젝트 ID
+     * @param dto CommunityCreateRequestDto
+     * @param userId 사용자 ID
+     * @return 성공 시 200 OK
+     * @author 조은애
+     * @since 2025-10-12
      */
     @Override
     public ResponseEntity<ResponseDto<String>> createCommunity(Long projectId, CommunityCreateRequestDto dto, Long userId) {
@@ -91,6 +97,7 @@ public class CommunityServiceImpl implements CommunityService {
      * @since 2025-10-03
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CursorPage<ReviewDto>>> getReviewList(Long projectId, String code, LocalDateTime lastCreatedAt, Long lastId, int size) {
         List<ReviewDto> reviewList = communityMapper.getReviewList(projectId, "RV", lastCreatedAt, lastId, size);
 

@@ -209,11 +209,10 @@
         AND ISVERIFIED = 'N'
     </update>
 
-    <select id="existsCreator" resultType="Integer">
-        SELECT 1
+    <select id="existsCreator" resultType="int">
+        SELECT COUNT(*)
         FROM CREATOR
         WHERE CREATORID = #{creatorId}
-        AND ROWNUM = 1
     </select>
 
     <select id="hasRequiredCreatorProfile" resultType="boolean">

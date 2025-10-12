@@ -33,38 +33,17 @@
             b.CODE AS code,
             b.RATING AS rating,
             u.NICKNAME AS nickname,
-            u.PROFILEIMG AS profileImg,
-            r.REPLYID AS r_replyId,
-            r.USERID AS r_userId,
-            r.CONTENT AS r_content,
-            r.CREATEDAT AS r_createdAt
+            u.PROFILEIMG AS profileImg
         FROM base b
         LEFT JOIN USERS u ON u.USERID = b.USERID
-        LEFT JOIN REPLY r ON r.CMID = b.CMID AND TRIM(r.CODE) = #{code}
-        ORDER BY b.CREATEDAT DESC, b.CMID DESC, r.CREATEDAT ASC, r.REPLYID ASC
+        ORDER BY b.CREATEDAT DESC, b.CMID DESC
     </sql>
 
-    <resultMap id="communityMap" type="communityDto" autoMapping="true">
-        <id property="cmId" column="cmId" jdbcType="NUMERIC" />
-
-        <collection property="replyList" ofType="replyDto" columnPrefix="r_" autoMapping="true">
-            <id property="replyId" column="r_replyId" jdbcType="NUMERIC" />
-        </collection>
-    </resultMap>
-
-    <resultMap id="reviewMap" type="reviewDto" autoMapping="true">
-        <id property="cmId" column="cmId" jdbcType="NUMERIC" />
-
-        <collection property="replyList" ofType="replyDto" columnPrefix="r_" autoMapping="true">
-            <id property="replyId" column="r_replyId" jdbcType="NUMERIC" />
-        </collection>
-    </resultMap>
-
-    <select id="getCommunityList" resultMap="communityMap" resultOrdered="true">
+    <select id="getCommunityList" resultType="communityDto">
         <include refid="foldedQuery" />
     </select>
 
-    <select id="getReviewList" resultMap="reviewMap" resultOrdered="true">
+    <select id="getReviewList" resultType="reviewDto">
         <include refid="foldedQuery" />
     </select>
     <!-- END 커뮤니티/후기 목록 -->
@@ -77,4 +56,9 @@
         INSERT INTO COMMUNITY (CMID, USERID, PROJECTID, CMCONTENT, CODE)
         VALUES (#{cmId}, #{userId}, #{projectId}, #{cmContent}, 'CM')
     </insert>
+
+    <select id="existsCommunityById" resultType="int">
+        SELECT COUNT(*) FROM COMMUNITY
+        WHERE CMID = #{cmId}
+    </select>
 </mapper>

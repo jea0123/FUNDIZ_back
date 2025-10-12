@@ -32,4 +32,6 @@ public interface CommunityMapper {
     int addQuestion(Qna item);
 
     int createCommunity(Community community);
+
+    int existsCommunityById(@Param("cmId") Long cmId);
 }

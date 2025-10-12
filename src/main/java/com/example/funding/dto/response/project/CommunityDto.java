@@ -19,6 +19,4 @@ public class CommunityDto {
 
     private String nickname;
     private String profileImg;
-
-    private List<ReplyDto> replyList;
 }

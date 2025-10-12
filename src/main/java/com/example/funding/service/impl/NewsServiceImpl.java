@@ -18,6 +18,16 @@ import org.springframework.web.server.ResponseStatusException;
 public class NewsServiceImpl implements NewsService {
     private final NewsMapper newsMapper;
 
+    /**
+     * <p>프로젝트 새소식 등록</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param dto NewsCreateRequestDto
+     * @param creatorId 창작자 ID
+     * @return 성공 시 200 Ok
+     * @author 조은애
+     * @since 2025-10-11
+     */
     @Override
     public ResponseEntity<ResponseDto<String>> createNews(Long projectId, Long creatorId, NewsCreateRequestDto dto) {
         //TODO: guard, validator

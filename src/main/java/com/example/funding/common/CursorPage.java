@@ -1,4 +1,4 @@
-package com.example.funding.dto.response.project;
+package com.example.funding.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -2,7 +2,7 @@ package com.example.funding.service;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.QnaAddRequestDto;
-import com.example.funding.dto.response.project.CursorPage;
+import com.example.funding.common.CursorPage;
 import com.example.funding.dto.response.project.QnaDto;
 import org.springframework.http.ResponseEntity;
 

@@ -2,12 +2,11 @@ package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.QnaAddRequestDto;
-import com.example.funding.dto.response.project.Cursor;
-import com.example.funding.dto.response.project.CursorPage;
+import com.example.funding.common.Cursor;
+import com.example.funding.common.CursorPage;
 import com.example.funding.dto.response.project.QnaDto;
 import com.example.funding.mapper.QnaMapper;
 import com.example.funding.mapper.ReplyMapper;
-import com.example.funding.model.Qna;
 import com.example.funding.service.QnaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

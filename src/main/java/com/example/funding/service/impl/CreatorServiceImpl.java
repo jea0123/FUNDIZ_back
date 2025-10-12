@@ -4,17 +4,12 @@ import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.creator.CreatorRegisterRequestDto;
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
-import com.example.funding.dto.response.creator.*;
 import com.example.funding.dto.response.backing.BackingCreatorBackerList;
 import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
-import com.example.funding.dto.response.creator.CreatorProjectDetailDto;
-import com.example.funding.dto.response.creator.CreatorProjectListDto;
-import com.example.funding.dto.response.creator.CreatorQnaDto;
-import com.example.funding.dto.response.creator.CreatorProjectSummaryDto;
-import com.example.funding.dto.response.creator.CreatorDashboardDto;
-import com.example.funding.dto.response.creator.CreatorDashboardRankDto;
+import com.example.funding.dto.response.creator.*;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
 import com.example.funding.mapper.*;
@@ -32,13 +27,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class CreatorServiceImpl implements CreatorService {
+    private static final int MAX_TAGS = 10;
+    private static final int MAX_LENGTH = 20;
     private final CreatorMapper creatorMapper;
     private final ProjectMapper projectMapper;
     private final TagMapper tagMapper;
@@ -48,9 +48,22 @@ public class CreatorServiceImpl implements CreatorService {
     private final SettlementMapper settlementMapper;
     private final BackingMapper backingMapper;
     private final ShippingMapper shippingMapper;
-
     private final ProjectInputValidator inputValidator;
     private final ProjectTransitionGuard transitionGuard;
+
+    private static List<String> normalizeTags(List<String> tagList) {
+        //불변 빈 리스트
+        if (tagList == null) return List.of();
+
+        List<String> out = new ArrayList<>(tagList.size());
+        for (String tag : tagList) {
+            if (tag == null) continue;
+            String display = ValidationRules.normTagDisplay(tag);
+            if (!display.isEmpty()) out.add(display);
+        }
+
+        return List.copyOf(out);
+    }
 
     /**
      * <p>프로젝트 목록 조회</p>
@@ -173,15 +186,15 @@ public class CreatorServiceImpl implements CreatorService {
         }
 
         Project project = Project.builder()
-            .projectId(dto.getProjectId())
-            .subctgrId(dto.getSubctgrId())
-            .title(dto.getTitle())
-            .content(dto.getContent())
-            .thumbnail(dto.getThumbnail())
-            .goalAmount(dto.getGoalAmount())
-            .startDate(dto.getStartDate())
-            .endDate(dto.getEndDate())
-            .build();
+                .projectId(dto.getProjectId())
+                .subctgrId(dto.getSubctgrId())
+                .title(dto.getTitle())
+                .content(dto.getContent())
+                .thumbnail(dto.getThumbnail())
+                .goalAmount(dto.getGoalAmount())
+                .startDate(dto.getStartDate())
+                .endDate(dto.getEndDate())
+                .build();
 
         int result = creatorMapper.updateProject(creatorId, project);
         if (result == 0) {
@@ -269,10 +282,10 @@ public class CreatorServiceImpl implements CreatorService {
         }
 
         CreatorProjectSummaryDto dto = new CreatorProjectSummaryDto(
-            project.getProjectId(),
-            project.getTitle(),
-            project.getEndDate(),
-            project.getProjectStatus()
+                project.getProjectId(),
+                project.getTitle(),
+                project.getEndDate(),
+                project.getProjectStatus()
         );
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 요약 조회 성공", dto));
@@ -309,28 +322,11 @@ public class CreatorServiceImpl implements CreatorService {
         return ResponseEntity.ok(ResponseDto.success(200, "창작자 프로필 조회 성공", summary));
     }
 
-    private static final int MAX_TAGS = 10;
-    private static final int MAX_LENGTH = 20;
-
-    private static List<String> normalizeTags(List<String> tagList) {
-        //불변 빈 리스트
-        if (tagList == null) return List.of();
-
-        List<String> out = new ArrayList<>(tagList.size());
-        for (String tag : tagList) {
-            if (tag == null) continue;
-            String display = ValidationRules.normTagDisplay(tag);
-            if (!display.isEmpty()) out.add(display);
-        }
-
-        return List.copyOf(out);
-    }
-
     /**
      * <p>QnA 내역 목록 조회(창작자 기준)</p>
      *
      * @param creatorId 창작자 ID
-     * @param pager Pager
+     * @param pager     Pager
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-10-08
@@ -350,7 +346,7 @@ public class CreatorServiceImpl implements CreatorService {
      * <p>프로젝트 목록 조회</p>
      *
      * @param creatorId 창작자 ID
-     * 대시보드
+     *                  대시보드
      * @return 성공 시 200 OK
      * @author 이윤기
      * @since 2025-10-08
@@ -368,12 +364,12 @@ public class CreatorServiceImpl implements CreatorService {
 
         //달성률 계산 (실패)
         double failedProject = (failedProjectCnt / totalProjectCnt) * 100;
-        failedProject = Math.round(failedProject* 100.0) / 100.0;
+        failedProject = Math.round(failedProject * 100.0) / 100.0;
 
         //달성률 계산(성공)
         double successProject = 100.0 - failedProject;
 
-        List<CreatorDashboardRankDto>  DashboardRank= creatorMapper.getProjectRankDate(creatorId);
+        List<CreatorDashboardRankDto> DashboardRank = creatorMapper.getProjectRankDate(creatorId);
 
         //내 프로젝트 후원자 랭킹
         List<CreatorDashboardRankDto> top3Backer = DashboardRank.stream()
@@ -468,7 +464,6 @@ public class CreatorServiceImpl implements CreatorService {
      */
 
     // 컨트롤러 나눠서 구현 -1
-
     @Override
     public ResponseEntity<ResponseDto<List<CreatorShippingProjectList>>> getCreatorShippingList(Long creatorId) {
         List<CreatorShippingProjectList> shippingProjectLists = projectMapper.getCShippingList(creatorId);
@@ -493,5 +488,15 @@ public class CreatorServiceImpl implements CreatorService {
         return ResponseEntity.ok(ResponseDto.success(200, "창작자의 배송(후원자) 리스트 조회 성공", shippingBackerLists));
     }
 
-
+    @Override
+    public ResponseEntity<ResponseDto<String>> registerCreator(CreatorRegisterRequestDto dto, Long userId) {
+        if (userMapper.getUserById(userId) == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 사용자입니다.");
+        }
+        if (userMapper.getCreatorIdByUserId(userId) != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 창작자입니다.");
+        }
+        creatorMapper.insertCreator(dto);
+        return ResponseEntity.ok(ResponseDto.success(200, "창작자 등록 성공", dto.getCreatorName()));
+    }
 }

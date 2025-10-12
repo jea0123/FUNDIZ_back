@@ -15,6 +15,7 @@ public class CreatorShippingBackerList {
     //유저
     private Long userId;
     private String email;
+    private String nickname;
 
     //창작자
     private Long creatorId;

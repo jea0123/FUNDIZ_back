@@ -286,8 +286,14 @@ public class AdminServiceImpl implements AdminService {
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트가 성공적으로 반려되었습니다.", null));
     }
 
-    //회원관리 목록
-    //251006
+    /**
+     * <p>회원 관리 목록 조회</p>
+     *
+     * @param pager Pager
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-10-06
+     */
     @Override
     public ResponseEntity<ResponseDto<PageResult<User>>> userList(Pager pager) {
         int total = adminMapper.userTotal();

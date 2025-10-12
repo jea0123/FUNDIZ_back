@@ -1,19 +1,13 @@
 package com.example.funding.service.impl;
 
-import com.example.funding.common.PageResult;
-import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.request.cs.IqrAddRequestDto;
-import com.example.funding.dto.request.project.QnaAddRequestDto;
 import com.example.funding.dto.response.project.*;
 import com.example.funding.mapper.CommunityMapper;
 import com.example.funding.mapper.ReplyMapper;
 import com.example.funding.mapper.UserMapper;
-import com.example.funding.model.*;
 import com.example.funding.service.CommunityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -77,37 +71,5 @@ public class CommunityServiceImpl implements CommunityService {
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "리뷰 조회 성공", CursorPage.of(reviewList, next)));
-    }
-
-    //QnA 목록 조회
-    //251007
-    @Override
-    public ResponseEntity<ResponseDto<PageResult<Qna>>> getQnaListOfPJ(Long projectId, Pager pager) {
-        int total = communityMapper.qnaTotalOfPJ(projectId);
-
-        List<Qna> qnaList = communityMapper.getQnaListOfPJ(projectId, pager);
-
-        PageResult<Qna> result = PageResult.of(qnaList, pager, total);
-
-        return ResponseEntity.ok(ResponseDto.success(200, "Q&A 목록 조회 성공", result));
-    }
-
-    //QnA 질문 등록
-    //251008
-    @Override
-    public ResponseEntity<ResponseDto<String>> addQuestion(Long projectId, Long userId, QnaAddRequestDto qnaDto) {
-        Qna item = Qna.builder()
-                .projectId(projectId)
-                .userId(userId)
-                .content(qnaDto.getContent())
-                .createdAt(qnaDto.getCreatedAt())
-                .build();
-
-        int result = communityMapper.addQuestion(item);
-
-        if (result == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "문의 등록 실패"));
-        }
-        return ResponseEntity.ok(ResponseDto.success(200, "문의 등록 성공", "데이터 출력확인"));
     }
 }

@@ -213,8 +213,14 @@ public class AdminController {
         return adminService.rejectProject(projectId, dto.getRejectedReason());
     }
 
-    //회원관리
-    //251006
+    /**
+     * <p>회원 관리 목록 조회</p>
+     *
+     * @param reqPager Pager
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-10-06
+     */
     @GetMapping("/user/list")
     public ResponseEntity<ResponseDto<PageResult<User>>> userList(Pager reqPager) {
         Pager pager = Pager.ofRequest(

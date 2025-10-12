@@ -237,7 +237,7 @@ public class AdminController {
         Pager pager = Pager.ofRequest(
                 reqPager != null ? reqPager.getPage() : 1,
                 reqPager != null ? reqPager.getSize() : 10,
-                reqPager != null ? reqPager.getPerGroup() : 10
+                reqPager != null ? reqPager.getPerGroup() : 5
         );
 
         return adminService.userList(pager);

@@ -1,5 +1,6 @@
 package com.example.funding.handler;
 
+import com.example.funding.exception.BusinessException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanCreationException;
@@ -209,6 +210,12 @@ public class GlobalExceptionHandler {
         String body = "요청하신 리소스를 찾을 수 없습니다.";
         log.warn("[404 NoResource] {} | raw: {}", body, clean(e));
         return json(HttpStatus.NOT_FOUND, body, req);
+    }
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ApiError> handleBusiness(BusinessException e, HttpServletRequest req) {
+        log.warn("[Business] {}", e.getMessage());
+        return json(e.getStatus(), e.getMessage(), req);
     }
 
     /* =======================

@@ -6,6 +6,7 @@ import com.example.funding.dto.request.user.UserNicknameDto;
 import com.example.funding.dto.request.user.UserPasswordDto;
 import com.example.funding.dto.request.user.UserProfileImgDto;
 import com.example.funding.dto.response.user.*;
+import com.example.funding.exception.UserNotFoundException;
 import com.example.funding.service.ProjectService;
 import com.example.funding.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class UserController {
      *
      * @param principal 인증된 사용자의 정보
      * @return 로그인 사용자 정보
+     * @throws UserNotFoundException 사용자가 존재하지 않을 때
      * @author by: 장민규
      */
     @GetMapping("/loginUser")
@@ -44,6 +46,7 @@ public class UserController {
      *
      * @param principal 인증된 사용자의 정보
      * @return 최근 본 프로젝트 목록
+     * @throws UserNotFoundException 사용자가 존재하지 않을 때
      * @author by: 장민규
      * @since 2025-09-05
      */

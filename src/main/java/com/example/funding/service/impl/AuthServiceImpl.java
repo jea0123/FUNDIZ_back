@@ -5,6 +5,9 @@ import com.example.funding.dto.request.auth.CheckEmailRequestDto;
 import com.example.funding.dto.request.auth.CheckNicknameRequestDto;
 import com.example.funding.dto.request.auth.SignInRequestDto;
 import com.example.funding.dto.request.auth.SignUpRequestDto;
+import com.example.funding.exception.DuplicatedEmailException;
+import com.example.funding.exception.DuplicatedNicknameException;
+import com.example.funding.exception.InvalidCredentialsException;
 import com.example.funding.mapper.UserMapper;
 import com.example.funding.model.User;
 import com.example.funding.provider.JwtProvider;
@@ -16,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
 @Service
@@ -32,7 +34,7 @@ public class AuthServiceImpl implements AuthService {
     public ResponseEntity<ResponseDto<String>> signUp(SignUpRequestDto dto) {
         User existingUser = userMapper.findByEmail(dto.getEmail());
         if (existingUser != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 사용중인 이메일입니다.");
+            throw new DuplicatedEmailException();
         }
         String encodedPassword = passwordEncoder.encode(dto.getPassword());
         dto.setPassword(encodedPassword);
@@ -48,7 +50,7 @@ public class AuthServiceImpl implements AuthService {
         String encodedPassword = passwordEncoder.encode(dto.getPassword());
 
         if (user == null || passwordEncoder.matches(encodedPassword, user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이메일 또는 비밀번호가 올바르지 않습니다.");
+            throw new InvalidCredentialsException();
         }
         String token = jwtProvider.createAccessToken(user.getUserId(), user.getEmail(), user.getRole().toString());
         userMapper.updateLastLogin(user.getUserId());
@@ -59,7 +61,7 @@ public class AuthServiceImpl implements AuthService {
     public ResponseEntity<ResponseDto<String>> checkEmail(CheckEmailRequestDto dto) {
         User existingUser = userMapper.findByEmail(dto.getEmail());
         if (existingUser != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 사용중인 이메일입니다.");
+            throw new DuplicatedEmailException();
         }
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "사용 가능한 이메일입니다.", dto.getEmail()));
     }
@@ -68,7 +70,7 @@ public class AuthServiceImpl implements AuthService {
     public ResponseEntity<ResponseDto<String>> checkNickname(CheckNicknameRequestDto dto) {
         User existingUser = userMapper.findByNickname(dto.getNickname());
         if (existingUser != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 사용중인 닉네임입니다.");
+            throw new DuplicatedNicknameException();
         }
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "사용 가능한 닉네임입니다.", dto.getNickname()));
     }

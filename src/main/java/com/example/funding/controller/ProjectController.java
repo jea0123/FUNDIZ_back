@@ -3,10 +3,12 @@ package com.example.funding.controller;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.project.SearchProjectDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
-import com.example.funding.dto.request.project.SearchProjectDto;
+import com.example.funding.exception.FeaturedProjectNotFoundException;
+import com.example.funding.exception.RecentPaidProjectNotFoundException;
 import com.example.funding.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +39,8 @@ public class ProjectController {
     /**
      * <p>최근 등록된 프로젝트 상위 10개 조회</p>
      *
-     * @return 성공 시 200 OK
+     * @return 최근 등록된 프로젝트 상위 10개
+     * @throws RecentPaidProjectNotFoundException 최근 24시간 내 결제된 프로젝트가 없을 경우
      * @author by: 장민규
      * @since 2025-09-03
      */
@@ -51,7 +54,8 @@ public class ProjectController {
      *
      * @param days  최근 N일 이내 시작된 프로젝트
      * @param limit 최대 조회 개수
-     * @return 성공 시 200 OK
+     * @return 추천 프로젝트 리스트
+     * @throws FeaturedProjectNotFoundException 추천 프로젝트가 없을 경우
      * @author by: 장민규
      * @since 2025-09-04
      */
@@ -64,7 +68,7 @@ public class ProjectController {
     /**
      * <p>검색 기능 (제목, 내용, 창작자명, 태그)</p>
      *
-     * @param dto SearchProjectDto
+     * @param dto      SearchProjectDto
      * @param reqPager 요청 pager
      * @return 성공 시 200 OK
      * @author 조은애

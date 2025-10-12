@@ -212,14 +212,21 @@ public class CreatorController {
         return creatorService.getCreatorProfileSummary(creatorId);
     }
 
-    //창작자 QnA 목록 조회
-    //251008
+    /**
+     * <p>QnA 내역 목록 조회(창작자 기준)</p>
+     *
+     * @param creatorId 창작자 ID
+     * @param reqPager Pager
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-10-08
+     */
     @GetMapping("/qna")
     public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfCreator(@RequestAttribute("creatorId") Long creatorId, Pager reqPager) {
         Pager pager = Pager.ofRequest(
                 reqPager != null ? reqPager.getPage() : 1,
                 reqPager != null ? reqPager.getSize() : 10,
-                reqPager != null ? reqPager.getPerGroup() : 10
+                reqPager != null ? reqPager.getPerGroup() : 5
         );
 
         return creatorService.getQnaListOfCreator(creatorId, pager);

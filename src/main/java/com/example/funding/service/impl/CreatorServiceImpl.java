@@ -328,8 +328,15 @@ public class CreatorServiceImpl implements CreatorService {
         return List.copyOf(out);
     }
 
-    //창작자 QnA 목록 조회
-    //251008
+    /**
+     * <p>QnA 내역 목록 조회(창작자 기준)</p>
+     *
+     * @param creatorId 창작자 ID
+     * @param pager Pager
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-10-08
+     */
     @Override
     public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfCreator(Long creatorId, Pager pager) {
         int total = creatorMapper.qnaTotalOfCreator(creatorId);

@@ -79,7 +79,7 @@
         WHERE userId = #{userId}
     </update>
 
-    <select id="isSuspendedCreator" resultType="Integer">
+    <select id="suspendedCreator" resultType="Integer">
         SELECT CASE WHEN ISSUSPENDED = 'Y' THEN 1 ELSE 0 END AS isSuspended
         FROM USERS u
         JOIN CREATOR c ON c.USERID = u.USERID

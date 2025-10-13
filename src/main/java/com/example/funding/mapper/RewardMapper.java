@@ -1,5 +1,6 @@
 package com.example.funding.mapper;
 
+import com.example.funding.dto.response.backing.BackingRewardDto;
 import com.example.funding.model.Reward;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -25,4 +26,6 @@ public interface RewardMapper {
     boolean existsByProjectIdAndNameNormalized(@Param("projectId") Long projectId, @Param("key") String key);
 
     Long getProjectIdByRewardId(@Param("rewardId") Long rewardId);
+
+    List<BackingRewardDto> getBackingProjectRewards(@Param("projectId")Long projectId);
 }

@@ -16,9 +16,7 @@ import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
 import com.example.funding.enums.CreatorType;
 import com.example.funding.exception.AlreadyCreatorException;
 import com.example.funding.exception.UserNotFoundException;
-import com.example.funding.mapper.CreatorMapper;
 import com.example.funding.mapper.ProjectMapper;
-import com.example.funding.model.Attach;
 import com.example.funding.model.Reward;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.NewsService;
@@ -32,9 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.imageio.ImageIO;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,7 +44,6 @@ public class CreatorController {
     private final RewardService rewardService;
     private final NewsService newsService;
     private final FileUploader fileUploader;
-    private final ProjectMapper projectMapper;
 
     /**
      * <p>크리에이터 등록</p>
@@ -64,13 +59,13 @@ public class CreatorController {
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseDto<String>> registerCreator(@ModelAttribute CreatorRegisterRequestDto dto
 //                                                               @AuthenticationPrincipal CustomUserPrincipal principal
-    ) {
-//        MultipartFile file = dto.getProfileImg();
-//        if (file != null && file.isEmpty()) {
-//            file = null;
-//        }
+    ) throws IOException {
+        MultipartFile file = dto.getProfileImg();
+        if (file != null && file.isEmpty()) {
+            file = null;
+        }
         CreatorType type = dto.getCreatorType() != null ? dto.getCreatorType() : CreatorType.GENERAL;
-//        dto.setProfileImg(file);
+        dto.setProfileImg(file);
         dto.setCreatorType(type);
 //        Long userId = principal.userId();
         Long userId = 400L; // TODO: 임시

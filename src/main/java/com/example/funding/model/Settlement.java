@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @AllArgsConstructor
 @Getter
@@ -19,4 +18,6 @@ public class Settlement {
     private Long fee;
     private Long settlementAmount;
     private LocalDate settlementDate;
+    private String settlementStatus;
+    private Long refundAmount;
 }

@@ -58,4 +58,6 @@ public interface AuthService {
      * @since 2025-08-27
      */
     ResponseEntity<ResponseDto<String>> checkNickname(CheckNicknameRequestDto dto);
+
+    ResponseEntity<ResponseDto<String>> withdrawUser(Long userId);
 }

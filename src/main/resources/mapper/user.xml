@@ -64,12 +64,12 @@
     <update id="updateNickname">
         UPDATE USERS
         SET nickname = #{nickname}
-        WHERE userId = #{userID}
+        WHERE userId = #{userId}
     </update>
 
     <update id="updatePwd">
         UPDATE USERS
-        SET pwd = #{pwd}
+        SET pwd = #{password}
         WHERE userId = #{userId}
     </update>
 
@@ -85,5 +85,10 @@
         JOIN CREATOR c ON c.USERID = u.USERID
         WHERE c.CREATORID = #{creatorId}
     </select>
+    
+    <delete id="withdrawUser" parameterType="long">
+        DELETE FROM USERS
+        WHERE USERID = #{userId}
+    </delete>
 
 </mapper>

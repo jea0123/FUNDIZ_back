@@ -5,7 +5,7 @@
     <select id="existsByProjectId" resultType="int">
         SELECT COUNT(*)
         FROM settlement
-        WHERE projectId = #{projectId} AND settlementStatus = 'WAITING'
+        WHERE projectId = #{projectId}
     </select>
 
     <select id="getStatus" resultType="string">

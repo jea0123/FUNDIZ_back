@@ -1,7 +1,6 @@
 package com.example.funding.mapper;
 
 import com.example.funding.common.Pager;
-import com.example.funding.dto.request.creator.CreatorRegisterRequestDto;
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
 import com.example.funding.dto.response.creator.*;
@@ -14,7 +13,7 @@ import java.util.List;
 
 @Mapper
 public interface CreatorMapper {
-    void insertCreator(CreatorRegisterRequestDto dto);
+    void insertCreator(Creator creator);
 
     List<Creator> findByIds(@Param("ids") List<Long> ids);
 

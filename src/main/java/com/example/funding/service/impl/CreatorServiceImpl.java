@@ -12,7 +12,10 @@ import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
 import com.example.funding.dto.response.creator.*;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
+import com.example.funding.exception.AlreadyCreatorException;
+import com.example.funding.exception.UserNotFoundException;
 import com.example.funding.mapper.*;
+import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.RewardService;
@@ -491,12 +494,23 @@ public class CreatorServiceImpl implements CreatorService {
     @Override
     public ResponseEntity<ResponseDto<String>> registerCreator(CreatorRegisterRequestDto dto, Long userId) {
         if (userMapper.getUserById(userId) == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 사용자입니다.");
+            throw new UserNotFoundException();
         }
         if (userMapper.getCreatorIdByUserId(userId) != null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 창작자입니다.");
+            throw new AlreadyCreatorException();
         }
-        creatorMapper.insertCreator(dto);
+        Creator creator = Creator.builder()
+                .userId(userId)
+                .creatorName(dto.getCreatorName())
+                .creatorType(dto.getCreatorType().name())
+                .businessNum(dto.getBusinessNumber())
+//                .profileImg(dto.getProfileImg())
+                .email(dto.getEmail())
+                .phone(dto.getPhone())
+                .account(dto.getAccount())
+                .bank(dto.getBank())
+                .build();
+        creatorMapper.insertCreator(creator);
         return ResponseEntity.ok(ResponseDto.success(200, "창작자 등록 성공", dto.getCreatorName()));
     }
 }

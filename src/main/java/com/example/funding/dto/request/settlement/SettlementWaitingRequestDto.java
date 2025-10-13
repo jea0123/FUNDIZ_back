@@ -1,12 +1,11 @@
-package com.example.funding.dto.request.admin;
+package com.example.funding.dto.request.settlement;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class SettlementPaidRequestDto {
-    private Long settlementId;
+public class SettlementWaitingRequestDto {
     private Long projectId;
     private Long creatorId;
     private Long totalAmount;

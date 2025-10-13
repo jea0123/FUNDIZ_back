@@ -1,4 +1,4 @@
-package com.example.funding.dto.response.creator;
+package com.example.funding.dto.response.settlement;
 
 import com.example.funding.dto.row.SettlementSummary;
 import com.example.funding.model.Settlement;

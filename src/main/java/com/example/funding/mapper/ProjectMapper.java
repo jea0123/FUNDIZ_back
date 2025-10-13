@@ -48,7 +48,7 @@ public interface ProjectMapper {
 
     int updateProjectsToFailed();
 
-    void updateProjectToSettled(@Param("projectId") Long projectId);
+    void updateProjectSettled(@Param("projectId") Long projectId, @Param("status") String status);
 
     LocalDate getProjectEndDate(@Param("projectId") Long projectId);
 

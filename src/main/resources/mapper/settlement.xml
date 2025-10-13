@@ -8,18 +8,17 @@
         WHERE projectId = #{projectId} AND settlementStatus = 'WAITING'
     </select>
 
-    <select id="isPaid" resultType="int">
-        SELECT COUNT(*)
+    <select id="getStatus" resultType="string">
+        SELECT settlementStatus
         FROM settlement
-        WHERE projectId = #{projectId} AND settlementId = #{settlementId} AND settlementStatus = 'PAID'
+        WHERE projectId = #{projectId} AND creatorId = #{creatorId} AND settlementId = #{settlementId}
     </select>
 
-    <update id="updateSettlementPaid" parameterType="settlementPaidRequestDto">
+    <update id="updateSettlementStatus" parameterType="settlementPaidRequestDto">
         UPDATE settlement
-        SET settlementStatus = 'PAID',
+        SET settlementStatus = #{settlementStatus},
         settlementDate = SYSDATE
-        WHERE projectId = #{projectId} AND creatorId = #{creatorId} AND settlementId = #{settlementId} AND
-        settlementStatus = 'WAITING'
+        WHERE projectId = #{projectId} AND creatorId = #{creatorId} AND settlementId = #{settlementId}
     </update>
 
     <select id="getByCreatorId" resultType="settlement">
@@ -42,6 +41,14 @@
         LEFT JOIN settlement s ON c.creatorId = s.creatorId
         WHERE c.creatorId = #{creatorId}
         GROUP BY c.creatorId, c.creatorName, c.bank, c.account
+    </select>
+
+    <select id="getSettlementSummary" resultType="settlementSummary">
+        SELECT
+        COALESCE(SUM(CASE WHEN s.settlementStatus = 'WAITING' THEN s.settlementAmount END), 0) AS waitingAmount,
+        COALESCE(SUM(CASE WHEN s.settlementStatus = 'PAID' THEN s.settlementAmount END), 0) AS completedAmount,
+        COALESCE(COUNT(CASE WHEN s.settlementStatus = 'PAID' THEN 1 END), 0) AS settledCount
+        FROM settlement s
     </select>
 
     <select id="getTotalAmountCreatorId" parameterType="long" resultType="long">
@@ -69,22 +76,22 @@
         SETTLEMENT_SEQ.NEXTVAL,
         p.projectId,
         p.creatorId,
-        NVL(paid.total_paid, 0)                                         AS totalAmount,
-        ROUND(NVL(paid.total_paid, 0) * #{feeRate,jdbcType=DOUBLE}, 0)  AS fee,
+        NVL(paid.total_paid, 0) AS totalAmount,
+        ROUND(NVL(paid.total_paid, 0) * #{feeRate,jdbcType=DOUBLE}, 0) AS fee,
         NVL(paid.total_paid, 0)
         - ROUND(NVL(paid.total_paid, 0) * #{feeRate,jdbcType=DOUBLE}, 0) AS settlementAmount,
-        SYSDATE                                                         AS settlementDate,
-        'WAITING'                                                       AS ${statusColumn},
-        0                                                               AS refundAmount
+        SYSDATE AS settlementDate,
+        'WAITING' AS ${statusColumn},
+        0 AS refundAmount
         FROM project p
         LEFT JOIN (
         SELECT
         r.projectId,
         SUM(pay.amount) AS total_paid
         FROM payment pay
-        JOIN backing b        ON b.backingId = pay.backingId
+        JOIN backing b ON b.backingId = pay.backingId
         JOIN backingDetail bd ON bd.backingId = b.backingId
-        JOIN reward r         ON r.rewardId = bd.rewardId
+        JOIN reward r ON r.rewardId = bd.rewardId
         WHERE pay.status = 'PAID'
         GROUP BY r.projectId
         ) paid
@@ -98,4 +105,63 @@
         AND s.${statusColumn} IN ('WAITING','PAID')
         )
     </insert>
+
+    <select id="count" resultType="int">
+        SELECT COUNT(1)
+        FROM (
+        <include refid="BaseSelect"/>
+        )
+    </select>
+
+    <select id="findPage" resultType="settlementItem">
+        SELECT *
+        FROM (
+        SELECT t.*, ROWNUM rn
+        FROM (
+        <include refid="BaseSelect"/>
+        ) t
+        WHERE ROWNUM &lt;= #{endRow}
+        )
+        WHERE rn &gt;= #{startRow}
+    </select>
+
+    <sql id="BaseSelect">
+        SELECT
+        s.settlementId,
+        s.projectId,
+        p.title AS projectTitle,
+        s.creatorId,
+        c.creatorName AS creatorName,
+        NVL(s.totalAmount, 0) AS totalAmount,
+        NVL(s.fee, 0) AS fee,
+        NVL(s.settlementAmount, 0) AS settlementAmount,
+        NVL(s.refundAmount, 0) AS refundAmount,
+        s.settlementDate,
+        s.settlementStatus
+        FROM settlement s
+        LEFT JOIN project p ON p.projectId = s.projectId
+        LEFT JOIN creator c ON c.creatorId = s.creatorId
+        WHERE 1 = 1
+        AND p.projectStatus IN ('SUCCESS', 'SETTLED')
+        <if test="q != null and q != ''">
+            AND (
+            LOWER(p.title) LIKE '%' || LOWER(#{q}) || '%'
+            OR LOWER(c.creatorName) LIKE '%' || LOWER(#{q}) || '%'
+            )
+        </if>
+
+        <if test="status != null and status != ''">
+            AND s.settlementStatus = #{status}
+        </if>
+
+        <if test="from != null">
+            AND s.settlementDate &gt;= #{from}
+        </if>
+        <if test="to != null">
+            AND s.settlementDate &lt; #{to} + 1
+        </if>
+        ORDER BY
+<!--        NVL(s.settlementDate, DATE '1970-01-01') DESC,-->
+        s.settlementId DESC
+    </sql>
 </mapper>

@@ -119,12 +119,10 @@ public class ProjectEntityValidator {
      * 창작자 프로필 검증
      */
     public void validateCreatorProfile(Long creatorId, List<String> errors) {
-        boolean ok = creatorMapper.hasRequiredCreatorProfile(creatorId);
-        if (!ok) {
+        if (creatorMapper.hasRequiredCreatorProfile(creatorId) != 1) {
             errors.add("창작자 프로필 필수 항목이 미완성입니다. (창작자명/사업자번호/이메일/전화번호)");
         }
-
-        if (Boolean.TRUE.equals(userMapper.suspendedCreator(creatorId))) {
+        if (userMapper.suspendedCreator(creatorId) == 1) {
             errors.add("정지된 창작자는 프로젝트 등록/수정이 불가합니다.");
         }
     }

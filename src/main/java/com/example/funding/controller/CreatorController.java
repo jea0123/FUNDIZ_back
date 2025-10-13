@@ -1,5 +1,6 @@
 package com.example.funding.controller;
 
+import com.example.funding.common.FileUploader;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
@@ -15,6 +16,7 @@ import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
 import com.example.funding.enums.CreatorType;
 import com.example.funding.exception.AlreadyCreatorException;
 import com.example.funding.exception.UserNotFoundException;
+import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.model.Reward;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.NewsService;
@@ -30,6 +32,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -40,6 +43,7 @@ public class CreatorController {
     private final CreatorService creatorService;
     private final RewardService rewardService;
     private final NewsService newsService;
+    private final FileUploader fileUploader;
 
     /**
      * <p>크리에이터 등록</p>
@@ -120,6 +124,33 @@ public class CreatorController {
         //TODO: userId -> creatorId
 
         return creatorService.createProject(dto, creatorId);
+    }
+
+    /**
+     * <p>프로젝트 생성 - 대표이미지 업로드</p>
+     *
+     * @param file 대표이미지
+     * @return 성공 시 200 OK
+     * @throws IOException I/O 예외
+     * @author 조은애
+     * @since 2025-10-14
+     */
+    @PostMapping(value = "/project/thumbnail", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseDto<ThumbnailUrlDto>> uploadThumbnail(@RequestPart("file") MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "파일을 찾을 수 없습니다.");
+        }
+        String contentType = Optional.ofNullable(file.getContentType()).orElse("application/octet-stream");
+        if (!(contentType.startsWith("image/jpeg") || contentType.startsWith("image/png"))) {
+            throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "JPG 또는 PNG만 허용됩니다.");
+        }
+        if (file.getSize() > 4L * 1024 * 1024) {
+            throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE, "파일 용량은 최대 4MB까지 허용됩니다.");
+        }
+
+        String url = fileUploader.upload(file);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "대표이미지 업로드 성공", new ThumbnailUrlDto(url)));
     }
 
     /**

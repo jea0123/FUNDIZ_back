@@ -301,7 +301,7 @@
         WHERE USERID = #{userId}
     </select>
 
-    <update id="updateUser" parameterType="com.example.funding.dto.request.cs.UserAdminUpdateRequestDto">
+    <update id="updateUser" parameterType="userAdminUpdateRequestDto">
         UPDATE user
         SET USERID = #{userId},
         NICKNAME = #{nickname},

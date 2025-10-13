@@ -1,5 +1,6 @@
 package com.example.funding.service.impl;
 
+import com.example.funding.common.FileUploader;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.common.Utils;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -53,6 +55,7 @@ public class CreatorServiceImpl implements CreatorService {
     private final ShippingMapper shippingMapper;
     private final ProjectInputValidator inputValidator;
     private final ProjectTransitionGuard transitionGuard;
+    private final FileUploader fileUploader;
 
     private static List<String> normalizeTags(List<String> tagList) {
         //불변 빈 리스트
@@ -492,19 +495,20 @@ public class CreatorServiceImpl implements CreatorService {
     }
 
     @Override
-    public ResponseEntity<ResponseDto<String>> registerCreator(CreatorRegisterRequestDto dto, Long userId) {
+    public ResponseEntity<ResponseDto<String>> registerCreator(CreatorRegisterRequestDto dto, Long userId) throws IOException {
         if (userMapper.getUserById(userId) == null) {
             throw new UserNotFoundException();
         }
         if (userMapper.getCreatorIdByUserId(userId) != null) {
             throw new AlreadyCreatorException();
         }
+        String profileImgPath = fileUploader.upload(dto.getProfileImg());
         Creator creator = Creator.builder()
                 .userId(userId)
                 .creatorName(dto.getCreatorName())
                 .creatorType(dto.getCreatorType().name())
                 .businessNum(dto.getBusinessNumber())
-//                .profileImg(dto.getProfileImg())
+                .profileImg(profileImgPath)
                 .email(dto.getEmail())
                 .phone(dto.getPhone())
                 .account(dto.getAccount())

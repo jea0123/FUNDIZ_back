@@ -25,8 +25,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -53,13 +55,13 @@ public class CreatorController {
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseDto<String>> registerCreator(@ModelAttribute CreatorRegisterRequestDto dto
 //                                                               @AuthenticationPrincipal CustomUserPrincipal principal
-    ) {
-//        MultipartFile file = dto.getProfileImg();
-//        if (file != null && file.isEmpty()) {
-//            file = null;
-//        }
+    ) throws IOException {
+        MultipartFile file = dto.getProfileImg();
+        if (file != null && file.isEmpty()) {
+            file = null;
+        }
         CreatorType type = dto.getCreatorType() != null ? dto.getCreatorType() : CreatorType.GENERAL;
-//        dto.setProfileImg(file);
+        dto.setProfileImg(file);
         dto.setCreatorType(type);
 //        Long userId = principal.userId();
         Long userId = 400L; // TODO: 임시

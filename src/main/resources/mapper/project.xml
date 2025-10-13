@@ -374,4 +374,13 @@
         group by p.projectId, p.creatorId, p.title, p.backerCnt
     </select>
 
+    <update id="updateProjectToSettled" parameterType="long">
+        UPDATE project
+        SET projectStatus = 'SETTLED',
+            updatedAt = SYSDATE
+        WHERE projectId = #{projectId}
+          AND projectStatus = 'SUCCESS'
+          AND (ENDDATE + 1) <![CDATA[ < ]]> TRUNC(SYSDATE)
+    </update>
+
 </mapper>

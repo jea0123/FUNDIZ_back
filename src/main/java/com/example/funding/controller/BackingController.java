@@ -30,6 +30,9 @@ public class BackingController {
     @PostMapping("/create/{userId}")
     public ResponseEntity<ResponseDto<String>> createBacking(@RequestBody BackingRequestDto requestDto,
                                                              @PathVariable Long userId) {
+
+        System.out.println("userId=" + userId + "backingId = " + requestDto.getBackingId());
+        System.out.println("body " + requestDto);
         return backingService.createBacking(userId, requestDto);
     }
 

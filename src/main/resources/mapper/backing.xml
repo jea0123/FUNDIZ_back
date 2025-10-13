@@ -210,6 +210,7 @@
         r.rewardId,
         r.rewardName,
         r.price,
+        r.quantity
         r.deliveryDate
 
         FROM users u
@@ -220,14 +221,19 @@
         WHERE u.userId = #{userId}
     </select>
 
-    <insert id="addBacking">
-        <selectKey keyProperty="backingId" resultType="long" order="BEFORE">
-            SELECT BACKING_SEQ.NEXTVAL FROM DUAL
-        </selectKey>
-
-        INSERT INTO BACKING(
-            BACKINGID, USERID, AMOUNT, CREATEDAT, BACKINGSTATUS
-        ) VALUES ( #{backingId}, #{userId}, #{amount}, SYSDATE, #{backingStatus}
+    <insert id="addBacking" parameterType="com.example.funding.dto.request.backing.BackingRequestDto">
+        INSERT INTO backing (
+        backingId,
+        userId,
+        amount,
+        createdAt,
+        backingStatus
+        ) VALUES (
+        BACKING_SEQ.NEXTVAL,
+        #{userId},
+        #{amount},
+        #{createdAt, jdbcType=DATE},
+        #{backingStatus}
         )
     </insert>
 

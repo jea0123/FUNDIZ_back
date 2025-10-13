@@ -1,12 +1,12 @@
 package com.example.funding.dto.response.creator;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
+@NoArgsConstructor
 public class CreatorProfileSummaryDto {
     private Long creatorId;
     private String creatorName;

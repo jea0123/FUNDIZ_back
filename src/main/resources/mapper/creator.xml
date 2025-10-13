@@ -223,7 +223,7 @@
         WHERE CREATORID = #{creatorId}
     </select>
 
-    <select id="hasRequiredCreatorProfile" resultType="boolean">
+    <select id="hasRequiredCreatorProfile" resultType="int">
         <![CDATA[
             SELECT CASE
                 WHEN NVL(TRIM(CREATORNAME), '') <> ''

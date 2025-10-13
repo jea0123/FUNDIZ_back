@@ -312,8 +312,8 @@ public class CreatorServiceImpl implements CreatorService {
         // Guard
         transitionGuard.ensureCreatorExistsOrThrow(creatorId);
 
-        boolean isComplete = creatorMapper.hasRequiredCreatorProfile(creatorId);
-        boolean isSuspended = Boolean.TRUE.equals(userMapper.suspendedCreator(creatorId));
+        boolean isComplete = creatorMapper.hasRequiredCreatorProfile(creatorId) == 1;
+        boolean isSuspended = userMapper.suspendedCreator(creatorId) == 1;
 
         CreatorProfileSummaryDto summary = creatorMapper.getCreatorProfileSummary(creatorId);
         if (summary == null) {

@@ -1,6 +1,5 @@
 package com.example.funding.controller;
 
-import com.example.funding.common.CustomUserPrincipal;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
@@ -14,6 +13,8 @@ import com.example.funding.dto.response.creator.*;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
 import com.example.funding.enums.CreatorType;
+import com.example.funding.exception.AlreadyCreatorException;
+import com.example.funding.exception.UserNotFoundException;
 import com.example.funding.model.Reward;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.NewsService;
@@ -23,9 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -40,17 +39,30 @@ public class CreatorController {
     private final RewardService rewardService;
     private final NewsService newsService;
 
+    /**
+     * <p>크리에이터 등록</p>
+     *
+     * @param dto       크리에이터 등록 요청 DTO
+     * @param principal 인증된 사용자 정보
+     * @return 크리에이터 이름
+     * @throws UserNotFoundException 유저를 찾을 수 없는 경우(404)
+     * @throws AlreadyCreatorException 이미 크리에이터로 등록된 유저인 경우(400)
+     * @author 장민규
+     * @since 2025-10-12
+     */
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseDto<String>> registerCreator(@ModelAttribute CreatorRegisterRequestDto dto, @AuthenticationPrincipal CustomUserPrincipal principal) {
-        MultipartFile file = dto.getProfileImg();
-        if (file != null && file.isEmpty()) {
-            file = null;
-        }
+    public ResponseEntity<ResponseDto<String>> registerCreator(@ModelAttribute CreatorRegisterRequestDto dto
+//                                                               @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+//        MultipartFile file = dto.getProfileImg();
+//        if (file != null && file.isEmpty()) {
+//            file = null;
+//        }
         CreatorType type = dto.getCreatorType() != null ? dto.getCreatorType() : CreatorType.GENERAL;
-        dto.setProfileImg(file);
+//        dto.setProfileImg(file);
         dto.setCreatorType(type);
-        Long userId = principal.userId();
-        userId = 1L; // TODO: 임시
+//        Long userId = principal.userId();
+        Long userId = 400L; // TODO: 임시
         return creatorService.registerCreator(dto, userId);
     }
 

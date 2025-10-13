@@ -10,6 +10,8 @@ import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
 import com.example.funding.dto.response.creator.*;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
+import com.example.funding.exception.AlreadyCreatorException;
+import com.example.funding.exception.UserNotFoundException;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -42,5 +44,14 @@ public interface CreatorService {
 
     ResponseEntity<ResponseDto<List<CreatorShippingBackerList>>> getShippingBackerList(Long creatorId, Long projectId);
 
+    /**
+     * 크리에이터 등록
+     * @param dto 크리에이터 등록 요청 DTO
+     * @param userId 유저 ID
+     * @return 크리에이터 이름
+     * @throws UserNotFoundException 유저를 찾을 수 없는 경우
+     * @throws AlreadyCreatorException 이미 크리에이터로 등록된 유저인 경우
+     * @since 2025-10-12
+     */
     ResponseEntity<ResponseDto<String>> registerCreator(CreatorRegisterRequestDto dto, Long userId);
 }

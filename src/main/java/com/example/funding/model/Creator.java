@@ -19,4 +19,6 @@ public class Creator {
     private String profileImg;
     private String email;
     private String phone;
+    private String account;
+    private String bank;
 }

@@ -7,6 +7,8 @@ import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.admin.AdminProjectUpdateDto;
 import com.example.funding.dto.request.admin.RejectProjectDto;
 import com.example.funding.dto.request.admin.SearchAdminProjectDto;
+import com.example.funding.dto.request.admin.UserAdminUpdateRequestDto;
+import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
 import com.example.funding.dto.request.settlement.SettlementPaidRequestDto;
 import com.example.funding.dto.request.settlement.SettlementSearchCond;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
@@ -19,6 +21,7 @@ import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
 import com.example.funding.dto.response.settlement.SettlementItem;
 import com.example.funding.dto.row.SettlementSummary;
 import com.example.funding.exception.*;
+import com.example.funding.model.Notice;
 import com.example.funding.model.User;
 import com.example.funding.service.AdminService;
 import com.example.funding.service.SettlementService;
@@ -304,5 +307,32 @@ public class AdminController {
     @PostMapping("/settlement")
     public ResponseEntity<ResponseDto<String>> updateStatus(@RequestBody SettlementPaidRequestDto dto) {
         return settlementService.updateStatus(dto);
+    }
+
+    /**
+     * <p>회원 정보 상세 페이지 조회</p>
+     *
+     * @param userId 사용자 ID
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author 이동혁
+     * @since 2025-10-13
+     */
+    @GetMapping("/user/info/{userId}")
+    public ResponseEntity<ResponseDto<User>> item(@PathVariable Long userId) {
+        return adminService.item(userId);
+    }
+
+    /**
+     * <p>회원 정보 수정(관리자)</p>
+     *
+     * @param userId 사용자 ID
+     * @param userDto UserAdminUpdateRequestDto
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author 이동혁
+     * @since 2025-10-13
+     */
+    @PostMapping("/user/update/{userId}")
+    public ResponseEntity<ResponseDto<String>> updateNotice(@PathVariable Long userId, @RequestBody UserAdminUpdateRequestDto userDto){
+        return adminService.updateUser(userId, userDto);
     }
 }

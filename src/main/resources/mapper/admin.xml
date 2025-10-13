@@ -296,4 +296,20 @@
         WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
 
+    <select id="userDetail" resultType="user">
+        SELECT * FROM user
+        WHERE USERID = #{userId}
+    </select>
+
+    <update id="updateUser" parameterType="com.example.funding.dto.request.cs.UserAdminUpdateRequestDto">
+        UPDATE user
+        SET USERID = #{userId},
+        NICKNAME = #{nickname},
+        ISSUSPENDED = #{isSuspended},
+        REASON = #{reason},
+        SUSPENDEDAT = SYSDATE,
+        RELEASEDAT = SYSDATE,
+        WHERE USERID=#{userId}
+    </update>
+
 </mapper>

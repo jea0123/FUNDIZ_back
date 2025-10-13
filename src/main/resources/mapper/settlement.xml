@@ -2,11 +2,41 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.funding.mapper.SettlementMapper">
 
+    <select id="getByCreatorId" resultType="settlement">
+        SELECT
+            *
+        FROM settlement
+        WHERE creatorId = #{creatorId}
+    </select>
+
+    <select id="getSettlementSummaryByCreatorId" parameterType="long" resultType="settlementSummary">
+        SELECT
+        c.creatorId,
+        c.creatorName,
+        COALESCE(SUM(CASE WHEN s.settlementStatus = 'WAITING' THEN s.settlementAmount END), 0) AS waitingAmount,
+        COALESCE(SUM(CASE WHEN s.settlementStatus = 'PAID' THEN s.settlementAmount END), 0) AS completedAmount,
+        COALESCE(COUNT(CASE WHEN s.settlementStatus = 'PAID' THEN 1 END), 0) AS settledCount,
+        c.bank,
+        c.account
+        FROM creator c
+        LEFT JOIN settlement s ON c.creatorId = s.creatorId
+        WHERE c.creatorId = #{creatorId}
+        GROUP BY c.creatorId, c.creatorName, c.bank, c.account
+    </select>
+
     <select id ="getTotalAmountCreatorId" parameterType="long" resultType="long">
         SELECT
             SUM(totalAmount)
         FROM settlement
         WHERE creatorId =#{creatorId}
+    </select>
+
+    <select id="getSettlementByCreatorId" parameterType="long" resultType="creatorSettlementDto">
+        SELECT
+            *
+        FROM settlement
+        WHERE creatorId = #{creatorId}
+        ORDER BY settlementDate DESC
     </select>
 
 </mapper>

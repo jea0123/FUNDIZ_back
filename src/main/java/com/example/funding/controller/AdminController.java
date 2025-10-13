@@ -4,10 +4,11 @@ import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.settlement.SettlementSearchCond;
 import com.example.funding.dto.request.admin.AdminProjectUpdateDto;
 import com.example.funding.dto.request.admin.RejectProjectDto;
 import com.example.funding.dto.request.admin.SearchAdminProjectDto;
-import com.example.funding.dto.request.admin.SettlementPaidRequestDto;
+import com.example.funding.dto.request.settlement.SettlementPaidRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
@@ -15,14 +16,17 @@ import com.example.funding.dto.response.admin.ProjectVerifyListDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
 import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
+import com.example.funding.dto.response.settlement.SettlementItem;
 import com.example.funding.exception.*;
 import com.example.funding.model.User;
 import com.example.funding.service.AdminService;
 import com.example.funding.service.SettlementService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -243,8 +247,28 @@ public class AdminController {
         return adminService.userList(pager);
     }
 
+    @GetMapping("/settlement/list")
+    public ResponseEntity<ResponseDto<PageResult<SettlementItem>>> getSettlements(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false, defaultValue = "ALL") String status,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to,
+            @RequestParam(required = false, defaultValue = "1") Integer page,
+            @RequestParam(required = false, defaultValue = "10") Integer size,
+            @RequestParam(required = false, defaultValue = "5") Integer perGroup
+    ) {
+        SettlementSearchCond cond = SettlementSearchCond.builder()
+                .q(q)
+                .status(status)
+                .from(from)
+                .to(to)
+                .build();
+        Pager pager = Pager.ofRequest(page, size, perGroup);
+        return settlementService.getSettlements(cond, pager);
+    }
+
     /**
-     * <p>크리에이터 ID로 정산 정보 조회</p>
+     * <p>정산 요청</p>
      *
      * @param dto 정산 요청 DTO
      * @return 정산 정보

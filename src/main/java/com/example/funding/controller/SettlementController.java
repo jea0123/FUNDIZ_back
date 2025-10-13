@@ -1,7 +1,7 @@
 package com.example.funding.controller;
 
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.response.creator.CreatorSettlementDto;
+import com.example.funding.dto.response.settlement.CreatorSettlementDto;
 import com.example.funding.exception.CreatorNotFountException;
 import com.example.funding.service.SettlementService;
 import lombok.RequiredArgsConstructor;

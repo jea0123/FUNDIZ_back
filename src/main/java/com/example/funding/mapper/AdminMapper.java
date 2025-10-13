@@ -2,6 +2,7 @@ package com.example.funding.mapper;
 
 import com.example.funding.common.Pager;
 import com.example.funding.dto.request.admin.SearchAdminProjectDto;
+import com.example.funding.dto.request.admin.UserAdminUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
 import com.example.funding.dto.response.admin.analytic.*;
@@ -51,4 +52,8 @@ public interface AdminMapper {
     int userTotal();
 
     List<User> userList(@Param("pager") Pager pager);
+
+    int updateUser(UserAdminUpdateRequestDto userDto);
+
+    User userDetail(@Param("userId") Long userId);
 }

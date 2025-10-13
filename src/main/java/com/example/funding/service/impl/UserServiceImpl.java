@@ -100,9 +100,9 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * <p>로그인 사용자 QNA 리스트 상세</p>
+     * <p>사용자 Q&A 목록</p>
      *
-     * @param userId 사용자
+     * @param userId 사용자 ID
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author by: 이윤기
      * @since 2025-09-05

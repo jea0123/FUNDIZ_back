@@ -18,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -40,7 +42,7 @@ public class BackingServiceImpl implements BackingService {
         List<AddressResponseDto> addressList = addressMapper.getAddressList(userId);
         List<Reward> rewardList = rewardMapper.getRewardList(projectId);
         Creator creator =creatorMapper.findById(project.getCreatorId());
-        //List<BackingPagePaymentDto>
+        List<BackingPagePaymentDto> backingPagePayment = paymentMapper.backingPagePayment(userId);
 
         if(user == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"후원 페이지를 찾을 수 없습니다."));
@@ -64,6 +66,7 @@ public class BackingServiceImpl implements BackingService {
                 .profileImg(creator.getProfileImg())
                 .title(project.getTitle())
                 .thumbnail(project.getThumbnail())
+                .backingPagePaymentList(backingPagePayment)
                 .build();
 
         return ResponseEntity.ok(ResponseDto.success(200,"후원페이지 출력 성공", backingResponse));
@@ -74,10 +77,23 @@ public class BackingServiceImpl implements BackingService {
     public ResponseEntity<ResponseDto<String>> createBacking(Long userId, BackingRequestDto requestDto) {
         BackingRequestDto backingRequest= BackingRequestDto.builder()
                 .userId(userId)
-                .backingRewardList(requestDto.getBackingRewardList())
-                .addrId(requestDto.getAddrId())
-                .newAddress(requestDto.getNewAddress())
+                .thumbnail(requestDto.getThumbnail())
+                .title(requestDto.getTitle())
+                .goalAmount(requestDto.getGoalAmount())
+                .currAmount(requestDto.getCurrAmount())
+                .endDate(requestDto.getEndDate())
+                .projectId(requestDto.getProjectId())
+                .rewardName(requestDto.getRewardName())
+                .deliveryDate(requestDto.getDeliveryDate())
+                .price(requestDto.getPrice())
+                .quantity(requestDto.getQuantity())
+                .amount(requestDto.getAmount())
+                .createdAt(LocalDate.now())
+                .backingStatus(requestDto.getBackingStatus())
                 .build();
+
+        int result = backingMapper.addBacking(backingRequest);
+
         return ResponseEntity.ok(ResponseDto.success(200, "후원 추가 성공", /*"추가!!"*/ backingRequest.toString()));
     }
 

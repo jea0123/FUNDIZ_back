@@ -9,12 +9,11 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @Builder
-public class Files {
-    private Long fileId;
+public class Attach {
+    private Long attachId;
     private String fileName;
     private String filePath;
-    private String fileSize;
     private String fileType;
     private String fileExt;
-    private Character code;
+    private String code;
 }

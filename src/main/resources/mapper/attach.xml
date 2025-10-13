@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.funding.mapper.AttachMapper">
+
+    <insert id="insert">
+        <selectKey keyProperty="attachId" resultType="Long" order="BEFORE">
+            SELECT ATTACH_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO ATTACH (ATTACHID, FILENAME, FILEPATH, FILETYPE, FILEEXT, CODE)
+        VALUES (#{attachId}, #{fileName}, #{filePath}, #{fileType}, #{fileExt}, #{code})
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM ATTACH WHERE ATTACHID = #{attachId}
+    </delete>
+
+</mapper>

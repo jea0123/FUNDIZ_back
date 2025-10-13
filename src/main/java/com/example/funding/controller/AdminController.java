@@ -7,6 +7,7 @@ import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.admin.AdminProjectUpdateDto;
 import com.example.funding.dto.request.admin.RejectProjectDto;
 import com.example.funding.dto.request.admin.SearchAdminProjectDto;
+import com.example.funding.dto.request.admin.SettlementPaidRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
@@ -14,12 +15,10 @@ import com.example.funding.dto.response.admin.ProjectVerifyListDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
 import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
-import com.example.funding.exception.AnalyticsNotFoundException;
-import com.example.funding.exception.CategorySuccessNotFoundException;
-import com.example.funding.exception.KPINotFoundException;
-import com.example.funding.exception.RewardSalesNotFoundException;
+import com.example.funding.exception.*;
 import com.example.funding.model.User;
 import com.example.funding.service.AdminService;
+import com.example.funding.service.SettlementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +38,7 @@ public class AdminController {
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
     private final AdminService adminService;
+    private final SettlementService settlementService;
 
     /**
      * 관리자 대시보드 분석 데이터 조회
@@ -241,5 +241,21 @@ public class AdminController {
         );
 
         return adminService.userList(pager);
+    }
+
+    /**
+     * <p>크리에이터 ID로 정산 정보 조회</p>
+     *
+     * @param dto 정산 요청 DTO
+     * @return 정산 정보
+     * @throws ProjectNotFoundException   존재하지 않는 프로젝트일 때
+     * @throws AccessDeniedException      접근 권한이 없을 때
+     * @throws ProjectNotSuccessException 프로젝트가 성공 상태가 아닐 때
+     * @author 장민규
+     * @since 2025-10-13
+     */
+    @PostMapping("/settlement")
+    public ResponseEntity<ResponseDto<String>> settleProject(@RequestBody SettlementPaidRequestDto dto) {
+        return settlementService.settleProject(dto);
     }
 }

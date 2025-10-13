@@ -3,11 +3,10 @@ package com.example.funding.mapper;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.request.project.SearchProjectDto;
 import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
-import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
-import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
-import com.example.funding.dto.row.ProjectRow;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
+import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
+import com.example.funding.dto.row.ProjectRow;
 import com.example.funding.model.Project;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -48,6 +47,8 @@ public interface ProjectMapper {
     int updateProjectsToSuccess();
 
     int updateProjectsToFailed();
+
+    void updateProjectSettled(@Param("projectId") Long projectId, @Param("status") String status);
 
     LocalDate getProjectEndDate(@Param("projectId") Long projectId);
 

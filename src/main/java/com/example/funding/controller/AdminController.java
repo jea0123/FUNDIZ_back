@@ -7,6 +7,8 @@ import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.admin.AdminProjectUpdateDto;
 import com.example.funding.dto.request.admin.RejectProjectDto;
 import com.example.funding.dto.request.admin.SearchAdminProjectDto;
+import com.example.funding.dto.request.settlement.SettlementPaidRequestDto;
+import com.example.funding.dto.request.settlement.SettlementSearchCond;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
@@ -14,16 +16,18 @@ import com.example.funding.dto.response.admin.ProjectVerifyListDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
 import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
-import com.example.funding.exception.AnalyticsNotFoundException;
-import com.example.funding.exception.CategorySuccessNotFoundException;
-import com.example.funding.exception.KPINotFoundException;
-import com.example.funding.exception.RewardSalesNotFoundException;
+import com.example.funding.dto.response.settlement.SettlementItem;
+import com.example.funding.dto.row.SettlementSummary;
+import com.example.funding.exception.*;
 import com.example.funding.model.User;
 import com.example.funding.service.AdminService;
+import com.example.funding.service.SettlementService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -39,6 +43,7 @@ public class AdminController {
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
     private final AdminService adminService;
+    private final SettlementService settlementService;
 
     /**
      * 관리자 대시보드 분석 데이터 조회
@@ -241,5 +246,63 @@ public class AdminController {
         );
 
         return adminService.userList(pager);
+    }
+
+    /**
+     * <p>정산 목록 조회 (검색 + 페이징)</p>
+     *
+     * @param q       검색어 (프로젝트명, 크리에이터명)
+     * @param status  정산 상태 (ALL, PENDING, COMPLETED)
+     * @param from    시작 날짜 (yyyy-MM-dd)
+     * @param to      종료 날짜 (yyyy-MM-dd)
+     * @param page    페이지 번호 (1부터 시작)
+     * @param size    페이지 크기
+     * @param perGroup 페이지 그룹당 페이지 수
+     * @return 정산 목록
+     * @throws IllegalArgumentException 잘못된 요청 파라미터일 때
+     * @author 장민규
+     * @since 2025-10-13
+     */
+    @GetMapping("/settlement/list")
+    public ResponseEntity<ResponseDto<PageResult<SettlementItem>>> getSettlements(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false, defaultValue = "ALL") String status,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to,
+            @RequestParam(required = false, defaultValue = "1") Integer page,
+            @RequestParam(required = false, defaultValue = "10") Integer size,
+            @RequestParam(required = false, defaultValue = "5") Integer perGroup
+    ) {
+        SettlementSearchCond cond = SettlementSearchCond.builder()
+                .q(q)
+                .status(status)
+                .from(from)
+                .to(to)
+                .build();
+        Pager pager = Pager.ofRequest(page, size, perGroup);
+        return settlementService.getSettlements(cond, pager);
+    }
+
+    @GetMapping("/settlement/summary")
+    public ResponseEntity<ResponseDto<SettlementSummary>> getSettlementSummary() {
+        return settlementService.getSettlementSummary();
+    }
+
+    /**
+     * <p>정산 상태 변경</p>
+     *
+     * @param dto 정산 요청 DTO
+     * @return 정산 정보
+     * @throws ProjectNotFoundException   존재하지 않는 프로젝트일 때
+     * @throws AccessDeniedException      접근 권한이 없을 때
+     * @throws ProjectNotSuccessException 프로젝트가 성공 상태가 아닐 때
+     * @throws SettlementNotFoundException 정산 정보를 찾을 수 없을 때
+     * @throws SettlementStatusAlreadyChangedException 이미 변경된 상태일 때
+     * @author 장민규
+     * @since 2025-10-13
+     */
+    @PostMapping("/settlement")
+    public ResponseEntity<ResponseDto<String>> updateStatus(@RequestBody SettlementPaidRequestDto dto) {
+        return settlementService.updateStatus(dto);
     }
 }

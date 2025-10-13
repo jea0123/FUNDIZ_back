@@ -18,7 +18,7 @@ public interface SettlementMapper {
 
     long getTotalAmountCreatorId(Long creatorId);
 
-    void updateSettlementPaid(SettlementPaidRequestDto dto);
+    void updateSettlementStatus(SettlementPaidRequestDto dto);
 
     int bulkInsertSettlementWaiting(
             @Param("feeRate") double feeRate,
@@ -27,7 +27,7 @@ public interface SettlementMapper {
 
     int existsByProjectId(Long projectId);
 
-    int isPaid(@Param("projectId") Long projectId, @Param("settlementId") Long settlementId);
+    String getStatus(@Param("projectId") Long projectId, @Param("creatorId") Long creatorId, @Param("settlementId") Long settlementId);
 
     int count(
             @Param("q") String q,
@@ -44,4 +44,6 @@ public interface SettlementMapper {
             @Param("startRow") int startRow,
             @Param("endRow") int endRow
     );
+
+    SettlementSummary getSettlementSummary();
 }

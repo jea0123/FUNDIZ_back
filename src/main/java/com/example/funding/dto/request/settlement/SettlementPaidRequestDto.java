@@ -9,8 +9,5 @@ public class SettlementPaidRequestDto {
     private Long settlementId;
     private Long projectId;
     private Long creatorId;
-    private Long totalAmount;
-    private Long fee;
-    private Long settlementAmount;
-    private Long refundAmount;
+    private String settlementStatus;
 }

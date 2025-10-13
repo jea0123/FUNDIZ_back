@@ -5,6 +5,7 @@ import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.admin.AdminProjectUpdateDto;
 import com.example.funding.dto.request.admin.SearchAdminProjectDto;
+import com.example.funding.dto.request.admin.UserAdminUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
@@ -90,4 +91,8 @@ public interface AdminService {
     ResponseEntity<ResponseDto<String>> rejectProject(Long projectId, String rejectedReason);
 
     ResponseEntity<ResponseDto<PageResult<User>>> userList(Pager pager);
+
+    ResponseEntity<ResponseDto<String>> updateUser(Long userId, UserAdminUpdateRequestDto userDto);
+
+    ResponseEntity<ResponseDto<User>> item(Long userId);
 }

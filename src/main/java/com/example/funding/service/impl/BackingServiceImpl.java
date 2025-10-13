@@ -6,6 +6,7 @@ import com.example.funding.dto.request.backing.BackingRequestUpdateDto;
 import com.example.funding.dto.response.backing.BackingResponseDto;
 import com.example.funding.dto.response.backing.BackingRewardDto;
 import com.example.funding.dto.response.address.AddressResponseDto;
+import com.example.funding.dto.response.payment.BackingPagePaymentDto;
 import com.example.funding.dto.response.user.BackingDto;
 import com.example.funding.mapper.*;
 import com.example.funding.model.*;
@@ -17,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -30,6 +33,7 @@ public class BackingServiceImpl implements BackingService {
     private final AddressMapper addressMapper;
     private final RewardMapper rewardMapper;
     private final CreatorMapper creatorMapper;
+    private final PaymentMapper paymentMapper;
 
     @Override
     public ResponseEntity<ResponseDto<BackingResponseDto>> prepareBacking(Long userId, Long projectId) {
@@ -38,22 +42,20 @@ public class BackingServiceImpl implements BackingService {
         List<AddressResponseDto> addressList = addressMapper.getAddressList(userId);
         List<Reward> rewardList = rewardMapper.getRewardList(projectId);
         Creator creator =creatorMapper.findById(project.getCreatorId());
+        List<BackingPagePaymentDto> backingPagePayment = paymentMapper.backingPagePayment(userId);
 
         if(user == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"후원 페이지를 찾을 수 없습니다."));
-        }
-        if(project == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"후원 페이지를 찾을 수 없습니다."));
         }
 
         List<BackingRewardDto> rewards = rewardList.stream()
                 .map(r->BackingRewardDto.builder()
-                .rewardId(r.getRewardId())
-                .rewardName(r.getRewardName())
-                .price(r.getPrice())
-                .quantity(1L)
-                .deliveryDate(r.getDeliveryDate())
-                .build()).toList();
+                        .rewardId(r.getRewardId())
+                        .rewardName(r.getRewardName())
+                        .price(r.getPrice())
+                        .quantity(1L)
+                        .deliveryDate(r.getDeliveryDate())
+                        .build()).toList();
 
         BackingResponseDto backingResponse = BackingResponseDto.builder()
                 .userId(userId)
@@ -64,6 +66,7 @@ public class BackingServiceImpl implements BackingService {
                 .profileImg(creator.getProfileImg())
                 .title(project.getTitle())
                 .thumbnail(project.getThumbnail())
+                .backingPagePaymentList(backingPagePayment)
                 .build();
 
         return ResponseEntity.ok(ResponseDto.success(200,"후원페이지 출력 성공", backingResponse));
@@ -74,10 +77,23 @@ public class BackingServiceImpl implements BackingService {
     public ResponseEntity<ResponseDto<String>> createBacking(Long userId, BackingRequestDto requestDto) {
         BackingRequestDto backingRequest= BackingRequestDto.builder()
                 .userId(userId)
-                .backingRewardList(requestDto.getBackingRewardList())
-                .addrId(requestDto.getAddrId())
-                .newAddress(requestDto.getNewAddress())
+                .thumbnail(requestDto.getThumbnail())
+                .title(requestDto.getTitle())
+                .goalAmount(requestDto.getGoalAmount())
+                .currAmount(requestDto.getCurrAmount())
+                .endDate(requestDto.getEndDate())
+                .projectId(requestDto.getProjectId())
+                .rewardName(requestDto.getRewardName())
+                .deliveryDate(requestDto.getDeliveryDate())
+                .price(requestDto.getPrice())
+                .quantity(requestDto.getQuantity())
+                .amount(requestDto.getAmount())
+                .createdAt(LocalDate.now())
+                .backingStatus(requestDto.getBackingStatus())
                 .build();
+
+        int result = backingMapper.addBacking(backingRequest);
+
         return ResponseEntity.ok(ResponseDto.success(200, "후원 추가 성공", /*"추가!!"*/ backingRequest.toString()));
     }
 
@@ -144,7 +160,7 @@ public class BackingServiceImpl implements BackingService {
     @Override
     public ResponseEntity<ResponseDto<String>> deleteBacking(Long backingId, Long userId) {
         int delete =backingMapper.deleteBacking(backingId, userId);
-        
+
         return ResponseEntity.ok((ResponseDto.success(200, "후원내용 삭제",null)));
     }
 }

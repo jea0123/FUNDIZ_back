@@ -9,4 +9,17 @@
         AND CREATEDAT >= #{since}
     </select>
 
+    <select id="backingPagePayment" resultType="com.example.funding.dto.response.payment.BackingPagePaymentDto">
+        select
+            p.orderId,
+            p.method,
+            p.status,
+            p.amount,
+            p.cardCompany
+        From Payment p
+        JOIN backing b ON b.backingId = p.backingId
+        JOIN users u ON u.userId = b.userId
+        WHERE u.userId = #{userId}
+    </select>
+
 </mapper>

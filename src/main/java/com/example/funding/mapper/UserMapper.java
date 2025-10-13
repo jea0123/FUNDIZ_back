@@ -32,7 +32,7 @@ public interface UserMapper {
 
     Long getCreatorIdByUserId(Long userId);
 
-    Boolean suspendedCreator(@Param("creatorId") Long creatorId);
+    int suspendedCreator(@Param("creatorId") Long creatorId);
 
     int withdrawUser(@Param("userId") Long userId);
 }

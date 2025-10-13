@@ -14,6 +14,7 @@ import com.example.funding.exception.AlreadyCreatorException;
 import com.example.funding.exception.UserNotFoundException;
 import org.springframework.http.ResponseEntity;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface CreatorService {
@@ -53,5 +54,5 @@ public interface CreatorService {
      * @throws AlreadyCreatorException 이미 크리에이터로 등록된 유저인 경우
      * @since 2025-10-12
      */
-    ResponseEntity<ResponseDto<String>> registerCreator(CreatorRegisterRequestDto dto, Long userId);
+    ResponseEntity<ResponseDto<String>> registerCreator(CreatorRegisterRequestDto dto, Long userId) throws IOException;
 }

@@ -296,4 +296,26 @@
         WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
 
+    <select id="userDetail" resultType="user">
+        SELECT * FROM users
+        WHERE USERID = #{userId}
+    </select>
+
+    <update id="updateUser" parameterType="userAdminUpdateRequestDto">
+        UPDATE users
+        SET USERID = #{userId},
+        NICKNAME = #{nickname},
+        ISSUSPENDED = #{isSuspended},
+        REASON = #{reason},
+        SUSPENDEDAT = CASE
+        WHEN ISSUSPENDED = 'N' AND #{isSuspended} = 'Y' THEN SYSDATE
+        ELSE SUSPENDEDAT
+        END,
+        RELEASEDAT = CASE
+        WHEN ISSUSPENDED = 'Y' AND #{isSuspended} = 'N' THEN SYSDATE
+        ELSE RELEASEDAT
+        END
+        WHERE USERID=#{userId}
+    </update>
+
 </mapper>

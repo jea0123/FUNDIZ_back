@@ -1,6 +1,7 @@
 package com.example.funding.dto.response.backing;
 
 import com.example.funding.dto.response.address.AddressResponseDto;
+import com.example.funding.dto.response.payment.BackingPagePaymentDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +20,7 @@ public class BackingResponseDto {
     private String nickname;
     private String email;
 
-    // 배송지 테이블 
+    // 배송지 테이블
     // 배송지 목록이 0개일 수 있음
     private List<AddressResponseDto> addressList;
 
@@ -33,5 +34,7 @@ public class BackingResponseDto {
     private String title;
     private String thumbnail;
 
-    private List<BackingRewardDto> rewards;
+    private List<BackingRewardDto> rewardsList;
+
+    private List<BackingPagePaymentDto> backingPagePaymentList;
 }

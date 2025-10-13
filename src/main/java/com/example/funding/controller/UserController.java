@@ -3,6 +3,7 @@ package com.example.funding.controller;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
 import com.example.funding.dto.request.user.UserNicknameDto;
 import com.example.funding.dto.request.user.UserPasswordDto;
 import com.example.funding.dto.request.user.UserProfileImgDto;
@@ -115,6 +116,15 @@ public class UserController {
     public ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(@PathVariable Long userId) {
         return userService.getLikedList(userId);
     }
+
+    /**
+     * <p>사용자 Q&A 목록</p>
+     *
+     * @param userId 사용자 ID
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author by: 이윤기
+     * @since 2025-09-05
+     */
 
     @GetMapping("/qna/{userId}")
     public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfUser(@PathVariable Long userId, Pager reqPager) {

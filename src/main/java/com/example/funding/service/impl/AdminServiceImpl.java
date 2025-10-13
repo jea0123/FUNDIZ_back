@@ -6,6 +6,8 @@ import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.admin.AdminProjectUpdateDto;
 import com.example.funding.dto.request.admin.SearchAdminProjectDto;
+import com.example.funding.dto.request.admin.UserAdminUpdateRequestDto;
+import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
@@ -19,10 +21,7 @@ import com.example.funding.mapper.AdminMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.RewardMapper;
 import com.example.funding.mapper.TagMapper;
-import com.example.funding.model.Project;
-import com.example.funding.model.Reward;
-import com.example.funding.model.Tag;
-import com.example.funding.model.User;
+import com.example.funding.model.*;
 import com.example.funding.service.AdminService;
 import com.example.funding.service.validator.ProjectTransitionGuard;
 import lombok.RequiredArgsConstructor;
@@ -294,5 +293,42 @@ public class AdminServiceImpl implements AdminService {
         PageResult<User> result = PageResult.of(userList, pager, total);
 
         return ResponseEntity.ok(ResponseDto.success(200, "회원 목록 조회 성공", result));
+    }
+
+    /**
+     * <p>회원 정보 상세 페이지 조회</p>
+     *
+     * @param userId 사용자 ID
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author 이동혁
+     * @since 2025-10-13
+     */
+    @Override
+    public ResponseEntity<ResponseDto<User>> item(Long userId) {
+        User item = adminMapper.userDetail(userId);
+        if (item == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "회원 정보 조회 불가"));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "회원 정보 조회 성공", item));
+    }
+
+    /**
+     * <p>회원 정보 수정(관리자)</p>
+     *
+     * @param userId 사용자 ID
+     * @param userDto UserAdminUpdateRequestDto
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author 이동혁
+     * @since 2025-10-13
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> updateUser(Long userId, UserAdminUpdateRequestDto userDto) {
+        userDto.setUserId(userId);
+
+        int result = adminMapper.updateUser(userDto);
+        if (result == 0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "회원정보 수정 실패"));
+        }
+        return ResponseEntity.ok(ResponseDto.success(200, "회원정보 수정 완료", "회원정보 수정 "));
     }
 }

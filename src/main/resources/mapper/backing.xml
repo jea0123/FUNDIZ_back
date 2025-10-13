@@ -170,10 +170,11 @@
         </collection>
 
         <!-- 리워드 리스트 -->
-        <collection property="rewards" ofType="com.example.funding.dto.response.backing.BackingRewardDto">
+        <collection property="rewardsList" ofType="com.example.funding.dto.response.backing.BackingRewardDto">
             <id property="rewardId" column="rewardId"/>
             <result property="rewardName" column="rewardName"/>
             <result property="price" column="price"/>
+            <result property="quantity" column="quantity"/>
             <result property="deliveryDate" column="deliveryDate"/>
         </collection>
     </resultMap>
@@ -218,7 +219,7 @@
         LEFT JOIN reward r ON r.projectId = p.projectId
         WHERE u.userId = #{userId}
     </select>
-    
+
     <insert id="addBacking">
         <selectKey keyProperty="backingId" resultType="long" order="BEFORE">
             SELECT BACKING_SEQ.NEXTVAL FROM DUAL

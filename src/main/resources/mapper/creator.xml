@@ -181,7 +181,7 @@
             STARTDATE, ENDDATE, CONTENT, THUMBNAIL, ISPOSTING
         ) VALUES (
             #{projectId}, #{creatorId}, #{subctgrId}, #{title}, #{goalAmount},
-            #{startDate}, #{endDate}, #{content}, #{thumbnail}, #{isPosting}
+            #{startDate}, #{endDate}, #{content}, #{thumbnailUrl}, #{isPosting}
         )
     </insert>
 

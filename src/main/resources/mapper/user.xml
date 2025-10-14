@@ -73,7 +73,7 @@
         WHERE userId = #{userId}
     </update>
 
-    <update id="updateProfileImg">
+    <update id="updateProfile">
         UPDATE USERS
         SET profileImg = #{profileImg}
         WHERE userId = #{userId}

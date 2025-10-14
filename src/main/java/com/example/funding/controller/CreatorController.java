@@ -16,7 +16,6 @@ import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
 import com.example.funding.enums.CreatorType;
 import com.example.funding.exception.AlreadyCreatorException;
 import com.example.funding.exception.UserNotFoundException;
-import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.model.Reward;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.NewsService;
@@ -120,9 +119,10 @@ public class CreatorController {
      */
     @PostMapping("/project/new")
     public ResponseEntity<ResponseDto<String>> createProject(@RequestBody ProjectCreateRequestDto dto,
-                                                             @RequestAttribute Long creatorId) {
+                                                             @RequestAttribute Long creatorId) throws IOException {
         //TODO: userId -> creatorId
-
+        String thumbnailUrl = fileUploader.upload(dto.getThumbnail());
+        dto.setThumbnailUrl(thumbnailUrl);
         return creatorService.createProject(dto, creatorId);
     }
 
@@ -165,13 +165,15 @@ public class CreatorController {
     @PostMapping("/project/{projectId}")
     public ResponseEntity<ResponseDto<String>> updateProject(@PathVariable Long projectId,
                                                              @RequestAttribute Long creatorId,
-                                                             @RequestBody ProjectCreateRequestDto dto) {
+                                                             @RequestBody ProjectCreateRequestDto dto) throws IOException {
         //TODO: userId -> creatorId
 
         if (dto.getProjectId() != null && !dto.getProjectId().equals(projectId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 프로젝트 ID 입니다.");
         }
         dto.setProjectId(projectId);
+        String thumbnailUrl = fileUploader.upload(dto.getThumbnail());
+        dto.setThumbnailUrl(thumbnailUrl);
 
         return creatorService.updateProject(dto, creatorId);
     }

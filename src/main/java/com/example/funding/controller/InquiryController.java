@@ -1,14 +1,23 @@
 package com.example.funding.controller;
 
+import com.example.funding.common.CursorPage;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.cs.IqrAddRequestDto;
+import com.example.funding.dto.request.cs.IqrReplyCreateRequestDto;
+import com.example.funding.dto.request.project.ReplyCreateRequestDto;
+import com.example.funding.dto.response.cs.InquiryReplyDto;
+import com.example.funding.dto.response.project.ReplyDto;
 import com.example.funding.model.Inquiry;
 import com.example.funding.service.InquiryService;
+import com.example.funding.service.ReplyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/v1/cs/inquiry")
@@ -16,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 public class InquiryController {
 
     private final InquiryService inquiryService;
+    private final ReplyService replyService;
 
 
     /**
@@ -70,4 +80,21 @@ public class InquiryController {
     public ResponseEntity<ResponseDto<String>> addInquiry(@PathVariable Long userId, @RequestBody IqrAddRequestDto iqrDto){
         return inquiryService.addInquiry(userId, iqrDto);
     }
+
+
+    @GetMapping("/reply/{inqId}")
+    public ResponseEntity<ResponseDto<CursorPage<InquiryReplyDto>>> getInquiryReplyList(@PathVariable Long inqId,
+                                                                          @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastCreatedAt,
+                                                                          @RequestParam(required = false) Long lastId,
+                                                                          @RequestParam(defaultValue = "10") int size) {
+        return replyService.getInquiryReplyList(inqId, lastCreatedAt, lastId, size);
+    }
+
+    @PostMapping("/reply/{inqId}")
+    public ResponseEntity<ResponseDto<InquiryReplyDto>> createInquiryReply(@PathVariable Long inqId,
+                                                                      @RequestBody IqrReplyCreateRequestDto dto) {
+
+        return replyService.createInquiryReply(inqId, dto);
+    }
+
 }

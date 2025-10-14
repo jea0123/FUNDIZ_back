@@ -34,6 +34,7 @@ public class BackingServiceImpl implements BackingService {
     private final RewardMapper rewardMapper;
     private final CreatorMapper creatorMapper;
     private final PaymentMapper paymentMapper;
+    private final ShippingMapper shippingMapper;
 
     @Override
     public ResponseEntity<ResponseDto<BackingResponseDto>> prepareBacking(Long userId, Long projectId) {
@@ -75,26 +76,29 @@ public class BackingServiceImpl implements BackingService {
 
     @Override
     public ResponseEntity<ResponseDto<String>> createBacking(Long userId, BackingRequestDto requestDto) {
-        BackingRequestDto backingRequest= BackingRequestDto.builder()
-                .userId(userId)
-                .thumbnail(requestDto.getThumbnail())
-                .title(requestDto.getTitle())
-                .goalAmount(requestDto.getGoalAmount())
-                .currAmount(requestDto.getCurrAmount())
-                .endDate(requestDto.getEndDate())
-                .projectId(requestDto.getProjectId())
-                .rewardName(requestDto.getRewardName())
-                .deliveryDate(requestDto.getDeliveryDate())
-                .price(requestDto.getPrice())
-                .quantity(requestDto.getQuantity())
-                .amount(requestDto.getAmount())
-                .createdAt(LocalDate.now())
-                .backingStatus(requestDto.getBackingStatus())
-                .build();
+        Backing backing = requestDto.getBacking();
 
-        int result = backingMapper.addBacking(backingRequest);
+        backing.setUserId(userId);
+        backing.setCreatedAt(LocalDate.now());
+        backingMapper.addBacking(backing);
 
-        return ResponseEntity.ok(ResponseDto.success(200, "후원 추가 성공", /*"추가!!"*/ backingRequest.toString()));
+        Long backingId = backing.getBackingId();
+        System.out.println("backingId 확인" + backingId);
+        BackingDetail detail = requestDto.getBackingDetail();
+        detail.setBackingId(backingId);
+        backingMapper.addBackingDetail(detail);
+
+//        Shipping shipping = requestDto.getShipping();
+//        shipping.setBackingId(backingId);
+//        shippingMapper.addShipping(shipping);
+//
+//        Payment payment = requestDto.getPayment();
+//        payment.setBackingId(backingId);
+//        paymentMapper.addPayment(payment);
+
+
+
+        return ResponseEntity.ok(ResponseDto.success(200, "후원 추가 성공", /*"추가!!"*/ null));
     }
 
     /**

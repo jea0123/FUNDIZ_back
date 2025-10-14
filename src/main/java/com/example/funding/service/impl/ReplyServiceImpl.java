@@ -201,6 +201,8 @@ public class ReplyServiceImpl implements ReplyService {
 
     @Override
     public ResponseEntity<ResponseDto<QnaReplyDto>> createQnaReply(Long qnaId, Long creatorId, QnaReplyCreateRequestDto dto) {
+        dto.setCreatorId(creatorId);
+
         if (qnaId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qnaId가 필요합니다.");
         }

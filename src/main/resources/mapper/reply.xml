@@ -109,6 +109,6 @@
         </selectKey>
 
         INSERT INTO REPLY (REPLYID, QNAID, CONTENT, CODE, CREATORID)
-        VALUES (#{replyId}, #{inqId}, #{content}, #{code}, #{creatorId})
+        VALUES (#{replyId}, #{qnaId}, #{content}, #{code}, #{creatorId})
     </insert>
 </mapper>

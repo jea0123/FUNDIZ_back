@@ -118,9 +118,8 @@ public class CreatorController {
      * @since 2025-09-09
      */
     @PostMapping("/project/new")
-    public ResponseEntity<ResponseDto<String>> createProject(@RequestBody ProjectCreateRequestDto dto,
-                                                             @RequestAttribute Long creatorId,
-                                                             List<MultipartFile> files) throws IOException {
+    public ResponseEntity<ResponseDto<String>> createProject(@ModelAttribute ProjectCreateRequestDto dto,
+                                                             @RequestAttribute Long creatorId) throws IOException {
         //TODO: userId -> creatorId
         String thumbnailUrl = fileUploader.upload(dto.getThumbnail());
         dto.setThumbnailUrl(thumbnailUrl);

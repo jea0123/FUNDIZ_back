@@ -136,13 +136,13 @@ public class CreatorServiceImpl implements CreatorService {
         dto.setCreatorId(creatorId);
 
         // Guard
-        transitionGuard.assertCanCreate(creatorId);
+//        transitionGuard.assertCanCreate(creatorId);
 
         // Validator
-        List<String> errors = inputValidator.validateProjectCreate(dto);
-        if (!errors.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.join("; ", errors));
-        }
+//        List<String> errors = inputValidator.validateProjectCreate(dto);
+//        if (!errors.isEmpty()) {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.join("; ", errors));
+//        }
 
         // 프로젝트 생성
         int result = creatorMapper.saveProject(dto);

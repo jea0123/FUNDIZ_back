@@ -390,6 +390,9 @@ public class CreatorServiceImpl implements CreatorService {
                 .sorted(Comparator.comparingLong(CreatorDashboardRankDto::getViewCnt)
                         .reversed()).limit(3).toList();
 
+        List<DailyCountDto> dailyCount = backingMapper.dailyCount(creatorId);
+        List<MonthCountDto> monthCount = backingMapper.monthCount(creatorId);
+
         //TODO : 추가 대시보드(2개) 리스트 구현을위해서는 컬럼을 추가할 필요가있음 상의 후 구현
 
         CreatorDashboardDto result = CreatorDashboardDto.builder()
@@ -405,6 +408,8 @@ public class CreatorServiceImpl implements CreatorService {
                 .top3BackerCnt(top3Backer)
                 .top3LikeCnt(top3Like)
                 .top3ViewCnt(top3View)
+                .dailyStatus(dailyCount)
+                .monthStatus(monthCount)
                 .build();
 
         return ResponseEntity.ok(ResponseDto.success(200, "대시보드 불러오기 성공", result));

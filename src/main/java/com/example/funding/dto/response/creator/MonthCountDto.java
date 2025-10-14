@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-public class MonthStatusDto {
-    private LocalDate date;
+public class MonthCountDto {
+    private LocalDate createdAt;
     private Long count;
 }

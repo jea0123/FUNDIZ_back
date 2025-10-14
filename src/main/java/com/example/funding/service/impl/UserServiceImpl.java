@@ -1,5 +1,6 @@
 package com.example.funding.service.impl;
 
+import com.example.funding.common.FileUploader;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
@@ -25,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -40,6 +42,7 @@ public class UserServiceImpl implements UserService {
     private final CreatorMapper creatorMapper;
     private final QnaMapper qnaMapper;
     private final PasswordEncoder passwordEncoder;
+    private final FileUploader fileUploader;
 
     @Override
     @Transactional(readOnly = true)
@@ -191,9 +194,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<ResponseDto<String>> userProfileImg(Long userId, UserProfileImgDto dto) {
+    public ResponseEntity<ResponseDto<String>> userProfileImg(Long userId, UserProfileImgDto dto) throws IOException {
         if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
-//        userMapper.updateProfile(userId, dto.getProfileImg());
+        String profileImgUrl = fileUploader.upload(dto.getProfileImg());
+        userMapper.updateProfile(userId, profileImgUrl);
         return ResponseEntity.ok(ResponseDto.success(200, "프로필 이미지 변경 성공", null));
     }
 

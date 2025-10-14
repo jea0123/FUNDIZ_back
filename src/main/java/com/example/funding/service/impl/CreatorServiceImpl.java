@@ -181,10 +181,8 @@ public class CreatorServiceImpl implements CreatorService {
         if (dto.getProjectId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "프로젝트 ID가 필요합니다.");
         }
-
         // Guard
         transitionGuard.assertCanUpdate(dto.getProjectId(), creatorId);
-
         // Validator
         List<String> errors = inputValidator.validateProjectUpdate(dto);
         if (!errors.isEmpty()) {

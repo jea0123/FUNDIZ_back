@@ -3,7 +3,6 @@ package com.example.funding.controller;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
 import com.example.funding.dto.request.user.UserNicknameDto;
 import com.example.funding.dto.request.user.UserPasswordDto;
 import com.example.funding.dto.request.user.UserProfileImgDto;
@@ -17,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -88,7 +88,7 @@ public class UserController {
     @PostMapping("/profileImg")
     public ResponseEntity<ResponseDto<String>> updateProfileImg(@ModelAttribute UserProfileImgDto dto
 //                                                                @AuthenticationPrincipal CustomUserPrincipal principal
-    ) {
+    ) throws IOException {
 //        Long userId = principal.userId();
         Long userId = 501L; // TODO: 임시
         return userService.userProfileImg(userId, dto);

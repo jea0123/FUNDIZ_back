@@ -78,4 +78,37 @@
         INSERT INTO REPLY (REPLYID, INQID, CONTENT, CODE)
         VALUES (#{replyId}, #{inqId}, #{content}, #{code})
     </insert>
+
+    <select id="getQnaReplyList" resultType="qnaReplyDto">
+        SELECT *
+        FROM (
+        SELECT
+        REPLYID,
+        QNAID,
+        CONTENT,
+        CREATEDAT
+        FROM REPLY
+        WHERE QNAID = #{qnaId}
+        AND CODE = 'QnA'
+        <if test="lastCreatedAt != null">
+            <![CDATA[
+                AND (
+                    CREATEDAT < #{lastCreatedAt}
+                    OR (CREATEDAT = #{lastCreatedAt} AND REPLYID < #{lastId})
+                )
+            ]]>
+        </if>
+        ORDER BY CREATEDAT DESC, REPLYID DESC
+        )
+        WHERE ROWNUM <![CDATA[ <= ]]> #{size}
+    </select>
+
+    <insert id="createQnaReply">
+        <selectKey keyProperty="replyId" resultType="Long" order="BEFORE">
+            SELECT REPLY_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO REPLY (REPLYID, QNAID, CONTENT, CODE, CREATORID)
+        VALUES (#{replyId}, #{inqId}, #{content}, #{code}, #{creatorId})
+    </insert>
 </mapper>

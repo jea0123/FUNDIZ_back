@@ -134,4 +134,9 @@
 
     </insert>
 
+    <select id="existsQnaById" resultType="int">
+        SELECT COUNT(*) FROM QNA
+        WHERE QNAID = #{qnaId}
+    </select>
+
 </mapper>

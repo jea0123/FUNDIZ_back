@@ -6,6 +6,8 @@ import com.example.funding.dto.response.backing.BackingCreatorBackerList;
 import com.example.funding.dto.response.backing.BackingResponseDto;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.user.BackingDto;
+import com.example.funding.model.Backing;
+import com.example.funding.model.BackingDetail;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -24,7 +26,9 @@ public interface BackingMapper {
     BackingResponseDto prepareBacking(@Param("userId") Long userId, @Param("projectId") Long projectId);
 
     //
-    int addBacking(BackingRequestDto backingRequestDto);
+    int addBacking(Backing backing);
+
+    int addBackingDetail(BackingDetail backingDetail);
 
     int updateBacking(BackingRequestUpdateDto updateDto);
 

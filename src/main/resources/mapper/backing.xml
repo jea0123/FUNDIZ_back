@@ -221,7 +221,11 @@
         WHERE u.userId = #{userId}
     </select>
 
-    <insert id="addBacking" parameterType="com.example.funding.dto.request.backing.BackingRequestDto">
+    <insert id="addBacking" parameterType="com.example.funding.model.Backing">
+        <selectKey keyProperty="backingId" resultType="long" order="BEFORE">
+            SELECT BACKING_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+
         INSERT INTO backing (
         backingId,
         userId,
@@ -229,13 +233,29 @@
         createdAt,
         backingStatus
         ) VALUES (
-        BACKING_SEQ.NEXTVAL,
+        #{backingId},
         #{userId},
         #{amount},
         #{createdAt, jdbcType=DATE},
         #{backingStatus}
         )
     </insert>
+
+    <!-- BACKING_DETAIL INSERT -->
+    <insert id="addBackingDetail" parameterType="com.example.funding.model.BackingDetail">
+        INSERT INTO backingDetail (
+        backingId,
+        rewardId,
+        price,
+        quantity
+        ) VALUES (
+        #{backingId},    <!-- ✅ 여기 -->
+        #{rewardId},
+        #{price},
+        #{quantity}
+        )
+    </insert>
+
 
     <update id="updateBacking" parameterType="com.example.funding.dto.request.backing.BackingRequestUpdateDto">
         UPDATE backing

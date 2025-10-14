@@ -20,4 +20,5 @@ public interface InquiryMapper {
 
     int addInquiry(Inquiry item);
 
+    int existsInquiryById(@Param("inqId") Long inqId);
 }

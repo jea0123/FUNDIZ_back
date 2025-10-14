@@ -161,10 +161,4 @@ public class BackingServiceImpl implements BackingService {
 
     }
 
-    @Override
-    public ResponseEntity<ResponseDto<String>> deleteBacking(Long backingId, Long userId) {
-        int delete =backingMapper.deleteBacking(backingId, userId);
-
-        return ResponseEntity.ok((ResponseDto.success(200, "후원내용 삭제",null)));
-    }
 }

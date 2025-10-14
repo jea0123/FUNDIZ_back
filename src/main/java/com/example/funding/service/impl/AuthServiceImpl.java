@@ -1,15 +1,15 @@
 package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.admin.RegisterAdminRequestDto;
 import com.example.funding.dto.request.auth.CheckEmailRequestDto;
 import com.example.funding.dto.request.auth.CheckNicknameRequestDto;
 import com.example.funding.dto.request.auth.SignInRequestDto;
 import com.example.funding.dto.request.auth.SignUpRequestDto;
-import com.example.funding.exception.DuplicatedEmailException;
-import com.example.funding.exception.DuplicatedNicknameException;
-import com.example.funding.exception.InvalidCredentialsException;
-import com.example.funding.exception.UserNotFoundException;
+import com.example.funding.exception.*;
+import com.example.funding.mapper.AdminMapper;
 import com.example.funding.mapper.UserMapper;
+import com.example.funding.model.Admin;
 import com.example.funding.model.User;
 import com.example.funding.provider.JwtProvider;
 import com.example.funding.service.AuthService;
@@ -30,6 +30,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final AdminMapper adminMapper;
 
     @Override
     public ResponseEntity<ResponseDto<String>> signUp(SignUpRequestDto dto) {
@@ -81,5 +82,30 @@ public class AuthServiceImpl implements AuthService {
         if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
         userMapper.withdrawUser(userId);
         return ResponseEntity.ok(ResponseDto.success(200, "회원 탈퇴 성공", null));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<String>> registerAdmin(RegisterAdminRequestDto dto) {
+        if( adminMapper.getAdminByAdminId(dto.getAdminId()) != null) {
+            throw new DuplicatedAdminIdException();
+        }
+        String encodedPwd = passwordEncoder.encode(dto.getAdminPwd());
+        dto.setAdminPwd(encodedPwd);
+        adminMapper.registerAdmin(dto);
+        return ResponseEntity.ok(ResponseDto.success(200, "관리자 등록 성공", null));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<String>> loginAdmin(RegisterAdminRequestDto dto) {
+        Admin admin = adminMapper.getAdminByAdminId(dto.getAdminId());
+        if (admin == null) {
+            throw new AdminNotFoundException();
+        }
+        if (passwordEncoder.matches(dto.getAdminPwd(), admin.getAdminPwd())) {
+            String token = jwtProvider.createAdminAccessToken(admin.getAdminId(), "ADMIN");
+            return ResponseEntity.ok(ResponseDto.success(200, "로그인 성공", token));
+        } else {
+            throw new InvalidAdminCredentialsException();
+        }
     }
 }

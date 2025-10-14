@@ -318,4 +318,17 @@
         WHERE USERID=#{userId}
     </update>
 
+    <insert id="registerAdmin" parameterType="registerAdminRequestDto">
+        INSERT INTO ADMIN (
+            ADID, ADMINID, ADMINPWD
+        ) VALUES (
+           ADMIN_SEQ.NEXTVAL, #{adminId}, #{adminPwd}
+        )
+    </insert>
+
+    <select id="getAdminByAdminId" resultType="admin">
+        SELECT * FROM ADMIN
+        WHERE ADMINID = #{adminId}
+    </select>
+
 </mapper>

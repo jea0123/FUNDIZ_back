@@ -305,38 +305,54 @@
         <!--AND p.PROJECTID = #{projectId}-->
     </select>
 
-    <select id = "dailyStatus" resultType ="com.example.funding.dto.response.creator.DailyCountDto">
+    <select id = "dailyCount" resultType ="com.example.funding.dto.response.creator.DailyCountDto">
         SELECT
-            d.target_date AS createdAt,
-            NVL(COUNT(b.BACKINGID), 0) AS count
+        d.target_date AS createdAt,
+        NVL(COUNT(DISTINCT b.backingId), 0) AS count
         FROM (
-            SELECT
-                TRUNC(SYSDATE) - LEVEL + 1 AS target_date
-            FROM
-                dual
-                CONNECT BY LEVEL &lt; 7
+        SELECT TRUNC(SYSDATE) - LEVEL + 1 AS target_date
+        FROM dual
+        CONNECT BY LEVEL &lt;= 7
         ) d
-        LEFT JOIN BACKING b
-        ON TRUNC(b.CREATEDAT) = d.target_date
+        LEFT JOIN (
+        SELECT
+        b.backingId,
+        b.createdAt,
+        p.creatorId
+        FROM backing b
+        JOIN backingDetail bd ON b.backingId = bd.backingId
+        JOIN reward r ON bd.rewardId = r.rewardId
+        JOIN project p ON r.projectId = p.projectId
+        ) b ON TRUNC(b.createdAt) = d.target_date
+        AND b.creatorId = #{creatorId}
         GROUP BY d.target_date
         ORDER BY d.target_date
     </select>
 
-    <select id = "monthStatus" resultType = "com.example.funding.dto.response.creator.MonthCountDto">
+    <select id = "monthCount" resultType = "com.example.funding.dto.response.creator.MonthCountDto">
         SELECT
-            m.target_month AS createdAt,
-            NVL(COUNT(p.projectId), 0) AS count
+        d.target_month AS createdAt,
+        NVL(COUNT(DISTINCT b.backingId), 0) AS count
         FROM (
-            SELECT
-                ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -LEVEL + 1) AS target_month
-            FROM
-                dual
-            CONNECT BY LEVEL &lt; 12
-        ) m
-        LEFT JOIN project p
-        ON TRUNC(p.createdAt, 'MM') = m.target_month
-        GROUP BY m.target_month
-        ORDER BY m.target_month
+
+        SELECT ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -LEVEL + 1) AS target_month
+        FROM dual
+        CONNECT BY LEVEL &lt;= 12
+        ) d
+        LEFT JOIN (
+        SELECT
+        b.backingId,
+        b.createdAt,
+        p.creatorId
+        FROM backing b
+        JOIN backingDetail bd ON b.backingId = bd.backingId
+        JOIN reward r ON bd.rewardId = r.rewardId
+        JOIN project p ON r.projectId = p.projectId
+        ) b
+        ON TRUNC(b.createdAt, 'MM') = d.target_month
+        AND b.creatorId = #{creatorId}
+        GROUP BY d.target_month
+        ORDER BY d.target_month
     </select>
 </mapper>
 

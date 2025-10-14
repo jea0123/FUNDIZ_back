@@ -3,12 +3,15 @@ package com.example.funding.service.impl;
 import com.example.funding.common.Cursor;
 import com.example.funding.common.CursorPage;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.creator.QnaReplyCreateRequestDto;
 import com.example.funding.dto.request.cs.IqrReplyCreateRequestDto;
 import com.example.funding.dto.request.project.ReplyCreateRequestDto;
 import com.example.funding.dto.response.cs.InquiryReplyDto;
+import com.example.funding.dto.response.cs.QnaReplyDto;
 import com.example.funding.dto.response.project.ReplyDto;
 import com.example.funding.mapper.CommunityMapper;
 import com.example.funding.mapper.InquiryMapper;
+import com.example.funding.mapper.QnaMapper;
 import com.example.funding.mapper.ReplyMapper;
 import com.example.funding.model.Reply;
 import com.example.funding.service.ReplyService;
@@ -30,6 +33,7 @@ public class ReplyServiceImpl implements ReplyService {
     private final ReplyMapper replyMapper;
     private final CommunityMapper communityMapper;
     private final InquiryMapper inquiryMapper;
+    private final QnaMapper qnaMapper;
 
     /**
      * <p>프로젝트 상세 페이지 - 커뮤니티 댓글 목록 조회</p>
@@ -117,7 +121,7 @@ public class ReplyServiceImpl implements ReplyService {
         if (inqId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "inqId가 필요합니다.");
         }
-        if (communityMapper.existsCommunityById(inqId) <= 0) {
+        if (inquiryMapper.existsInquiryById(inqId) <= 0) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "문의 글이 없습니다.");
         }
 
@@ -167,4 +171,63 @@ public class ReplyServiceImpl implements ReplyService {
 
         return ResponseEntity.ok(ResponseDto.success(200, "댓글 등록 성공", null));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<CursorPage<QnaReplyDto>>> getQnaReplyList(Long qnaId, LocalDateTime lastCreatedAt, Long lastId, int size) {
+        if (qnaId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qnaId가 필요합니다.");
+        }
+        if (qnaMapper.existsQnaById(qnaId) <= 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "문의 글이 없습니다.");
+        }
+
+        int limitPlusOne = Math.max(1, size) + 1;
+        List<QnaReplyDto> replyList = replyMapper.getQnaReplyList(qnaId, lastCreatedAt, lastId, limitPlusOne);
+
+        boolean hasMore = replyList.size() > size;
+        if (hasMore) {
+            replyList = replyList.subList(0, size);
+        }
+
+        Cursor next = null;
+        if (hasMore && !replyList.isEmpty()) {
+            QnaReplyDto last = replyList.getLast();
+            next = new Cursor(last.getCreatedAt(),last.getQnaId());
+        }
+
+        return ResponseEntity.ok(ResponseDto.success(200, "댓글 목록 조회 성공", CursorPage.of(replyList, next)));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<QnaReplyDto>> createQnaReply(Long qnaId, Long creatorId, QnaReplyCreateRequestDto dto) {
+        if (qnaId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qnaId가 필요합니다.");
+        }
+
+        if (qnaMapper.existsQnaById(qnaId) <= 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "문의 글이 없습니다.");
+        }
+
+        String content = (dto.getContent() == null ? "" : dto.getContent().trim());
+        if (content.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "내용은 필수입니다.");
+        }
+        //TODO: 문자 길이 체크
+
+        Reply reply = Reply.builder()
+                .qnaId(qnaId)
+                .content(content)
+                .code("QnA")
+                .creatorId(creatorId)
+                .build();
+
+        int result = replyMapper.createQnaReply(reply);
+        if (result != 1 || reply.getReplyId() == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "댓글 등록 실패");
+        }
+
+        return ResponseEntity.ok(ResponseDto.success(200, "댓글 등록 성공", null));
+    }
+
 }

@@ -22,4 +22,5 @@ public class Reply {
     private LocalDate createdAt;
     private LocalDate deletedAt;
     private String code;
+    private Long creatorId;
 }

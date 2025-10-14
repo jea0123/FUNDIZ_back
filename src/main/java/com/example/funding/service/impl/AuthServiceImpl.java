@@ -8,6 +8,7 @@ import com.example.funding.dto.request.auth.SignUpRequestDto;
 import com.example.funding.exception.DuplicatedEmailException;
 import com.example.funding.exception.DuplicatedNicknameException;
 import com.example.funding.exception.InvalidCredentialsException;
+import com.example.funding.exception.UserNotFoundException;
 import com.example.funding.mapper.UserMapper;
 import com.example.funding.model.User;
 import com.example.funding.provider.JwtProvider;
@@ -73,5 +74,12 @@ public class AuthServiceImpl implements AuthService {
             throw new DuplicatedNicknameException();
         }
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "사용 가능한 닉네임입니다.", dto.getNickname()));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<String>> withdrawUser(Long userId) {
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        userMapper.withdrawUser(userId);
+        return ResponseEntity.ok(ResponseDto.success(200, "회원 탈퇴 성공", null));
     }
 }

@@ -1,10 +1,16 @@
 package com.example.funding.service.impl;
 
+import com.example.funding.common.FileUploader;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.user.UserNicknameDto;
+import com.example.funding.dto.request.user.UserPasswordDto;
+import com.example.funding.dto.request.user.UserProfileImgDto;
 import com.example.funding.dto.response.creator.CreatorQnaDto;
 import com.example.funding.dto.response.user.*;
+import com.example.funding.exception.DuplicatedPasswordException;
+import com.example.funding.exception.InCorrectPasswordException;
 import com.example.funding.exception.UserNotFoundException;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Creator;
@@ -16,9 +22,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -33,6 +41,8 @@ public class UserServiceImpl implements UserService {
 
     private final CreatorMapper creatorMapper;
     private final QnaMapper qnaMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final FileUploader fileUploader;
 
     @Override
     @Transactional(readOnly = true)
@@ -177,18 +187,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<ResponseDto<String>> userNickname(Long userId) {
-        return null;
+    public ResponseEntity<ResponseDto<String>> userNickname(Long userId, UserNicknameDto dto) {
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        userMapper.updateNickname(userId, dto.getNickname());
+        return ResponseEntity.ok(ResponseDto.success(200, "닉네임 변경 성공", dto.getNickname()));
     }
 
     @Override
-    public ResponseEntity<ResponseDto<String>> userProfileImg(Long userId) {
-        return null;
+    public ResponseEntity<ResponseDto<String>> userProfileImg(Long userId, UserProfileImgDto dto) throws IOException {
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        String profileImgUrl = fileUploader.upload(dto.getProfileImg());
+        userMapper.updateProfile(userId, profileImgUrl);
+        return ResponseEntity.ok(ResponseDto.success(200, "프로필 이미지 변경 성공", null));
     }
 
     @Override
-    public ResponseEntity<ResponseDto<String>> userpassword(Long userId) {
-        return null;
-    }
+    public ResponseEntity<ResponseDto<String>> userPassword(Long userId, UserPasswordDto dto) {
+        User user = userMapper.getUserById(userId);
+        if (user == null) throw new UserNotFoundException();
+        String encodedPassword = passwordEncoder.encode(dto.getPassword());
+        String encodedNewPassword = passwordEncoder.encode(dto.getNewPassword());
+        if (!passwordEncoder.matches(encodedPassword, user.getPassword())) throw new InCorrectPasswordException();
+        if (passwordEncoder.matches(encodedNewPassword, user.getPassword())) throw new DuplicatedPasswordException();
 
+        userMapper.updatePwd(userId, encodedNewPassword);
+        return ResponseEntity.ok(ResponseDto.success(200, "비밀번호 변경 성공", "********"));
+    }
 }

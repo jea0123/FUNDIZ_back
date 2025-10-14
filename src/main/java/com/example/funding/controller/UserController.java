@@ -1,10 +1,8 @@
 package com.example.funding.controller;
 
-import com.example.funding.common.CustomUserPrincipal;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
 import com.example.funding.dto.request.user.UserNicknameDto;
 import com.example.funding.dto.request.user.UserPasswordDto;
 import com.example.funding.dto.request.user.UserProfileImgDto;
@@ -16,9 +14,9 @@ import com.example.funding.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -39,9 +37,11 @@ public class UserController {
      * @author by: 장민규
      */
     @GetMapping("/loginUser")
-    public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(@AuthenticationPrincipal CustomUserPrincipal principal) {
-        Long userId = principal.userId();
-        userId = 501L; // TODO: 임시
+    public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(
+//            @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+//        Long userId = principal.userId();
+        Long userId = 501L; // TODO: 임시
         return userService.getLoginUser(userId);
     }
 
@@ -55,9 +55,11 @@ public class UserController {
      * @since 2025-09-05
      */
     @GetMapping("/recentViewProjects")
-    public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(@AuthenticationPrincipal CustomUserPrincipal principal) {
-        Long userId = principal.userId();
-        userId = 501L; // TODO: 임시
+    public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(
+//            @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+//        Long userId = principal.userId();
+        Long userId = 501L; // TODO: 임시
         return userService.getRecentViewProjects(userId);
     }
 
@@ -74,19 +76,31 @@ public class UserController {
         return userService.getMyPageUser(userId);
     }
 
-    @PostMapping("/userPage-nickname/{userId}")
-    public ResponseEntity<ResponseDto<String>> updateNickname(@PathVariable Long userId, @RequestBody UserNicknameDto nickname) {
-        return userService.userNickname(userId);
+    @PostMapping("/nickname")
+    public ResponseEntity<ResponseDto<String>> updateNickname(@RequestBody UserNicknameDto dto
+//                                                              @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+//        Long userId = principal.userId();
+        Long userId = 501L; // TODO: 임시
+        return userService.userNickname(userId, dto);
     }
 
-    @PostMapping("/userPage-profile/{userId}")
-    public ResponseEntity<ResponseDto<String>> updateProfileImg(@PathVariable Long userId, @RequestBody UserProfileImgDto profileImg) {
-        return userService.userProfileImg(userId);
+    @PostMapping("/profileImg")
+    public ResponseEntity<ResponseDto<String>> updateProfileImg(@ModelAttribute UserProfileImgDto dto
+//                                                                @AuthenticationPrincipal CustomUserPrincipal principal
+    ) throws IOException {
+//        Long userId = principal.userId();
+        Long userId = 501L; // TODO: 임시
+        return userService.userProfileImg(userId, dto);
     }
 
-    @PostMapping("/userPage-pass/{userId}")
-    public ResponseEntity<ResponseDto<String>> updatePassword(@PathVariable Long userId, @RequestBody UserPasswordDto password) {
-        return userService.userpassword(userId);
+    @PostMapping("/password")
+    public ResponseEntity<ResponseDto<String>> updatePassword(@RequestBody UserPasswordDto dto
+//                                                              @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+//        Long userId = principal.userId();
+        Long userId = 501L; // TODO: 임시
+        return userService.userPassword(userId, dto);
     }
 
     /**

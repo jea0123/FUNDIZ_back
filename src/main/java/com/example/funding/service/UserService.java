@@ -3,11 +3,15 @@ package com.example.funding.service;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.user.UserNicknameDto;
+import com.example.funding.dto.request.user.UserPasswordDto;
+import com.example.funding.dto.request.user.UserProfileImgDto;
 import com.example.funding.dto.response.creator.CreatorQnaDto;
 import com.example.funding.dto.response.user.*;
 import com.example.funding.exception.UserNotFoundException;
 import org.springframework.http.ResponseEntity;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface UserService {
@@ -42,9 +46,9 @@ public interface UserService {
     //서비스에서구현
     ResponseEntity<ResponseDto<MyPageQnADetailDto>> getQnADetail(Long userId, Long projectId);
 
-    ResponseEntity<ResponseDto<String>> userNickname(Long userId);
+    ResponseEntity<ResponseDto<String>> userNickname(Long userId, UserNicknameDto dto);
 
-    ResponseEntity<ResponseDto<String>> userProfileImg(Long userId);
+    ResponseEntity<ResponseDto<String>> userProfileImg(Long userId, UserProfileImgDto dto) throws IOException;
 
-    ResponseEntity<ResponseDto<String>> userpassword(Long userId);
+    ResponseEntity<ResponseDto<String>> userPassword(Long userId, UserPasswordDto dto);
 }

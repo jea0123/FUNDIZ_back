@@ -12,10 +12,7 @@ import com.example.funding.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -79,5 +76,14 @@ public class AuthController {
     @PostMapping("/checkNickname")
     public ResponseEntity<ResponseDto<String>> checkNickname(@RequestBody CheckNicknameRequestDto dto) {
         return authService.checkNickname(dto);
+    }
+
+    @DeleteMapping("/withdraw")
+    public ResponseEntity<ResponseDto<String>> withdrawUser(
+//            @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+//        Long userId = principal.userId();
+        Long userId = 501L; // TODO: 임시
+        return authService.withdrawUser(userId);
     }
 }

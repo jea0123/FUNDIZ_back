@@ -86,19 +86,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             Claims claims = jwtProvider.validateAndGetClaims(token);
+            String role = claims.get("role", String.class);
+            List<GrantedAuthority> auths = new ArrayList<>();
+            auths.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
+            if("ADMIN".equalsIgnoreCase(role)) {
+                //관리자는 여기서 끝
+                CustomUserPrincipal principal = new CustomUserPrincipal(null, null, claims.getSubject(), auths);
+                Authentication auth =
+                        new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(auth);
+
+                filterChain.doFilter(request, response);
+                return;
+            }
+            Long userId = ((Number) claims.get("userId")).longValue();
+            Long creatorId = userMapper.getCreatorIdByUserId(userId);
+            if (creatorId != null) {
+                auths.add(new SimpleGrantedAuthority("ROLE_CREATOR"));
+            }
+
             String email = claims.get("email", String.class);
             if (email == null || userMapper.findByEmail(email) == null) {
                 request.setAttribute("authError", "TOKEN_INVALID");
                 entryPoint.commence(request, response, null);
                 return;
-            }
-            String role = claims.get("role", String.class);
-            List<GrantedAuthority> auths = new ArrayList<>();
-            auths.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
-            Long userId = ((Number) claims.get("userId")).longValue();
-            Long creatorId = userMapper.getCreatorIdByUserId(userId);
-            if (creatorId != null) {
-                auths.add(new SimpleGrantedAuthority("ROLE_CREATOR"));
             }
 
             CustomUserPrincipal principal = new CustomUserPrincipal(userId, creatorId, email, auths);

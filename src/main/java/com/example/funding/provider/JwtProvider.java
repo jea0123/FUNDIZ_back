@@ -45,6 +45,14 @@ public class JwtProvider {
                 .compact();
     }
 
+    /**
+     * <p>관리자용 JWT 액세스 토큰 생성</p>
+     * @param adminId 관리자 ID
+     * @param role 관리자 역할
+     * @return 생성된 JWT 토큰
+     * @since 2025-10-14
+     * @author 장민규
+     */
     public String createAdminAccessToken(String adminId, String role) {
         Key key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         return Jwts.builder().subject(adminId)

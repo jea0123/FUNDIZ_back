@@ -39,21 +39,21 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String[] WHITELIST = {
-            "/api/v1/shipping/**",
-            "/api/v1/admin/**",
-            "/api/v1/backing/**",
-            "/api/v1/categories/**",
-            "/api/v1/project/**",
-            "/api/v1/creator/**",
-            "/api/v1/cs/**",
-            "/api/v1/notifications/**",
-            "/api/v1/reward/**",
-            "/api/v1/auth/**",
-            "/api/v1/user/**",
-            "/api/v1/settlement/**",
+//            "/api/v1/shipping/**",
+//            "/api/v1/admin/**",
+//            "/api/v1/backing/**",
+//            "/api/v1/categories/**",
+//            "/api/v1/project/**",
+//            "/api/v1/creator/**",
+//            "/api/v1/cs/**",
+//            "/api/v1/notifications/**",
+//            "/api/v1/reward/**",
+//            "/api/v1/auth/**",
+//            "/api/v1/user/**",
+//            "/api/v1/settlement/**",
+//            "/uploads/**",
             "/public/**", "/swagger-ui/**", "/v3/api-docs/**",
             "/error", "/favicon.ico",
-            "/static/**", "/static/uploads/**"
     };
     private final JwtAuthenticationEntryPoint entryPoint;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
@@ -92,8 +92,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = resolveToken(request);
         if (token == null) {
-            request.setAttribute("authError", "TOKEN_MISSING");
-            entryPoint.commence(request, response, null);
+            filterChain.doFilter(request, response);
             return;
         }
 

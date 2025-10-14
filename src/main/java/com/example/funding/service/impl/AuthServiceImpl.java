@@ -50,7 +50,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userMapper.findByEmail(dto.getEmail());
         String encodedPassword = passwordEncoder.encode(dto.getPassword());
 
-        if (user == null || passwordEncoder.matches(encodedPassword, user.getPassword())) {
+        if (user == null || passwordEncoder.matches(user.getPassword(), encodedPassword)) {
             throw new InvalidCredentialsException();
         }
         String token = jwtProvider.createAccessToken(user.getUserId(), user.getEmail(), user.getRole().toString());

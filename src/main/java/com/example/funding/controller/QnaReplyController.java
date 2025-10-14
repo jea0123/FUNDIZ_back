@@ -36,8 +36,10 @@ public class QnaReplyController {
 
     @PostMapping("/reply/{qnaId}")
     public ResponseEntity<ResponseDto<QnaReplyDto>> createQnaReply(@PathVariable Long qnaId,
-                                                                   @RequestAttribute Long creatorId,
+                                                                   Long creatorId,
                                                                    @RequestBody QnaReplyCreateRequestDto dto) {
+
+        creatorId = 179L;
 
         return replyService.createQnaReply(qnaId, creatorId, dto);
     }

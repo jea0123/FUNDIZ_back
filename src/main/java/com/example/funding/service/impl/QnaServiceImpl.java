@@ -33,7 +33,7 @@ public class QnaServiceImpl implements QnaService {
      *
      * @param projectId 프로젝트 ID
      * @param lastCreatedAt 마지막 항목의 생성일시
-     * @param lastId 마지막 항목의 cmId
+     * @param lastId 마지막 항목의 qnaId
      * @param size 한 번에 가져올 항목 수
      * @return 성공 시 200 OK
      * @author 이동혁

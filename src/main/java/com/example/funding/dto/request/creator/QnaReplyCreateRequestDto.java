@@ -7,4 +7,5 @@ import lombok.Setter;
 @Setter
 public class QnaReplyCreateRequestDto {
     private String content;
+    private Long creatorId;
 }

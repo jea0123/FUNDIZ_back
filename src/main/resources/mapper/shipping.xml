@@ -46,4 +46,28 @@
         WHERE c.creatorId = #{creatorId}
         AND p.projectId = #{projectId}
     </select>
+
+    <insert id="addShipping" parameterType="com.example.funding.model.Shipping">
+        <selectKey keyProperty="shippingId" resultType="long" order="BEFORE">
+            SELECT SHIPPING_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO shipping (
+        shippingId,
+        backingId,
+        addrId,
+        shippingStatus,
+        trackingNum,
+        shippedAt,
+        deliveredAt
+        ) VALUES (
+        #{shippingId},
+        #{backingId},
+        #{addrId},
+        #{shippingStatus},
+        #{trackingNum},
+        #{shippedAt, jdbcType=DATE},
+        #{deliveredAt, jdbcType=DATE}
+        )
+    </insert>
 </mapper>

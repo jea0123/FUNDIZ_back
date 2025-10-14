@@ -22,4 +22,27 @@
         WHERE u.userId = #{userId}
     </select>
 
+    <insert id="addPayment" parameterType="com.example.funding.model.Payment">
+        <selectKey keyProperty="paymentId" resultType="long" order="BEFORE">
+            SELECT PAYMENT_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO payment (
+        paymentId,
+        orderId,
+        backingId,
+        method,
+        amount,
+        status
+        ) VALUES (
+        #{paymentId},
+        #{orderId},
+        #{backingId},
+        #{method},
+        #{amount},
+        #{status}
+        )
+    </insert>
+
+
 </mapper>

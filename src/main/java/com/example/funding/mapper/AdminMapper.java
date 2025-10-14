@@ -1,12 +1,14 @@
 package com.example.funding.mapper;
 
 import com.example.funding.common.Pager;
+import com.example.funding.dto.request.admin.RegisterAdminRequestDto;
 import com.example.funding.dto.request.admin.SearchAdminProjectDto;
 import com.example.funding.dto.request.admin.UserAdminUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
 import com.example.funding.dto.response.admin.analytic.*;
 import com.example.funding.dto.response.admin.ProjectVerifyListDto;
+import com.example.funding.model.Admin;
 import com.example.funding.model.User;
 import com.example.funding.model.Project;
 import org.apache.ibatis.annotations.Mapper;
@@ -56,4 +58,8 @@ public interface AdminMapper {
     int updateUser(UserAdminUpdateRequestDto userDto);
 
     User userDetail(@Param("userId") Long userId);
+
+    void registerAdmin(RegisterAdminRequestDto dto);
+
+    Admin getAdminByAdminId(String adminId);
 }

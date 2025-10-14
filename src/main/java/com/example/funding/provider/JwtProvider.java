@@ -45,6 +45,15 @@ public class JwtProvider {
                 .compact();
     }
 
+    public String createAdminAccessToken(String adminId, String role) {
+        Key key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        return Jwts.builder().subject(adminId)
+                .claim("role", role)
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(key)
+                .compact();
+    }
+
     /**
      * <p>JWT 토큰 검증 및 클레임 추출</p>
      * @param token 검증할 JWT 토큰

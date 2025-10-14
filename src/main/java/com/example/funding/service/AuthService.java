@@ -1,13 +1,12 @@
 package com.example.funding.service;
 
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.admin.RegisterAdminRequestDto;
 import com.example.funding.dto.request.auth.CheckEmailRequestDto;
 import com.example.funding.dto.request.auth.CheckNicknameRequestDto;
 import com.example.funding.dto.request.auth.SignInRequestDto;
 import com.example.funding.dto.request.auth.SignUpRequestDto;
-import com.example.funding.exception.DuplicatedEmailException;
-import com.example.funding.exception.DuplicatedNicknameException;
-import com.example.funding.exception.InvalidCredentialsException;
+import com.example.funding.exception.*;
 import org.springframework.http.ResponseEntity;
 
 public interface AuthService {
@@ -60,4 +59,29 @@ public interface AuthService {
     ResponseEntity<ResponseDto<String>> checkNickname(CheckNicknameRequestDto dto);
 
     ResponseEntity<ResponseDto<String>> withdrawUser(Long userId);
+
+    /**
+     * <p>관리자 회원가입</p>
+     * <p>- 이미 존재하는 관리자 아이디인지 확인, 비밀번호 암호화, 관리자 정보 저장</p>
+     *
+     * @param dto 가입 정보
+     * @return 관리자 아이디
+     * @throws DuplicatedAdminIdException 이미 존재하는 관리자 아이디인 경우
+     * @author by: 장민규
+     * @since 2025-10-14
+     */
+    ResponseEntity<ResponseDto<String>> registerAdmin(RegisterAdminRequestDto dto);
+
+    /**
+     * <p>관리자 로그인</p>
+     * <p>- 관리자 아이디와 비밀번호 확인, JWT 토큰 생성 및 반환</p>
+     *
+     * @param dto 로그인 정보
+     * @return JWT 토큰
+     * @throws AdminNotFoundException 관리자 아이디가 올바르지 않은 경우
+     * @throws InvalidAdminCredentialsException 관리자 아이디 또는 비밀번호가 올바르지 않은 경우
+     * @author by: 장민규
+     * @since 2025-10-14
+     */
+    ResponseEntity<ResponseDto<String>> loginAdmin(RegisterAdminRequestDto dto);
 }

@@ -46,4 +46,9 @@
         VALUES (inquiry_seq.NEXTVAL, #{userId}, 10, #{title}, #{content}, SYSDATE, 'N', #{ctgr}, 'N')
     </insert>
 
+    <select id="existsInquiryById" resultType="int">
+        SELECT COUNT(*) FROM INQUIRY
+        WHERE INQID = #{inqId}
+    </select>
+
 </mapper>

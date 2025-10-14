@@ -194,7 +194,7 @@ public class CreatorServiceImpl implements CreatorService {
                 .subctgrId(dto.getSubctgrId())
                 .title(dto.getTitle())
                 .content(dto.getContent())
-                .thumbnail(dto.getThumbnail())
+                .thumbnail(dto.getThumbnailUrl())
                 .goalAmount(dto.getGoalAmount())
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())

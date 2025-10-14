@@ -30,5 +30,4 @@ public class CreatorDashboardDto {
     private List<DailyCountDto> dailyStatus;
     private List<MonthCountDto> monthStatus;
 
-
 }

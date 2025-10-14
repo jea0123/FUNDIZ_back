@@ -1,10 +1,10 @@
 package com.example.funding.mapper;
 
-import com.example.funding.dto.request.backing.BackingRequestDto;
 import com.example.funding.dto.request.backing.BackingRequestUpdateDto;
 import com.example.funding.dto.response.backing.BackingCreatorBackerList;
 import com.example.funding.dto.response.backing.BackingResponseDto;
-import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
+import com.example.funding.dto.response.creator.DailyCountDto;
+import com.example.funding.dto.response.creator.MonthCountDto;
 import com.example.funding.dto.response.user.BackingDto;
 import com.example.funding.model.Backing;
 import com.example.funding.model.BackingDetail;
@@ -37,5 +37,9 @@ public interface BackingMapper {
     long getBackerCnt(Long creatorId);
 
     List<BackingCreatorBackerList> getCBackerList(Long creatorId);
+
+    List<DailyCountDto> dailyCount(Long creatorId);
+
+    List<MonthCountDto> monthCount(Long creatorId);
 
 }

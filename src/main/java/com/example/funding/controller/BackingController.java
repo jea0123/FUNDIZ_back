@@ -21,6 +21,7 @@ import java.util.List;
 public class BackingController {
     private final BackingService backingService;
 
+
     @GetMapping("/{userId}/create/{projectId}")
     public ResponseEntity<ResponseDto<BackingResponseDto>>prepareBacking(@PathVariable Long projectId,
                                                                          @PathVariable Long userId) {
@@ -31,7 +32,7 @@ public class BackingController {
     public ResponseEntity<ResponseDto<String>> createBacking(@RequestBody BackingRequestDto requestDto,
                                                              @PathVariable Long userId) {
 
-        System.out.println("userId=" + userId + "backingId = " + requestDto.getBackingId());
+        System.out.println("userId=" + userId);
         System.out.println("body " + requestDto);
         return backingService.createBacking(userId, requestDto);
     }

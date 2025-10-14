@@ -281,7 +281,7 @@
 
     <select id = "getBackerCnt" parameterType="long" resultType="long">
         SELECT
-            sum(backerCnt)
+            NVL(sum(backerCnt),0)
         FROM
             project
         WHERE
@@ -305,7 +305,7 @@
         <!--AND p.PROJECTID = #{projectId}-->
     </select>
 
-    <select id = "dailyStatus" resultType ="com.example.funding.dto.response.creator.DailyCountDto">
+    <select id = "dailyStatus" parameterType="long" resultType ="com.example.funding.dto.response.creator.DailyCountDto">
         SELECT
             d.target_date AS createdAt,
             NVL(COUNT(b.BACKINGID), 0) AS count
@@ -322,7 +322,7 @@
         ORDER BY d.target_date
     </select>
 
-    <select id = "monthStatus" resultType = "com.example.funding.dto.response.creator.MonthCountDto">
+    <select id = "monthStatus" parameterType="long" resultType= "com.example.funding.dto.response.creator.MonthCountDto">
         SELECT
             m.target_month AS createdAt,
             NVL(COUNT(p.projectId), 0) AS count

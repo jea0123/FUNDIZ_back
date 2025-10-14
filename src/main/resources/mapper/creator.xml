@@ -247,12 +247,12 @@
 
     <select id ="creatorDashboardDto" parameterType="long" resultType="com.example.funding.dto.response.creator.CreatorDashboardDto">
         SELECT
-            count(*) AS totalProjectCnt,
-            count(CASE WHEN projectStatus = 'FAILED' THEN creatorId END) AS projectFailedCnt
+            NVL(count(*),0) AS totalProjectCnt,
+            NVL(count(CASE WHEN projectStatus = 'FAILED' THEN creatorId END),0) AS projectFailedCnt
         FROM
             project
         WHERE CREATORID = #{creatorId}
-        GROUP BY creatorId
+<!--        GROUP BY creatorId-->
     </select>
 
 

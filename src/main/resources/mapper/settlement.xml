@@ -53,7 +53,7 @@
 
     <select id="getTotalAmountCreatorId" parameterType="long" resultType="long">
         SELECT
-        SUM(totalAmount)
+        NVL(SUM(totalAmount),0)
         FROM settlement
         WHERE creatorId =#{creatorId}
     </select>

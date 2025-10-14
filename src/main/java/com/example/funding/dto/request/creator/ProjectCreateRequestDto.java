@@ -35,4 +35,7 @@ public class ProjectCreateRequestDto {
     private String businessNum;
     private String email;
     private String phone;
+
+    private List<MultipartFile> files;
+    private MultipartFile businessDoc;
 }

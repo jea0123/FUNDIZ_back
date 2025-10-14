@@ -45,4 +45,37 @@
         INSERT INTO REPLY (REPLYID, CMID, USERID, CONTENT, ISSECRET, CODE)
         VALUES (#{replyId}, #{cmId}, #{userId}, #{content}, #{isSecret}, #{code})
     </insert>
+
+    <select id="getInquiryReplyList" resultType="inquiryReplyDto">
+        SELECT *
+        FROM (
+        SELECT
+        REPLYID,
+        INQID,
+        CONTENT,
+        CREATEDAT
+        FROM REPLY
+        WHERE INQID = #{inqId}
+        AND CODE = 'IQ'
+        <if test="lastCreatedAt != null">
+            <![CDATA[
+                AND (
+                    CREATEDAT < #{lastCreatedAt}
+                    OR (CREATEDAT = #{lastCreatedAt} AND REPLYID < #{lastId})
+                )
+            ]]>
+        </if>
+        ORDER BY CREATEDAT DESC, REPLYID DESC
+        )
+        WHERE ROWNUM <![CDATA[ <= ]]> #{size}
+    </select>
+
+    <insert id="createInquiryReply">
+        <selectKey keyProperty="replyId" resultType="Long" order="BEFORE">
+            SELECT REPLY_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO REPLY (REPLYID, INQID, CONTENT, CODE)
+        VALUES (#{replyId}, #{inqId}, #{content}, #{code})
+    </insert>
 </mapper>

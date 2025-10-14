@@ -198,18 +198,17 @@ public class UserServiceImpl implements UserService {
         if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
         String profileImgUrl = fileUploader.upload(dto.getProfileImg());
         userMapper.updateProfile(userId, profileImgUrl);
-        return ResponseEntity.ok(ResponseDto.success(200, "프로필 이미지 변경 성공", null));
+        return ResponseEntity.ok(ResponseDto.success(200, "프로필 이미지 변경 성공", profileImgUrl));
     }
 
     @Override
     public ResponseEntity<ResponseDto<String>> userPassword(Long userId, UserPasswordDto dto) {
         User user = userMapper.getUserById(userId);
         if (user == null) throw new UserNotFoundException();
-        String encodedPassword = passwordEncoder.encode(dto.getPassword());
-        String encodedNewPassword = passwordEncoder.encode(dto.getNewPassword());
-        if (!passwordEncoder.matches(encodedPassword, user.getPassword())) throw new InCorrectPasswordException();
-        if (passwordEncoder.matches(encodedNewPassword, user.getPassword())) throw new DuplicatedPasswordException();
+        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) throw new InCorrectPasswordException();
+        if (passwordEncoder.matches(dto.getNewPassword(), user.getPassword())) throw new DuplicatedPasswordException();
 
+        String encodedNewPassword = passwordEncoder.encode(dto.getNewPassword());
         userMapper.updatePwd(userId, encodedNewPassword);
         return ResponseEntity.ok(ResponseDto.success(200, "비밀번호 변경 성공", "********"));
     }

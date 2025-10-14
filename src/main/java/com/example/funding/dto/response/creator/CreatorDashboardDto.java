@@ -27,4 +27,8 @@ public class CreatorDashboardDto {
     private List<CreatorDashboardRankDto> top3LikeCnt;
     private List<CreatorDashboardRankDto> top3ViewCnt;
 
+    private List<DailyCountDto> dailyStatus;
+    private List<MonthCountDto> monthStatus;
+
+
 }

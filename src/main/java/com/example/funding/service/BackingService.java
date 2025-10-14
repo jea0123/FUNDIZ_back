@@ -20,5 +20,4 @@ public interface BackingService {
 
     ResponseEntity<ResponseDto<String>> updateBacking(BackingRequestUpdateDto requestDto, Long backingId, Long userId);
 
-    ResponseEntity<ResponseDto<String>> deleteBacking(Long backingId, Long userId);
 }

@@ -52,7 +52,7 @@
     <select id="getBackingProjectAndUserId" parameterType="map" resultMap="BackingDetailResultMap">
         SELECT
         <!-- 프로젝트 테이블에서 가져올 내용 -->
-        p.projectId AS price,
+        p.projectId AS projectId,
         p.title AS title,
         p.thumbnail AS thumbnail,
         p.endDate AS endDate,
@@ -105,6 +105,7 @@
         <association property="backing" javaType="com.example.funding.model.Backing">
             <id property="backingId" column="backingId" jdbcType="NUMERIC"/>
             <result property="backingStatus" column="backingStatus"/>
+            <result property="amount" column="amount" jdbcType="NUMERIC"/>
         </association>
     </resultMap>
 
@@ -126,6 +127,7 @@
         <!-- 후원 테이블에서 가져올 내용 -->
         b.backingId AS backingId,
         b.backingStatus AS backingStatus,
+        b.amount AS amount,
 
         <!-- 후원 상세에서 가져올 내용 -->
         bd.price AS price,
@@ -210,7 +212,7 @@
         r.rewardId,
         r.rewardName,
         r.price,
-        r.quantity
+        r.quantity,
         r.deliveryDate
 
         FROM users u
@@ -249,7 +251,7 @@
         price,
         quantity
         ) VALUES (
-        #{backingId},    <!-- ✅ 여기 -->
+        #{backingId},
         #{rewardId},
         #{price},
         #{quantity}
@@ -277,12 +279,6 @@
         AND userId = #{userId}
     </update>
 
-    <delete id="deleteBacking">
-        DELETE FROM BACKING
-        WHERE BACKINGID =#{backingId}
-        AND USERID =#{userId}
-    </delete>
-
     <select id = "getBackerCnt" parameterType="long" resultType="long">
         SELECT
             sum(backerCnt)
@@ -307,6 +303,40 @@
         JOIN project p ON p.creatorId = c.creatorId
         WHERE c.CREATORID = #{creatorId}
         <!--AND p.PROJECTID = #{projectId}-->
+    </select>
+
+    <select id = "dailyStatus" resultType ="com.example.funding.dto.response.creator.DailyCountDto">
+        SELECT
+            d.target_date AS createdAt,
+            NVL(COUNT(b.BACKINGID), 0) AS count
+        FROM (
+            SELECT
+                TRUNC(SYSDATE) - LEVEL + 1 AS target_date
+            FROM
+                dual
+                CONNECT BY LEVEL &lt; 7
+        ) d
+        LEFT JOIN BACKING b
+        ON TRUNC(b.CREATEDAT) = d.target_date
+        GROUP BY d.target_date
+        ORDER BY d.target_date
+    </select>
+
+    <select id = "monthStatus" resultType = "com.example.funding.dto.response.creator.MonthCountDto">
+        SELECT
+            m.target_month AS createdAt,
+            NVL(COUNT(p.projectId), 0) AS count
+        FROM (
+            SELECT
+                ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -LEVEL + 1) AS target_month
+            FROM
+                dual
+            CONNECT BY LEVEL &lt; 12
+        ) m
+        LEFT JOIN project p
+        ON TRUNC(p.createdAt, 'MM') = m.target_month
+        GROUP BY m.target_month
+        ORDER BY m.target_month
     </select>
 </mapper>
 

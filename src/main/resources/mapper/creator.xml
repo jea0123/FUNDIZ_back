@@ -25,43 +25,6 @@
         WHERE creatorId = #{creatorId}
     </select>
 
-    <!--    <select id="">-->
-    <!--        SELECT-->
-    <!--            (-->
-    <!--            SELECT count(*)-->
-    <!--            FROM project-->
-    <!--            WHERE creatorId = #{creatorId}-->
-    <!--            ) AS totalProject,-->
-
-    <!--            (-->
-    <!--            SELECT sum(s.*)-->
-    <!--            FROM settlement s-->
-    <!--            JOIN project p ON p.projectId = s.projectId-->
-    <!--            JOIN creator c ON c.creatorId = p.creatorId-->
-    <!--            WHERE creatorId = #{creatorId}-->
-    <!--            ) AS totalAmount,-->
-
-    <!--            (-->
-    <!--            SELECT count(b.backingId)-->
-    <!--            FROM backing b-->
-    <!--            JOIN backingDetail bd ON b.backingId = bd.backingId-->
-    <!--            JOIN reward r ON bd.rewardId = r.rewardId-->
-    <!--            JOIN project p ON r.projectId = p.projectId-->
-    <!--            WHERE p.creatorId = #{creatorId}-->
-    <!--            ) AS totalBackers,-->
-
-    <!--            (-->
-    <!--            select count(*)-->
-    <!--            from project p-->
-    <!--            where p.creatorId = 96-->
-    <!--            and p.projectStatus ='VERIFYING';-->
-    <!--            ) AS pendingApproval-->
-    <!--        FROM dual;-->
-
-    <!--    </select>-->
-
-
-
     <sql id="projectListWhere">
         <where>
             p.CREATORID = #{creatorId}
@@ -291,5 +254,6 @@
         WHERE CREATORID = #{creatorId}
         GROUP BY creatorId
     </select>
+
 
 </mapper>

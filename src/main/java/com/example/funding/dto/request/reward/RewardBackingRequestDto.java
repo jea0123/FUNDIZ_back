@@ -11,9 +11,6 @@ import lombok.*;
 public class RewardBackingRequestDto {
     // 리워드
     private String rewardName;
-    private String price;
-
-    // 후원상세
-    private Long backingPrice;
-    private Long quantity;
+    private Long price;
+    private String rewardContent;
 }

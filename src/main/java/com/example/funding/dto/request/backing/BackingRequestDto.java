@@ -21,7 +21,7 @@ import java.util.List;
 public class BackingRequestDto {
     private Long backingId;
     private Backing backing;
-    private Shipping shipping;
+    private BackingDetail backingDetail;
     private Payment payment;
     private Address address;
     private List<RewardBackingRequestDto> rewards;

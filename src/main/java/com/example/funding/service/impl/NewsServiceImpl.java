@@ -2,8 +2,8 @@ package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.creator.NewsCreateRequestDto;
-import com.example.funding.exception.AccessDeniedException;
-import com.example.funding.exception.CreatorNotFoundException;
+import com.example.funding.exception.forbidden.AccessDeniedException;
+import com.example.funding.exception.notfound.CreatorNotFoundException;
 import com.example.funding.mapper.CreatorMapper;
 import com.example.funding.mapper.NewsMapper;
 import com.example.funding.mapper.ProjectMapper;

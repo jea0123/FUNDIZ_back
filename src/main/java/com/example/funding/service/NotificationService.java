@@ -2,9 +2,9 @@ package com.example.funding.service;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.notification.CreateNotificationRequestDto;
-import com.example.funding.exception.AccessDeniedException;
-import com.example.funding.exception.NotificationNotFoundException;
-import com.example.funding.exception.UserNotFoundException;
+import com.example.funding.exception.forbidden.AccessDeniedException;
+import com.example.funding.exception.notfound.NotificationNotFoundException;
+import com.example.funding.exception.notfound.UserNotFoundException;
 import com.example.funding.model.Notification;
 import org.springframework.http.ResponseEntity;
 

@@ -4,7 +4,7 @@ import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.cs.RpAddRequestDto;
-import com.example.funding.exception.UserNotFoundException;
+import com.example.funding.exception.notfound.UserNotFoundException;
 import com.example.funding.mapper.ReportMapper;
 import com.example.funding.mapper.UserMapper;
 import com.example.funding.model.Report;

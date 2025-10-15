@@ -5,7 +5,7 @@ import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.cs.NoticeAddRequestDto;
 import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
-import com.example.funding.exception.NoticeNotFoundException;
+import com.example.funding.exception.notfound.NoticeNotFoundException;
 import com.example.funding.mapper.NoticeMapper;
 import com.example.funding.model.Notice;
 import com.example.funding.service.NoticeService;

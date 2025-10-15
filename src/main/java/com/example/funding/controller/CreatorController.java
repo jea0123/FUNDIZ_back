@@ -9,6 +9,7 @@ import com.example.funding.dto.request.creator.NewsCreateRequestDto;
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
 import com.example.funding.dto.request.reward.RewardCreateRequestDto;
+import com.example.funding.dto.request.shipping.ShippingStatusDto;
 import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
 import com.example.funding.dto.response.creator.*;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
@@ -20,6 +21,7 @@ import com.example.funding.model.Reward;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.NewsService;
 import com.example.funding.service.RewardService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -299,8 +301,13 @@ public class CreatorController {
     public ResponseEntity<ResponseDto<List<CreatorShippingBackerList>>> getShippingBackerList(@RequestAttribute Long creatorId, @PathVariable Long projectId) {
         return creatorService.getShippingBackerList(creatorId, projectId);
     }
-    
-    // TODO: 이윤기 - 창작자 배송 리스트에서 배송상태 변경을 위한 @PostMapping 필요
+
+    @PostMapping("/shippingBackerList/{projectId}")
+    public ResponseEntity<ResponseDto<String>> setShippingStatus (@PathVariable Long projectId,
+                                                                  @RequestAttribute Long creatorId,
+                                                                  @Valid @RequestBody ShippingStatusDto status) {
+        return creatorService.setShippingStatus(projectId ,creatorId, status);
+    }
 
     /**
      * <p>프로젝트 새소식 등록</p>

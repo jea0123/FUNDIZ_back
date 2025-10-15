@@ -8,6 +8,7 @@ import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.creator.CreatorRegisterRequestDto;
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
+import com.example.funding.dto.request.shipping.ShippingStatusDto;
 import com.example.funding.dto.response.backing.BackingCreatorBackerList;
 import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
 import com.example.funding.dto.response.creator.*;
@@ -18,6 +19,7 @@ import com.example.funding.exception.UserNotFoundException;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
+import com.example.funding.model.Shipping;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.RewardService;
 import com.example.funding.service.validator.ProjectInputValidator;
@@ -393,8 +395,6 @@ public class CreatorServiceImpl implements CreatorService {
         List<DailyCountDto> dailyCount = backingMapper.dailyCount(creatorId);
         List<MonthCountDto> monthCount = backingMapper.monthCount(creatorId);
 
-        //TODO : 추가 대시보드(2개) 리스트 구현을위해서는 컬럼을 추가할 필요가있음 상의 후 구현
-
         CreatorDashboardDto result = CreatorDashboardDto.builder()
                 .creatorId(creatorId)
                 .projectTotal(projectTotal)
@@ -519,5 +519,16 @@ public class CreatorServiceImpl implements CreatorService {
                 .build();
         creatorMapper.insertCreator(creator);
         return ResponseEntity.ok(ResponseDto.success(200, "창작자 등록 성공", dto.getCreatorName()));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<String>> setShippingStatus(Long projectId, Long creatorId,ShippingStatusDto shippingStatusDto) {
+
+        int result = shippingMapper.updateShippingStatus(projectId, creatorId, shippingStatusDto);
+        if(result == 0){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "배송상태변경실패"));
+        }
+        
+        return ResponseEntity.ok(ResponseDto.success(200, "배송지 변경 완료" ,"배송지 변경"));
     }
 }

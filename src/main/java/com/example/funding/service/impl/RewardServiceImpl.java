@@ -2,10 +2,10 @@ package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.reward.RewardCreateRequestDto;
-import com.example.funding.exception.AccessDeniedException;
-import com.example.funding.exception.CreatorNotFoundException;
-import com.example.funding.exception.ProjectNotFoundException;
-import com.example.funding.exception.RewardNotFoundException;
+import com.example.funding.exception.forbidden.AccessDeniedException;
+import com.example.funding.exception.notfound.CreatorNotFoundException;
+import com.example.funding.exception.notfound.ProjectNotFoundException;
+import com.example.funding.exception.notfound.RewardNotFoundException;
 import com.example.funding.mapper.CreatorMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.RewardMapper;

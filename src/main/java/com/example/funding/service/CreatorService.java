@@ -10,9 +10,9 @@ import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
 import com.example.funding.dto.response.creator.*;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
-import com.example.funding.exception.AlreadyCreatorException;
-import com.example.funding.exception.CreatorNotFoundException;
-import com.example.funding.exception.UserNotFoundException;
+import com.example.funding.exception.badrequest.AlreadyCreatorException;
+import com.example.funding.exception.notfound.CreatorNotFoundException;
+import com.example.funding.exception.notfound.UserNotFoundException;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;

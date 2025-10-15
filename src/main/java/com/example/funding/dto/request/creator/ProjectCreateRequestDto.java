@@ -18,7 +18,6 @@ public class ProjectCreateRequestDto {
     //프로젝트
     private String title;
     private String content;
-    private MultipartFile thumbnail;
     private String thumbnailUrl;
     private Integer goalAmount;
     private LocalDate startDate;
@@ -36,8 +35,10 @@ public class ProjectCreateRequestDto {
     private String email;
     private String phone;
 
-    private List<MultipartFile> files;
+    //파일
+    private MultipartFile thumbnail;
     private MultipartFile businessDoc;
 
+    //에디터
     private String contentBlocks;
 }

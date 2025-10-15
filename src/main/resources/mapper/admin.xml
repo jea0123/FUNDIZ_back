@@ -273,6 +273,14 @@
           AND PROJECTSTATUS = 'VERIFYING'
           AND ISVERIFIED = 'Y'
     </update>
+    
+    <select id="isApprovable" resultType="int">
+        SELECT COUNT(*)
+        FROM PROJECT
+        WHERE PROJECTID = #{projectId}
+          AND PROJECTSTATUS = 'VERIFYING'
+          AND ISVERIFIED = 'Y'
+    </select>
 
     <update id="rejectProject">
         UPDATE PROJECT
@@ -283,6 +291,14 @@
           AND PROJECTSTATUS = 'VERIFYING'
           AND ISVERIFIED = 'Y'
     </update>
+    
+    <select id="isRejectable" resultType="int">
+        SELECT COUNT(*)
+        FROM PROJECT
+        WHERE PROJECTID = #{projectId}
+          AND PROJECTSTATUS = 'VERIFYING'
+          AND ISVERIFIED = 'Y'
+    </select>
 
     <select id="userTotal" resultType="Integer">
         SELECT COUNT(*) FROM users

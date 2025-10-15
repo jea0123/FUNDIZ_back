@@ -5,10 +5,12 @@ import com.example.funding.dto.request.address.AddrAddRequestDto;
 import com.example.funding.dto.request.address.AddrDefaultSetDto;
 import com.example.funding.dto.request.address.AddrUpdateRequestDto;
 import com.example.funding.dto.response.address.AddressResponseDto;
+import com.example.funding.exception.forbidden.AccessDeniedException;
+import com.example.funding.exception.notfound.AddressNotFoundException;
+import com.example.funding.exception.notfound.UserNotFoundException;
 import com.example.funding.mapper.AddressMapper;
 import com.example.funding.mapper.UserMapper;
 import com.example.funding.model.Address;
-import com.example.funding.model.User;
 import com.example.funding.service.AddressService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,20 +30,17 @@ public class AddressServiceImpl implements AddressService {
     private final AddressMapper addressMapper;
     private final UserMapper userMapper;
 
-
     @Override
     public ResponseEntity<ResponseDto<List<AddressResponseDto>>> getAddrList(Long userId) {
-        User user = userMapper.getUserById(userId);
-        if(user == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "사용자를 찾을 수 없습니다."));
-        }
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+
         List<AddressResponseDto> addrResponse = addressMapper.getAddressList(userId);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "사용자 주소 리스트 불러오기 성공", addrResponse));
     }
 
     @Override
     public ResponseEntity<ResponseDto<String>> addAddress(Long userId, AddrAddRequestDto addrDto) {
-
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
         Address addr = Address.builder()
                 .userId(userId)
                 .addrName(addrDto.getAddrName())
@@ -52,55 +51,47 @@ public class AddressServiceImpl implements AddressService {
                 .recipientPhone(addrDto.getRecipientPhone())
                 .isDefault(addrDto.getIsDefault())
                 .build();
-
-        int result = addressMapper.addAddr(addr);
-
-        if(result ==0){
-          return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"배송지 추가 실패"));
-        }
-        return ResponseEntity.ok(ResponseDto.success(200,"배송지 추가 성공", "데이터 출력확인"));
+        addressMapper.addAddr(addr);
+        return ResponseEntity.ok(ResponseDto.success(200, "배송지 추가 성공", null));
     }
 
 
     @Override
     public ResponseEntity<ResponseDto<String>> updateAddr(Long userId, Long addrId, AddrUpdateRequestDto addrDto) {
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        Address existingAddr = addressMapper.getAddr(addrId);
+        if (existingAddr == null) throw new AddressNotFoundException();
+        if(!existingAddr.getUserId().equals(userId)) throw new AccessDeniedException();
         addrDto.setAddrId(addrId);
         addrDto.setUserId(userId);
-
-        //addressMapper.resetDefaultAddr(userId, addrId);
-
-        int result = addressMapper.updateAddr(addrDto);
-        if(result ==0){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "주소 수정 실패"));
-        }
-        return ResponseEntity.ok(ResponseDto.success(200,"주소 수정 완료", "주소 수정 "));
+        addressMapper.updateAddr(addrDto);
+        return ResponseEntity.ok(ResponseDto.success(200, "주소 수정 완료", null));
     }
 
 
     @Override
     public ResponseEntity<ResponseDto<String>> deleteAddr(Long userId, Long addrId) {
-        int deleted = addressMapper.deleteAddr(userId, addrId);
-        if(deleted == 0){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"주소 삭제 실패"));
-        }
-        return ResponseEntity.ok(ResponseDto.success(200, "주소 삭제 완료", "주소 삭제"));
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        Address existingAddr = addressMapper.getAddr(addrId);
+        if (existingAddr == null) throw new AddressNotFoundException();
+        if(!existingAddr.getUserId().equals(userId)) throw new AccessDeniedException();
+        addressMapper.deleteAddr(userId, addrId);
+        return ResponseEntity.ok(ResponseDto.success(200, "주소 삭제 완료", null));
     }
 
     //TODO: 컨트롤러 분리 (기본주소지설정)
     @Override
     public ResponseEntity<ResponseDto<String>> defaultAddr(Long userId, Long addrId, AddrDefaultSetDto addrDefaultDto) {
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        Address existingAddr = addressMapper.getAddr(addrId);
+        if (existingAddr == null) throw new AddressNotFoundException();
+        if(!existingAddr.getUserId().equals(userId)) throw new AccessDeniedException();
         addrDefaultDto.setUserId(userId);
         addrDefaultDto.setAddrId(addrId);
 
         //기본 값을 'N'으로 바꿈
-        int result = addressMapper.resetDefaultAddr(userId, addrId);
-
-        if(result == 0){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404,"배송지 기본 설정 실패"));
-        }
-
-        return ResponseEntity.ok(ResponseDto.success(200,"배송지 기본설정 완료", "배송지 기본설정완료 "));
-
+        addressMapper.resetDefaultAddr(userId, addrId);
+        return ResponseEntity.ok(ResponseDto.success(200, "배송지 기본설정 완료", null));
     }
 
 }

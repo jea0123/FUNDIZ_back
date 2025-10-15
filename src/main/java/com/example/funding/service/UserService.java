@@ -8,10 +8,9 @@ import com.example.funding.dto.request.user.UserPasswordDto;
 import com.example.funding.dto.request.user.UserProfileImgDto;
 import com.example.funding.dto.response.creator.CreatorQnaDto;
 import com.example.funding.dto.response.user.*;
-import com.example.funding.exception.DuplicatedLikedProjectException;
-import com.example.funding.exception.LikedProjectNotFoundException;
-import com.example.funding.exception.ProjectNotFoundException;
-import com.example.funding.exception.UserNotFoundException;
+import com.example.funding.exception.conflict.DuplicatedFollowCreatorException;
+import com.example.funding.exception.conflict.DuplicatedLikedProjectException;
+import com.example.funding.exception.notfound.*;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
@@ -92,4 +91,42 @@ public interface UserService {
      * @since 2025-10-15
      */
     ResponseEntity<ResponseDto<Boolean>> checkLikedProject(Long userId, Long projectId);
+
+    /**
+     * <p>크리에이터 팔로우 여부 확인</p>
+     * @param userId 인증된 사용자의 ID
+     * @param creatorId 확인할 크리에이터 ID
+     * @return 팔로우한 크리에이터 이름
+     * @throws UserNotFoundException 사용자가 존재하지 않을 때
+     * @throws CreatorNotFoundException 크리에이터가 존재하지 않을 때
+     * @throws DuplicatedFollowCreatorException 이미 팔로우한 크리에이터일 때
+     * @author by: 장민규
+     * @since 2025-10-15
+     */
+    ResponseEntity<ResponseDto<String>> followCreator(Long userId, Long creatorId);
+
+    /**
+     * <p>크리에이터 언팔로우</p>
+     * @param userId 인증된 사용자의 ID
+     * @param creatorId 언팔로우할 크리에이터 ID
+     * @return 언팔로우한 크리에이터 이름
+     * @throws UserNotFoundException 사용자가 존재하지 않을 때
+     * @throws CreatorNotFoundException 크리에이터가 존재하지 않을 때
+     * @throws FollowingCreatorNotFoundException 팔로우한 크리에이터가 아닐 때
+     * @author by: 장민규
+     * @since 2025-10-15
+     */
+    ResponseEntity<ResponseDto<String>> unfollowCreator(Long userId, Long creatorId);
+
+    /**
+     * <p>크리에이터 팔로우 여부 확인</p>
+     * @param userId 인증된 사용자의 ID
+     * @param creatorId 확인할 크리에이터 ID
+     * @return 크리에이터 팔로우 여부 (true/false)
+     * @throws UserNotFoundException 사용자가 존재하지 않을 때
+     * @throws CreatorNotFoundException 크리에이터가 존재하지 않을 때
+     * @author by: 장민규
+     * @since 2025-10-15
+     */
+    ResponseEntity<ResponseDto<Boolean>> isFollowingCreator(Long userId, Long creatorId);
 }

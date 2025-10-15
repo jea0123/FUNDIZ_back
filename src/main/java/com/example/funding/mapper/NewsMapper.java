@@ -10,5 +10,5 @@ import java.util.List;
 public interface NewsMapper {
     List<News> getNewsList(@Param("projectId") Long projectId);
 
-    int createNews(News news);
+    void createNews(News news);
 }

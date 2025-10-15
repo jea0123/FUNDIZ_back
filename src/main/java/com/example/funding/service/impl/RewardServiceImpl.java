@@ -2,8 +2,14 @@ package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.reward.RewardCreateRequestDto;
+import com.example.funding.exception.forbidden.AccessDeniedException;
+import com.example.funding.exception.notfound.CreatorNotFoundException;
+import com.example.funding.exception.notfound.ProjectNotFoundException;
+import com.example.funding.exception.notfound.RewardNotFoundException;
+import com.example.funding.mapper.CreatorMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.RewardMapper;
+import com.example.funding.model.Project;
 import com.example.funding.model.Reward;
 import com.example.funding.service.RewardService;
 import com.example.funding.service.validator.ProjectInputValidator;
@@ -27,6 +33,7 @@ public class RewardServiceImpl implements RewardService {
 
     private final RewardMapper rewardMapper;
     private final ProjectMapper projectMapper;
+    private final CreatorMapper creatorMapper;
     private final ProjectInputValidator inputValidator;
     private final ProjectTransitionGuard transitionGuard;
 
@@ -53,19 +60,16 @@ public class RewardServiceImpl implements RewardService {
 
         for (RewardCreateRequestDto dto : rewardList) {
             Reward reward = Reward.builder()
-                .projectId(projectId)
-                .rewardName(dto.getRewardName().trim())
-                .price(dto.getPrice())
-                .rewardContent(dto.getRewardContent().trim())
-                .deliveryDate(dto.getDeliveryDate())
-                .rewardCnt(dto.getRewardCnt())
-                .isPosting(dto.getIsPosting())
-                .build();
+                    .projectId(projectId)
+                    .rewardName(dto.getRewardName().trim())
+                    .price(dto.getPrice())
+                    .rewardContent(dto.getRewardContent().trim())
+                    .deliveryDate(dto.getDeliveryDate())
+                    .rewardCnt(dto.getRewardCnt())
+                    .isPosting(dto.getIsPosting())
+                    .build();
 
-            int result = rewardMapper.saveReward(reward);
-            if (result != 1) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "리워드 생성 실패");
-            }
+            rewardMapper.saveReward(reward);
         }
     }
 
@@ -93,19 +97,16 @@ public class RewardServiceImpl implements RewardService {
 
         for (RewardCreateRequestDto dto : rewardList) {
             Reward reward = Reward.builder()
-                .projectId(projectId)
-                .rewardName(dto.getRewardName().trim())
-                .price(dto.getPrice())
-                .rewardContent(dto.getRewardContent().trim())
-                .deliveryDate(dto.getDeliveryDate())
-                .rewardCnt(dto.getRewardCnt())
-                .isPosting(dto.getIsPosting())
-                .build();
+                    .projectId(projectId)
+                    .rewardName(dto.getRewardName().trim())
+                    .price(dto.getPrice())
+                    .rewardContent(dto.getRewardContent().trim())
+                    .deliveryDate(dto.getDeliveryDate())
+                    .rewardCnt(dto.getRewardCnt())
+                    .isPosting(dto.getIsPosting())
+                    .build();
 
-            int saved = rewardMapper.saveReward(reward);
-            if (saved != 1) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "리워드 저장 실패");
-            }
+            rewardMapper.saveReward(reward);
         }
     }
 
@@ -120,14 +121,12 @@ public class RewardServiceImpl implements RewardService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> deleteReward(Long projectId, Long rewardId) {
+        if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
+        if (rewardMapper.findById(rewardId) == null) throw new RewardNotFoundException();
         // Guard
         transitionGuard.requireDraft(projectId);
 
-        int result = rewardMapper.deleteReward(projectId, rewardId);
-        if (result != 1) {
-            throw new  ResponseStatusException(HttpStatus.NOT_FOUND, "리워드를 찾을 수 없습니다.");
-        }
-
+        rewardMapper.deleteReward(projectId, rewardId);
         return ResponseEntity.ok(ResponseDto.success(200, "리워드 삭제 성공", null));
     }
 
@@ -143,6 +142,10 @@ public class RewardServiceImpl implements RewardService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<Reward>>> getCreatorRewardList(Long projectId, Long creatorId) {
+        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
+        Project existingProject = projectMapper.findById(projectId);
+        if (existingProject == null) throw new ProjectNotFoundException();
+        if (!existingProject.getCreatorId().equals(creatorId)) throw new AccessDeniedException();
         // Guard
         transitionGuard.ensureProjectOwner(projectId, creatorId);
 
@@ -156,13 +159,17 @@ public class RewardServiceImpl implements RewardService {
      *
      * @param projectId 프로젝트 Id
      * @param creatorId 창작자 ID
-     * @param dto RewardCreateRequestDto
+     * @param dto       RewardCreateRequestDto
      * @return 성공 시 200 Ok
      * @author 조은애
      * @since 2025-10-08
      */
     @Override
     public ResponseEntity<ResponseDto<String>> addReward(Long projectId, Long creatorId, RewardCreateRequestDto dto) {
+        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
+        Project existingProject = projectMapper.findById(projectId);
+        if (existingProject == null) throw new ProjectNotFoundException();
+        if (!existingProject.getCreatorId().equals(creatorId)) throw new AccessDeniedException();
         // Guard
         transitionGuard.ensureProjectOwner(projectId, creatorId);
         transitionGuard.requireStatusIn(projectId, "UPCOMING", "OPEN");
@@ -175,20 +182,16 @@ public class RewardServiceImpl implements RewardService {
         }
 
         Reward reward = Reward.builder()
-            .projectId(projectId)
-            .rewardName(dto.getRewardName().trim())
-            .price(dto.getPrice())
-            .rewardContent(dto.getRewardContent().trim())
-            .deliveryDate(dto.getDeliveryDate())
-            .rewardCnt(dto.getRewardCnt())
-            .isPosting(dto.getIsPosting())
-            .build();
+                .projectId(projectId)
+                .rewardName(dto.getRewardName().trim())
+                .price(dto.getPrice())
+                .rewardContent(dto.getRewardContent().trim())
+                .deliveryDate(dto.getDeliveryDate())
+                .rewardCnt(dto.getRewardCnt())
+                .isPosting(dto.getIsPosting())
+                .build();
 
-        int result = rewardMapper.saveReward(reward);
-        if (result != 1) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "리워드 추가 실패");
-        }
-
+        rewardMapper.saveReward(reward);
         return ResponseEntity.ok(ResponseDto.success(200, "리워드 추가 성공", null));
     }
 }

@@ -6,7 +6,13 @@ import com.example.funding.dto.request.auth.CheckEmailRequestDto;
 import com.example.funding.dto.request.auth.CheckNicknameRequestDto;
 import com.example.funding.dto.request.auth.SignInRequestDto;
 import com.example.funding.dto.request.auth.SignUpRequestDto;
-import com.example.funding.exception.*;
+import com.example.funding.exception.badrequest.InvalidCredentialsException;
+import com.example.funding.exception.conflict.DuplicatedAdminIdException;
+import com.example.funding.exception.conflict.DuplicatedEmailException;
+import com.example.funding.exception.conflict.DuplicatedNicknameException;
+import com.example.funding.exception.forbidden.InvalidAdminCredentialsException;
+import com.example.funding.exception.notfound.AdminNotFoundException;
+import com.example.funding.exception.notfound.UserNotFoundException;
 import com.example.funding.mapper.AdminMapper;
 import com.example.funding.mapper.UserMapper;
 import com.example.funding.model.Admin;
@@ -35,9 +41,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseEntity<ResponseDto<String>> signUp(SignUpRequestDto dto) {
         User existingUser = userMapper.findByEmail(dto.getEmail());
-        if (existingUser != null) {
-            throw new DuplicatedEmailException();
-        }
+        if (existingUser != null) throw new DuplicatedEmailException();
+
         String encodedPassword = passwordEncoder.encode(dto.getPassword());
         dto.setPassword(encodedPassword);
         User user = User.builder().email(dto.getEmail()).password(dto.getPassword()).nickname(dto.getNickname())
@@ -51,9 +56,8 @@ public class AuthServiceImpl implements AuthService {
         User user = userMapper.findByEmail(dto.getEmail());
         String encodedPassword = passwordEncoder.encode(dto.getPassword());
 
-        if (user == null || passwordEncoder.matches(user.getPassword(), encodedPassword)) {
-            throw new InvalidCredentialsException();
-        }
+        if (user == null || passwordEncoder.matches(user.getPassword(), encodedPassword)) throw new InvalidCredentialsException();
+
         String token = jwtProvider.createAccessToken(user.getUserId(), user.getEmail(), user.getRole().toString());
         userMapper.updateLastLogin(user.getUserId());
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "로그인 성공", token));
@@ -62,18 +66,16 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseEntity<ResponseDto<String>> checkEmail(CheckEmailRequestDto dto) {
         User existingUser = userMapper.findByEmail(dto.getEmail());
-        if (existingUser != null) {
-            throw new DuplicatedEmailException();
-        }
+        if (existingUser != null) throw new DuplicatedEmailException();
+
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "사용 가능한 이메일입니다.", dto.getEmail()));
     }
 
     @Override
     public ResponseEntity<ResponseDto<String>> checkNickname(CheckNicknameRequestDto dto) {
         User existingUser = userMapper.findByNickname(dto.getNickname());
-        if (existingUser != null) {
-            throw new DuplicatedNicknameException();
-        }
+        if (existingUser != null) throw new DuplicatedNicknameException();
+
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "사용 가능한 닉네임입니다.", dto.getNickname()));
     }
 
@@ -86,9 +88,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<ResponseDto<String>> registerAdmin(RegisterAdminRequestDto dto) {
-        if( adminMapper.getAdminByAdminId(dto.getAdminId()) != null) {
-            throw new DuplicatedAdminIdException();
-        }
+        if( adminMapper.getAdminByAdminId(dto.getAdminId()) != null) throw new DuplicatedAdminIdException();
+
         String encodedPwd = passwordEncoder.encode(dto.getAdminPwd());
         dto.setAdminPwd(encodedPwd);
         adminMapper.registerAdmin(dto);
@@ -98,9 +99,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseEntity<ResponseDto<String>> loginAdmin(RegisterAdminRequestDto dto) {
         Admin admin = adminMapper.getAdminByAdminId(dto.getAdminId());
-        if (admin == null) {
-            throw new AdminNotFoundException();
-        }
+        if (admin == null) throw new AdminNotFoundException();
+
         if (passwordEncoder.matches(dto.getAdminPwd(), admin.getAdminPwd())) {
             String token = jwtProvider.createAdminAccessToken(admin.getAdminId(), "ADMIN");
             return ResponseEntity.ok(ResponseDto.success(200, "로그인 성공", token));

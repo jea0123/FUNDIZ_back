@@ -15,8 +15,9 @@ import com.example.funding.dto.response.creator.*;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
 import com.example.funding.enums.CreatorType;
-import com.example.funding.exception.AlreadyCreatorException;
-import com.example.funding.exception.UserNotFoundException;
+import com.example.funding.exception.badrequest.AlreadyCreatorException;
+import com.example.funding.exception.notfound.CreatorNotFoundException;
+import com.example.funding.exception.notfound.UserNotFoundException;
 import com.example.funding.model.Reward;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.NewsService;
@@ -33,7 +34,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -124,7 +124,12 @@ public class CreatorController {
                                                              @RequestAttribute Long creatorId) throws IOException {
         //TODO: userId -> creatorId
         String thumbnailUrl = fileUploader.upload(dto.getThumbnail());
+//        String businessDocUrl = null;
+//        if (dto.getBusinessDoc() != null && !dto.getBusinessDoc().isEmpty()) {
+//            businessDocUrl = fileUploader.upload(dto.getBusinessDoc());
+//        }
         dto.setThumbnailUrl(thumbnailUrl);
+//        dto.setBusinessDoc(businessDocUrl);
         return creatorService.createProject(dto, creatorId);
     }
 
@@ -326,4 +331,17 @@ public class CreatorController {
         return newsService.createNews(projectId, creatorId, dto);
     }
 
+    /**
+     * <p>크리에이터 팔로워 수 조회</p>
+     *
+     * @param creatorId 크리에이터 ID
+     * @return 팔로워 수
+     * @throws CreatorNotFoundException 크리에이터를 찾을 수 없는 경우(404)
+     * @author 장민규
+     * @since 2025-10-15
+     */
+    @GetMapping("/followerCnt/{creatorId}")
+    public ResponseEntity<ResponseDto<Long>> getFollowerCnt(@PathVariable Long creatorId) {
+        return creatorService.getFollowerCnt(creatorId);
+    }
 }

@@ -357,7 +357,6 @@
             CREATORID = #{creatorId}
     </select>
 
-    <!-- TODO : 학교컴 데이터로 확인해보기 (조건 변경 여지 있음)-->
     <select id ="getCShippingList" parameterType="long" resultType = "com.example.funding.dto.response.shipping.CreatorShippingProjectList">
         SELECT
         p.creatorId,
@@ -367,10 +366,13 @@
         count(case when s.shippingStatus = 'DELIVERED' THEN b.userId END) AS completedShippingCnt
         FROM project p
         JOIN creator c ON p.creatorId = c.creatorId
-        JOIN users u ON u.userId = c.userId
-        JOIN backing b ON b.userId = u.userId
+        JOIN reward r ON r.projectId = p.projectId
+        JOIN backingDetail bd ON bd.rewardId = r.rewardId
+        JOIN backing b ON b.backingId = bd.backingId
+        JOIN users u ON u.userId = b.userId
         JOIN shipping s ON b.backingId = s.backingId
         where c.creatorId = #{creatorId}
+          AND p.projectStatus = 'SUCCESS'
         group by p.projectId, p.creatorId, p.title, p.backerCnt
     </select>
 

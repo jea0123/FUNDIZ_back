@@ -11,8 +11,9 @@ import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
 import com.example.funding.dto.response.creator.*;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
-import com.example.funding.exception.AlreadyCreatorException;
-import com.example.funding.exception.UserNotFoundException;
+import com.example.funding.exception.badrequest.AlreadyCreatorException;
+import com.example.funding.exception.notfound.CreatorNotFoundException;
+import com.example.funding.exception.notfound.UserNotFoundException;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
@@ -58,4 +59,14 @@ public interface CreatorService {
     ResponseEntity<ResponseDto<String>> registerCreator(CreatorRegisterRequestDto dto, Long userId) throws IOException;
 
     ResponseEntity<ResponseDto<String>> setShippingStatus(Long projectId, Long creatorId, ShippingStatusDto status);
+    /**
+     * 크리에이터 팔로워 수 조회
+     * @param creatorId 크리에이터 ID
+     * @return 팔로워 수
+     * @throws CreatorNotFoundException 크리에이터를 찾을 수 없는 경우
+     * @since 2025-10-15
+     * @author 장민규
+     */
+    ResponseEntity<ResponseDto<Long>> getFollowerCnt(Long creatorId);
+
 }

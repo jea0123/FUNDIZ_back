@@ -15,11 +15,7 @@ import java.util.List;
 public interface CreatorMapper {
     void insertCreator(Creator creator);
 
-    List<Creator> findByIds(@Param("ids") List<Long> ids);
-
     Creator findById(@Param("creatorId") Long creatorId);
-
-//    CreatorPDetailDto getCreatorPDetailDto(@Param("creatorId") Long creatorId);
 
     int countProject(@Param("creatorId") Long creatorId, @Param("dto") SearchCreatorProjectDto dto);
 
@@ -27,11 +23,11 @@ public interface CreatorMapper {
 
     int saveProject(ProjectCreateRequestDto dto);
 
-    int updateProject(@Param("creatorId") Long creatorId, @Param("project") Project project);
+    void updateProject(@Param("creatorId") Long creatorId, @Param("project") Project project);
 
-    int deleteProject(@Param("projectId") Long projectId);
+    void deleteProject(@Param("projectId") Long projectId);
 
-    int markVerifyProject(@Param("projectId") Long projectId);
+    void markVerifyProject(@Param("projectId") Long projectId);
 
     CreatorProjectDetailDto getProjectDetail(@Param("projectId") Long projectId, @Param("creatorId") Long creatorId);
 
@@ -48,4 +44,8 @@ public interface CreatorMapper {
     List<CreatorDashboardRankDto> getProjectRankDate(Long creatorId);
 
     CreatorDashboardDto creatorDashboardDto(Long creatorId);
+
+    void increaseFollowersCount(@Param("creatorId") Long creatorId);
+
+    void decreaseFollowersCount(@Param("creatorId") Long creatorId);
 }

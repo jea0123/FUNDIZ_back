@@ -2,7 +2,7 @@ package com.example.funding.controller;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.response.settlement.CreatorSettlementDto;
-import com.example.funding.exception.CreatorNotFountException;
+import com.example.funding.exception.notfound.CreatorNotFoundException;
 import com.example.funding.service.SettlementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ public class SettlementController {
      *
      * @param principal 인증된 사용자 정보
      * @return 정산 정보
-     * @throws CreatorNotFountException 크리에이터를 찾을 수 없을 때 (404)
+     * @throws CreatorNotFoundException 크리에이터를 찾을 수 없을 때 (404)
      * @author 장민규
      * @since 2025-10-13
      */

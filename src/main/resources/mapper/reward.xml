@@ -119,9 +119,8 @@
         AND NVL(DEL_YN,'N') = 'N'
     </select>
 
-    <select id="getProjectIdByRewardId" resultType="long">
-        SELECT PROJECTID
-        FROM REWARD
+    <select id="findById" resultType="reward">
+        SELECT * FROM REWARD
         WHERE REWARDID = #{rewardId}
     </select>
 

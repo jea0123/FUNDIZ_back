@@ -38,4 +38,6 @@ public class ProjectCreateRequestDto {
 
     private List<MultipartFile> files;
     private MultipartFile businessDoc;
+
+    private String contentBlocks;
 }

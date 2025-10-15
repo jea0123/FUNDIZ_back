@@ -141,10 +141,10 @@
 
         INSERT INTO PROJECT (
             PROJECTID, CREATORID, SUBCTGRID, TITLE, GOALAMOUNT,
-            STARTDATE, ENDDATE, CONTENT, THUMBNAIL, ISPOSTING
+            STARTDATE, ENDDATE, CONTENT, THUMBNAIL, CONTENTBLOCKS
         ) VALUES (
             #{projectId}, #{creatorId}, #{subctgrId}, #{title}, #{goalAmount},
-            #{startDate}, #{endDate}, #{content}, #{thumbnailUrl}, #{isPosting}
+            #{startDate}, #{endDate}, #{content}, #{thumbnailUrl}, #{contentBlocks}
         )
     </insert>
 

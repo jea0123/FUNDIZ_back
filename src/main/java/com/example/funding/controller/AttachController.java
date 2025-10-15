@@ -75,6 +75,12 @@ public class AttachController {
         return ResponseEntity.ok(ResponseDto.success(200, "파일 삭제 성공", null));
     }
 
+    @PostMapping("/image")
+    public ResponseEntity<ResponseDto<String>> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
+        String uploaded = fileUploader.upload(file);
+        return ResponseEntity.ok(ResponseDto.success(200, "이미지 업로드 성공", uploaded));
+    }
+
     private void commonUpload(List<MultipartFile> files, String code) throws IOException {
         for (MultipartFile file : files) {
             String uploaded = fileUploader.upload(file);

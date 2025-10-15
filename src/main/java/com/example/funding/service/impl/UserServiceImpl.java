@@ -235,7 +235,7 @@ public class UserServiceImpl implements UserService {
         if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
         if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
         int isLiked = userMapper.isProjectLiked(userId, projectId);
-        if (isLiked == 1) {
+        if (isLiked > 0) {
             return ResponseEntity.ok(ResponseDto.success(200, "좋아요한 프로젝트입니다.", true));
         } else {
             return ResponseEntity.ok(ResponseDto.success(200, "좋아요하지 않은 프로젝트입니다.", false));
@@ -269,7 +269,7 @@ public class UserServiceImpl implements UserService {
         if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
         if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
         int isFollowing = followMapper.isFollowingCreator(userId, creatorId);
-        if (isFollowing == 1) {
+        if (isFollowing > 0) {
             return ResponseEntity.ok(ResponseDto.success(200, "팔로우한 크리에이터입니다.", true));
         } else {
             return ResponseEntity.ok(ResponseDto.success(200, "팔로우하지 않은 크리에이터입니다.", false));

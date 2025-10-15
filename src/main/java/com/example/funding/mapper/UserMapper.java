@@ -35,4 +35,8 @@ public interface UserMapper {
     int suspendedCreator(@Param("creatorId") Long creatorId);
 
     int withdrawUser(@Param("userId") Long userId);
+
+    void likeProject(@Param("userId") Long userId, @Param("projectId") Long projectId);
+
+    int isProjectLiked(@Param("userId") Long userId, @Param("projectId") Long projectId);
 }

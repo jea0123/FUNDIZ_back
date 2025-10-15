@@ -9,9 +9,7 @@ import com.example.funding.dto.request.user.UserPasswordDto;
 import com.example.funding.dto.request.user.UserProfileImgDto;
 import com.example.funding.dto.response.creator.CreatorQnaDto;
 import com.example.funding.dto.response.user.*;
-import com.example.funding.exception.DuplicatedPasswordException;
-import com.example.funding.exception.InCorrectPasswordException;
-import com.example.funding.exception.UserNotFoundException;
+import com.example.funding.exception.*;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
@@ -211,5 +209,14 @@ public class UserServiceImpl implements UserService {
         String encodedNewPassword = passwordEncoder.encode(dto.getNewPassword());
         userMapper.updatePwd(userId, encodedNewPassword);
         return ResponseEntity.ok(ResponseDto.success(200, "비밀번호 변경 성공", "********"));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<Long>> likeProject(Long userId, Long projectId) {
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
+        if (userMapper.isProjectLiked(userId, projectId) == 1) throw new DuplicatedLikedProjectException();
+        userMapper.likeProject(userId, projectId);
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 좋아요 성공", projectId));
     }
 }

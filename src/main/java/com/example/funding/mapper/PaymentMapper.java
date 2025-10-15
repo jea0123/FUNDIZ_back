@@ -11,5 +11,5 @@ public interface PaymentMapper {
 
     List<BackingPagePaymentDto> backingPagePayment(Long userId);
 
-    int addPayment(Payment payment);
+    void addPayment(Payment payment);
 }

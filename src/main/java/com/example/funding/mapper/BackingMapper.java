@@ -1,6 +1,7 @@
 package com.example.funding.mapper;
 
 import com.example.funding.dto.request.backing.BackingRequestUpdateDto;
+import com.example.funding.dto.request.reward.RewardBackingRequestDto;
 import com.example.funding.dto.response.backing.BackingCreatorBackerList;
 import com.example.funding.dto.response.creator.DailyCountDto;
 import com.example.funding.dto.response.creator.MonthCountDto;
@@ -18,10 +19,7 @@ public interface BackingMapper {
     List<BackingDto> getBackingListUserId(@Param("userId") Long userId);
 
     //후원한 목록의 상세 리스트
-
     BackingDto getBackingProjectAndUserId( @Param("userId") Long userId,@Param("projectId")Long projectId, @Param("rewardId") Long rewardId, @Param("backingId") Long backingId);
-
-    BackingDto getBackingProjectAndUserId(@Param("userId") Long userId, @Param("projectId") Long projectId, @Param("rewardId") Long rewardId);
 
     void addBacking(Backing backing);
 
@@ -38,5 +36,7 @@ public interface BackingMapper {
     List<MonthCountDto> monthCount(Long creatorId);
 
     Backing findById(Long backingId);
+
+    void addRewardBabing();
 
 }

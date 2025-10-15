@@ -21,7 +21,6 @@ import com.example.funding.model.Reward;
 import com.example.funding.model.Tag;
 import com.example.funding.service.ProjectService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,14 +50,10 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<ProjectDetailDto>> getProjectDetail(Long projectId) {
+        ProjectRow row = projectMapper.getProjectRow(projectId);
+        if (row == null) throw new ProjectNotFoundException();
         //조회수 증가
         projectMapper.updateViewCnt(projectId);
-
-        //프로젝트 단건 조회
-        ProjectRow row = projectMapper.getProjectRow(projectId);
-        if (row == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "존재하지 않는 프로젝트입니다."));
-        }
 
         //컬렉션 조회
         List<Tag> tagList = tagMapper.getTagList(projectId);
@@ -122,9 +117,8 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<FeaturedProjectDto>>> getFeatured(int days, int limit) {
         List<FeaturedProjectDto> result = projectMapper.findFeaturedJoinedWithRecent(days, limit);
-        if (result == null || result.isEmpty()) {
-            throw new FeaturedProjectNotFoundException();
-        }
+        if (result == null || result.isEmpty()) throw new FeaturedProjectNotFoundException();
+
         return ResponseEntity.ok(ResponseDto.success(200, "추천 프로젝트 조회 성공", result));
     }
 
@@ -152,6 +146,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<Long>> getLikeCnt(Long projectId) {
         if(projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
         Long likeCnt = projectMapper.getLikeCnt(projectId);

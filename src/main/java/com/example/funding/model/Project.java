@@ -31,4 +31,5 @@ public class Project {
     private Character isVerified;
     private String rejectedReason;
     private LocalDate requestedAt;
+    private String contentBlocks;
 }

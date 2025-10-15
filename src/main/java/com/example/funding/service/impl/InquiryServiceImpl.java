@@ -4,12 +4,13 @@ import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.cs.IqrAddRequestDto;
+import com.example.funding.exception.UserNotFoundException;
 import com.example.funding.mapper.InquiryMapper;
+import com.example.funding.mapper.UserMapper;
 import com.example.funding.model.Inquiry;
 import com.example.funding.service.InquiryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import java.util.List;
 public class InquiryServiceImpl implements InquiryService {
 
     private final InquiryMapper inquiryMapper;
+    private final UserMapper userMapper;
 
     /**
      * <p>1:1 문의 내역 목록 조회(관리자 기준)</p>
@@ -33,6 +35,7 @@ public class InquiryServiceImpl implements InquiryService {
      * @since 2025-09-23
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<Inquiry>>> inquiryList(Pager pager) {
         int total = inquiryMapper.inquiryTotal();
 
@@ -47,12 +50,13 @@ public class InquiryServiceImpl implements InquiryService {
      * <p>내 문의 내역 목록 조회(후원자 기준)</p>
      *
      * @param userId 사용자 ID
-     * @param pager Pager
+     * @param pager  Pager
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-09-23
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<Inquiry>>> myInquiryList(Long userId, Pager pager) {
         int total = inquiryMapper.myInquiryTotal(userId);
 
@@ -74,6 +78,7 @@ public class InquiryServiceImpl implements InquiryService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> addInquiry(Long userId, IqrAddRequestDto iqrDto) {
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
         Inquiry item = Inquiry.builder()
                 .userId(userId)
                 .title(iqrDto.getTitle())
@@ -83,11 +88,7 @@ public class InquiryServiceImpl implements InquiryService {
                 .ctgr(iqrDto.getCtgr())
                 .build();
 
-        int result = inquiryMapper.addInquiry(item);
-
-        if (result == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "문의 등록 실패"));
-        }
+        inquiryMapper.addInquiry(item);
         return ResponseEntity.ok(ResponseDto.success(200, "문의 등록 성공", "데이터 출력확인"));
     }
 }

@@ -3,7 +3,9 @@ package com.example.funding.service.impl;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.request.cs.*;
+import com.example.funding.dto.request.cs.NoticeAddRequestDto;
+import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
+import com.example.funding.exception.NoticeNotFoundException;
 import com.example.funding.mapper.NoticeMapper;
 import com.example.funding.model.Notice;
 import com.example.funding.service.NoticeService;
@@ -33,6 +35,7 @@ public class NoticeServiceImpl implements NoticeService {
      * @since 2025-09-19
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<Notice>>> noticeList(Pager pager) {
         int total = noticeMapper.noticeTotal();
 
@@ -52,15 +55,13 @@ public class NoticeServiceImpl implements NoticeService {
      * @since 2025-09-19
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<Notice>> item(Long noticeId) {
+        Notice item = noticeMapper.noticeDetail(noticeId);
+        if (item == null) throw new NoticeNotFoundException();
         //조회수 증가
         noticeMapper.updateViewCnt(noticeId);
-
         //공지사항 상세페이지 조회
-        Notice item = noticeMapper.noticeDetail(noticeId);
-        if (item == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "공지사항 상세 조회 불가"));
-        }
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "공지사항 상세 조회 성공", item));
     }
 
@@ -81,11 +82,7 @@ public class NoticeServiceImpl implements NoticeService {
                 .createdAt(ntcDto.getCreatedAt())
                 .build();
 
-        int result = noticeMapper.addNotice(item);
-
-        if (result == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "공지사항 추가 실패"));
-        }
+        noticeMapper.addNotice(item);
         return ResponseEntity.ok(ResponseDto.success(200, "공지사항 추가 성공", "데이터 출력확인"));
     }
 
@@ -101,12 +98,10 @@ public class NoticeServiceImpl implements NoticeService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> updateNotice(Long noticeId, NoticeUpdateRequestDto ntcDto) {
+        if(noticeMapper.noticeDetail(noticeId) == null) throw new NoticeNotFoundException();
         ntcDto.setNoticeId(noticeId);
 
-        int result = noticeMapper.updateNotice(ntcDto);
-        if (result == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "공지사항 수정 실패"));
-        }
+        noticeMapper.updateNotice(ntcDto);
         return ResponseEntity.ok(ResponseDto.success(200, "공지사항 수정 완료", "공지사항 수정 "));
     }
 
@@ -121,10 +116,9 @@ public class NoticeServiceImpl implements NoticeService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> deleteNotice(Long noticeId) {
-        int deleted = noticeMapper.deleteNotice(noticeId);
-        if (deleted == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "공지사항 삭제 실패"));
-        }
+        if(noticeMapper.noticeDetail(noticeId) == null) throw new NoticeNotFoundException();
+
+        noticeMapper.deleteNotice(noticeId);
         return ResponseEntity.ok(ResponseDto.success(200, "공지사항 삭제 완료", "공지사항 삭제"));
     }
 }

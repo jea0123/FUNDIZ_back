@@ -10,7 +10,7 @@ import java.util.List;
 public interface TagMapper {
     List<Tag> getTagList(@Param("projectId") Long projectId);
 
-    int saveTag(@Param("projectId") Long projectId, @Param("tagName") String tagName);
+    void saveTag(@Param("projectId") Long projectId, @Param("tagName") String tagName);
 
     void deleteTags(@Param("projectId") Long projectId);
 }

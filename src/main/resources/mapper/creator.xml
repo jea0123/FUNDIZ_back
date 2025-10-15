@@ -255,5 +255,16 @@
 <!--        GROUP BY creatorId-->
     </select>
 
+    <update id="increaseFollowersCount" parameterType="long">
+        UPDATE CREATOR
+        SET FOLLOWERCNT = FOLLOWERCNT + 1
+        WHERE CREATORID = #{creatorId}
+    </update>
+
+    <update id="decreaseFollowersCount" parameterType="long">
+        UPDATE CREATOR
+        SET FOLLOWERCNT = FOLLOWERCNT - 1
+        WHERE CREATORID = #{creatorId} AND FOLLOWERCNT > 0
+    </update>
 
 </mapper>

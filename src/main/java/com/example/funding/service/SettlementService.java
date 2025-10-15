@@ -17,7 +17,7 @@ public interface SettlementService {
      *
      * @param creatorId 크리에이터 ID
      * @return 정산 정보
-     * @throws CreatorNotFountException 크리에이터를 찾을 수 없을 때
+     * @throws CreatorNotFoundException 크리에이터를 찾을 수 없을 때
      * @author 장민규
      * @since 2025-10-13
      */

@@ -33,7 +33,7 @@ public class SettlementServiceImpl implements SettlementService {
     @Override
     public ResponseEntity<ResponseDto<CreatorSettlementDto>> getSettlementByCreatorId(Long creatorId) {
         if (creatorMapper.existsCreator(creatorId) == 0) {
-            throw new CreatorNotFountException();
+            throw new CreatorNotFoundException();
         }
         List<Settlement> settlement = settlementMapper.getByCreatorId(creatorId);
         SettlementSummary settlementSummary = settlementMapper.getSettlementSummaryByCreatorId(creatorId);

@@ -8,10 +8,7 @@ import com.example.funding.dto.request.user.UserPasswordDto;
 import com.example.funding.dto.request.user.UserProfileImgDto;
 import com.example.funding.dto.response.creator.CreatorQnaDto;
 import com.example.funding.dto.response.user.*;
-import com.example.funding.exception.DuplicatedLikedProjectException;
-import com.example.funding.exception.LikedProjectNotFoundException;
-import com.example.funding.exception.ProjectNotFoundException;
-import com.example.funding.exception.UserNotFoundException;
+import com.example.funding.exception.*;
 import com.example.funding.service.ProjectService;
 import com.example.funding.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -205,5 +202,56 @@ public class UserController {
 //        Long userId = principal.userId();
         Long userId = 501L; // TODO: 임시
         return userService.checkLikedProject(userId, projectId);
+    }
+
+    /**
+     * <p>크리에이터 팔로우</p>
+     *
+     * @param creatorId 팔로우할 크리에이터 ID
+     * @param principal 인증된 사용자의 정보
+     * @return 팔로우한 크리에이터 ID
+     * @throws UserNotFoundException        사용자가 존재하지 않을 때
+     * @throws CreatorNotFoundException     크리에이터가 존재하지 않을 때
+     * @throws DuplicatedFollowCreatorException 이미 팔로우한 크리에이터일 때
+     * @author by: 장민규
+     * @since 2025-10-15
+     */
+    @PostMapping("/follow/{creatorId}")
+    public ResponseEntity<ResponseDto<String>> followCreator(@PathVariable Long creatorId
+//                                                            @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+//        Long userId = principal.userId();
+        Long userId = 501L; // TODO: 임시
+        return userService.followCreator(userId, creatorId);
+    }
+
+    /**
+     * <p>크리에이터 언팔로우</p>
+     *
+     * @param creatorId 언팔로우할 크리에이터 ID
+     * @param principal 인증된 사용자의 정보
+     * @return 언팔로우한 크리에이터 ID
+     * @throws UserNotFoundException        사용자가 존재하지 않을 때
+     * @throws CreatorNotFoundException     크리에이터가 존재하지 않을 때
+     * @throws FollowingCreatorNotFoundException 팔로우한 크리에이터가 아닐 때
+     * @author by: 장민규
+     * @since 2025-10-15
+     */
+    @DeleteMapping("/unfollow/{creatorId}")
+    public ResponseEntity<ResponseDto<String>> unfollowCreator(@PathVariable Long creatorId
+//                                                              @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+//        Long userId = principal.userId();
+        Long userId = 501L; // TODO: 임시
+        return userService.unfollowCreator(userId, creatorId);
+    }
+
+    @GetMapping("/checkFollow/{creatorId}")
+    public ResponseEntity<ResponseDto<Boolean>> isFollowingCreator(@PathVariable Long creatorId
+//                                                                 @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+//        Long userId = principal.userId();
+        Long userId = 501L; // TODO: 임시
+        return userService.isFollowingCreator(userId, creatorId);
     }
 }

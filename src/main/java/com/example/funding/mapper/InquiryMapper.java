@@ -18,7 +18,7 @@ public interface InquiryMapper {
 
     int myInquiryTotal(Long userId);
 
-    int addInquiry(Inquiry item);
+    void addInquiry(Inquiry item);
 
     int existsInquiryById(@Param("inqId") Long inqId);
 }

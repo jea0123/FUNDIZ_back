@@ -2,27 +2,32 @@ package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.creator.NewsCreateRequestDto;
+import com.example.funding.exception.AccessDeniedException;
+import com.example.funding.exception.CreatorNotFoundException;
+import com.example.funding.mapper.CreatorMapper;
 import com.example.funding.mapper.NewsMapper;
+import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.model.News;
+import com.example.funding.model.Project;
 import com.example.funding.service.NewsService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class NewsServiceImpl implements NewsService {
     private final NewsMapper newsMapper;
+    private final CreatorMapper creatorMapper;
+    private final ProjectMapper projectMapper;
 
     /**
      * <p>프로젝트 새소식 등록</p>
      *
      * @param projectId 프로젝트 ID
-     * @param dto NewsCreateRequestDto
+     * @param dto       NewsCreateRequestDto
      * @param creatorId 창작자 ID
      * @return 성공 시 200 Ok
      * @author 조은애
@@ -30,18 +35,19 @@ public class NewsServiceImpl implements NewsService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> createNews(Long projectId, Long creatorId, NewsCreateRequestDto dto) {
+        Project existingProject = projectMapper.findById(projectId);
+        if (existingProject == null) throw new CreatorNotFoundException();
+        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
+        if (!existingProject.getCreatorId().equals(creatorId)) throw new AccessDeniedException();
+
         //TODO: guard, validator
 
         News news = News.builder()
-            .projectId(projectId)
-            .content(dto.getContent())
-            .build();
+                .projectId(projectId)
+                .content(dto.getContent())
+                .build();
 
-        int result = newsMapper.createNews(news);
-        if (result != 1 || news.getNewsId() == null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "새소식 등록 실패");
-        }
-
+        newsMapper.createNews(news);
         return ResponseEntity.ok(ResponseDto.success(200, "새소식 등록 성공", null));
     }
 }

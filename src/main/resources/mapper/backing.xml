@@ -354,5 +354,11 @@
         GROUP BY d.target_month
         ORDER BY d.target_month
     </select>
+
+    <select id="findById" resultType="backing">
+        SELECT *
+        FROM backing
+        WHERE backingId = #{backingId}
+    </select>
 </mapper>
 

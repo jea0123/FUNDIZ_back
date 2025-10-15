@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+
 @Mapper
 public interface NoticeMapper {
     List<Notice> noticeList(@Param("pager") Pager pager);
@@ -21,10 +22,9 @@ public interface NoticeMapper {
 
     void add(ResponseEntity<ResponseDto<Notice>> item);
 
-    int addNotice(Notice item);
+    void addNotice(Notice item);
 
-    int updateNotice(NoticeUpdateRequestDto ntcDto);
+    void updateNotice(NoticeUpdateRequestDto ntcDto);
 
-    int deleteNotice(Long noticeId);
-
+    void deleteNotice(Long noticeId);
 }

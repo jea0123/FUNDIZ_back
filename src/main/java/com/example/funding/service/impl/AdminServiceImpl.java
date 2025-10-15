@@ -7,21 +7,17 @@ import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.admin.AdminProjectUpdateDto;
 import com.example.funding.dto.request.admin.SearchAdminProjectDto;
 import com.example.funding.dto.request.admin.UserAdminUpdateRequestDto;
-import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
 import com.example.funding.dto.response.admin.ProjectVerifyListDto;
 import com.example.funding.dto.response.admin.analytic.*;
-import com.example.funding.exception.AnalyticsNotFoundException;
-import com.example.funding.exception.CategorySuccessNotFoundException;
-import com.example.funding.exception.KPINotFoundException;
-import com.example.funding.exception.RewardSalesNotFoundException;
-import com.example.funding.mapper.AdminMapper;
-import com.example.funding.mapper.ProjectMapper;
-import com.example.funding.mapper.RewardMapper;
-import com.example.funding.mapper.TagMapper;
-import com.example.funding.model.*;
+import com.example.funding.exception.*;
+import com.example.funding.mapper.*;
+import com.example.funding.model.Project;
+import com.example.funding.model.Reward;
+import com.example.funding.model.Tag;
+import com.example.funding.model.User;
 import com.example.funding.service.AdminService;
 import com.example.funding.service.validator.ProjectTransitionGuard;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +26,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -46,6 +41,7 @@ public class AdminServiceImpl implements AdminService {
     private final ProjectMapper projectMapper;
     private final TagMapper tagMapper;
     private final RewardMapper rewardMapper;
+    private final UserMapper userMapper;
 
     private final ProjectTransitionGuard transitionGuard;
 
@@ -58,9 +54,8 @@ public class AdminServiceImpl implements AdminService {
         List<PaymentMethod> paymentMethods = adminMapper.getPaymentMethods(from, to);
         List<CategorySuccess> categorySuccesses = adminMapper.getCategorySuccessByCategory(ctgrId);
 
-        if (kpi == null || revenueTrends.isEmpty() || rewardSalesTops.isEmpty() || paymentMethods.isEmpty() || categorySuccesses.isEmpty()) {
+        if (kpi == null || revenueTrends.isEmpty() || rewardSalesTops.isEmpty() || paymentMethods.isEmpty() || categorySuccesses.isEmpty())
             throw new AnalyticsNotFoundException();
-        }
 
         AdminAnalyticsDto analytics = AdminAnalyticsDto.builder()
                 .kpi(kpi)
@@ -76,9 +71,8 @@ public class AdminServiceImpl implements AdminService {
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(Long ctgrId) {
         List<CategorySuccess> categorySuccesses = adminMapper.getCategorySuccessByCategory(ctgrId);
-        if (categorySuccesses.isEmpty()) {
-            throw new CategorySuccessNotFoundException();
-        }
+        if (categorySuccesses.isEmpty()) throw new CategorySuccessNotFoundException();
+
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "카테고리별 성공률 조회 성공", categorySuccesses));
     }
 
@@ -93,11 +87,11 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<RewardSalesTop>>> getRewardSalesTops(LocalDate from, LocalDate to, int limit, String metric) {
         List<RewardSalesTop> rewardSalesTops = adminMapper.getRewardSalesTops(from, to, limit, metric);
-        if (rewardSalesTops.isEmpty()) {
-            throw new RewardSalesNotFoundException();
-        }
+        if (rewardSalesTops.isEmpty()) throw new RewardSalesNotFoundException();
+
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "리워드 판매 상위 조회 성공", rewardSalesTops));
     }
 
@@ -139,11 +133,8 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> cancelProject(Long projectId) {
-        int result = adminMapper.cancelProject(projectId);
-        if (result == 0) {
-            throw new IllegalStateException("이미 취소되었거나 존재하지 않는 프로젝트입니다.");
-        }
-
+        if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
+        adminMapper.cancelProject(projectId);
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 취소 성공", null));
     }
 
@@ -157,14 +148,8 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> updateProject(AdminProjectUpdateDto dto) {
-        if (dto.getProjectId() == null) {
-            throw new IllegalArgumentException("프로젝트 ID가 필요합니다.");
-        }
-
         Project existing = projectMapper.findById(dto.getProjectId());
-        if (existing == null) {
-            throw new IllegalStateException("존재하지 않는 프로젝트입니다.");
-        }
+        if (existing == null) throw new ProjectNotFoundException();
 
         //TODO: 목표금액, 종료일 무결성 체크
 
@@ -176,11 +161,7 @@ public class AdminServiceImpl implements AdminService {
                 .projectStatus(dto.getProjectStatus())
                 .build();
 
-        int result = adminMapper.updateProject(project);
-        if (result == 0) {
-            throw new IllegalStateException("프로젝트 수정 실패");
-        }
-
+        adminMapper.updateProject(project);
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 수정 성공", null));
     }
 
@@ -221,9 +202,8 @@ public class AdminServiceImpl implements AdminService {
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<ProjectVerifyDetailDto>> getProjectVerifyDetail(Long projectId) {
         ProjectVerifyDetailDto detail = adminMapper.getProjectVerifyDetail(projectId);
-        if (detail == null) {
-            throw new IllegalStateException("존재하지 않는 프로젝트입니다.");
-        }
+        if (detail == null) throw new ProjectNotFoundException();
+
         List<Tag> tagList = tagMapper.getTagList(projectId);
         detail.setTagList(tagList);
 
@@ -243,14 +223,11 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> approveProject(Long projectId) {
+        if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
         // Guard
         transitionGuard.assertCanApprove(projectId);
-
-        int result = adminMapper.approveProject(projectId);
-        if (result != 1) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 처리되었거나 현재 상태에서 승인할 수 없습니다.");
-        }
-
+        if (adminMapper.isApprovable(projectId) == 0) throw new ProjectApproveException();
+        adminMapper.approveProject(projectId);
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트가 성공적으로 승인되었습니다.", null));
     }
 
@@ -265,13 +242,11 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> rejectProject(Long projectId, String rejectedReason) {
+        if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
         // Guard
         transitionGuard.requireVerifying(projectId);
-
-        int result = adminMapper.rejectProject(projectId, rejectedReason);
-        if (result != 1) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 처리되었거나 현재 상태에서 반려할 수 없습니다.");
-        }
+        if (adminMapper.isRejectable(projectId) == 0) throw new ProjectRejectException();
+        adminMapper.rejectProject(projectId, rejectedReason);
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트가 성공적으로 반려되었습니다.", null));
     }
@@ -285,9 +260,9 @@ public class AdminServiceImpl implements AdminService {
      * @since 2025-10-06
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<User>>> userList(Pager pager) {
         int total = adminMapper.userTotal();
-
         List<User> userList = adminMapper.userList(pager);
 
         PageResult<User> result = PageResult.of(userList, pager, total);
@@ -304,18 +279,18 @@ public class AdminServiceImpl implements AdminService {
      * @since 2025-10-13
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<User>> item(Long userId) {
-        User item = adminMapper.userDetail(userId);
-        if (item == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "회원 정보 조회 불가"));
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "회원 정보 조회 성공", item));
+        User user = userMapper.getUserById(userId);
+        if (user == null) throw new UserNotFoundException();
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "회원 정보 조회 성공", user));
     }
 
     /**
      * <p>회원 정보 수정(관리자)</p>
      *
-     * @param userId 사용자 ID
+     * @param userId  사용자 ID
      * @param userDto UserAdminUpdateRequestDto
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author 이동혁
@@ -323,12 +298,10 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> updateUser(Long userId, UserAdminUpdateRequestDto userDto) {
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
         userDto.setUserId(userId);
 
-        int result = adminMapper.updateUser(userDto);
-        if (result == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "회원정보 수정 실패"));
-        }
-        return ResponseEntity.ok(ResponseDto.success(200, "회원정보 수정 완료", "회원정보 수정 "));
+        adminMapper.updateUser(userDto);
+        return ResponseEntity.ok(ResponseDto.success(200, "회원정보 수정 완료", null));
     }
 }

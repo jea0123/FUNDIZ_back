@@ -13,9 +13,7 @@ import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
 import com.example.funding.dto.response.creator.*;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
-import com.example.funding.exception.AlreadyCreatorException;
-import com.example.funding.exception.CreatorNotFoundException;
-import com.example.funding.exception.UserNotFoundException;
+import com.example.funding.exception.*;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
@@ -112,6 +110,8 @@ public class CreatorServiceImpl implements CreatorService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CreatorProjectDetailDto>> getProjectDetail(Long projectId, Long creatorId) {
+        if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
+        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
         // Guard: 소유자
         transitionGuard.ensureProjectOwner(projectId, creatorId);
 
@@ -153,10 +153,7 @@ public class CreatorServiceImpl implements CreatorService {
         // 태그 저장
         List<String> normalized = normalizeTags(dto.getTagList());
         for (String tagName : normalized) {
-            int saved = tagMapper.saveTag(dto.getProjectId(), tagName);
-            if (saved == 0) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "태그 저장 실패");
-            }
+            tagMapper.saveTag(dto.getProjectId(), tagName);
         }
 
         // 리워드 생성
@@ -178,9 +175,11 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> updateProject(ProjectCreateRequestDto dto, Long creatorId) {
-        if (dto.getProjectId() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "프로젝트 ID가 필요합니다.");
-        }
+        Project existing = projectMapper.findById(dto.getProjectId());
+        if (existing == null) throw new ProjectNotFoundException();
+        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
+        if (!existing.getCreatorId().equals(creatorId)) throw new AccessDeniedException();
+        dto.setCreatorId(creatorId);
         // Guard
         transitionGuard.assertCanUpdate(dto.getProjectId(), creatorId);
         // Validator
@@ -200,19 +199,13 @@ public class CreatorServiceImpl implements CreatorService {
                 .endDate(dto.getEndDate())
                 .build();
 
-        int result = creatorMapper.updateProject(creatorId, project);
-        if (result == 0) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "프로젝트 수정 실패");
-        }
+        creatorMapper.updateProject(creatorId, project);
 
         // 태그 전체 삭제 후 저장
         tagMapper.deleteTags(dto.getProjectId());
         List<String> normalized = normalizeTags(dto.getTagList());
         for (String tagName : normalized) {
-            int saved = tagMapper.saveTag(dto.getProjectId(), tagName);
-            if (saved == 0) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "태그 저장 실패");
-            }
+            tagMapper.saveTag(dto.getProjectId(), tagName);
         }
 
         //리워드 전체 삭제 후 저장
@@ -232,16 +225,17 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> deleteProject(Long projectId, Long creatorId) {
+        Project existing = projectMapper.findById(projectId);
+        if (existing == null) throw new ProjectNotFoundException();
+        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
+        if (!existing.getCreatorId().equals(creatorId)) throw new AccessDeniedException();
         // Guard
         transitionGuard.assertCanDelete(projectId, creatorId);
 
         rewardMapper.deleteRewards(projectId);
         tagMapper.deleteTags(projectId);
 
-        int result = creatorMapper.deleteProject(projectId);
-        if (result == 0) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "프로젝트 삭제 실패");
-        }
+        creatorMapper.deleteProject(projectId);
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 삭제 성공", null));
     }
@@ -257,14 +251,15 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> verifyProject(Long projectId, Long creatorId) {
+        Project existing = projectMapper.findById(projectId);
+        if (existing == null) throw new ProjectNotFoundException();
+        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
+        if (!existing.getCreatorId().equals(creatorId)) throw new AccessDeniedException();
         // Guard
         transitionGuard.assertCanSubmit(projectId, creatorId);
 
         //상태 업데이트
-        int result = creatorMapper.markVerifyProject(projectId);
-        if (result == 0) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "심사 요청 실패");
-        }
+        creatorMapper.markVerifyProject(projectId);
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 심사 요청 성공", null));
     }
@@ -279,11 +274,12 @@ public class CreatorServiceImpl implements CreatorService {
      * @since 2025-10-08
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CreatorProjectSummaryDto>> getProjectSummary(Long projectId, Long creatorId) {
         Project project = projectMapper.findById(projectId);
-        if (project == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다.");
-        }
+        if (project == null) throw new ProjectNotFoundException();
+        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
+        if (!project.getCreatorId().equals(creatorId)) throw new AccessDeniedException();
 
         CreatorProjectSummaryDto dto = new CreatorProjectSummaryDto(
                 project.getProjectId(),
@@ -309,7 +305,10 @@ public class CreatorServiceImpl implements CreatorService {
      * @author 조은애
      * @since 2025-10-11
      */
+    @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CreatorProfileSummaryDto>> getCreatorProfileSummary(Long creatorId) {
+        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
         // Guard
         transitionGuard.ensureCreatorExistsOrThrow(creatorId);
 
@@ -336,7 +335,9 @@ public class CreatorServiceImpl implements CreatorService {
      * @since 2025-10-08
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfCreator(Long creatorId, Pager pager) {
+        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
         int total = creatorMapper.qnaTotalOfCreator(creatorId);
 
         List<CreatorQnaDto> qnaList = creatorMapper.getQnaListOfCreator(creatorId, pager);
@@ -356,7 +357,10 @@ public class CreatorServiceImpl implements CreatorService {
      * @since 2025-10-08
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(Long creatorId) {
+        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
+
         long projectTotal = projectMapper.getProjectCnt(creatorId);
         long totalAmount = settlementMapper.getTotalAmountCreatorId(creatorId);
         long totalBackingCnt = backingMapper.getBackerCnt(creatorId);
@@ -425,7 +429,10 @@ public class CreatorServiceImpl implements CreatorService {
      */
     // 컨트롤러 하나에서 구현
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<BackingCreatorProjectListDto>>> getCreatorProjectList(Long creatorId) {
+        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
+
         //창작자의 모든 프로젝트 리스트
         List<BackingCreatorProjectListDto> backingCProjectList = projectMapper.getBackingCreatorProjectList(creatorId);
 
@@ -474,7 +481,10 @@ public class CreatorServiceImpl implements CreatorService {
 
     // 컨트롤러 나눠서 구현 -1
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<CreatorShippingProjectList>>> getCreatorShippingList(Long creatorId) {
+        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
+
         List<CreatorShippingProjectList> shippingProjectLists = projectMapper.getCShippingList(creatorId);
 
         return ResponseEntity.ok(ResponseDto.success(200, "창작자의 배송(프로젝트) 리스트 조회 성공", shippingProjectLists));
@@ -490,7 +500,12 @@ public class CreatorServiceImpl implements CreatorService {
      */
     // 컨트롤러 나눠서 구현 - 2
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<CreatorShippingBackerList>>> getShippingBackerList(Long creatorId, Long projectId) {
+        Project project = projectMapper.findById(projectId);
+        if (project == null) throw new ProjectNotFoundException();
+        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
+        if (!project.getCreatorId().equals(creatorId)) throw new AccessDeniedException();
 
         List<CreatorShippingBackerList> shippingBackerLists = shippingMapper.creatorShippingBackerList(creatorId, projectId);
 
@@ -499,12 +514,9 @@ public class CreatorServiceImpl implements CreatorService {
 
     @Override
     public ResponseEntity<ResponseDto<String>> registerCreator(CreatorRegisterRequestDto dto, Long userId) throws IOException {
-        if (userMapper.getUserById(userId) == null) {
-            throw new UserNotFoundException();
-        }
-        if (userMapper.getCreatorIdByUserId(userId) != null) {
-            throw new AlreadyCreatorException();
-        }
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        if (userMapper.getCreatorIdByUserId(userId) != null) throw new AlreadyCreatorException();
+
         String profileImgPath = fileUploader.upload(dto.getProfileImg());
         Creator creator = Creator.builder()
                 .userId(userId)
@@ -522,8 +534,9 @@ public class CreatorServiceImpl implements CreatorService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<Long>> getFollowerCnt(Long creatorId) {
-        if(creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
+        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
         Long followerCnt = followMapper.getFollowerCnt(creatorId);
         return ResponseEntity.ok(ResponseDto.success(200, "팔로워 수 조회 성공", followerCnt));
     }

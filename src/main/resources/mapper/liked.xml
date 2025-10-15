@@ -28,7 +28,21 @@
         WHERE l.userId=#{userId}
 
         ORDER BY l.createdAt DESC
-
-
     </select>
+    
+    <select id="isProjectLiked" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM Liked
+        WHERE userId = #{userId} AND projectId = #{projectId}
+    </select>
+    
+    <insert id="likeProject" parameterType="map">
+        INSERT INTO Liked (userId, projectId)
+        VALUES (#{userId}, #{projectId})
+    </insert>
+
+    <delete id="dislikeProject" parameterType="map">
+        DELETE FROM Liked
+        WHERE userId = #{userId} AND projectId = #{projectId}
+    </delete>
 </mapper>

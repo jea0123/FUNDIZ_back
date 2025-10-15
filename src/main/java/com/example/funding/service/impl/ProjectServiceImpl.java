@@ -10,6 +10,7 @@ import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
 import com.example.funding.dto.row.ProjectRow;
 import com.example.funding.exception.FeaturedProjectNotFoundException;
+import com.example.funding.exception.ProjectNotFoundException;
 import com.example.funding.exception.RecentPaidProjectNotFoundException;
 import com.example.funding.mapper.NewsMapper;
 import com.example.funding.mapper.ProjectMapper;
@@ -150,4 +151,10 @@ public class ProjectServiceImpl implements ProjectService {
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 검색 성공", result));
     }
 
+    @Override
+    public ResponseEntity<ResponseDto<Long>> getLikeCnt(Long projectId) {
+        if(projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
+        Long likeCnt = projectMapper.getLikeCnt(projectId);
+        return ResponseEntity.ok(ResponseDto.success(200, "좋아요 수 조회 성공", likeCnt));
+    }
 }

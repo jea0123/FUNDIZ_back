@@ -9,10 +9,11 @@ import com.example.funding.dto.request.user.UserPasswordDto;
 import com.example.funding.dto.request.user.UserProfileImgDto;
 import com.example.funding.dto.response.creator.CreatorQnaDto;
 import com.example.funding.dto.response.user.*;
-import com.example.funding.exception.DuplicatedPasswordException;
-import com.example.funding.exception.InCorrectPasswordException;
-import com.example.funding.exception.UserNotFoundException;
-import com.example.funding.mapper.*;
+import com.example.funding.exception.*;
+import com.example.funding.mapper.CreatorMapper;
+import com.example.funding.mapper.ProjectMapper;
+import com.example.funding.mapper.QnaMapper;
+import com.example.funding.mapper.UserMapper;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
 import com.example.funding.model.Qna;
@@ -37,8 +38,6 @@ public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
     private final ProjectMapper projectMapper;
-    private final BackingMapper backingMapper;
-
     private final CreatorMapper creatorMapper;
     private final QnaMapper qnaMapper;
     private final PasswordEncoder passwordEncoder;
@@ -211,5 +210,37 @@ public class UserServiceImpl implements UserService {
         String encodedNewPassword = passwordEncoder.encode(dto.getNewPassword());
         userMapper.updatePwd(userId, encodedNewPassword);
         return ResponseEntity.ok(ResponseDto.success(200, "비밀번호 변경 성공", "********"));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<Long>> likeProject(Long userId, Long projectId) {
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
+        if (userMapper.isProjectLiked(userId, projectId) == 1) throw new DuplicatedLikedProjectException();
+        userMapper.likeProject(userId, projectId);
+        projectMapper.increaseLikeCnt(projectId);
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 좋아요 성공", projectId));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<Long>> dislikeProject(Long userId, Long projectId) {
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
+        if (userMapper.isProjectLiked(userId, projectId) == 0) throw new LikedProjectNotFoundException();
+        userMapper.dislikeProject(userId, projectId);
+        projectMapper.decreaseLikeCnt(projectId);
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 좋아요 취소 성공", projectId));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<Boolean>> checkLikedProject(Long userId, Long projectId) {
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
+        int isLiked = userMapper.isProjectLiked(userId, projectId);
+        if (isLiked == 1) {
+            return ResponseEntity.ok(ResponseDto.success(200, "좋아요한 프로젝트입니다.", true));
+        } else {
+            return ResponseEntity.ok(ResponseDto.success(200, "좋아요하지 않은 프로젝트입니다.", false));
+        }
     }
 }

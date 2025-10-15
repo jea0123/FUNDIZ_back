@@ -10,4 +10,6 @@ public interface FollowMapper {
     void followCreator(@Param("userId") Long userId, @Param("creatorId") Long creatorId);
 
     void unfollowCreator(@Param("userId") Long userId, @Param("creatorId") Long creatorId);
+
+    Long getFollowerCnt(@Param("creatorId") Long creatorId);
 }

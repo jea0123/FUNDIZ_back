@@ -246,6 +246,17 @@ public class UserController {
         return userService.unfollowCreator(userId, creatorId);
     }
 
+    /**
+     * <p>크리에이터 팔로우 여부 확인</p>
+     *
+     * @param creatorId 확인할 크리에이터 ID
+     * @param principal 인증된 사용자의 정보
+     * @return 크리에이터 팔로우 여부 (true/false)
+     * @throws UserNotFoundException    사용자가 존재하지 않을 때
+     * @throws CreatorNotFoundException 크리에이터가 존재하지 않을 때
+     * @author by: 장민규
+     * @since 2025-10-15
+     */
     @GetMapping("/checkFollow/{creatorId}")
     public ResponseEntity<ResponseDto<Boolean>> isFollowingCreator(@PathVariable Long creatorId
 //                                                                 @AuthenticationPrincipal CustomUserPrincipal principal

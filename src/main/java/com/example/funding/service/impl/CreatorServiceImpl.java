@@ -14,6 +14,7 @@ import com.example.funding.dto.response.creator.*;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
 import com.example.funding.exception.AlreadyCreatorException;
+import com.example.funding.exception.CreatorNotFoundException;
 import com.example.funding.exception.UserNotFoundException;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Creator;
@@ -42,8 +43,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class CreatorServiceImpl implements CreatorService {
-    private static final int MAX_TAGS = 10;
-    private static final int MAX_LENGTH = 20;
     private final CreatorMapper creatorMapper;
     private final ProjectMapper projectMapper;
     private final TagMapper tagMapper;
@@ -53,6 +52,7 @@ public class CreatorServiceImpl implements CreatorService {
     private final SettlementMapper settlementMapper;
     private final BackingMapper backingMapper;
     private final ShippingMapper shippingMapper;
+    private final FollowMapper followMapper;
     private final ProjectInputValidator inputValidator;
     private final ProjectTransitionGuard transitionGuard;
     private final FileUploader fileUploader;
@@ -519,5 +519,12 @@ public class CreatorServiceImpl implements CreatorService {
                 .build();
         creatorMapper.insertCreator(creator);
         return ResponseEntity.ok(ResponseDto.success(200, "창작자 등록 성공", dto.getCreatorName()));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<Long>> getFollowerCnt(Long creatorId) {
+        if(creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
+        Long followerCnt = followMapper.getFollowerCnt(creatorId);
+        return ResponseEntity.ok(ResponseDto.success(200, "팔로워 수 조회 성공", followerCnt));
     }
 }

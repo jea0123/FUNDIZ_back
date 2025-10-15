@@ -6,11 +6,11 @@ import com.example.funding.dto.request.admin.SearchAdminProjectDto;
 import com.example.funding.dto.request.admin.UserAdminUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
-import com.example.funding.dto.response.admin.analytic.*;
 import com.example.funding.dto.response.admin.ProjectVerifyListDto;
+import com.example.funding.dto.response.admin.analytic.*;
 import com.example.funding.model.Admin;
-import com.example.funding.model.User;
 import com.example.funding.model.Project;
+import com.example.funding.model.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -37,9 +37,9 @@ public interface AdminMapper {
 
     List<AdminProjectListDto> getProjectList(@Param("dto") SearchAdminProjectDto dto, @Param("pager") Pager pager);
 
-    int cancelProject(@Param("projectId") Long projectId);
+    void cancelProject(@Param("projectId") Long projectId);
 
-    int updateProject(Project project);
+    void updateProject(Project project);
 
     int countProjectVerify(@Param("dto") SearchAdminProjectDto dto);
 
@@ -47,17 +47,19 @@ public interface AdminMapper {
 
     ProjectVerifyDetailDto getProjectVerifyDetail(@Param("projectId") Long projectId);
 
-    int approveProject(@Param("projectId") Long projectId);
+    int isApprovable(@Param("projectId") Long projectId);
 
-    int rejectProject(@Param("projectId") Long projectId, @Param("rejectedReason") String rejectedReason);
+    void approveProject(@Param("projectId") Long projectId);
+
+    int isRejectable(@Param("projectId") Long projectId);
+
+    void rejectProject(@Param("projectId") Long projectId, @Param("rejectedReason") String rejectedReason);
 
     int userTotal();
 
     List<User> userList(@Param("pager") Pager pager);
 
-    int updateUser(UserAdminUpdateRequestDto userDto);
-
-    User userDetail(@Param("userId") Long userId);
+    void updateUser(UserAdminUpdateRequestDto userDto);
 
     void registerAdmin(RegisterAdminRequestDto dto);
 

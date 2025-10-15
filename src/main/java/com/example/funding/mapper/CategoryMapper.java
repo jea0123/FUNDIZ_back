@@ -14,7 +14,5 @@ public interface CategoryMapper {
 
     List<Subcategory> getAllSubcategories();
 
-    Subcategory findSubcategoryById(@Param("subctgrId") Long subctgrId);
-
     SubcategoryWithParentDto getSubcategoryWithParent(@Param("subctgrId") Long subctgrId);
 }

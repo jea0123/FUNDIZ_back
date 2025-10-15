@@ -1,6 +1,5 @@
 package com.example.funding.mapper;
 
-import com.example.funding.dto.response.backing.BackingRewardDto;
 import com.example.funding.model.Reward;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -13,19 +12,13 @@ public interface RewardMapper {
 
     List<Reward> findByProjectId(@Param("projectId") Long projectId);
 
-    List<Reward> findProjectIdsByRewardIds(@Param("ids") List<Long> rewardIds);
+    void saveReward(Reward reward);
 
-    int saveReward(Reward reward);
-
-    int deleteReward(@Param("projectId") Long projectId, @Param("rewardId") Long rewardId);
+    void deleteReward(@Param("projectId") Long projectId, @Param("rewardId") Long rewardId);
 
     void deleteRewards(@Param("projectId") Long projectId);
 
     List<Reward> getCreatorRewardList(@Param("projectId") Long projectId, @Param("creatorId") Long creatorId);
 
-    boolean existsByProjectIdAndNameNormalized(@Param("projectId") Long projectId, @Param("key") String key);
-
-    Long getProjectIdByRewardId(@Param("rewardId") Long rewardId);
-
-    List<BackingRewardDto> getBackingProjectRewards(@Param("projectId")Long projectId);
+    Reward findById(@Param("rewardId") Long rewardId);
 }

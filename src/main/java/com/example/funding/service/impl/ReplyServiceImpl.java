@@ -9,10 +9,11 @@ import com.example.funding.dto.request.project.ReplyCreateRequestDto;
 import com.example.funding.dto.response.cs.InquiryReplyDto;
 import com.example.funding.dto.response.cs.QnaReplyDto;
 import com.example.funding.dto.response.project.ReplyDto;
-import com.example.funding.mapper.CommunityMapper;
-import com.example.funding.mapper.InquiryMapper;
-import com.example.funding.mapper.QnaMapper;
-import com.example.funding.mapper.ReplyMapper;
+import com.example.funding.exception.notfound.CommunityNotFoundException;
+import com.example.funding.exception.notfound.InquiryNotFoundException;
+import com.example.funding.exception.notfound.QnANotFoundException;
+import com.example.funding.exception.notfound.UserNotFoundException;
+import com.example.funding.mapper.*;
 import com.example.funding.model.Reply;
 import com.example.funding.service.ReplyService;
 import lombok.RequiredArgsConstructor;
@@ -34,14 +35,15 @@ public class ReplyServiceImpl implements ReplyService {
     private final CommunityMapper communityMapper;
     private final InquiryMapper inquiryMapper;
     private final QnaMapper qnaMapper;
+    private final UserMapper userMapper;
 
     /**
      * <p>프로젝트 상세 페이지 - 커뮤니티 댓글 목록 조회</p>
      *
-     * @param cmId 커뮤니티 ID
+     * @param cmId          커뮤니티 ID
      * @param lastCreatedAt 마지막 항목의 생성일시
-     * @param lastId 마지막 항목의 id
-     * @param size 한 번에 가져올 항목 수
+     * @param lastId        마지막 항목의 id
+     * @param size          한 번에 가져올 항목 수
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-10-12
@@ -52,9 +54,7 @@ public class ReplyServiceImpl implements ReplyService {
         if (cmId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cmId가 필요합니다.");
         }
-        if (communityMapper.existsCommunityById(cmId) <= 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "커뮤니티 글이 없습니다.");
-        }
+        if (communityMapper.existsCommunityById(cmId) <= 0) throw new CommunityNotFoundException();
 
         int limitPlusOne = Math.max(1, size) + 1;
         List<ReplyDto> replyList = replyMapper.getReplyList(cmId, lastCreatedAt, lastId, limitPlusOne);
@@ -67,7 +67,7 @@ public class ReplyServiceImpl implements ReplyService {
         Cursor next = null;
         if (hasMore && !replyList.isEmpty()) {
             ReplyDto last = replyList.getLast();
-            next = new Cursor(last.getCreatedAt(),last.getCmId());
+            next = new Cursor(last.getCreatedAt(), last.getCmId());
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "댓글 목록 조회 성공", CursorPage.of(replyList, next)));
@@ -76,8 +76,8 @@ public class ReplyServiceImpl implements ReplyService {
     /**
      * <p>프로젝트 상세 페이지 - 커뮤니티 댓글 등록</p>
      *
-     * @param cmId 커뮤니티 ID
-     * @param dto ReplyCreateRequestDto
+     * @param cmId   커뮤니티 ID
+     * @param dto    ReplyCreateRequestDto
      * @param userId 사용자 ID
      * @return 성공 시 200 OK
      * @author 조은애
@@ -85,13 +85,12 @@ public class ReplyServiceImpl implements ReplyService {
      */
     @Override
     public ResponseEntity<ResponseDto<ReplyDto>> createCommunityReply(Long cmId, ReplyCreateRequestDto dto, Long userId) {
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
         if (cmId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cmId가 필요합니다.");
         }
         //TODO: userId 체크
-        if (communityMapper.existsCommunityById(cmId) <= 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "커뮤니티 글이 없습니다.");
-        }
+        if (communityMapper.existsCommunityById(cmId) <= 0) throw new CommunityNotFoundException();
 
         String content = (dto.getContent() == null ? "" : dto.getContent().trim());
         if (content.isEmpty()) {
@@ -100,18 +99,14 @@ public class ReplyServiceImpl implements ReplyService {
         //TODO: 문자 길이 체크
 
         Reply reply = Reply.builder()
-            .cmId(cmId)
-            .userId(userId)
-            .content(content)
-            .isSecret(dto.getIsSecret())
-            .code("CM")
-            .build();
+                .cmId(cmId)
+                .userId(userId)
+                .content(content)
+                .isSecret(dto.getIsSecret())
+                .code("CM")
+                .build();
 
-        int result = replyMapper.createCommunityReply(reply);
-        if (result != 1 || reply.getReplyId() == null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "댓글 등록 실패");
-        }
-
+        replyMapper.createCommunityReply(reply);
         return ResponseEntity.ok(ResponseDto.success(200, "댓글 등록 성공", null));
     }
 
@@ -121,9 +116,7 @@ public class ReplyServiceImpl implements ReplyService {
         if (inqId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "inqId가 필요합니다.");
         }
-        if (inquiryMapper.existsInquiryById(inqId) <= 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "문의 글이 없습니다.");
-        }
+        if (inquiryMapper.existsInquiryById(inqId) <= 0) throw new InquiryNotFoundException();
 
         int limitPlusOne = Math.max(1, size) + 1;
         List<InquiryReplyDto> replyList = replyMapper.getInquiryReplyList(inqId, lastCreatedAt, lastId, limitPlusOne);
@@ -136,7 +129,7 @@ public class ReplyServiceImpl implements ReplyService {
         Cursor next = null;
         if (hasMore && !replyList.isEmpty()) {
             InquiryReplyDto last = replyList.getLast();
-            next = new Cursor(last.getCreatedAt(),last.getInqId());
+            next = new Cursor(last.getCreatedAt(), last.getInqId());
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "댓글 목록 조회 성공", CursorPage.of(replyList, next)));
@@ -148,9 +141,7 @@ public class ReplyServiceImpl implements ReplyService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "inqId가 필요합니다.");
         }
 
-        if (inquiryMapper.existsInquiryById(inqId) <= 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "문의 글이 없습니다.");
-        }
+        if (inquiryMapper.existsInquiryById(inqId) <= 0) throw new InquiryNotFoundException();
 
         String content = (dto.getContent() == null ? "" : dto.getContent().trim());
         if (content.isEmpty()) {
@@ -164,11 +155,7 @@ public class ReplyServiceImpl implements ReplyService {
                 .code("IQ")
                 .build();
 
-        int result = replyMapper.createInquiryReply(reply);
-        if (result != 1 || reply.getReplyId() == null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "댓글 등록 실패");
-        }
-
+        replyMapper.createInquiryReply(reply);
         return ResponseEntity.ok(ResponseDto.success(200, "댓글 등록 성공", null));
     }
 
@@ -178,9 +165,7 @@ public class ReplyServiceImpl implements ReplyService {
         if (qnaId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qnaId가 필요합니다.");
         }
-        if (qnaMapper.existsQnaById(qnaId) <= 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "문의 글이 없습니다.");
-        }
+        if (qnaMapper.existsQnaById(qnaId) <= 0) throw new QnANotFoundException();
 
         int limitPlusOne = Math.max(1, size) + 1;
         List<QnaReplyDto> replyList = replyMapper.getQnaReplyList(qnaId, lastCreatedAt, lastId, limitPlusOne);
@@ -193,7 +178,7 @@ public class ReplyServiceImpl implements ReplyService {
         Cursor next = null;
         if (hasMore && !replyList.isEmpty()) {
             QnaReplyDto last = replyList.getLast();
-            next = new Cursor(last.getCreatedAt(),last.getQnaId());
+            next = new Cursor(last.getCreatedAt(), last.getQnaId());
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "댓글 목록 조회 성공", CursorPage.of(replyList, next)));
@@ -207,9 +192,8 @@ public class ReplyServiceImpl implements ReplyService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qnaId가 필요합니다.");
         }
 
-        if (qnaMapper.existsQnaById(qnaId) <= 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "문의 글이 없습니다.");
-        }
+        if (qnaMapper.existsQnaById(qnaId) <= 0) throw new QnANotFoundException();
+        if (userMapper.getUserById(creatorId) == null) throw new UserNotFoundException();
 
         String content = (dto.getContent() == null ? "" : dto.getContent().trim());
         if (content.isEmpty()) {
@@ -224,11 +208,7 @@ public class ReplyServiceImpl implements ReplyService {
                 .creatorId(creatorId)
                 .build();
 
-        int result = replyMapper.createQnaReply(reply);
-        if (result != 1 || reply.getReplyId() == null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "댓글 등록 실패");
-        }
-
+        replyMapper.createQnaReply(reply);
         return ResponseEntity.ok(ResponseDto.success(200, "댓글 등록 성공", null));
     }
 

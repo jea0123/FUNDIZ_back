@@ -8,7 +8,12 @@ import com.example.funding.dto.request.settlement.SettlementSearchCond;
 import com.example.funding.dto.response.settlement.CreatorSettlementDto;
 import com.example.funding.dto.response.settlement.SettlementItem;
 import com.example.funding.dto.row.SettlementSummary;
-import com.example.funding.exception.*;
+import com.example.funding.exception.badrequest.ProjectNotSuccessException;
+import com.example.funding.exception.badrequest.SettlementStatusAlreadyChangedException;
+import com.example.funding.exception.forbidden.AccessDeniedException;
+import com.example.funding.exception.notfound.CreatorNotFoundException;
+import com.example.funding.exception.notfound.ProjectNotFoundException;
+import com.example.funding.exception.notfound.SettlementNotFoundException;
 import com.example.funding.mapper.CreatorMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.SettlementMapper;
@@ -18,12 +23,14 @@ import com.example.funding.service.SettlementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class SettlementServiceImpl implements SettlementService {
 
     private final CreatorMapper creatorMapper;
@@ -31,10 +38,10 @@ public class SettlementServiceImpl implements SettlementService {
     private final ProjectMapper projectMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CreatorSettlementDto>> getSettlementByCreatorId(Long creatorId) {
-        if (creatorMapper.existsCreator(creatorId) == 0) {
-            throw new CreatorNotFoundException();
-        }
+        if (creatorMapper.existsCreator(creatorId) == 0) throw new CreatorNotFoundException();
+
         List<Settlement> settlement = settlementMapper.getByCreatorId(creatorId);
         SettlementSummary settlementSummary = settlementMapper.getSettlementSummaryByCreatorId(creatorId);
         CreatorSettlementDto dtos = CreatorSettlementDto.builder()
@@ -61,6 +68,7 @@ public class SettlementServiceImpl implements SettlementService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<SettlementItem>>> getSettlements(SettlementSearchCond cond, Pager pager) {
         String q = cond.getQ();
         String status = normalizeStatus(cond.getStatus());
@@ -84,6 +92,7 @@ public class SettlementServiceImpl implements SettlementService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<SettlementSummary>> getSettlementSummary() {
         SettlementSummary summary = settlementMapper.getSettlementSummary();
         return ResponseEntity.ok(ResponseDto.success(200, "정산 요약 정보 조회 성공", summary));

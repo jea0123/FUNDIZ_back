@@ -10,10 +10,7 @@ import com.example.funding.dto.request.user.UserProfileImgDto;
 import com.example.funding.dto.response.creator.CreatorQnaDto;
 import com.example.funding.dto.response.user.*;
 import com.example.funding.exception.*;
-import com.example.funding.mapper.CreatorMapper;
-import com.example.funding.mapper.ProjectMapper;
-import com.example.funding.mapper.QnaMapper;
-import com.example.funding.mapper.UserMapper;
+import com.example.funding.mapper.*;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
 import com.example.funding.model.Qna;
@@ -40,6 +37,7 @@ public class UserServiceImpl implements UserService {
     private final ProjectMapper projectMapper;
     private final CreatorMapper creatorMapper;
     private final QnaMapper qnaMapper;
+    private final FollowMapper followMapper;
     private final PasswordEncoder passwordEncoder;
     private final FileUploader fileUploader;
 
@@ -241,6 +239,40 @@ public class UserServiceImpl implements UserService {
             return ResponseEntity.ok(ResponseDto.success(200, "좋아요한 프로젝트입니다.", true));
         } else {
             return ResponseEntity.ok(ResponseDto.success(200, "좋아요하지 않은 프로젝트입니다.", false));
+        }
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<String>> followCreator(Long userId, Long creatorId) {
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        Creator creator = creatorMapper.findById(creatorId);
+        if (creator == null) throw new CreatorNotFoundException();
+        if (followMapper.isFollowingCreator(userId, creatorId) == 1) throw new DuplicatedFollowCreatorException();
+        followMapper.followCreator(userId, creatorId);
+        creatorMapper.increaseFollowersCount(creatorId);
+        return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 팔로우 성공", creator.getCreatorName()));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<String>> unfollowCreator(Long userId, Long creatorId) {
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        Creator creator = creatorMapper.findById(creatorId);
+        if (creator == null) throw new CreatorNotFoundException();
+        if (followMapper.isFollowingCreator(userId, creatorId) == 0) throw new FollowingCreatorNotFoundException();
+        followMapper.unfollowCreator(userId, creatorId);
+        creatorMapper.decreaseFollowersCount(creatorId);
+        return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 언팔로우 성공", creator.getCreatorName()));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<Boolean>> isFollowingCreator(Long userId, Long creatorId) {
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
+        int isFollowing = followMapper.isFollowingCreator(userId, creatorId);
+        if (isFollowing == 1) {
+            return ResponseEntity.ok(ResponseDto.success(200, "팔로우한 크리에이터입니다.", true));
+        } else {
+            return ResponseEntity.ok(ResponseDto.success(200, "팔로우하지 않은 크리에이터입니다.", false));
         }
     }
 }

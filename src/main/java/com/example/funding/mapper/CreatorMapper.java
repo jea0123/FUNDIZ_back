@@ -48,4 +48,8 @@ public interface CreatorMapper {
     List<CreatorDashboardRankDto> getProjectRankDate(Long creatorId);
 
     CreatorDashboardDto creatorDashboardDto(Long creatorId);
+
+    void increaseFollowersCount(@Param("creatorId") Long creatorId);
+
+    void decreaseFollowersCount(@Param("creatorId") Long creatorId);
 }

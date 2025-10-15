@@ -29,11 +29,6 @@ public interface ProjectMapper {
     List<FeaturedProjectDto> findFeaturedJoinedWithRecent(@Param("days") int days,
                                                           @Param("limit") int limit);
 
-    List<Project> findFeaturedExcluding(
-            @Param("limit") int limit,
-            @Param("excludeIds") List<Long> excludeIds
-    );
-
     int getProjectCnt(@Param("creatorId") Long creatorId);
 
     String getStatus(@Param("projectId") Long projectId);
@@ -58,4 +53,7 @@ public interface ProjectMapper {
 
     List<CreatorShippingProjectList> getCShippingList(Long creatorId);
 
+    void increaseLikeCnt(@Param("projectId") Long projectId);
+
+    void decreaseLikeCnt(@Param("projectId") Long projectId);
 }

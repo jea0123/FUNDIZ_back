@@ -383,4 +383,16 @@
           AND (ENDDATE + 1) <![CDATA[ < ]]> TRUNC(SYSDATE)
     </update>
 
+    <update id="increaseLikeCnt" parameterType="long">
+        UPDATE project
+        SET likeCnt = likeCnt + 1
+        WHERE projectId = #{projectId}
+    </update>
+
+    <update id="decreaseLikeCnt" parameterType="long">
+        UPDATE project
+        SET likeCnt = CASE WHEN likeCnt > 0 THEN likeCnt - 1 ELSE 0 END
+        WHERE projectId = #{projectId}
+    </update>
+
 </mapper>

@@ -218,6 +218,7 @@ public class UserServiceImpl implements UserService {
         if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
         if (userMapper.isProjectLiked(userId, projectId) == 1) throw new DuplicatedLikedProjectException();
         userMapper.likeProject(userId, projectId);
+        projectMapper.increaseLikeCnt(projectId);
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 좋아요 성공", projectId));
     }
 
@@ -227,6 +228,7 @@ public class UserServiceImpl implements UserService {
         if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
         if (userMapper.isProjectLiked(userId, projectId) == 0) throw new LikedProjectNotFoundException();
         userMapper.dislikeProject(userId, projectId);
+        projectMapper.decreaseLikeCnt(projectId);
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 좋아요 취소 성공", projectId));
     }
 

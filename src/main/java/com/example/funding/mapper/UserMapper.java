@@ -39,4 +39,6 @@ public interface UserMapper {
     void likeProject(@Param("userId") Long userId, @Param("projectId") Long projectId);
 
     int isProjectLiked(@Param("userId") Long userId, @Param("projectId") Long projectId);
+
+    void dislikeProject(@Param("userId") Long userId, @Param("projectId") Long projectId);
 }

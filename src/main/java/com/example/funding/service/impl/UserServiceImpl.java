@@ -10,7 +10,10 @@ import com.example.funding.dto.request.user.UserProfileImgDto;
 import com.example.funding.dto.response.creator.CreatorQnaDto;
 import com.example.funding.dto.response.user.*;
 import com.example.funding.exception.*;
-import com.example.funding.mapper.*;
+import com.example.funding.mapper.CreatorMapper;
+import com.example.funding.mapper.ProjectMapper;
+import com.example.funding.mapper.QnaMapper;
+import com.example.funding.mapper.UserMapper;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
 import com.example.funding.model.Qna;
@@ -35,8 +38,6 @@ public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
     private final ProjectMapper projectMapper;
-    private final BackingMapper backingMapper;
-
     private final CreatorMapper creatorMapper;
     private final QnaMapper qnaMapper;
     private final PasswordEncoder passwordEncoder;
@@ -218,5 +219,14 @@ public class UserServiceImpl implements UserService {
         if (userMapper.isProjectLiked(userId, projectId) == 1) throw new DuplicatedLikedProjectException();
         userMapper.likeProject(userId, projectId);
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 좋아요 성공", projectId));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<Long>> dislikeProject(Long userId, Long projectId) {
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
+        if (userMapper.isProjectLiked(userId, projectId) == 0) throw new LikedProjectNotFoundException();
+        userMapper.dislikeProject(userId, projectId);
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 좋아요 취소 성공", projectId));
     }
 }

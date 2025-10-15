@@ -40,4 +40,9 @@
         INSERT INTO Liked (userId, projectId)
         VALUES (#{userId}, #{projectId})
     </insert>
+
+    <delete id="dislikeProject" parameterType="map">
+        DELETE FROM Liked
+        WHERE userId = #{userId} AND projectId = #{projectId}
+    </delete>
 </mapper>

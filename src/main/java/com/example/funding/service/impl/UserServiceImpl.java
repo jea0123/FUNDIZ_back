@@ -229,4 +229,16 @@ public class UserServiceImpl implements UserService {
         userMapper.dislikeProject(userId, projectId);
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 좋아요 취소 성공", projectId));
     }
+
+    @Override
+    public ResponseEntity<ResponseDto<Boolean>> checkLikedProject(Long userId, Long projectId) {
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
+        int isLiked = userMapper.isProjectLiked(userId, projectId);
+        if (isLiked == 1) {
+            return ResponseEntity.ok(ResponseDto.success(200, "좋아요한 프로젝트입니다.", true));
+        } else {
+            return ResponseEntity.ok(ResponseDto.success(200, "좋아요하지 않은 프로젝트입니다.", false));
+        }
+    }
 }

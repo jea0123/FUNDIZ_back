@@ -80,4 +80,16 @@ public interface UserService {
      * @since 2025-10-15
      */
     ResponseEntity<ResponseDto<Long>> dislikeProject(Long userId, Long projectId);
+
+    /**
+     * <p>프로젝트 좋아요 여부 확인</p>
+     * @param userId 인증된 사용자의 ID
+     * @param projectId 확인할 프로젝트 ID
+     * @return 프로젝트 좋아요 여부 (true/false)
+     * @throws UserNotFoundException 사용자가 존재하지 않을 때
+     * @throws ProjectNotFoundException 프로젝트가 존재하지 않을 때
+     * @author by: 장민규
+     * @since 2025-10-15
+     */
+    ResponseEntity<ResponseDto<Boolean>> checkLikedProject(Long userId, Long projectId);
 }

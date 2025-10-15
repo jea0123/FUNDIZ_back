@@ -186,4 +186,24 @@ public class UserController {
         Long userId = 501L; // TODO: 임시
         return userService.dislikeProject(userId, projectId);
     }
+
+    /**
+     * <p>프로젝트 좋아요 여부 확인</p>
+     *
+     * @param projectId 확인할 프로젝트 ID
+     * @param principal 인증된 사용자의 정보
+     * @return 프로젝트 좋아요 여부 (true/false)
+     * @throws UserNotFoundException    사용자가 존재하지 않을 때
+     * @throws ProjectNotFoundException 프로젝트가 존재하지 않을 때
+     * @author by: 장민규
+     * @since 2025-10-15
+     */
+    @GetMapping("/checkLike/{projectId}")
+    public ResponseEntity<ResponseDto<Boolean>> isProjectLiked(@PathVariable Long projectId
+//                                                              @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+//        Long userId = principal.userId();
+        Long userId = 501L; // TODO: 임시
+        return userService.checkLikedProject(userId, projectId);
+    }
 }

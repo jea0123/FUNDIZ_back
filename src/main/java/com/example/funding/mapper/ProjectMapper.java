@@ -56,4 +56,6 @@ public interface ProjectMapper {
     void increaseLikeCnt(@Param("projectId") Long projectId);
 
     void decreaseLikeCnt(@Param("projectId") Long projectId);
+
+    Long getLikeCnt(@Param("projectId") Long projectId);
 }

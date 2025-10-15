@@ -395,4 +395,10 @@
         WHERE projectId = #{projectId}
     </update>
 
+    <select id="getLikeCnt" resultType="long" parameterType="long">
+        SELECT likeCnt
+        FROM project
+        WHERE projectId = #{projectId}
+    </select>
+
 </mapper>

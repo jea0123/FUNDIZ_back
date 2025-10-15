@@ -17,4 +17,10 @@
         DELETE FROM follow
         WHERE creatorId = #{creatorId} AND userId = #{userId}
     </delete>
+
+    <select id="getFollowerCnt" parameterType="long" resultType="long">
+        SELECT COUNT(*)
+        FROM follow
+        WHERE creatorId = #{creatorId}
+    </select>
 </mapper>

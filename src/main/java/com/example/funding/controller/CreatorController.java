@@ -122,7 +122,12 @@ public class CreatorController {
                                                              @RequestAttribute Long creatorId) throws IOException {
         //TODO: userId -> creatorId
         String thumbnailUrl = fileUploader.upload(dto.getThumbnail());
+//        String businessDocUrl = null;
+//        if (dto.getBusinessDoc() != null && !dto.getBusinessDoc().isEmpty()) {
+//            businessDocUrl = fileUploader.upload(dto.getBusinessDoc());
+//        }
         dto.setThumbnailUrl(thumbnailUrl);
+//        dto.setBusinessDoc(businessDocUrl);
         return creatorService.createProject(dto, creatorId);
     }
 

@@ -3,6 +3,7 @@ package com.example.funding.service.impl;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.backing.BackingRequestDto;
 import com.example.funding.dto.request.backing.BackingRequestUpdateDto;
+import com.example.funding.dto.request.reward.RewardBackingRequestDto;
 import com.example.funding.dto.response.address.AddressResponseDto;
 import com.example.funding.dto.response.backing.BackingResponseDto;
 import com.example.funding.dto.response.backing.BackingRewardDto;
@@ -75,27 +76,18 @@ public class BackingServiceImpl implements BackingService {
     }
 
 
+    //TODO : 후원 하기 (생성)
     @Override
     public ResponseEntity<ResponseDto<String>> createBacking(Long userId, BackingRequestDto requestDto) {
         Backing backing = requestDto.getBacking();
+        Shipping shipping = requestDto.getShipping();
+        Payment payment = requestDto.getPayment();
+        Address address = requestDto.getAddress();
+        List<RewardBackingRequestDto> rewardBacking = requestDto.getRewards();
 
         backing.setUserId(userId);
         backing.setCreatedAt(LocalDate.now());
         backingMapper.addBacking(backing);
-
-        Long backingId = backing.getBackingId();
-        System.out.println("backingId 확인" + backingId);
-        BackingDetail detail = requestDto.getBackingDetail();
-        detail.setBackingId(backingId);
-        backingMapper.addBackingDetail(detail);
-
-//        Shipping shipping = requestDto.getShipping();
-//        shipping.setBackingId(backingId);
-//        shippingMapper.addShipping(shipping);
-//
-//        Payment payment = requestDto.getPayment();
-//        payment.setBackingId(backingId);
-//        paymentMapper.addPayment(payment);
 
 
         return ResponseEntity.ok(ResponseDto.success(200, "후원 추가 성공", /*"추가!!"*/ null));
@@ -129,11 +121,11 @@ public class BackingServiceImpl implements BackingService {
 
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(Long userId, Long projectId, Long rewardId) {
+    public ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(Long userId, Long projectId, Long rewardId, Long backingId) {
         if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
         if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
 
-        BackingDto backingDetailDto = backingMapper.getBackingProjectAndUserId(userId, projectId, rewardId);
+        BackingDto backingDetailDto = backingMapper.getBackingProjectAndUserId(userId, projectId, rewardId, backingId);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "후원한 프로젝트 리스트 상세 조회성공", backingDetailDto));
     }

@@ -6,6 +6,7 @@ import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.creator.CreatorRegisterRequestDto;
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
+import com.example.funding.dto.request.shipping.ShippingStatusDto;
 import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
 import com.example.funding.dto.response.creator.*;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
@@ -57,6 +58,7 @@ public interface CreatorService {
      */
     ResponseEntity<ResponseDto<String>> registerCreator(CreatorRegisterRequestDto dto, Long userId) throws IOException;
 
+    ResponseEntity<ResponseDto<String>> setShippingStatus(Long projectId, Long creatorId, ShippingStatusDto status);
     /**
      * 크리에이터 팔로워 수 조회
      * @param creatorId 크리에이터 ID
@@ -66,4 +68,5 @@ public interface CreatorService {
      * @author 장민규
      */
     ResponseEntity<ResponseDto<Long>> getFollowerCnt(Long creatorId);
+
 }

@@ -31,9 +31,6 @@ public class BackingController {
     @PostMapping("/create/{userId}")
     public ResponseEntity<ResponseDto<String>> createBacking(@RequestBody BackingRequestDto requestDto,
                                                              @PathVariable Long userId) {
-
-        System.out.println("userId=" + userId);
-        System.out.println("body " + requestDto);
         return backingService.createBacking(userId, requestDto);
     }
 
@@ -49,9 +46,9 @@ public class BackingController {
         return backingService.getBackingList(userId);
     }
 
-    @GetMapping("/page/{userId}/project/{projectId}/reward/{rewardId}")
-    public ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(@PathVariable Long userId, @PathVariable Long projectId, @PathVariable Long rewardId){
-        return backingService.getBackingDetail(userId,projectId, rewardId);
+    @GetMapping("/page/{userId}/project/{projectId}/reward/{rewardId}/backing/{backingId}")
+    public ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(@PathVariable Long userId, @PathVariable Long projectId, @PathVariable Long rewardId, @PathVariable Long backingId){
+        return backingService.getBackingDetail(userId,projectId, rewardId, backingId);
     }
 
 }

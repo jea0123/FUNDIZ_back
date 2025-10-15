@@ -82,6 +82,7 @@
         WHERE b.userId=#{userId}
         AND p.projectId=#{projectId}
         AND r.rewardId=#{rewardId}
+        AND b.backingId=#{backingId}
     </select>
 
     <resultMap id="BackingListMap" type="com.example.funding.dto.response.user.BackingDto" autoMapping="false">

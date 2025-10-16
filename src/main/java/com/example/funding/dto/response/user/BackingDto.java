@@ -3,6 +3,8 @@ package com.example.funding.dto.response.user;
 import com.example.funding.model.Backing;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor

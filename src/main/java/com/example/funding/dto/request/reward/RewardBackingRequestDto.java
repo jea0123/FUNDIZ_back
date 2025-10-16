@@ -10,7 +10,10 @@ import lombok.*;
 @Builder
 public class RewardBackingRequestDto {
     // 리워드
+    private Long rewardId;
     private String rewardName;
     private Long price;
     private String rewardContent;
+    private Long quantity;
+
 }

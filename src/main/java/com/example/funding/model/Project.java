@@ -21,7 +21,9 @@ public class Project {
     private LocalDate startDate;
     private LocalDate endDate;
     private String content;
+    private String contentBlocks;
     private String thumbnail;
+    private String businessDoc;
     private LocalDate createdAt;
     private LocalDate updatedAt;
     private String projectStatus;
@@ -29,7 +31,6 @@ public class Project {
     private Integer likeCnt;
     private Integer viewCnt;
     private Character isVerified;
-    private String rejectedReason;
     private LocalDate requestedAt;
-    private String contentBlocks;
+    private String rejectedReason;
 }

@@ -361,5 +361,65 @@
         FROM backing
         WHERE backingId = #{backingId}
     </select>
+
+    <select id = "getBackingList" resultType = "com.example.funding.dto.response.backing.userList_detail.MyPageBackingListDto">
+        SELECT
+            p.projectId,
+            p.title,
+            p.goalAmount,
+            p.currAmount,
+            p.endDate,
+            p.thumbnail,
+            b.userId,
+            b.backingId,
+            b.amount,
+            b.createdAt,
+            b.backingStatus,
+            s.shippingStatus,
+            c.creatorName
+        FROM backingDetail bd
+        JOIN backing b ON b.backingId = bd.backingId
+        JOIN reward r ON r.rewardId = bd.rewardId
+        JOIN project p ON p.projectId = r.projectId
+        JOIN shipping s ON s.backingId = b.backingId
+        JOIN creator c ON p.creatorId = c.creatorId
+        WHERE b.userId = #{userId}
+    </select>
+
+    <select id = "getBackingDetail" resultType = "com.example.funding.dto.response.backing.userList_detail.MyPageBackingDetailDto">
+        SELECT
+            b.backingId,
+            b.userId,
+            b.amount,
+            b.createdAt,
+            b.backingStatus,
+            py.method,
+            py.cardCompany,
+            s.shippingStatus,
+            s.trackingNum,
+            s.shippedAt,
+            s.deliveredAt,
+            p.title,
+            p.thumbnail,
+            a.addrName,
+            a.recipient,
+            a.postalCode,
+            a.roadAddr,
+            a.detailAddr,
+            a.recipientPhone,
+            c.creatorId
+        FROM backingDetail bd
+        JOIN backing b ON b.backingId = bd.backingId
+        JOIN reward r ON r.rewardId = bd.rewardId
+        JOIN project p ON p.projectId = r.projectId
+        JOIN shipping s ON s.backingId = b.backingId
+        JOIN creator c ON p.creatorId = c.creatorId
+        JOIN address a ON a.addrId = s.addrId
+        JOIN payment py ON py.backingId = b.backingId
+        JOIN creator c ON c.creatorId = p.creatorId
+        WHERE b.userId = #{userId}
+    </select>
+
+
 </mapper>
 

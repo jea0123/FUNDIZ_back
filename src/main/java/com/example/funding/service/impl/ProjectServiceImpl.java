@@ -57,7 +57,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         //컬렉션 조회
         List<Tag> tagList = tagMapper.getTagList(projectId);
-        List<Reward> rewardList = rewardMapper.getRewardList(projectId);
+        List<Reward> rewardList = rewardMapper.getRewardListPublic(projectId);
         List<News> newsList = newsMapper.getNewsList(projectId);
 
         //달성률, 창작자가 등록한 프로젝트 수, 결제일

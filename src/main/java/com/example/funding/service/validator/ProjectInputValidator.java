@@ -2,8 +2,6 @@ package com.example.funding.service.validator;
 
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.reward.RewardCreateRequestDto;
-import com.example.funding.dto.response.category.SubcategoryWithParentDto;
-import com.example.funding.mapper.CreatorMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;

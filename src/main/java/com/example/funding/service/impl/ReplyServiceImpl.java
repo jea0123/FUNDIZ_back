@@ -9,11 +9,16 @@ import com.example.funding.dto.request.project.ReplyCreateRequestDto;
 import com.example.funding.dto.response.cs.InquiryReplyDto;
 import com.example.funding.dto.response.cs.QnaReplyDto;
 import com.example.funding.dto.response.project.ReplyDto;
+import com.example.funding.enums.NotificationType;
 import com.example.funding.exception.notfound.CommunityNotFoundException;
 import com.example.funding.exception.notfound.InquiryNotFoundException;
 import com.example.funding.exception.notfound.QnANotFoundException;
 import com.example.funding.exception.notfound.UserNotFoundException;
+import com.example.funding.handler.NotificationPublisher;
 import com.example.funding.mapper.*;
+import com.example.funding.model.Community;
+import com.example.funding.model.Inquiry;
+import com.example.funding.model.Qna;
 import com.example.funding.model.Reply;
 import com.example.funding.service.ReplyService;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +41,8 @@ public class ReplyServiceImpl implements ReplyService {
     private final InquiryMapper inquiryMapper;
     private final QnaMapper qnaMapper;
     private final UserMapper userMapper;
+
+    private final NotificationPublisher notificationPublisher;
 
     /**
      * <p>프로젝트 상세 페이지 - 커뮤니티 댓글 목록 조회</p>
@@ -90,7 +97,8 @@ public class ReplyServiceImpl implements ReplyService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cmId가 필요합니다.");
         }
         //TODO: userId 체크
-        if (communityMapper.existsCommunityById(cmId) <= 0) throw new CommunityNotFoundException();
+        Community existingCommunity = communityMapper.getCommunityById(cmId);
+        if (existingCommunity == null) throw new CommunityNotFoundException();
 
         String content = (dto.getContent() == null ? "" : dto.getContent().trim());
         if (content.isEmpty()) {
@@ -107,6 +115,7 @@ public class ReplyServiceImpl implements ReplyService {
                 .build();
 
         replyMapper.createCommunityReply(reply);
+        notificationPublisher.publish(existingCommunity.getUserId(), NotificationType.COMMUNITY_REPLY, existingCommunity.getCmContent(), cmId);
         return ResponseEntity.ok(ResponseDto.success(200, "댓글 등록 성공", null));
     }
 
@@ -140,8 +149,8 @@ public class ReplyServiceImpl implements ReplyService {
         if (inqId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "inqId가 필요합니다.");
         }
-
-        if (inquiryMapper.existsInquiryById(inqId) <= 0) throw new InquiryNotFoundException();
+        Inquiry existingInquiry = inquiryMapper.findById(inqId);
+        if (existingInquiry == null) throw new InquiryNotFoundException();
 
         String content = (dto.getContent() == null ? "" : dto.getContent().trim());
         if (content.isEmpty()) {
@@ -156,6 +165,7 @@ public class ReplyServiceImpl implements ReplyService {
                 .build();
 
         replyMapper.createInquiryReply(reply);
+        notificationPublisher.publish(existingInquiry.getUserId(), NotificationType.INQUIRY_ANSWERED, existingInquiry.getTitle(), inqId);
         return ResponseEntity.ok(ResponseDto.success(200, "댓글 등록 성공", null));
     }
 
@@ -192,7 +202,8 @@ public class ReplyServiceImpl implements ReplyService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qnaId가 필요합니다.");
         }
 
-        if (qnaMapper.existsQnaById(qnaId) <= 0) throw new QnANotFoundException();
+        Qna existingQna = qnaMapper.findById(qnaId);
+        if (existingQna == null) throw new QnANotFoundException();
         if (userMapper.getUserById(creatorId) == null) throw new UserNotFoundException();
 
         String content = (dto.getContent() == null ? "" : dto.getContent().trim());
@@ -209,6 +220,7 @@ public class ReplyServiceImpl implements ReplyService {
                 .build();
 
         replyMapper.createQnaReply(reply);
+        notificationPublisher.publish(existingQna.getUserId(), NotificationType.QNA_REPLY, existingQna.getTitle(), qnaId);
         return ResponseEntity.ok(ResponseDto.success(200, "댓글 등록 성공", null));
     }
 

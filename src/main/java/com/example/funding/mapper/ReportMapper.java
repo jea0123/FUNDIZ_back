@@ -18,5 +18,5 @@ public interface ReportMapper {
 
     int myReportTotal(Long userId);
 
-    void addReport(Report item);
+    Long addReport(Report item);
 }

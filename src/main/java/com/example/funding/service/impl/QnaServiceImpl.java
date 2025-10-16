@@ -5,11 +5,17 @@ import com.example.funding.common.CursorPage;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.QnaAddRequestDto;
 import com.example.funding.dto.response.project.QnaDto;
+import com.example.funding.enums.NotificationType;
+import com.example.funding.exception.notfound.CreatorNotFoundException;
 import com.example.funding.exception.notfound.ProjectNotFoundException;
 import com.example.funding.exception.notfound.UserNotFoundException;
+import com.example.funding.handler.NotificationPublisher;
+import com.example.funding.mapper.CreatorMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.QnaMapper;
 import com.example.funding.mapper.UserMapper;
+import com.example.funding.model.Creator;
+import com.example.funding.model.Project;
 import com.example.funding.service.QnaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +35,9 @@ public class QnaServiceImpl implements QnaService {
     private final QnaMapper qnaMapper;
     private final ProjectMapper projectMapper;
     private final UserMapper userMapper;
+    private final CreatorMapper creatorMapper;
+
+    private final NotificationPublisher notificationPublisher;
 
     /**
      * <p>QnA 내역 목록 조회(프로젝트 상세 페이지 기준)</p>
@@ -68,8 +77,14 @@ public class QnaServiceImpl implements QnaService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> addQuestion(Long projectId, Long userId, QnaAddRequestDto qnaDto) {
-        if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
+        Project existingProject = projectMapper.findById(projectId);
+        if (existingProject == null) throw new ProjectNotFoundException();
+
         if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+
+        Creator existingCreator = creatorMapper.findById(existingProject.getCreatorId());
+        if (existingCreator == null) throw new CreatorNotFoundException();
+
         QnaDto item = QnaDto.builder()
                 .projectId(projectId)
                 .userId(userId)
@@ -78,6 +93,7 @@ public class QnaServiceImpl implements QnaService {
                 .build();
 
         qnaMapper.addQuestion(item);
+        notificationPublisher.publish(existingCreator.getUserId(), NotificationType.QNA_NEW, existingProject.getTitle(), projectId);
         return ResponseEntity.ok(ResponseDto.success(200, "문의 등록 성공", "데이터 출력확인"));
     }
 }

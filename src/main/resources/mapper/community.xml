@@ -61,4 +61,10 @@
         SELECT COUNT(*) FROM COMMUNITY
         WHERE CMID = #{cmId}
     </select>
+
+    <select id="getCommunityById" resultType="community">
+        SELECT *
+        FROM COMMUNITY
+        WHERE CMID = #{cmId}
+    </select>
 </mapper>

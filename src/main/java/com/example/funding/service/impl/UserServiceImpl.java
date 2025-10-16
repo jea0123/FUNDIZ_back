@@ -130,6 +130,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public ResponseEntity<ResponseDto<?>> addRecentViewProject(Long userId, Long projectId) {
+        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
+        userMapper.upsertRecentView(userId, projectId);
+        return ResponseEntity.ok(ResponseDto.success(200, "최근 본 프로젝트 추가 성공", null));
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(Long userId) {
         if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();

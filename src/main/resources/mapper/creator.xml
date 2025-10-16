@@ -125,7 +125,25 @@
     </select>
 
     <select id="getProjectDetail" resultType="creatorProjectDetailDto">
-        SELECT p.*, c.*, sc.*, cg.*
+        SELECT
+            p.PROJECTID,
+            p.CREATORID,
+            p.TITLE,
+            p.GOALAMOUNT,
+            p.STARTDATE,
+            p.ENDDATE,
+            p.CONTENT,
+            p.CONTENTBLOCKS,
+            p.THUMBNAIL,
+            p.BUSINESSDOC,
+            cg.CTGRID,
+            cg.CTGRNAME,
+            sc.SUBCTGRID,
+            sc.SUBCTGRNAME,
+            c.CREATORNAME,
+            c.BUSINESSNUM,
+            c.EMAIL,
+            c.PHONE
         FROM PROJECT p
         JOIN CREATOR c ON c.CREATORID = p.CREATORID
         JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
@@ -140,27 +158,31 @@
         </selectKey>
 
         INSERT INTO PROJECT (
-            PROJECTID, CREATORID, SUBCTGRID, TITLE, GOALAMOUNT,
-            STARTDATE, ENDDATE, CONTENT, THUMBNAIL, CONTENTBLOCKS
+            PROJECTID, CREATORID, SUBCTGRID, TITLE, GOALAMOUNT, STARTDATE, ENDDATE,
+            CONTENT, CONTENTBLOCKS, THUMBNAIL, BUSINESSDOC
         ) VALUES (
-            #{projectId}, #{creatorId}, #{subctgrId}, #{title}, #{goalAmount},
-            #{startDate}, #{endDate}, #{content}, #{thumbnailUrl}, #{contentBlocks}
+            #{projectId}, #{creatorId}, #{subctgrId}, #{title}, #{goalAmount}, #{startDate}, #{endDate},
+            #{content}, #{contentBlocks}, #{thumbnail}, #{businessDoc}
         )
     </insert>
 
     <update id="updateProject">
         UPDATE PROJECT
         <set>
-            <if test="project.subctgrId != null"> SUBCTGRID = #{project.subctgrId}, </if>
-            <if test="project.title != null"> TITLE = #{project.title}, </if>
-            <if test="project.content != null"> CONTENT = #{project.content}, </if>
-            <if test="project.thumbnail != null"> THUMBNAIL = #{project.thumbnail}, </if>
-            <if test="project.goalAmount != null"> GOALAMOUNT = #{project.goalAmount}, </if>
-            <if test="project.startDate != null"> STARTDATE = #{project.startDate}, </if>
-            <if test="project.endDate != null"> ENDDATE = #{project.endDate}, </if>
+            <if test="subctgrId != null"> SUBCTGRID = #{subctgrId}, </if>
+            <if test="title != null"> TITLE = #{title}, </if>
+            <if test="goalAmount != null"> GOALAMOUNT = #{goalAmount}, </if>
+            <if test="startDate != null"> STARTDATE = #{startDate}, </if>
+            <if test="endDate != null"> ENDDATE = #{endDate}, </if>
+            <if test="content != null"> CONTENT = #{content}, </if>
+            <if test="contentBlocks != null and contentBlocks != ''">
+                CONTENTBLOCKS = #{contentBlocks},
+            </if>
+            <if test="thumbnail != null"> THUMBNAIL = #{thumbnail}, </if>
+            <if test="businessDoc != null"> BUSINESSDOC = #{businessDoc}, </if>
             UPDATEDAT = SYSDATE
         </set>
-        WHERE PROJECTID = #{project.projectId}
+        WHERE PROJECTID = #{projectId}
         AND CREATORID = #{creatorId}
         AND PROJECTSTATUS = 'DRAFT'
     </update>
@@ -201,12 +223,7 @@
     </select>
 
     <select id="getCreatorProfileSummary" resultType="creatorProfileSummaryDto">
-        SELECT
-            CREATORID,
-            CREATORNAME,
-            BUSINESSNUM,
-            EMAIL,
-            PHONE
+        SELECT CREATORNAME, BUSINESSNUM, EMAIL, PHONE
         FROM CREATOR
         WHERE CREATORID = #{creatorId}
     </select>

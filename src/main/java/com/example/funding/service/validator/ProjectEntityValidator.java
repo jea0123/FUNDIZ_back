@@ -85,7 +85,7 @@ public class ProjectEntityValidator {
      * 리워드 검증
      */
     public void validateRewardsFromDb(Long projectId, LocalDate endDate, List<String> errors) {
-        List<Reward> rewards = Optional.ofNullable(rewardMapper.getRewardList(projectId))
+        List<Reward> rewards = Optional.ofNullable(rewardMapper.getRewardListPublic(projectId))
             .orElseGet(Collections::emptyList);
 
         if (rewards.isEmpty()) {

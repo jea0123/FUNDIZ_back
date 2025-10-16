@@ -9,7 +9,7 @@ import java.util.List;
 
 @Mapper
 public interface RewardMapper {
-    List<Reward> getRewardList(@Param("projectId") Long projectId);
+    List<Reward> getRewardListPublic(@Param("projectId") Long projectId);
 
     List<Reward> findByProjectId(@Param("projectId") Long projectId);
 
@@ -19,7 +19,7 @@ public interface RewardMapper {
 
     void deleteRewards(@Param("projectId") Long projectId);
 
-    List<Reward> getCreatorRewardList(@Param("projectId") Long projectId, @Param("creatorId") Long creatorId);
+    List<Reward> getRewardListManage(@Param("projectId") Long projectId, @Param("creatorId") Long creatorId);
 
     Reward findById(@Param("rewardId") Long rewardId);
 

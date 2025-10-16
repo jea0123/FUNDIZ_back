@@ -13,32 +13,22 @@ import java.util.List;
 public class ProjectCreateRequestDto {
     private Long projectId;
     private Long subctgrId;
-    private Long creatorId;
 
     //프로젝트
     private String title;
-    private String content;
-    private String thumbnailUrl;
     private Integer goalAmount;
     private LocalDate startDate;
     private LocalDate endDate;
+    private String content;
+    private String contentBlocks;
+    private String thumbnailUrl;
+    private String businessDocUrl;
 
-    //태그
+    //태그/리워드
     private List<String> tagList;
-
-    //리워드
     private List<RewardCreateRequestDto> rewardList;
-
-    //창작자
-    private String creatorName;
-    private String businessNum;
-    private String email;
-    private String phone;
 
     //파일
     private MultipartFile thumbnail;
     private MultipartFile businessDoc;
-
-    //에디터
-    private String contentBlocks;
 }

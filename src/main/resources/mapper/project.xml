@@ -10,11 +10,9 @@
 
     <select id="findById" resultType="project">
         SELECT
-        PROJECTID, CREATORID, SUBCTGRID, TITLE, GOALAMOUNT, CURRAMOUNT,
-        STARTDATE, ENDDATE, CONTENT, THUMBNAIL, CREATEDAT, UPDATEDAT,
-        PROJECTSTATUS, BACKERCNT, LIKECNT, VIEWCNT, ISVERIFIED,
-        REJECTEDREASON, REQUESTEDAT,
-        CONTENTBLOCKS, BUSINESSDOC
+            projectId, creatorId, subctgrId, title, goalAmount, currAmount, startDate, endDate, content, contentBlocks,
+            thumbnail, businessDoc, TRUNC(createdAt), TRUNC(updatedat), projectStatus, backerCnt, likeCnt, viewCnt,
+            isVerified, requestedAt, rejectedReason
         FROM PROJECT
         WHERE PROJECTID = #{projectId}
     </select>

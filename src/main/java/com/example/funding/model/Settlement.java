@@ -14,7 +14,6 @@ import java.time.LocalDate;
 public class Settlement {
     private Long settlementId;
     private Long projectId;
-    private Long creatorId;
     private Long totalAmount;
     private Long fee;
     private Long settlementAmount;

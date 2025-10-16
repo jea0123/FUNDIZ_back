@@ -80,7 +80,7 @@ public class BackingServiceImpl implements BackingService {
     @Override
     public ResponseEntity<ResponseDto<String>> createBacking(Long userId, BackingRequestDto requestDto) {
         Backing backing = requestDto.getBacking();
-        Shipping shipping = requestDto.getShipping();
+//        Shipping shipping = requestDto.getShipping();
         Payment payment = requestDto.getPayment();
         Address address = requestDto.getAddress();
         List<RewardBackingRequestDto> rewardBacking = requestDto.getRewards();

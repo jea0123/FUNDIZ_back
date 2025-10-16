@@ -12,14 +12,13 @@ import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
 import com.example.funding.dto.response.admin.ProjectVerifyListDto;
 import com.example.funding.dto.response.admin.analytic.*;
+import com.example.funding.enums.NotificationType;
 import com.example.funding.exception.badrequest.ProjectApproveException;
 import com.example.funding.exception.badrequest.ProjectRejectException;
 import com.example.funding.exception.notfound.*;
+import com.example.funding.handler.NotificationPublisher;
 import com.example.funding.mapper.*;
-import com.example.funding.model.Project;
-import com.example.funding.model.Reward;
-import com.example.funding.model.Tag;
-import com.example.funding.model.User;
+import com.example.funding.model.*;
 import com.example.funding.service.AdminService;
 import com.example.funding.service.validator.ProjectTransitionGuard;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +44,9 @@ public class AdminServiceImpl implements AdminService {
     private final RewardMapper rewardMapper;
     private final UserMapper userMapper;
 
+    private final NotificationPublisher notificationPublisher;
     private final ProjectTransitionGuard transitionGuard;
+    private final CreatorMapper creatorMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -225,11 +226,18 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> approveProject(Long projectId) {
-        if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
+        Project existing = projectMapper.findById(projectId);
+        if (existing == null) throw new ProjectNotFoundException();
+
+        Creator existingCreator = creatorMapper.findById(existing.getCreatorId());
+        if (existingCreator == null) throw new CreatorNotFoundException();
+
         // Guard
-        transitionGuard.assertCanApprove(projectId);
+//        transitionGuard.assertCanApprove(projectId);
         if (adminMapper.isApprovable(projectId) == 0) throw new ProjectApproveException();
         adminMapper.approveProject(projectId);
+
+        notificationPublisher.publish(501L, NotificationType.FUNDING_UPCOMING, existing.getTitle(), projectId);
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트가 성공적으로 승인되었습니다.", null));
     }
 
@@ -244,12 +252,17 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> rejectProject(Long projectId, String rejectedReason) {
-        if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
+        Project existing = projectMapper.findById(projectId);
+        if (existing == null) throw new ProjectNotFoundException();
+
+        Creator existingCreator = creatorMapper.findById(existing.getCreatorId());
+        if (existingCreator == null) throw new CreatorNotFoundException();
         // Guard
         transitionGuard.requireVerifying(projectId);
         if (adminMapper.isRejectable(projectId) == 0) throw new ProjectRejectException();
         adminMapper.rejectProject(projectId, rejectedReason);
 
+        notificationPublisher.publish(existingCreator.getUserId(), NotificationType.FUNDING_REJECTED, existing.getTitle(), projectId);
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트가 성공적으로 반려되었습니다.", null));
     }
 

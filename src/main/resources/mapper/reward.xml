@@ -124,4 +124,10 @@
         WHERE REWARDID = #{rewardId}
     </select>
 
+    <select id="getMyPageDetailRewardList" resultType = "com.example.funding.dto.response.backing.userList_detail.MyPageBackingList_reward">
+        SELECT rewardId, price, rewardContent FROM reward
+        WHERE rewardId= #{rewardId}
+
+    </select>
+
 </mapper>

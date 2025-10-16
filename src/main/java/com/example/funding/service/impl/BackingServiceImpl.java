@@ -7,9 +7,11 @@ import com.example.funding.dto.request.reward.RewardBackingRequestDto;
 import com.example.funding.dto.response.address.AddressResponseDto;
 import com.example.funding.dto.response.backing.BackingResponseDto;
 import com.example.funding.dto.response.backing.BackingRewardDto;
+import com.example.funding.dto.response.backing.userList_detail.MyPageBackingListDto;
+import com.example.funding.dto.response.backing.userList_detail.MyPageBackingList_backingDetail;
+import com.example.funding.dto.response.backing.userList_detail.MyPageBackingList_reward;
 import com.example.funding.dto.response.payment.BackingPagePaymentDto;
 import com.example.funding.dto.response.user.BackingDto;
-import com.example.funding.enums.BackingStatus;
 import com.example.funding.exception.notfound.BackingNotFoundException;
 import com.example.funding.exception.notfound.ProjectNotFoundException;
 import com.example.funding.exception.notfound.UserNotFoundException;
@@ -25,6 +27,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Slf4j
@@ -95,18 +99,36 @@ public class BackingServiceImpl implements BackingService {
         backingMapper.addBacking(backing);
 
         Long backingId = backing.getBackingId();
-        System.out.println("backingId 확인" + backingId);
-        BackingDetail detail = requestDto.getBackingDetail();
-        detail.setBackingId(backingId);
-        backingMapper.addBackingDetail(detail);
 
-//        Shipping shipping = requestDto.getShipping();
-//        shipping.setBackingId(backingId);
-//        shippingMapper.addShipping(shipping);
-//
-//        Payment payment = requestDto.getPayment();
-//        payment.setBackingId(backingId);
-//        paymentMapper.addPayment(payment);
+        List<RewardBackingRequestDto> rewards = requestDto.getRewards();
+
+        if(rewards != null && !rewards.isEmpty()){
+            for(RewardBackingRequestDto reward : rewards){
+                BackingDetail detail = new BackingDetail();
+                detail.setBackingId(backingId);
+                detail.setRewardId(reward.getRewardId());
+                detail.setQuantity(reward.getQuantity());
+                detail.setPrice(reward.getPrice());
+                backingMapper.addBackingDetail(detail);
+            }
+
+        }
+        if (rewards != null) {
+            rewards.forEach(r -> System.out.println("  - rewardId: " + r.getRewardId() + ", qty: " + r.getQuantity()));
+        }
+
+//        Long backingId = backing.getBackingId();
+//        System.out.println("backingId 확인" + backingId);
+//        BackingDetail detail = requestDto.getBackingDetail();
+//        detail.setBackingId(backingId);
+//        backingMapper.addBackingDetail(detail);
+
+        //orderId 임의 값 설정
+        String orderId = "ORD-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+
+        payment.setOrderId(orderId);
+        payment.setBackingId(backingId);
+        paymentMapper.addPayment(payment);
         return ResponseEntity.ok(ResponseDto.success(200, "후원 추가 성공", /*"추가!!"*/ null));
     }
 
@@ -160,6 +182,17 @@ public class BackingServiceImpl implements BackingService {
 
         backingMapper.updateBacking(updateDto);
         return ResponseEntity.ok(ResponseDto.success(200, "후원 수정 성공", null));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<List<MyPageBackingListDto>>> getMyPageBackingList(Long userId) {
+        List<MyPageBackingListDto> backings= backingMapper.getBackingList(userId);
+        List<MyPageBackingList_backingDetail> backingDetails = backingMapper.getMyPageDetailBackingList(userId);
+        List<MyPageBackingList_reward> rewards=  rewardMapper.getMyPageDetailRewardList(userId);
+
+        List<MyPageBackingListDto> list = backings.stream().toList();
+
+        return null;
     }
 
 }

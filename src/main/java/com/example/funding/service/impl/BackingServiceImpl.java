@@ -7,9 +7,11 @@ import com.example.funding.dto.request.reward.RewardBackingRequestDto;
 import com.example.funding.dto.response.address.AddressResponseDto;
 import com.example.funding.dto.response.backing.BackingResponseDto;
 import com.example.funding.dto.response.backing.BackingRewardDto;
+import com.example.funding.dto.response.backing.userList_detail.MyPageBackingListDto;
+import com.example.funding.dto.response.backing.userList_detail.MyPageBackingList_backingDetail;
+import com.example.funding.dto.response.backing.userList_detail.MyPageBackingList_reward;
 import com.example.funding.dto.response.payment.BackingPagePaymentDto;
 import com.example.funding.dto.response.user.BackingDto;
-import com.example.funding.enums.BackingStatus;
 import com.example.funding.exception.notfound.BackingNotFoundException;
 import com.example.funding.exception.notfound.ProjectNotFoundException;
 import com.example.funding.exception.notfound.UserNotFoundException;
@@ -104,7 +106,6 @@ public class BackingServiceImpl implements BackingService {
             }
 
         }
-        System.out.println("💬 전달된 리워드 리스트 = " + rewards);
         if (rewards != null) {
             rewards.forEach(r -> System.out.println("  - rewardId: " + r.getRewardId() + ", qty: " + r.getQuantity()));
         }
@@ -175,6 +176,17 @@ public class BackingServiceImpl implements BackingService {
 
         backingMapper.updateBacking(updateDto);
         return ResponseEntity.ok(ResponseDto.success(200, "후원 수정 성공", null));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto<List<MyPageBackingListDto>>> getMyPageBackingList(Long userId) {
+        List<MyPageBackingListDto> backings= backingMapper.getBackingList(userId);
+        List<MyPageBackingList_backingDetail> backingDetails = backingMapper.getMyPageDetailBackingList(userId);
+        List<MyPageBackingList_reward> rewards=  rewardMapper.getMyPageDetailRewardList(userId);
+
+        List<MyPageBackingListDto> list = backings.stream().toList();
+
+        return null;
     }
 
 }

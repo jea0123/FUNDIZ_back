@@ -11,9 +11,9 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class BackingDto {
-    private List<MyPageBackingRewardDto> backingReward;
+    private MyPageBackingRewardDto backingReward;
     private Long price;
     private Long quantity;
-    private List<Backing> backing;
+    private Backing backing;
 
 }

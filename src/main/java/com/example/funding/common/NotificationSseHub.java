@@ -85,6 +85,7 @@ public class NotificationSseHub {
         try {
             String json = objectMapper.writeValueAsString(noti);
             emitter.send(SseEmitter.event().name("NOTIFICATION").data(json));
+            log.info("Sent notification to user {}", noti.getUserId());
         } catch (IOException e) {
             log.debug("SSE 알림 전송 실패 {}: {}", noti.getUserId(), e.getMessage());
             cleanup(noti.getUserId(), emitter);

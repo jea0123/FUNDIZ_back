@@ -2,7 +2,6 @@ package com.example.funding.service.impl;
 
 import com.example.funding.common.NotificationSseHub;
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.request.notification.CreateNotificationRequestDto;
 import com.example.funding.exception.forbidden.AccessDeniedException;
 import com.example.funding.exception.notfound.NotificationNotFoundException;
 import com.example.funding.exception.notfound.UserNotFoundException;
@@ -24,7 +23,6 @@ import java.util.List;
 @Transactional
 public class NotificationServiceImpl implements NotificationService {
 
-    private final NotificationSseHub hub;
     private final NotificationMapper notificationMapper;
     private final UserMapper userMapper;
 
@@ -46,23 +44,6 @@ public class NotificationServiceImpl implements NotificationService {
         if (!notification.getUserId().equals(userId)) throw new AccessDeniedException();
 
         return ResponseEntity.ok(ResponseDto.success(200, "알림 조회 성공", notification));
-    }
-
-    @Override
-    public ResponseEntity<ResponseDto<String>> insertNotification(CreateNotificationRequestDto dto) {
-        Notification noti = Notification.builder()
-                .userId(dto.getUserId())
-                .type(dto.getType())
-                .targetId(dto.getTargetId())
-                .message(dto.getMessage())
-                .isRead('N')
-                .build();
-        notificationMapper.insertNotification(noti);
-        Long notificationId = noti.getNotificationId();
-        Notification notification = notificationMapper.getNotificationById(notificationId);
-        hub.sendToUser(notification);
-
-        return ResponseEntity.ok(ResponseDto.success(201, "알림 생성 성공", dto.getMessage()));
     }
 
     @Override

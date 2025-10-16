@@ -32,7 +32,7 @@
         WHERE INQID = #{inqId}
     </select>
 
-    <select id="item" resultType="inquiry">
+    <select id="findById" resultType="inquiry">
         SELECT * FROM inquiry
         WHERE INQID=#{inqId}
     </select>

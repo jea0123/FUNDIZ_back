@@ -26,4 +26,6 @@ public interface CommunityMapper {
     int createCommunity(Community community);
 
     int existsCommunityById(@Param("cmId") Long cmId);
+
+    Community getCommunityById(@Param("cmId") Long cmId);
 }

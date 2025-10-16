@@ -32,4 +32,5 @@ public class Project {
     private String rejectedReason;
     private LocalDate requestedAt;
     private String contentBlocks;
+    private String businessDoc;
 }

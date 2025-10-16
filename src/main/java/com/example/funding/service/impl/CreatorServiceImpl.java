@@ -191,20 +191,21 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> updateProject(ProjectCreateRequestDto dto, Long creatorId) {
-        Project existing = projectMapper.findById(dto.getProjectId());
-        if (existing == null) throw new ProjectNotFoundException();
-        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
-        if (!existing.getCreatorId().equals(creatorId)) throw new AccessDeniedException();
-
-        // Guard
-        transitionGuard.assertCanUpdate(dto.getProjectId(), creatorId);
-        // Validator
-        List<String> errors = inputValidator.validateProjectUpdate(dto);
-        if (!errors.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.join("; ", errors));
-        }
+//        Project existing = projectMapper.findById(dto.getProjectId());
+//        if (existing == null) throw new ProjectNotFoundException();
+//        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
+//        if (!existing.getCreatorId().equals(creatorId)) throw new AccessDeniedException();
+//
+//        // Guard
+//        transitionGuard.assertCanUpdate(dto.getProjectId(), creatorId);
+//        // Validator
+//        List<String> errors = inputValidator.validateProjectUpdate(dto);
+//        if (!errors.isEmpty()) {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.join("; ", errors));
+//        }
 
         Project project = Project.builder()
+                .creatorId(creatorId)
                 .projectId(dto.getProjectId())
                 .subctgrId(dto.getSubctgrId())
                 .title(dto.getTitle())
@@ -217,7 +218,7 @@ public class CreatorServiceImpl implements CreatorService {
                 .businessDoc(dto.getBusinessDocUrl())
                 .build();
 
-        creatorMapper.updateProject(creatorId, project);
+        creatorMapper.updateProject(project);
 
         // 태그 전체 삭제 후 저장
         tagMapper.deleteTags(dto.getProjectId());
@@ -243,12 +244,12 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> deleteProject(Long projectId, Long creatorId) {
-        Project existing = projectMapper.findById(projectId);
-        if (existing == null) throw new ProjectNotFoundException();
-        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
-        if (!existing.getCreatorId().equals(creatorId)) throw new AccessDeniedException();
-        // Guard
-        transitionGuard.assertCanDelete(projectId, creatorId);
+//        Project existing = projectMapper.findById(projectId);
+//        if (existing == null) throw new ProjectNotFoundException();
+//        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
+//        if (!existing.getCreatorId().equals(creatorId)) throw new AccessDeniedException();
+//        // Guard
+//        transitionGuard.assertCanDelete(projectId, creatorId);
 
         rewardMapper.deleteRewards(projectId);
         tagMapper.deleteTags(projectId);

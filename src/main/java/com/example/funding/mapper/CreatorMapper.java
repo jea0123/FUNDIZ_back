@@ -23,7 +23,7 @@ public interface CreatorMapper {
 
     int saveProject(Project project);
 
-    void updateProject(@Param("creatorId") Long creatorId, @Param("project") Project project);
+    void updateProject(Project project);
 
     void deleteProject(@Param("projectId") Long projectId);
 

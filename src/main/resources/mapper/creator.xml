@@ -129,11 +129,13 @@
             p.PROJECTID,
             p.CREATORID,
             p.TITLE,
-            p.CONTENT,
-            p.THUMBNAIL,
             p.GOALAMOUNT,
             p.STARTDATE,
             p.ENDDATE,
+            p.CONTENT,
+            p.CONTENTBLOCKS,
+            p.THUMBNAIL,
+            p.BUSINESSDOC,
             cg.CTGRID,
             cg.CTGRNAME,
             sc.SUBCTGRID,
@@ -167,18 +169,20 @@
     <update id="updateProject">
         UPDATE PROJECT
         <set>
-            <if test="project.subctgrId != null"> SUBCTGRID = #{project.subctgrId}, </if>
-            <if test="project.title != null"> TITLE = #{project.title}, </if>
-            <if test="project.content != null"> CONTENT = #{project.content}, </if>
-            <if test="project.contentBlocks != null">CONTENTBLOCKS = #{contentBlocks},</if>
-            <if test="project.goalAmount != null"> GOALAMOUNT = #{project.goalAmount}, </if>
-            <if test="project.startDate != null"> STARTDATE = #{project.startDate}, </if>
-            <if test="project.endDate != null"> ENDDATE = #{project.endDate}, </if>
-            <if test="project.thumbnailUrl != null"> THUMBNAIL = #{project.thumbnail}, </if>
-            <if test="project.businessDocUrl != null"> BUSINESSDOC = #{project.businessDoc}, </if>
+            <if test="subctgrId != null"> SUBCTGRID = #{subctgrId}, </if>
+            <if test="title != null"> TITLE = #{title}, </if>
+            <if test="goalAmount != null"> GOALAMOUNT = #{goalAmount}, </if>
+            <if test="startDate != null"> STARTDATE = #{startDate}, </if>
+            <if test="endDate != null"> ENDDATE = #{endDate}, </if>
+            <if test="content != null"> CONTENT = #{content}, </if>
+            <if test="contentBlocks != null and contentBlocks != ''">
+                CONTENTBLOCKS = #{contentBlocks},
+            </if>
+            <if test="thumbnail != null"> THUMBNAIL = #{thumbnail}, </if>
+            <if test="businessDoc != null"> BUSINESSDOC = #{businessDoc}, </if>
             UPDATEDAT = SYSDATE
         </set>
-        WHERE PROJECTID = #{project.projectId}
+        WHERE PROJECTID = #{projectId}
         AND CREATORID = #{creatorId}
         AND PROJECTSTATUS = 'DRAFT'
     </update>

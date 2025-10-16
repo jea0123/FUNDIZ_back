@@ -21,4 +21,6 @@ public interface InquiryMapper {
     void addInquiry(Inquiry item);
 
     int existsInquiryById(@Param("inqId") Long inqId);
+
+    Inquiry findById(@Param("inqId") Long inqId);
 }

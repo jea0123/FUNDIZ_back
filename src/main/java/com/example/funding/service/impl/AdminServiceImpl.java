@@ -233,11 +233,11 @@ public class AdminServiceImpl implements AdminService {
         if (existingCreator == null) throw new CreatorNotFoundException();
 
         // Guard
-//        transitionGuard.assertCanApprove(projectId);
+        transitionGuard.assertCanApprove(projectId);
         if (adminMapper.isApprovable(projectId) == 0) throw new ProjectApproveException();
         adminMapper.approveProject(projectId);
 
-        notificationPublisher.publish(501L, NotificationType.FUNDING_UPCOMING, existing.getTitle(), projectId);
+        notificationPublisher.publish(existingCreator.getUserId(), NotificationType.FUNDING_UPCOMING, existing.getTitle(), projectId);
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트가 성공적으로 승인되었습니다.", null));
     }
 

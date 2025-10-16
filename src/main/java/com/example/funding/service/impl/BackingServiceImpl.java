@@ -12,6 +12,7 @@ import com.example.funding.dto.response.user.BackingDto;
 import com.example.funding.exception.notfound.BackingNotFoundException;
 import com.example.funding.exception.notfound.ProjectNotFoundException;
 import com.example.funding.exception.notfound.UserNotFoundException;
+import com.example.funding.handler.NotificationPublisher;
 import com.example.funding.mapper.*;
 import com.example.funding.model.*;
 import com.example.funding.service.BackingService;
@@ -37,6 +38,8 @@ public class BackingServiceImpl implements BackingService {
     private final RewardMapper rewardMapper;
     private final CreatorMapper creatorMapper;
     private final PaymentMapper paymentMapper;
+
+    private final NotificationPublisher notificationPublisher;
 
     @Override
     public ResponseEntity<ResponseDto<BackingResponseDto>> prepareBacking(Long userId, Long projectId) {

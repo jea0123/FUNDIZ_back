@@ -12,6 +12,7 @@ public enum NotificationType {
     FUNDING_SUCCESS("축하합니다! '{title}' 펀딩이 성공적으로 완료되었습니다."),
     FUNDING_FAILURE("안타깝게도 '{title}' 펀딩이 목표 금액에 도달하지 못했습니다."),
     FUNDING_SETTLED("'{title}' 펀딩이 성공적으로 정산되었습니다."),
+    FUNDING_SETTLED_CANCELLED("'{title}' 펀딩 정산이 취소되었습니다."),
     SHIPPING_SENT("좋은 소식입니다! '{title}' 리워드가 발송되었습니다."),
     SHIPPING_DELIVERED("'{title}' 리워드가 성공적으로 배송되었습니다."),
     BACKING_SUCCESS("펀딩 참여가 성공적으로 완료되었습니다: '{title}'"),

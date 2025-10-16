@@ -4,7 +4,9 @@ import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.cs.RpAddRequestDto;
+import com.example.funding.enums.NotificationType;
 import com.example.funding.exception.notfound.UserNotFoundException;
+import com.example.funding.handler.NotificationPublisher;
 import com.example.funding.mapper.ReportMapper;
 import com.example.funding.mapper.UserMapper;
 import com.example.funding.model.Report;
@@ -25,6 +27,8 @@ public class ReportServiceImpl implements ReportService {
 
     private final ReportMapper reportMapper;
     private final UserMapper userMapper;
+
+    private final NotificationPublisher notificationPublisher;
 
     /**
      * <p>신고 내역 목록 조회(관리자 기준)</p>
@@ -87,6 +91,7 @@ public class ReportServiceImpl implements ReportService {
                 .build();
 
         reportMapper.addReport(item);
+        notificationPublisher.publish(userId, NotificationType.REPORT_RECEIVED, null, item.getReportId());
         return ResponseEntity.ok(ResponseDto.success(200, "신고 등록 성공", "데이터 출력확인"));
     }
 }

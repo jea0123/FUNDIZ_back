@@ -21,7 +21,7 @@ public interface CreatorMapper {
 
     List<CreatorProjectListDto> getProjectList(@Param("creatorId") Long creatorId, @Param("dto") SearchCreatorProjectDto dto, @Param("pager") Pager pager);
 
-    int saveProject(ProjectCreateRequestDto dto);
+    int saveProject(Project project);
 
     void updateProject(@Param("creatorId") Long creatorId, @Param("project") Project project);
 

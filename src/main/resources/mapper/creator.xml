@@ -140,11 +140,11 @@
         </selectKey>
 
         INSERT INTO PROJECT (
-            PROJECTID, CREATORID, SUBCTGRID, TITLE, GOALAMOUNT,
-            STARTDATE, ENDDATE, CONTENT, THUMBNAIL, CONTENTBLOCKS
+            PROJECTID, CREATORID, SUBCTGRID, TITLE, GOALAMOUNT, STARTDATE, ENDDATE,
+            CONTENT, CONTENTBLOCKS, THUMBNAIL, BUSINESSDOC
         ) VALUES (
-            #{projectId}, #{creatorId}, #{subctgrId}, #{title}, #{goalAmount},
-            #{startDate}, #{endDate}, #{content}, #{thumbnailUrl}, #{contentBlocks}
+            #{projectId}, #{creatorId}, #{subctgrId}, #{title}, #{goalAmount}, #{startDate}, #{endDate},
+            #{content}, #{contentBlocks}, #{thumbnail}, #{businessDoc}
         )
     </insert>
 
@@ -154,10 +154,12 @@
             <if test="project.subctgrId != null"> SUBCTGRID = #{project.subctgrId}, </if>
             <if test="project.title != null"> TITLE = #{project.title}, </if>
             <if test="project.content != null"> CONTENT = #{project.content}, </if>
-            <if test="project.thumbnail != null"> THUMBNAIL = #{project.thumbnail}, </if>
+            <if test="project.contentBlocks != null">CONTENTBLOCKS = #{contentBlocks},</if>
             <if test="project.goalAmount != null"> GOALAMOUNT = #{project.goalAmount}, </if>
             <if test="project.startDate != null"> STARTDATE = #{project.startDate}, </if>
             <if test="project.endDate != null"> ENDDATE = #{project.endDate}, </if>
+            <if test="project.thumbnailUrl != null"> THUMBNAIL = #{project.thumbnail}, </if>
+            <if test="project.businessDocUrl != null"> BUSINESSDOC = #{project.businessDoc}, </if>
             UPDATEDAT = SYSDATE
         </set>
         WHERE PROJECTID = #{project.projectId}
@@ -201,12 +203,7 @@
     </select>
 
     <select id="getCreatorProfileSummary" resultType="creatorProfileSummaryDto">
-        SELECT
-            CREATORID,
-            CREATORNAME,
-            BUSINESSNUM,
-            EMAIL,
-            PHONE
+        SELECT CREATORNAME, BUSINESSNUM, EMAIL, PHONE
         FROM CREATOR
         WHERE CREATORID = #{creatorId}
     </select>

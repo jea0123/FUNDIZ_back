@@ -22,7 +22,6 @@ import com.example.funding.exception.notfound.UserNotFoundException;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
-import com.example.funding.model.Shipping;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.RewardService;
 import com.example.funding.service.validator.ProjectInputValidator;
@@ -131,7 +130,7 @@ public class CreatorServiceImpl implements CreatorService {
     /**
      * <p>프로젝트 생성</p>
      *
-     * @param dto       ProjectCreateRequestDto
+     * @param dto ProjectCreateRequestDto
      * @param creatorId 사용자 ID
      * @return 성공 시 200 OK
      * @author 조은애
@@ -139,8 +138,6 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> createProject(ProjectCreateRequestDto dto, Long creatorId) {
-        dto.setCreatorId(creatorId);
-
         // Guard
 //        transitionGuard.assertCanCreate(creatorId);
 
@@ -151,7 +148,20 @@ public class CreatorServiceImpl implements CreatorService {
 //        }
 
         // 프로젝트 생성
-        int result = creatorMapper.saveProject(dto);
+        Project project = Project.builder()
+            .creatorId(creatorId)
+            .subctgrId(dto.getSubctgrId())
+            .title(dto.getTitle())
+            .goalAmount(dto.getGoalAmount())
+            .startDate(dto.getStartDate())
+            .endDate(dto.getEndDate())
+            .content(dto.getContent())
+            .contentBlocks(dto.getContentBlocks())
+            .thumbnail(dto.getThumbnailUrl())
+            .businessDoc(dto.getBusinessDocUrl())
+            .build();
+
+        int result = creatorMapper.saveProject(project);
         if (result == 0) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "프로젝트 생성 실패");
         }
@@ -159,12 +169,12 @@ public class CreatorServiceImpl implements CreatorService {
         // 태그 저장
         List<String> normalized = normalizeTags(dto.getTagList());
         for (String tagName : normalized) {
-            tagMapper.saveTag(dto.getProjectId(), tagName);
+            tagMapper.saveTag(project.getProjectId(), tagName);
         }
 
         // 리워드 생성
         if (dto.getRewardList() != null && !dto.getRewardList().isEmpty()) {
-            rewardService.createReward(dto.getProjectId(), dto.getRewardList(), dto.getEndDate(), true);
+            rewardService.createReward(project.getProjectId(), dto.getRewardList(), dto.getEndDate(), true);
         }
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 생성 성공", null));
@@ -185,7 +195,7 @@ public class CreatorServiceImpl implements CreatorService {
         if (existing == null) throw new ProjectNotFoundException();
         if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
         if (!existing.getCreatorId().equals(creatorId)) throw new AccessDeniedException();
-        dto.setCreatorId(creatorId);
+
         // Guard
         transitionGuard.assertCanUpdate(dto.getProjectId(), creatorId);
         // Validator
@@ -198,11 +208,13 @@ public class CreatorServiceImpl implements CreatorService {
                 .projectId(dto.getProjectId())
                 .subctgrId(dto.getSubctgrId())
                 .title(dto.getTitle())
-                .content(dto.getContent())
-                .thumbnail(dto.getThumbnailUrl())
                 .goalAmount(dto.getGoalAmount())
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
+                .content(dto.getContent())
+                .contentBlocks(dto.getContentBlocks())
+                .thumbnail(dto.getThumbnailUrl())
+                .businessDoc(dto.getBusinessDocUrl())
                 .build();
 
         creatorMapper.updateProject(creatorId, project);
@@ -304,7 +316,6 @@ public class CreatorServiceImpl implements CreatorService {
      * <li>사업자번호</li>
      * <li>이메일</li>
      * <li>전화번호</li>
-     * <li>정지 여부</li>
      *
      * @param creatorId 창작자 ID
      * @return 성공 시 200 Ok
@@ -314,19 +325,10 @@ public class CreatorServiceImpl implements CreatorService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CreatorProfileSummaryDto>> getCreatorProfileSummary(Long creatorId) {
-        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
         // Guard
         transitionGuard.ensureCreatorExistsOrThrow(creatorId);
 
-        boolean isComplete = creatorMapper.hasRequiredCreatorProfile(creatorId) == 1;
-        boolean isSuspended = userMapper.suspendedCreator(creatorId) == 1;
-
         CreatorProfileSummaryDto summary = creatorMapper.getCreatorProfileSummary(creatorId);
-        if (summary == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "창작자 프로필을 찾을 수 없습니다.");
-        }
-        summary.setIsComplete(isComplete);
-        summary.setIsSuspended(isSuspended);
 
         return ResponseEntity.ok(ResponseDto.success(200, "창작자 프로필 조회 성공", summary));
     }

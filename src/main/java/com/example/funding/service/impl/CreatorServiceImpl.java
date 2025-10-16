@@ -122,7 +122,7 @@ public class CreatorServiceImpl implements CreatorService {
 
         CreatorProjectDetailDto dto = creatorMapper.getProjectDetail(projectId, creatorId);
         dto.setTagList(tagMapper.getTagList(projectId));
-        dto.setRewardList(rewardMapper.getRewardList(projectId));
+        dto.setRewardList(rewardMapper.getRewardListPublic(projectId)); //TODO: getProjectRewardsManage
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 상세 조회 성공", dto));
     }

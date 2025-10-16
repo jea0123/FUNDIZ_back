@@ -141,7 +141,7 @@ public class RewardServiceImpl implements RewardService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<Reward>>> getCreatorRewardList(Long projectId, Long creatorId) {
+    public ResponseEntity<ResponseDto<List<Reward>>> getRewardListManage(Long projectId, Long creatorId) {
         if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
         Project existingProject = projectMapper.findById(projectId);
         if (existingProject == null) throw new ProjectNotFoundException();
@@ -149,7 +149,7 @@ public class RewardServiceImpl implements RewardService {
         // Guard
         transitionGuard.ensureProjectOwner(projectId, creatorId);
 
-        List<Reward> rewardList = rewardMapper.getCreatorRewardList(projectId, creatorId);
+        List<Reward> rewardList = rewardMapper.getRewardListManage(projectId, creatorId);
 
         return ResponseEntity.ok(ResponseDto.success(200, "창작자 리워드 목록 조회 성공", rewardList));
     }

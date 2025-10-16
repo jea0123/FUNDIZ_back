@@ -56,7 +56,7 @@ public class BackingServiceImpl implements BackingService {
         if (project == null) throw new ProjectNotFoundException();
 
         List<AddressResponseDto> addressList = addressMapper.getAddressList(userId);
-        List<Reward> rewardList = rewardMapper.getRewardList(projectId);
+        List<Reward> rewardList = rewardMapper.getRewardListPublic(projectId);
         Creator creator = creatorMapper.findById(project.getCreatorId());
         List<BackingPagePaymentDto> backingPagePayment = paymentMapper.backingPagePayment(userId);
 

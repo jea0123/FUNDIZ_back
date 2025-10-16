@@ -219,9 +219,9 @@ public class CreatorController {
      * @since 2025-10-08
      */
     @GetMapping("/projects/{projectId}/reward")
-    public ResponseEntity<ResponseDto<List<Reward>>> getCreatorRewardList(@PathVariable Long projectId,
+    public ResponseEntity<ResponseDto<List<Reward>>> getRewardListManage(@PathVariable Long projectId,
                                                                           @RequestAttribute Long creatorId) {
-        return rewardService.getCreatorRewardList(projectId, creatorId);
+        return rewardService.getRewardListManage(projectId, creatorId);
     }
 
     /**

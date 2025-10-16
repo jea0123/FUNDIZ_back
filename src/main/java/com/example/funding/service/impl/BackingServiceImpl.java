@@ -9,6 +9,7 @@ import com.example.funding.dto.response.backing.BackingResponseDto;
 import com.example.funding.dto.response.backing.BackingRewardDto;
 import com.example.funding.dto.response.payment.BackingPagePaymentDto;
 import com.example.funding.dto.response.user.BackingDto;
+import com.example.funding.enums.BackingStatus;
 import com.example.funding.exception.notfound.BackingNotFoundException;
 import com.example.funding.exception.notfound.ProjectNotFoundException;
 import com.example.funding.exception.notfound.UserNotFoundException;
@@ -38,6 +39,7 @@ public class BackingServiceImpl implements BackingService {
     private final RewardMapper rewardMapper;
     private final CreatorMapper creatorMapper;
     private final PaymentMapper paymentMapper;
+    private final ShippingMapper shippingMapper;
 
     private final NotificationPublisher notificationPublisher;
 
@@ -81,9 +83,9 @@ public class BackingServiceImpl implements BackingService {
 
     //TODO : 후원 하기 (생성)
     @Override
+    @Transactional
     public ResponseEntity<ResponseDto<String>> createBacking(Long userId, BackingRequestDto requestDto) {
         Backing backing = requestDto.getBacking();
-//        Shipping shipping = requestDto.getShipping();
         Payment payment = requestDto.getPayment();
         Address address = requestDto.getAddress();
         List<RewardBackingRequestDto> rewardBacking = requestDto.getRewards();
@@ -92,7 +94,19 @@ public class BackingServiceImpl implements BackingService {
         backing.setCreatedAt(LocalDate.now());
         backingMapper.addBacking(backing);
 
+        Long backingId = backing.getBackingId();
+        System.out.println("backingId 확인" + backingId);
+        BackingDetail detail = requestDto.getBackingDetail();
+        detail.setBackingId(backingId);
+        backingMapper.addBackingDetail(detail);
 
+//        Shipping shipping = requestDto.getShipping();
+//        shipping.setBackingId(backingId);
+//        shippingMapper.addShipping(shipping);
+//
+//        Payment payment = requestDto.getPayment();
+//        payment.setBackingId(backingId);
+//        paymentMapper.addPayment(payment);
         return ResponseEntity.ok(ResponseDto.success(200, "후원 추가 성공", /*"추가!!"*/ null));
     }
 

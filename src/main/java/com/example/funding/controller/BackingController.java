@@ -5,6 +5,7 @@ import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.backing.BackingRequestDto;
 import com.example.funding.dto.request.backing.BackingRequestUpdateDto;
 import com.example.funding.dto.response.backing.BackingResponseDto;
+import com.example.funding.dto.response.backing.userList_detail.MyPageBackingDetailDto;
 import com.example.funding.dto.response.backing.userList_detail.MyPageBackingListDto;
 import com.example.funding.dto.response.user.BackingDto;
 import com.example.funding.service.BackingService;
@@ -54,8 +55,13 @@ public class BackingController {
     }
 
     @GetMapping("/myPageBackingList/{userId}")
-    public ResponseEntity<ResponseDto<List<MyPageBackingListDto>>>geMyPagetBackingList(@PathVariable Long userId) {
+    public ResponseEntity<ResponseDto<List<MyPageBackingListDto>>>geMyPageBackingList(@PathVariable Long userId) {
         return backingService.getMyPageBackingList(userId);
+    }
+
+    @GetMapping("/myPageBackingDetail/{userId}")
+    public ResponseEntity<ResponseDto<List<MyPageBackingDetailDto>>>geMyPageBackingDetail(@PathVariable Long userId) {
+        return backingService.getMyPageBackingDetail(userId);
     }
 
 }

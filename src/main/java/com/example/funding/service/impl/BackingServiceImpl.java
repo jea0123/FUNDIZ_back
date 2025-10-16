@@ -7,9 +7,9 @@ import com.example.funding.dto.request.reward.RewardBackingRequestDto;
 import com.example.funding.dto.response.address.AddressResponseDto;
 import com.example.funding.dto.response.backing.BackingResponseDto;
 import com.example.funding.dto.response.backing.BackingRewardDto;
+import com.example.funding.dto.response.backing.userList_detail.MyPageBackingDetailDto;
 import com.example.funding.dto.response.backing.userList_detail.MyPageBackingListDto;
-import com.example.funding.dto.response.backing.userList_detail.MyPageBackingList_backingDetail;
-import com.example.funding.dto.response.backing.userList_detail.MyPageBackingList_reward;
+import com.example.funding.dto.response.backing.userList_detail.MyPageBacking_RewardDto;
 import com.example.funding.dto.response.payment.BackingPagePaymentDto;
 import com.example.funding.dto.response.user.BackingDto;
 import com.example.funding.exception.notfound.BackingNotFoundException;
@@ -92,18 +92,18 @@ public class BackingServiceImpl implements BackingService {
         Backing backing = requestDto.getBacking();
         Payment payment = requestDto.getPayment();
         Address address = requestDto.getAddress();
-        List<RewardBackingRequestDto> rewardBacking = requestDto.getRewards();
+        List<RewardBackingRequestDto> rewards = requestDto.getRewards();
 
+        //backing
         backing.setUserId(userId);
         backing.setCreatedAt(LocalDate.now());
         backingMapper.addBacking(backing);
 
         Long backingId = backing.getBackingId();
 
-        List<RewardBackingRequestDto> rewards = requestDto.getRewards();
-
-        if(rewards != null && !rewards.isEmpty()){
-            for(RewardBackingRequestDto reward : rewards){
+        // backingDetail
+        if (rewards != null && !rewards.isEmpty()) {
+            for (RewardBackingRequestDto reward : rewards) {
                 BackingDetail detail = new BackingDetail();
                 detail.setBackingId(backingId);
                 detail.setRewardId(reward.getRewardId());
@@ -111,25 +111,36 @@ public class BackingServiceImpl implements BackingService {
                 detail.setPrice(reward.getPrice());
                 backingMapper.addBackingDetail(detail);
             }
-
-        }
-        if (rewards != null) {
             rewards.forEach(r -> System.out.println("  - rewardId: " + r.getRewardId() + ", qty: " + r.getQuantity()));
         }
 
-//        Long backingId = backing.getBackingId();
-//        System.out.println("backingId 확인" + backingId);
-//        BackingDetail detail = requestDto.getBackingDetail();
-//        detail.setBackingId(backingId);
-//        backingMapper.addBackingDetail(detail);
-
-        //orderId 임의 값 설정
+        //payment
         String orderId = "ORD-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-
         payment.setOrderId(orderId);
         payment.setBackingId(backingId);
         paymentMapper.addPayment(payment);
-        return ResponseEntity.ok(ResponseDto.success(200, "후원 추가 성공", /*"추가!!"*/ null));
+
+        //TODO: address새로 생성시 로직추가 ,address 선택시 해당 address 만 연결
+        // 신규 주소 직접 입력한 경우
+        Long addrId;
+        if (address != null && address.getAddrId() != null) {
+            // 기존 주소 선택한 경우 
+            addrId = address.getAddrId();
+        } else {
+            
+        }
+
+
+
+        // insert (shipping직접 생성)
+        if (address != null) {
+            Shipping shipping = new Shipping();
+            shipping.setBackingId(backingId);
+            shipping.setAddrId(address.getAddrId());
+            shippingMapper.addShipping(shipping);
+        }
+
+        return ResponseEntity.ok(ResponseDto.success(200, "후원 추가 성공", null));
     }
 
     /**
@@ -185,14 +196,82 @@ public class BackingServiceImpl implements BackingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<MyPageBackingListDto>>> getMyPageBackingList(Long userId) {
-        List<MyPageBackingListDto> backings= backingMapper.getBackingList(userId);
-        List<MyPageBackingList_backingDetail> backingDetails = backingMapper.getMyPageDetailBackingList(userId);
-        List<MyPageBackingList_reward> rewards=  rewardMapper.getMyPageDetailRewardList(userId);
 
-        List<MyPageBackingListDto> list = backings.stream().toList();
+        List<MyPageBackingListDto> backingList = backingMapper.getBackingList(userId);
 
-        return null;
+        List<MyPageBacking_RewardDto> rewardLists = rewardMapper.getMyPageDetailRewardList(userId);
+
+        List<MyPageBackingListDto> result = backingList.stream()
+                .map(project -> {
+                    List<MyPageBacking_RewardDto> rewardList = rewardLists.stream()
+                            .filter(reward -> reward.getBackingId().equals(project.getBackingId()))
+                            .toList();
+
+                    return MyPageBackingListDto.builder()
+                            .projectId(project.getProjectId())
+                            .title(project.getTitle())
+                            .goalAmount(project.getGoalAmount())
+                            .currAmount(project.getCurrAmount())
+                            .endDate(project.getEndDate())
+                            .thumbnail(project.getThumbnail())
+                            .userId(project.getUserId())
+                            .backingId(project.getBackingId())
+                            .amount(project.getAmount())
+                            .createdAt(project.getCreatedAt())
+                            .backingStatus(project.getBackingStatus())
+                            .shippingStatus(project.getShippingStatus())
+                            .creatorName(project.getCreatorName())
+                            .mpBackingList(rewardList)
+                            .build();
+                })
+                .toList();
+
+        return ResponseEntity.ok(ResponseDto.success(200, "후원 내역 조회 성공", result));
     }
+
+    @Override
+    public ResponseEntity<ResponseDto<List<MyPageBackingDetailDto>>> getMyPageBackingDetail(Long userId) {
+
+        List<MyPageBackingDetailDto> backingList = backingMapper.getBackingDetail(userId);
+
+        List<MyPageBacking_RewardDto> rewardLists = rewardMapper.getMyPageDetailRewardList(userId);
+
+        List<MyPageBackingDetailDto> result = backingList.stream()
+                .map(project -> {
+                    List<MyPageBacking_RewardDto> rewardList = rewardLists.stream()
+                            .filter(reward -> reward.getBackingId().equals(project.getBackingId()))
+                            .toList();
+
+                    return MyPageBackingDetailDto.builder()
+                            .amount(project.getAmount())
+                            .createdAt(project.getCreatedAt())
+                            .backingStatus(project.getBackingStatus())
+                            .method(project.getMethod())
+                            .cardCompany(project.getCardCompany())
+                            .shippingStatus(project.getShippingStatus())
+                            .trackingNum(project.getTrackingNum())
+                            .shippedAt(project.getShippedAt())
+                            .deliveredAt(project.getDeliveredAt())
+                            .title(project.getTitle())
+                            .thumbnail(project.getThumbnail())
+                            .userId(project.getUserId())
+                            .backingId(project.getBackingId())
+                            .addrName(project.getAddrName())
+                            .recipient(project.getRecipient())
+                            .postalCode(project.getPostalCode())
+                            .roadAddr(project.getRoadAddr())
+                            .detailAddr(project.getDetailAddr())
+                            .recipientPhone(project.getRecipientPhone())
+                            .creatorName(project.getCreatorName())
+                            .rewards(rewardList)
+                            .build();
+                })
+                .toList();
+
+        return ResponseEntity.ok(ResponseDto.success(200, "후원 내역 상세 조회 성공", result));
+    }
+
 
 }

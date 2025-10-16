@@ -1,6 +1,6 @@
 package com.example.funding.mapper;
 
-import com.example.funding.dto.response.backing.userList_detail.MyPageBackingList_reward;
+import com.example.funding.dto.response.backing.userList_detail.MyPageBacking_RewardDto;
 import com.example.funding.model.Reward;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -23,5 +23,9 @@ public interface RewardMapper {
 
     Reward findById(@Param("rewardId") Long rewardId);
 
-    List<MyPageBackingList_reward>getMyPageDetailRewardList (Long rewardId);
+    List<MyPageBacking_RewardDto> getMyPageDetailRewardList(@Param("backingId") Long backingId);
+
+    List<MyPageBacking_RewardDto> getMyPageDetailRewardDetail(@Param("backingId") Long backingId);
+
+
 }

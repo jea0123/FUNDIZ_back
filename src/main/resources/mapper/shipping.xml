@@ -63,12 +63,13 @@
         #{shippingId},
         #{backingId},
         #{addrId},
-        #{shippingStatus},
+        NVL(#{shippingStatus}, 'PENDING'),
         #{trackingNum},
         #{shippedAt, jdbcType=DATE},
         #{deliveredAt, jdbcType=DATE}
         )
     </insert>
+
 
     <update id ="updateShippingStatus" >
         UPDATE shipping s

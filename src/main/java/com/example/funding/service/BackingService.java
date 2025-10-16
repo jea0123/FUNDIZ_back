@@ -4,6 +4,7 @@ import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.backing.BackingRequestDto;
 import com.example.funding.dto.request.backing.BackingRequestUpdateDto;
 import com.example.funding.dto.response.backing.BackingResponseDto;
+import com.example.funding.dto.response.backing.userList_detail.MyPageBackingDetailDto;
 import com.example.funding.dto.response.backing.userList_detail.MyPageBackingListDto;
 import com.example.funding.dto.response.user.BackingDto;
 import org.springframework.http.ResponseEntity;
@@ -22,4 +23,6 @@ public interface BackingService {
     ResponseEntity<ResponseDto<String>> updateBacking(BackingRequestUpdateDto requestDto, Long backingId, Long userId);
 
     ResponseEntity<ResponseDto<List<MyPageBackingListDto>>> getMyPageBackingList(Long userId);
+
+    ResponseEntity<ResponseDto<List<MyPageBackingDetailDto>>> getMyPageBackingDetail(Long userId);
 }

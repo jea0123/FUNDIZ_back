@@ -125,7 +125,23 @@
     </select>
 
     <select id="getProjectDetail" resultType="creatorProjectDetailDto">
-        SELECT p.*, c.*, sc.*, cg.*
+        SELECT
+            p.PROJECTID,
+            p.CREATORID,
+            p.TITLE,
+            p.CONTENT,
+            p.THUMBNAIL,
+            p.GOALAMOUNT,
+            p.STARTDATE,
+            p.ENDDATE,
+            cg.CTGRID,
+            cg.CTGRNAME,
+            sc.SUBCTGRID,
+            sc.SUBCTGRNAME,
+            c.CREATORNAME,
+            c.BUSINESSNUM,
+            c.EMAIL,
+            c.PHONE
         FROM PROJECT p
         JOIN CREATOR c ON c.CREATORID = p.CREATORID
         JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID

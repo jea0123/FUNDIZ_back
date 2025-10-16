@@ -15,6 +15,7 @@ import com.example.funding.dto.response.user.BackingDto;
 import com.example.funding.exception.notfound.BackingNotFoundException;
 import com.example.funding.exception.notfound.ProjectNotFoundException;
 import com.example.funding.exception.notfound.UserNotFoundException;
+import com.example.funding.handler.NotificationPublisher;
 import com.example.funding.mapper.*;
 import com.example.funding.model.*;
 import com.example.funding.service.BackingService;
@@ -43,6 +44,8 @@ public class BackingServiceImpl implements BackingService {
     private final CreatorMapper creatorMapper;
     private final PaymentMapper paymentMapper;
     private final ShippingMapper shippingMapper;
+
+    private final NotificationPublisher notificationPublisher;
 
     @Override
     public ResponseEntity<ResponseDto<BackingResponseDto>> prepareBacking(Long userId, Long projectId) {
@@ -87,6 +90,10 @@ public class BackingServiceImpl implements BackingService {
     @Transactional
     public ResponseEntity<ResponseDto<String>> createBacking(Long userId, BackingRequestDto requestDto) {
         Backing backing = requestDto.getBacking();
+        Payment payment = requestDto.getPayment();
+        Address address = requestDto.getAddress();
+        List<RewardBackingRequestDto> rewardBacking = requestDto.getRewards();
+
         backing.setUserId(userId);
         backing.setCreatedAt(LocalDate.now());
         backingMapper.addBacking(backing);
@@ -119,7 +126,6 @@ public class BackingServiceImpl implements BackingService {
         //orderId 임의 값 설정
         String orderId = "ORD-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
 
-        Payment payment = requestDto.getPayment();
         payment.setOrderId(orderId);
         payment.setBackingId(backingId);
         paymentMapper.addPayment(payment);

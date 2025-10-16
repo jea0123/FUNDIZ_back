@@ -301,6 +301,13 @@
         <include refid="searchFilterWhere" />
     </select>
 
+    <select id="getProjectToOpen" resultType="project">
+        SELECT *
+        FROM PROJECT
+        WHERE PROJECTSTATUS = 'UPCOMING'
+          AND STARTDATE <![CDATA[ <= ]]> TRUNC(SYSDATE)
+    </select>
+
     <update id="updateProjectsToOpen">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'OPEN',
@@ -308,6 +315,14 @@
         WHERE PROJECTSTATUS = 'UPCOMING'
           AND STARTDATE <![CDATA[ <= ]]> TRUNC(SYSDATE)
     </update>
+
+    <select id="getProjectToSuccess" resultType="project">
+        SELECT *
+        FROM PROJECT
+        WHERE PROJECTSTATUS = 'OPEN'
+          AND (ENDDATE + 1) <![CDATA[ < ]]> TRUNC(SYSDATE)
+          AND CURRAMOUNT <![CDATA[ >= ]]> GOALAMOUNT
+    </select>
 
     <update id="updateProjectsToSuccess">
         UPDATE PROJECT
@@ -317,6 +332,14 @@
           AND (ENDDATE + 1) <![CDATA[ < ]]> TRUNC(SYSDATE)
           AND CURRAMOUNT <![CDATA[ >= ]]> GOALAMOUNT
     </update>
+
+    <select id="getProjectToFailed" resultType="project">
+        SELECT *
+        FROM PROJECT
+        WHERE PROJECTSTATUS = 'OPEN'
+          AND (ENDDATE + 1) <![CDATA[ < ]]> TRUNC(SYSDATE)
+          AND CURRAMOUNT <![CDATA[ < ]]> GOALAMOUNT
+    </select>
 
     <update id="updateProjectsToFailed">
         UPDATE PROJECT

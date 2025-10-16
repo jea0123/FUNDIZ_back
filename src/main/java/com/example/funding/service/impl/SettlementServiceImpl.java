@@ -8,15 +8,18 @@ import com.example.funding.dto.request.settlement.SettlementSearchCond;
 import com.example.funding.dto.response.settlement.CreatorSettlementDto;
 import com.example.funding.dto.response.settlement.SettlementItem;
 import com.example.funding.dto.row.SettlementSummary;
+import com.example.funding.enums.NotificationType;
 import com.example.funding.exception.badrequest.ProjectNotSuccessException;
 import com.example.funding.exception.badrequest.SettlementStatusAlreadyChangedException;
 import com.example.funding.exception.forbidden.AccessDeniedException;
 import com.example.funding.exception.notfound.CreatorNotFoundException;
 import com.example.funding.exception.notfound.ProjectNotFoundException;
 import com.example.funding.exception.notfound.SettlementNotFoundException;
+import com.example.funding.handler.NotificationPublisher;
 import com.example.funding.mapper.CreatorMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.SettlementMapper;
+import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
 import com.example.funding.model.Settlement;
 import com.example.funding.service.SettlementService;
@@ -37,6 +40,8 @@ public class SettlementServiceImpl implements SettlementService {
     private final SettlementMapper settlementMapper;
     private final ProjectMapper projectMapper;
 
+    private final NotificationPublisher notificationPublisher;
+
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CreatorSettlementDto>> getSettlementByCreatorId(Long creatorId) {
@@ -55,15 +60,25 @@ public class SettlementServiceImpl implements SettlementService {
     public ResponseEntity<ResponseDto<String>> updateStatus(SettlementPaidRequestDto dto) {
         Project project = projectMapper.findById(dto.getProjectId());
         if (project == null) throw new ProjectNotFoundException();
+
+        Creator existingCreator = creatorMapper.findById(dto.getCreatorId());
+        if (existingCreator == null) throw new CreatorNotFoundException();
+
         if (!project.getCreatorId().equals(dto.getCreatorId())) throw new AccessDeniedException();
         if (!List.of("SUCCESS", "SETTLED").contains(project.getProjectStatus())) throw new ProjectNotSuccessException();
-        if (settlementMapper.existsByProjectId(dto.getProjectId()) == 0) throw new SettlementNotFoundException();
+
+        if (settlementMapper.getByProjectId(dto.getProjectId()) == null) throw new SettlementNotFoundException();
         if (settlementMapper.getStatus(dto.getProjectId(), dto.getCreatorId(), dto.getSettlementId()).equals(dto.getSettlementStatus()))
             throw new SettlementStatusAlreadyChangedException();
 
         settlementMapper.updateSettlementStatus(dto);
         String projectStatus = dto.getSettlementStatus().equals("PAID") ? "SETTLED" : projectMapper.getStatus(dto.getProjectId());
         projectMapper.updateProjectSettled(dto.getProjectId(), projectStatus);
+        if (projectStatus.equals("SETTLED")) {
+            notificationPublisher.publish(existingCreator.getUserId(), NotificationType.FUNDING_SETTLED, project.getTitle(), dto.getSettlementId());
+        } else {
+            notificationPublisher.publish(existingCreator.getUserId(), NotificationType.FUNDING_SETTLED_CANCELLED, project.getTitle(), dto.getSettlementId());
+        }
         return ResponseEntity.ok(ResponseDto.success(200, "정산 상태 변경 성공", null));
     }
 
@@ -101,6 +116,6 @@ public class SettlementServiceImpl implements SettlementService {
     private String normalizeStatus(String status) {
         if (status == null || status.isBlank()) return null;
         String up = status.trim().toUpperCase();
-        return "ALL".equals(up) ? null : up; // ALL이면 where절에서 제외하기 위해 null
+        return "ALL".equals(up) ? null : up;
     }
 }

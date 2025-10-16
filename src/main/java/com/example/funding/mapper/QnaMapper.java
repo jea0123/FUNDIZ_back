@@ -27,4 +27,6 @@ public interface QnaMapper {
     int qnaTotalOfUser(Long userId);
 
     int existsQnaById(@Param("qnaId") Long qnaId);
+
+    Qna findById(@Param("qnaId") Long qnaId);
 }

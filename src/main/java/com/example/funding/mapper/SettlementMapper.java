@@ -25,7 +25,7 @@ public interface SettlementMapper {
             @Param("statusColumn") String statusColumn
     );
 
-    int existsByProjectId(Long projectId);
+    Settlement getByProjectId(@Param("projectId") Long projectId);
 
     String getStatus(@Param("projectId") Long projectId, @Param("creatorId") Long creatorId, @Param("settlementId") Long settlementId);
 

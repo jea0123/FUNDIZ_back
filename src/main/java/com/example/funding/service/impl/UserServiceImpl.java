@@ -9,11 +9,13 @@ import com.example.funding.dto.request.user.UserPasswordDto;
 import com.example.funding.dto.request.user.UserProfileImgDto;
 import com.example.funding.dto.response.creator.CreatorQnaDto;
 import com.example.funding.dto.response.user.*;
+import com.example.funding.enums.NotificationType;
 import com.example.funding.exception.conflict.DuplicatedFollowCreatorException;
 import com.example.funding.exception.conflict.DuplicatedLikedProjectException;
 import com.example.funding.exception.conflict.DuplicatedPasswordException;
 import com.example.funding.exception.forbidden.InCorrectPasswordException;
 import com.example.funding.exception.notfound.*;
+import com.example.funding.handler.NotificationPublisher;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
@@ -44,6 +46,8 @@ public class UserServiceImpl implements UserService {
     private final FollowMapper followMapper;
     private final PasswordEncoder passwordEncoder;
     private final FileUploader fileUploader;
+
+    private final NotificationPublisher notificationPublisher;
 
     @Override
     @Transactional(readOnly = true)
@@ -240,12 +244,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<ResponseDto<String>> followCreator(Long userId, Long creatorId) {
-        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        User existingUser = userMapper.getUserById(userId);
+        if (existingUser == null) throw new UserNotFoundException();
         Creator creator = creatorMapper.findById(creatorId);
         if (creator == null) throw new CreatorNotFoundException();
         if (followMapper.isFollowingCreator(userId, creatorId) == 1) throw new DuplicatedFollowCreatorException();
         followMapper.followCreator(userId, creatorId);
         creatorMapper.increaseFollowersCount(creatorId);
+
+        notificationPublisher.publish(userId, NotificationType.NEW_FOLLOWER, existingUser.getNickname(), null);
         return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 팔로우 성공", creator.getCreatorName()));
     }
 

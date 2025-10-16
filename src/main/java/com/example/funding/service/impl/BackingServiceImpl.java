@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Slf4j
@@ -88,18 +90,38 @@ public class BackingServiceImpl implements BackingService {
         backingMapper.addBacking(backing);
 
         Long backingId = backing.getBackingId();
-        System.out.println("backingId 확인" + backingId);
-        BackingDetail detail = requestDto.getBackingDetail();
-        detail.setBackingId(backingId);
-        backingMapper.addBackingDetail(detail);
 
-//        Shipping shipping = requestDto.getShipping();
-//        shipping.setBackingId(backingId);
-//        shippingMapper.addShipping(shipping);
-//
-//        Payment payment = requestDto.getPayment();
-//        payment.setBackingId(backingId);
-//        paymentMapper.addPayment(payment);
+        List<RewardBackingRequestDto> rewards = requestDto.getRewards();
+
+        if(rewards != null && !rewards.isEmpty()){
+            for(RewardBackingRequestDto reward : rewards){
+                BackingDetail detail = new BackingDetail();
+                detail.setBackingId(backingId);
+                detail.setRewardId(reward.getRewardId());
+                detail.setQuantity(reward.getQuantity());
+                detail.setPrice(reward.getPrice());
+                backingMapper.addBackingDetail(detail);
+            }
+
+        }
+        System.out.println("💬 전달된 리워드 리스트 = " + rewards);
+        if (rewards != null) {
+            rewards.forEach(r -> System.out.println("  - rewardId: " + r.getRewardId() + ", qty: " + r.getQuantity()));
+        }
+
+//        Long backingId = backing.getBackingId();
+//        System.out.println("backingId 확인" + backingId);
+//        BackingDetail detail = requestDto.getBackingDetail();
+//        detail.setBackingId(backingId);
+//        backingMapper.addBackingDetail(detail);
+
+        //orderId 임의 값 설정
+        String orderId = "ORD-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+
+        Payment payment = requestDto.getPayment();
+        payment.setOrderId(orderId);
+        payment.setBackingId(backingId);
+        paymentMapper.addPayment(payment);
         return ResponseEntity.ok(ResponseDto.success(200, "후원 추가 성공", /*"추가!!"*/ null));
     }
 

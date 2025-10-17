@@ -115,6 +115,17 @@ public class ReplyServiceImpl implements ReplyService {
         return ResponseEntity.ok(ResponseDto.success(200, "댓글 등록 성공", null));
     }
 
+    /**
+     * <p>문의내역 답변 조회</p>
+     *
+     * @param inqId 문의내역 ID
+     * @param lastCreatedAt 마지막 항목의 생성일시
+     * @param lastId 마지막 항목의 id
+     * @param size 한 번에 가져올 항목 수
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-10-13
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CursorPage<InquiryReplyDto>>> getInquiryReplyList(Long inqId, LocalDateTime lastCreatedAt, Long lastId, int size) {
@@ -142,6 +153,15 @@ public class ReplyServiceImpl implements ReplyService {
         return ResponseEntity.ok(ResponseDto.success(200, "댓글 목록 조회 성공", CursorPage.of(replyList, next)));
     }
 
+    /**
+     * <p>문의내역 답변 등록</p>
+     *
+     * @param inqId 문의내역 ID
+     * @param dto IqrReplyCreateRequestDto
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-10-13
+     */
     @Override
     public ResponseEntity<ResponseDto<InquiryReplyDto>> createInquiryReply(Long inqId, IqrReplyCreateRequestDto dto) {
         if (inqId == null) {
@@ -172,6 +192,17 @@ public class ReplyServiceImpl implements ReplyService {
         return ResponseEntity.ok(ResponseDto.success(200, "댓글 등록 성공", null));
     }
 
+    /**
+     * <p>Q&A 답변 조회</p>
+     *
+     * @param qnaId Q&A ID
+     * @param lastCreatedAt 마지막 항목의 생성일시
+     * @param lastId 마지막 항목의 id
+     * @param size 한 번에 가져올 항목 수
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-10-14
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CursorPage<QnaReplyDto>>> getQnaReplyList(Long qnaId, LocalDateTime lastCreatedAt, Long lastId, int size) {
@@ -199,6 +230,16 @@ public class ReplyServiceImpl implements ReplyService {
         return ResponseEntity.ok(ResponseDto.success(200, "댓글 목록 조회 성공", CursorPage.of(replyList, next)));
     }
 
+
+    /**
+     * <p>Q&A 답변 등록</p>
+     *
+     * @param qnaId 커뮤니티 ID
+     * @param dto QnaReplyCreateRequestDto
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-10-14
+     */
     @Override
     public ResponseEntity<ResponseDto<QnaReplyDto>> createQnaReply(Long qnaId, Long creatorId, QnaReplyCreateRequestDto dto) {
         dto.setCreatorId(creatorId);

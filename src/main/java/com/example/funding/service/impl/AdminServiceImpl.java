@@ -7,6 +7,7 @@ import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.admin.AdminProjectUpdateDto;
 import com.example.funding.dto.request.admin.SearchAdminProjectDto;
 import com.example.funding.dto.request.admin.UserAdminUpdateRequestDto;
+import com.example.funding.dto.request.cs.NoticeAddRequestDto;
 import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
@@ -17,10 +18,7 @@ import com.example.funding.exception.AnalyticsNotFoundException;
 import com.example.funding.exception.CategorySuccessNotFoundException;
 import com.example.funding.exception.KPINotFoundException;
 import com.example.funding.exception.RewardSalesNotFoundException;
-import com.example.funding.mapper.AdminMapper;
-import com.example.funding.mapper.ProjectMapper;
-import com.example.funding.mapper.RewardMapper;
-import com.example.funding.mapper.TagMapper;
+import com.example.funding.mapper.*;
 import com.example.funding.model.*;
 import com.example.funding.service.AdminService;
 import com.example.funding.service.validator.ProjectTransitionGuard;
@@ -46,6 +44,7 @@ public class AdminServiceImpl implements AdminService {
     private final ProjectMapper projectMapper;
     private final TagMapper tagMapper;
     private final RewardMapper rewardMapper;
+    private final NoticeMapper noticeMapper;
 
     private final ProjectTransitionGuard transitionGuard;
 
@@ -331,4 +330,69 @@ public class AdminServiceImpl implements AdminService {
         }
         return ResponseEntity.ok(ResponseDto.success(200, "회원정보 수정 완료", "회원정보 수정 "));
     }
+
+    /**
+     * <p>공지사항 등록</p>
+     *
+     * @param ntcDto NoticeAddRequestDto
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author 이동혁
+     * @since 2025-09-24
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> addNotice(NoticeAddRequestDto ntcDto) {
+        Notice item = Notice.builder()
+                .title(ntcDto.getTitle())
+                .content(ntcDto.getContent())
+                .viewCnt(ntcDto.getViewCnt())
+                .createdAt(ntcDto.getCreatedAt())
+                .build();
+
+        int result = noticeMapper.addNotice(item);
+
+        if (result == 0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "공지사항 추가 실패"));
+        }
+        return ResponseEntity.ok(ResponseDto.success(200, "공지사항 추가 성공", "데이터 출력확인"));
+    }
+
+
+    /**
+     * <p>공지사항 수정</p>
+     *
+     * @param noticeId 공지사항 ID
+     * @param ntcDto NoticeUpdateRequestDto
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author 이동혁
+     * @since 2025-09-24
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> updateNotice(Long noticeId, NoticeUpdateRequestDto ntcDto) {
+        ntcDto.setNoticeId(noticeId);
+
+        int result = noticeMapper.updateNotice(ntcDto);
+        if (result == 0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "공지사항 수정 실패"));
+        }
+        return ResponseEntity.ok(ResponseDto.success(200, "공지사항 수정 완료", "공지사항 수정 "));
+    }
+
+
+    /**
+     * <p>공지사항 삭제</p>
+     *
+     * @param noticeId 공지사항 ID
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author 이동혁
+     * @since 2025-09-24
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> deleteNotice(Long noticeId) {
+        int deleted = noticeMapper.deleteNotice(noticeId);
+        if (deleted == 0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "공지사항 삭제 실패"));
+        }
+        return ResponseEntity.ok(ResponseDto.success(200, "공지사항 삭제 완료", "공지사항 삭제"));
+    }
+
 }

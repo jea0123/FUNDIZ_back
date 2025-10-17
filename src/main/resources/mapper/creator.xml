@@ -10,6 +10,24 @@
         )
     </insert>
 
+    <select id="creatorInfo" parameterType="Long" resultType="creator">
+        SELECT * FROM creator
+        WHERE creatorId = #{creatorId}
+    </select>
+
+    <update id="updateCreatorInfo" parameterType="com.example.funding.dto.request.creator.CreatorUpdateRequestDto">
+        UPDATE creator
+        SET CREATORNAME = #{creatorName},
+        CREATORTYPE = #{creatorType},
+        EMAIL = #{email},
+        PHONE = #{phone},
+        BANK = #{bank},
+        ACCOUNT = #{account},
+        BUSINESSNUM = #{businessNum},
+        PROFILEIMG = #{profileImgUrl}
+        WHERE CREATORID=#{creatorId}
+    </update>
+
     <select id="findByIds" resultType="creator">
         SELECT *
         FROM creator

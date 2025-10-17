@@ -6,8 +6,10 @@ import com.example.funding.common.Pager;
 import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.creator.CreatorRegisterRequestDto;
+import com.example.funding.dto.request.creator.CreatorUpdateRequestDto;
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
+import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
 import com.example.funding.dto.response.backing.BackingCreatorBackerList;
 import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
 import com.example.funding.dto.response.creator.*;
@@ -17,6 +19,7 @@ import com.example.funding.exception.AlreadyCreatorException;
 import com.example.funding.exception.UserNotFoundException;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Creator;
+import com.example.funding.model.Notice;
 import com.example.funding.model.Project;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.RewardService;
@@ -29,6 +32,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
@@ -519,5 +523,41 @@ public class CreatorServiceImpl implements CreatorService {
                 .build();
         creatorMapper.insertCreator(creator);
         return ResponseEntity.ok(ResponseDto.success(200, "창작자 등록 성공", dto.getCreatorName()));
+    }
+
+    /**
+     * <p>크리에이터 상세 정보 조회</p>
+     *
+     * @param creatorId 창작자 ID
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author 이동혁
+     * @since 2025-10-15
+     */
+    @Override
+    public ResponseEntity<ResponseDto<Creator>> item(Long creatorId) {
+        Creator item = creatorMapper.creatorInfo(creatorId);
+        if (item == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "창작자 정보 조회 불가"));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "창작자 정보 조회 성공", item));
+    }
+
+    /**
+     * <p>크리에이터 정보 수정</p>
+     *
+     * @param creatorId 창작자 ID
+     * @param dto CreatorUpdateRequestDto
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-10-15
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> updateCreatorInfo(Long creatorId, CreatorUpdateRequestDto dto) {
+
+        int result = creatorMapper.updateCreatorInfo(dto);
+        if (result == 0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "창작자 정보 수정 실패"));
+        }
+        return ResponseEntity.ok(ResponseDto.success(200, "창작자 정보 수정 완료", "창작자 정보 수정 "));
     }
 }

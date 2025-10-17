@@ -8,6 +8,7 @@ import com.example.funding.dto.request.admin.AdminProjectUpdateDto;
 import com.example.funding.dto.request.admin.RejectProjectDto;
 import com.example.funding.dto.request.admin.SearchAdminProjectDto;
 import com.example.funding.dto.request.admin.UserAdminUpdateRequestDto;
+import com.example.funding.dto.request.cs.NoticeAddRequestDto;
 import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
 import com.example.funding.dto.request.settlement.SettlementPaidRequestDto;
 import com.example.funding.dto.request.settlement.SettlementSearchCond;
@@ -335,4 +336,47 @@ public class AdminController {
     public ResponseEntity<ResponseDto<String>> updateNotice(@PathVariable Long userId, @RequestBody UserAdminUpdateRequestDto userDto){
         return adminService.updateUser(userId, userDto);
     }
+
+    /**
+     * <p>공지사항 등록</p>
+     *
+     * @param ntcDto NoticeAddRequestDto
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-09-24
+     */
+    @PostMapping("/notice/add")
+    public ResponseEntity<ResponseDto<String>> addNotice(@RequestBody NoticeAddRequestDto ntcDto){
+
+        return adminService.addNotice(ntcDto);
+    }
+
+
+    /**
+     * <p>공지사항 수정</p>
+     *
+     * @param noticeId 공지사항 ID
+     * @param ntcDto NoticeUpdateRequestDto
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-09-24
+     */
+    @PostMapping("/notice/update/{noticeId}")
+    public ResponseEntity<ResponseDto<String>> updateNotice(@PathVariable Long noticeId, @RequestBody NoticeUpdateRequestDto ntcDto){
+        return adminService.updateNotice(noticeId, ntcDto);
+    }
+
+    /**
+     * <p>공지사항 삭제</p>
+     *
+     * @param noticeId 공지사항 ID
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-09-24
+     */
+    @DeleteMapping("/notice/delete/{noticeId}")
+    public ResponseEntity<ResponseDto<String>> deleteNotice(@PathVariable Long noticeId) {
+        return adminService.deleteNotice(noticeId);
+    }
+
 }

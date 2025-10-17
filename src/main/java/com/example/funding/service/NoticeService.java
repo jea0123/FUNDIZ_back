@@ -13,10 +13,4 @@ public interface NoticeService {
 
     ResponseEntity<ResponseDto<Notice>> item(Long noticeId);
 
-    ResponseEntity<ResponseDto<String>> addNotice(NoticeAddRequestDto ntcDto);
-
-    ResponseEntity<ResponseDto<String>> updateNotice(Long noticeId, NoticeUpdateRequestDto ntcDto);
-
-    ResponseEntity<ResponseDto<String>> deleteNotice(Long noticeId);
-
 }

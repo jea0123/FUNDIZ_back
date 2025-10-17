@@ -82,6 +82,17 @@ public class InquiryController {
     }
 
 
+    /**
+     * <p>문의내역 답변 조회</p>
+     *
+     * @param inqId 문의내역 ID
+     * @param lastCreatedAt 마지막 항목의 생성일시
+     * @param lastId 마지막 항목의 id
+     * @param size 한 번에 가져올 항목 수
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-10-13
+     */
     @GetMapping("/reply/{inqId}")
     public ResponseEntity<ResponseDto<CursorPage<InquiryReplyDto>>> getInquiryReplyList(@PathVariable Long inqId,
                                                                           @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastCreatedAt,
@@ -90,6 +101,15 @@ public class InquiryController {
         return replyService.getInquiryReplyList(inqId, lastCreatedAt, lastId, size);
     }
 
+    /**
+     * <p>문의내역 답변 등록</p>
+     *
+     * @param inqId 문의내역 ID
+     * @param dto IqrReplyCreateRequestDto
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-10-13
+     */
     @PostMapping("/reply/{inqId}")
     public ResponseEntity<ResponseDto<InquiryReplyDto>> createInquiryReply(@PathVariable Long inqId,
                                                                       @RequestBody IqrReplyCreateRequestDto dto) {

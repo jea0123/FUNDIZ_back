@@ -25,6 +25,17 @@ public class QnaReplyController {
 
     private final ReplyService replyService;
 
+    /**
+     * <p>Q&A 답변 조회</p>
+     *
+     * @param qnaId Q&A ID
+     * @param lastCreatedAt 마지막 항목의 생성일시
+     * @param lastId 마지막 항목의 id
+     * @param size 한 번에 가져올 항목 수
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-10-14
+     */
     @GetMapping("/reply/{qnaId}")
     public ResponseEntity<ResponseDto<CursorPage<QnaReplyDto>>> getInquiryReplyList(
                                                                                         @PathVariable Long qnaId,
@@ -34,6 +45,15 @@ public class QnaReplyController {
         return replyService.getQnaReplyList(qnaId, lastCreatedAt, lastId, size);
     }
 
+    /**
+     * <p>Q&A 답변 등록</p>
+     *
+     * @param qnaId 커뮤니티 ID
+     * @param dto QnaReplyCreateRequestDto
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-10-14
+     */
     @PostMapping("/reply/{qnaId}")
     public ResponseEntity<ResponseDto<QnaReplyDto>> createQnaReply(@PathVariable Long qnaId,
                                                                    Long creatorId,

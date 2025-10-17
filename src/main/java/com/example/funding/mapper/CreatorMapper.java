@@ -1,6 +1,7 @@
 package com.example.funding.mapper;
 
 import com.example.funding.common.Pager;
+import com.example.funding.dto.request.creator.CreatorUpdateRequestDto;
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
 import com.example.funding.dto.response.creator.*;
@@ -48,4 +49,8 @@ public interface CreatorMapper {
     List<CreatorDashboardRankDto> getProjectRankDate(Long creatorId);
 
     CreatorDashboardDto creatorDashboardDto(Long creatorId);
+
+    int updateCreatorInfo(CreatorUpdateRequestDto dto);
+
+    Creator creatorInfo(Long creatorId);
 }

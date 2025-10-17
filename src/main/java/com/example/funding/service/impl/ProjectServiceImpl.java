@@ -20,20 +20,24 @@ import com.example.funding.model.News;
 import com.example.funding.model.Reward;
 import com.example.funding.model.Tag;
 import com.example.funding.service.ProjectService;
+import com.example.funding.validator.Loaders;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Validated
 public class ProjectServiceImpl implements ProjectService {
-
+    private final Loaders loaders;
     private final ProjectMapper projectMapper;
     private final TagMapper tagMapper;
     private final RewardMapper rewardMapper;
@@ -63,7 +67,7 @@ public class ProjectServiceImpl implements ProjectService {
         //달성률, 창작자가 등록한 프로젝트 수, 결제일
         int percentNow = Utils.getPercentNow(row.getCurrAmount(), row.getGoalAmount());
         int projectCnt = projectMapper.getProjectCnt(row.getCreatorId());
-        LocalDate paymentDate = row.getEndDate().plusDays(1);
+        LocalDateTime paymentDate = row.getEndDate().plusDays(1);
 
         //응답Dto 조립
         ProjectDetailDto detail = ProjectDetailDto.builder()
@@ -148,7 +152,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<Long>> getLikeCnt(Long projectId) {
-        if(projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
+        loaders.project(projectId);
         Long likeCnt = projectMapper.getLikeCnt(projectId);
         return ResponseEntity.ok(ResponseDto.success(200, "좋아요 수 조회 성공", likeCnt));
     }

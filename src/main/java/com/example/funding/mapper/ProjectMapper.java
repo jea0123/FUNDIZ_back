@@ -12,6 +12,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +47,7 @@ public interface ProjectMapper {
 
     void updateProjectSettled(@Param("projectId") Long projectId, @Param("status") String status);
 
-    LocalDate getProjectEndDate(@Param("projectId") Long projectId);
+    LocalDateTime getProjectEndDate(@Param("projectId") Long projectId);
 
     long getVerifyingCnt(Long creatorId);
 

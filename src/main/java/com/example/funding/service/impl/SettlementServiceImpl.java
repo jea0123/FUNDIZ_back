@@ -11,32 +11,32 @@ import com.example.funding.dto.row.SettlementSummary;
 import com.example.funding.enums.NotificationType;
 import com.example.funding.exception.badrequest.ProjectNotSuccessException;
 import com.example.funding.exception.badrequest.SettlementStatusAlreadyChangedException;
-import com.example.funding.exception.forbidden.AccessDeniedException;
-import com.example.funding.exception.notfound.CreatorNotFoundException;
-import com.example.funding.exception.notfound.ProjectNotFoundException;
 import com.example.funding.exception.notfound.SettlementNotFoundException;
 import com.example.funding.handler.NotificationPublisher;
-import com.example.funding.mapper.CreatorMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.SettlementMapper;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
 import com.example.funding.model.Settlement;
 import com.example.funding.service.SettlementService;
+import com.example.funding.validator.Loaders;
+import com.example.funding.validator.PermissionChecker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Validated
 public class SettlementServiceImpl implements SettlementService {
-
-    private final CreatorMapper creatorMapper;
+    private final Loaders loaders;
+    private final PermissionChecker auth;
     private final SettlementMapper settlementMapper;
     private final ProjectMapper projectMapper;
 
@@ -45,7 +45,7 @@ public class SettlementServiceImpl implements SettlementService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CreatorSettlementDto>> getSettlementByCreatorId(Long creatorId) {
-        if (creatorMapper.existsCreator(creatorId) == 0) throw new CreatorNotFoundException();
+        loaders.creator(creatorId);
 
         List<Settlement> settlement = settlementMapper.getByCreatorId(creatorId);
         SettlementSummary settlementSummary = settlementMapper.getSettlementSummaryByCreatorId(creatorId);
@@ -58,13 +58,10 @@ public class SettlementServiceImpl implements SettlementService {
 
     @Override
     public ResponseEntity<ResponseDto<String>> updateStatus(SettlementPaidRequestDto dto) {
-        Project project = projectMapper.findById(dto.getProjectId());
-        if (project == null) throw new ProjectNotFoundException();
+        Project project = loaders.project(dto.getProjectId());
+        Creator existingCreator = loaders.creator(dto.getCreatorId());
 
-        Creator existingCreator = creatorMapper.findById(dto.getCreatorId());
-        if (existingCreator == null) throw new CreatorNotFoundException();
-
-        if (!project.getCreatorId().equals(dto.getCreatorId())) throw new AccessDeniedException();
+        auth.mustBeOwner(dto.getCreatorId(), existingCreator.getCreatorId());
         if (!List.of("SUCCESS", "SETTLED").contains(project.getProjectStatus())) throw new ProjectNotSuccessException();
 
         if (settlementMapper.getByProjectId(dto.getProjectId()) == null) throw new SettlementNotFoundException();
@@ -87,8 +84,8 @@ public class SettlementServiceImpl implements SettlementService {
     public ResponseEntity<ResponseDto<PageResult<SettlementItem>>> getSettlements(SettlementSearchCond cond, Pager pager) {
         String q = cond.getQ();
         String status = normalizeStatus(cond.getStatus());
-        LocalDate from = cond.getFrom();
-        LocalDate to = cond.getTo();
+        LocalDateTime from = cond.getFrom();
+        LocalDateTime to = cond.getTo();
 
         int total = settlementMapper.count(q, status, from, to);
         if (total == 0) {

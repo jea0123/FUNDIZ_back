@@ -15,6 +15,7 @@ import com.example.funding.enums.CreatorType;
 import com.example.funding.exception.badrequest.AlreadyCreatorException;
 import com.example.funding.exception.notfound.CreatorNotFoundException;
 import com.example.funding.exception.notfound.UserNotFoundException;
+import com.example.funding.model.Creator;
 import com.example.funding.model.Reward;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.NewsService;
@@ -68,6 +69,55 @@ public class CreatorController {
 //        Long userId = principal.userId();
         Long userId = 400L; // TODO: 임시
         return creatorService.registerCreator(dto, userId);
+    }
+
+    /**
+     * <p>크리에이터 상세 정보 조회</p>
+     *
+     * @param creatorId 창작자 ID
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author 이동혁
+     * @since 2025-10-15
+     */
+    @GetMapping("/info")
+    public ResponseEntity<ResponseDto<Creator>> item(@RequestAttribute Long creatorId) {
+
+        creatorId = 1L;
+        return creatorService.item(creatorId);
+    }
+
+    /**
+     * <p>크리에이터 정보 수정</p>
+     *
+     * @param creatorId 창작자 ID
+     * @param dto CreatorUpdateRequestDto
+     * @param profileImg 프로필 이미지
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-10-15
+     */
+    @PostMapping(value = "/update/{creatorId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseDto<String>> updateCreatorInfo(@RequestAttribute Long creatorId,
+                                                                 @ModelAttribute CreatorUpdateRequestDto dto,
+                                                                 @RequestParam(required = false) MultipartFile profileImg) throws IOException {
+
+        creatorId = 1L;
+
+        if (profileImg != null && !profileImg.isEmpty()) {
+            // 새로운 프로필 이미지가 있다면 업로드 처리
+            dto.setProfileImg(profileImg);
+            String profileImgUrl = fileUploader.upload(dto.getProfileImg());
+
+            if (profileImgUrl != null && !profileImgUrl.isEmpty()) {
+                    dto.setProfileImgUrl(profileImgUrl);
+                } else {
+                    dto.setProfileImgUrl(dto.getProfileImgUrl());
+                }
+            } else {
+                dto.setProfileImgUrl(dto.getProfileImgUrl());
+            }
+
+        return creatorService.updateCreatorInfo(creatorId, dto);
     }
 
     /**
@@ -333,6 +383,7 @@ public class CreatorController {
         return newsService.createNews(projectId, creatorId, dto);
     }
 
+
     /**
      * <p>크리에이터 팔로워 수 조회</p>
      *
@@ -346,4 +397,5 @@ public class CreatorController {
     public ResponseEntity<ResponseDto<Long>> getFollowerCnt(@PathVariable Long creatorId) {
         return creatorService.getFollowerCnt(creatorId);
     }
+
 }

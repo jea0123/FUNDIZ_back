@@ -90,4 +90,5 @@ public class NoticeController {
     public ResponseEntity<ResponseDto<String>> deleteNotice(@PathVariable Long noticeId) {
         return noticeService.deleteNotice(noticeId);
     }
+
 }

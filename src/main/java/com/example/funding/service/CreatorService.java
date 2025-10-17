@@ -28,7 +28,7 @@ public interface CreatorService {
 
     ResponseEntity<ResponseDto<CreatorProjectDetailDto>> getProjectDetail(Long projectId, Long creatorId);
 
-    ResponseEntity<ResponseDto<String>> createProject(ProjectCreateRequestDto dto, Long creatorId);
+    ResponseEntity<ResponseDto<Long>> createProject(ProjectCreateRequestDto dto, Long creatorId);
 
     ResponseEntity<ResponseDto<String>> updateProject(ProjectCreateRequestDto dto, Long creatorId);
 

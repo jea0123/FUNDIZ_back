@@ -7,11 +7,10 @@ import com.example.funding.dto.request.reward.RewardBackingRequestDto;
 import com.example.funding.dto.response.address.AddressResponseDto;
 import com.example.funding.dto.response.backing.BackingResponseDto;
 import com.example.funding.dto.response.backing.BackingRewardDto;
-import com.example.funding.dto.response.backing.userList_detail.MyPageBackingDetailDto;
-import com.example.funding.dto.response.backing.userList_detail.MyPageBackingListDto;
-import com.example.funding.dto.response.backing.userList_detail.MyPageBacking_RewardDto;
+import com.example.funding.dto.response.backing.userList_detail.*;
 import com.example.funding.dto.response.payment.BackingPagePaymentDto;
 import com.example.funding.dto.response.user.BackingDto;
+import com.example.funding.dto.response.user.MyPageBackingRewardDto;
 import com.example.funding.exception.notfound.BackingNotFoundException;
 import com.example.funding.exception.notfound.ProjectNotFoundException;
 import com.example.funding.exception.notfound.UserNotFoundException;
@@ -29,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -198,77 +197,87 @@ public class BackingServiceImpl implements BackingService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<MyPageBackingListDto>>> getMyPageBackingList(Long userId) {
+        List<MyPageBackingSaveDto> backingLists = backingMapper.getBackingLists(userId);
 
-        List<MyPageBackingListDto> backingList = backingMapper.getBackingList(userId);
+        Map<Long ,MyPageBackingListDto> grouped = new LinkedHashMap<>();
 
-        List<MyPageBacking_RewardDto> rewardLists = rewardMapper.getMyPageDetailRewardList(userId);
+        for(MyPageBackingSaveDto list : backingLists) {
+            MyPageBackingListDto myPageBackingList = grouped.computeIfAbsent(list.getBackingId(), id ->{
+                MyPageBackingListDto newList = new MyPageBackingListDto();
+                newList.setProjectId(list.getProjectId());
+                newList.setTitle(list.getTitle());
+                newList.setGoalAmount(list.getGoalAmount());
+                newList.setCurrAmount(list.getCurrAmount());
+                newList.setEndDate(list.getEndDate());
+                newList.setThumbnail(list.getThumbnail());
 
-        List<MyPageBackingListDto> result = backingList.stream()
-                .map(project -> {
-                    List<MyPageBacking_RewardDto> rewardList = rewardLists.stream()
-                            .filter(reward -> reward.getBackingId().equals(project.getBackingId()))
-                            .toList();
+                newList.setUserId(list.getUserId());
+                newList.setBackingId(list.getBackingId());
+                newList.setAmount(list.getAmount());
+                newList.setCreatedAt(list.getCreatedAt());
+                newList.setBackingStatus(list.getBackingStatus());
+                newList.setShippingStatus(list.getShippingStatus());
+                newList.setCreatorName(list.getCreatorName());
+                return newList;
+            });
 
-                    return MyPageBackingListDto.builder()
-                            .projectId(project.getProjectId())
-                            .title(project.getTitle())
-                            .goalAmount(project.getGoalAmount())
-                            .currAmount(project.getCurrAmount())
-                            .endDate(project.getEndDate())
-                            .thumbnail(project.getThumbnail())
-                            .userId(project.getUserId())
-                            .backingId(project.getBackingId())
-                            .amount(project.getAmount())
-                            .createdAt(project.getCreatedAt())
-                            .backingStatus(project.getBackingStatus())
-                            .shippingStatus(project.getShippingStatus())
-                            .creatorName(project.getCreatorName())
-                            .mpBackingList(rewardList)
-                            .build();
-                })
-                .toList();
+            MyPageBacking_RewardDto reward = new MyPageBacking_RewardDto();
+            reward.setRewardId(list.getRewardId());
+            reward.setProjectId(list.getProjectId());
+            reward.setRewardName(list.getRewardName());
+            reward.setPrice(list.getPrice());
+            reward.setDeliveryDate(list.getDeliveryDate());
+            reward.setQuantity(list.getQuantity());
+            myPageBackingList.getMpBackingList().add(reward);
+        }
 
-        return ResponseEntity.ok(ResponseDto.success(200, "후원 내역 조회 성공", result));
+        List<MyPageBackingListDto> result = new ArrayList<>(grouped.values());
+        return ResponseEntity.ok(ResponseDto.success(200,"후원내역 조회성공", result));
     }
 
     @Override
     public ResponseEntity<ResponseDto<List<MyPageBackingDetailDto>>> getMyPageBackingDetail(Long userId) {
+        List<MyPageBackingDetailSaveDto> backingDetils = backingMapper.getBackingDetails(userId);
 
-        List<MyPageBackingDetailDto> backingList = backingMapper.getBackingDetail(userId);
+        Map<Long, MyPageBackingDetailDto> grouped = new LinkedHashMap<>();
 
-        List<MyPageBacking_RewardDto> rewardLists = rewardMapper.getMyPageDetailRewardList(userId);
+        for(MyPageBackingDetailSaveDto list : backingDetils) {
+            MyPageBackingDetailDto backingDetail = grouped.computeIfAbsent(list.getBackingId(), id -> {
+                MyPageBackingDetailDto newDetail = new MyPageBackingDetailDto();
+                newDetail.setBackingId(list.getBackingId());
+                newDetail.setUserId(list.getUserId());
+                newDetail.setAmount(list.getAmount());
+                newDetail.setCreatedAt(list.getCreatedAt());
+                newDetail.setBackingStatus(list.getBackingStatus());
+                newDetail.setMethod(list.getMethod());
+                newDetail.setCardCompany(list.getCardCompany());
+                newDetail.setShippingStatus(list.getShippingStatus());
+                newDetail.setTrackingNum(list.getTrackingNum());
+                newDetail.setShippedAt(list.getShippedAt());
+                newDetail.setDeliveredAt(list.getDeliveredAt());
+                newDetail.setTitle(list.getTitle());
+                newDetail.setThumbnail(list.getThumbnail());
+                newDetail.setAddrName(list.getAddrName());
+                newDetail.setRecipient(list.getRecipient());
+                newDetail.setPostalCode(list.getPostalCode());
+                newDetail.setRoadAddr(list.getRoadAddr());
+                newDetail.setDetailAddr(list.getDetailAddr());
+                newDetail.setRecipientPhone(list.getRecipientPhone());
+                newDetail.setCreatorName(list.getCreatorName());
+                return newDetail;
+            });
 
-        List<MyPageBackingDetailDto> result = backingList.stream()
-                .map(project -> {
-                    List<MyPageBacking_RewardDto> rewardList = rewardLists.stream()
-                            .filter(reward -> reward.getBackingId().equals(project.getBackingId()))
-                            .toList();
+            MyPageBacking_RewardDto rewards = new MyPageBacking_RewardDto();
+            rewards.setRewardId(list.getRewardId());
+            rewards.setProjectId(list.getProjectId());
+            rewards.setRewardName(list.getRewardName());
+            rewards.setPrice(list.getPrice());
+            rewards.setDeliveryDate(list.getDeliveryDate());
+            rewards.setQuantity(list.getQuantity());
+            backingDetail.getRewards().add(rewards);
+        }
 
-                    return MyPageBackingDetailDto.builder()
-                            .amount(project.getAmount())
-                            .createdAt(project.getCreatedAt())
-                            .backingStatus(project.getBackingStatus())
-                            .method(project.getMethod())
-                            .cardCompany(project.getCardCompany())
-                            .shippingStatus(project.getShippingStatus())
-                            .trackingNum(project.getTrackingNum())
-                            .shippedAt(project.getShippedAt())
-                            .deliveredAt(project.getDeliveredAt())
-                            .title(project.getTitle())
-                            .thumbnail(project.getThumbnail())
-                            .userId(project.getUserId())
-                            .backingId(project.getBackingId())
-                            .addrName(project.getAddrName())
-                            .recipient(project.getRecipient())
-                            .postalCode(project.getPostalCode())
-                            .roadAddr(project.getRoadAddr())
-                            .detailAddr(project.getDetailAddr())
-                            .recipientPhone(project.getRecipientPhone())
-                            .creatorName(project.getCreatorName())
-                            .rewards(rewardList)
-                            .build();
-                })
-                .toList();
+        List<MyPageBackingDetailDto> result = new ArrayList<>(grouped.values());
 
         return ResponseEntity.ok(ResponseDto.success(200, "후원 내역 상세 조회 성공", result));
     }

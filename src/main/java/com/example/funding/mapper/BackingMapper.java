@@ -3,7 +3,9 @@ package com.example.funding.mapper;
 import com.example.funding.dto.request.backing.BackingRequestUpdateDto;
 import com.example.funding.dto.response.backing.BackingCreatorBackerList;
 import com.example.funding.dto.response.backing.userList_detail.MyPageBackingDetailDto;
+import com.example.funding.dto.response.backing.userList_detail.MyPageBackingDetailSaveDto;
 import com.example.funding.dto.response.backing.userList_detail.MyPageBackingListDto;
+import com.example.funding.dto.response.backing.userList_detail.MyPageBackingSaveDto;
 import com.example.funding.dto.response.creator.DailyCountDto;
 import com.example.funding.dto.response.creator.MonthCountDto;
 import com.example.funding.dto.response.user.BackingDto;
@@ -41,4 +43,8 @@ public interface BackingMapper {
     List<MyPageBackingListDto> getBackingList(@Param("userId") Long userId);
 
     List<MyPageBackingDetailDto> getBackingDetail(@Param("userId") Long userId);
+
+    List<MyPageBackingSaveDto> getBackingLists(@Param("userId") Long userId);
+
+    List<MyPageBackingDetailSaveDto> getBackingDetails(@Param("userId") Long userId);
 }

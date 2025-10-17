@@ -1,27 +1,20 @@
 package com.example.funding.dto.response.backing.userList_detail;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class MyPageBackingListDto {
-    //프로젝트 테이블
+public class MyPageBackingSaveDto {
     private Long projectId;
     private String title;
     private Long goalAmount;
     private Long currAmount;
     private LocalDate endDate;
     private String thumbnail;
-
-    //리워드 테이블
-    private List<MyPageBacking_RewardDto> mpBackingList = new ArrayList<>();
 
     //후원 테이블
     private Long userId;
@@ -35,5 +28,16 @@ public class MyPageBackingListDto {
 
     //창작자 테이블
     private String creatorName;
+
+    private Long rewardId;
+    private String rewardName;
+    private Long price;
+    private LocalDate deliveryDate;
+
+    // 후원상세
+    private Long quantity;
+
+
+
 
 }

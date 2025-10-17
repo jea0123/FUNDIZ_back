@@ -12,7 +12,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface ProjectMapper {
@@ -45,7 +47,7 @@ public interface ProjectMapper {
 
     void updateProjectSettled(@Param("projectId") Long projectId, @Param("status") String status);
 
-    LocalDate getProjectEndDate(@Param("projectId") Long projectId);
+    LocalDateTime getProjectEndDate(@Param("projectId") Long projectId);
 
     long getVerifyingCnt(Long creatorId);
 
@@ -59,9 +61,9 @@ public interface ProjectMapper {
 
     Long getLikeCnt(@Param("projectId") Long projectId);
 
-    List<Project> getProjectToOpen();
+    List<Map<String, Object>> getProjectToOpen();
 
-    List<Project> getProjectToSuccess();
+    List<Map<String, Object>> getProjectToSuccess();
 
-    List<Project> getProjectToFailed();
+    List<Map<String, Object>> getProjectToFailed();
 }

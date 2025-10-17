@@ -304,7 +304,7 @@
         <include refid="searchFilterWhere" />
     </select>
 
-    <select id="getProjectToOpen" resultType="project">
+    <select id="getProjectToOpen" resultType="map">
         SELECT *
         FROM PROJECT
         WHERE PROJECTSTATUS = 'UPCOMING'
@@ -319,7 +319,7 @@
           AND STARTDATE <![CDATA[ <= ]]> TRUNC(SYSDATE)
     </update>
 
-    <select id="getProjectToSuccess" resultType="project">
+    <select id="getProjectToSuccess" resultType="map">
         SELECT *
         FROM PROJECT
         WHERE PROJECTSTATUS = 'OPEN'
@@ -336,7 +336,7 @@
           AND CURRAMOUNT <![CDATA[ >= ]]> GOALAMOUNT
     </update>
 
-    <select id="getProjectToFailed" resultType="project">
+    <select id="getProjectToFailed" resultType="map">
         SELECT *
         FROM PROJECT
         WHERE PROJECTSTATUS = 'OPEN'

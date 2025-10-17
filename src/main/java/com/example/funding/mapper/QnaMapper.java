@@ -22,7 +22,7 @@ public interface QnaMapper {
 
     List<CreatorQnaDto> getQnaListOfUser(Long userId, @Param("pager") Pager pager);
 
-    Qna getQnAById(@Param("userId") Long userId, @Param("projectId") Long projectIds);
+    Qna getQnAById(@Param("userId") Long userId, @Param("projectId") Long projectId);
 
     int qnaTotalOfUser(Long userId);
 

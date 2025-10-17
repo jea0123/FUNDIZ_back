@@ -3,7 +3,7 @@ package com.example.funding.dto.response.user;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -14,5 +14,5 @@ public class RecentViewProject {
     private String thumbnail;
     private Integer percentNow;
     private Integer currAmount;
-    private LocalDate endDate;
+    private LocalDateTime endDate;
 }

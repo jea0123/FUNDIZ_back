@@ -2,11 +2,6 @@ package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.reward.RewardCreateRequestDto;
-import com.example.funding.exception.forbidden.AccessDeniedException;
-import com.example.funding.exception.notfound.CreatorNotFoundException;
-import com.example.funding.exception.notfound.ProjectNotFoundException;
-import com.example.funding.exception.notfound.RewardNotFoundException;
-import com.example.funding.mapper.CreatorMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.RewardMapper;
 import com.example.funding.model.Project;
@@ -14,26 +9,30 @@ import com.example.funding.model.Reward;
 import com.example.funding.service.RewardService;
 import com.example.funding.service.validator.ProjectInputValidator;
 import com.example.funding.service.validator.ProjectTransitionGuard;
+import com.example.funding.validator.Loaders;
+import com.example.funding.validator.PermissionChecker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Validated
 public class RewardServiceImpl implements RewardService {
-
+    private final Loaders loaders;
+    private final PermissionChecker auth;
     private final RewardMapper rewardMapper;
     private final ProjectMapper projectMapper;
-    private final CreatorMapper creatorMapper;
     private final ProjectInputValidator inputValidator;
     private final ProjectTransitionGuard transitionGuard;
 
@@ -46,7 +45,8 @@ public class RewardServiceImpl implements RewardService {
      * @since 2025-09-09
      */
     @Override
-    public void createReward(Long projectId, List<RewardCreateRequestDto> rewardList, LocalDate endDate, boolean validated) {
+    public void createReward(Long projectId, List<RewardCreateRequestDto> rewardList, LocalDateTime endDate, boolean validated) {
+        loaders.project(projectId);
         // Guard
         transitionGuard.requireDraft(projectId);
 
@@ -83,7 +83,8 @@ public class RewardServiceImpl implements RewardService {
      * @since 2025-10-07
      */
     @Override
-    public void replaceRewards(Long projectId, List<RewardCreateRequestDto> rewardList, LocalDate endDate) {
+    public void replaceRewards(Long projectId, List<RewardCreateRequestDto> rewardList, LocalDateTime endDate) {
+        loaders.project(projectId);
         // Guard
         transitionGuard.requireDraft(projectId);
 
@@ -121,8 +122,10 @@ public class RewardServiceImpl implements RewardService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> deleteReward(Long projectId, Long rewardId) {
-        if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
-        if (rewardMapper.findById(rewardId) == null) throw new RewardNotFoundException();
+        // TODO: 리워드 삭제 시, 해당 리워드를 선택한 서포터가 있을 경우 예외 처리 필요
+        // TODO: 크리에이터 권한 검사 추가 필요
+        loaders.project(projectId);
+        loaders.reward(rewardId);
         // Guard
         transitionGuard.requireDraft(projectId);
 
@@ -142,10 +145,9 @@ public class RewardServiceImpl implements RewardService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<Reward>>> getRewardListManage(Long projectId, Long creatorId) {
-        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
-        Project existingProject = projectMapper.findById(projectId);
-        if (existingProject == null) throw new ProjectNotFoundException();
-        if (!existingProject.getCreatorId().equals(creatorId)) throw new AccessDeniedException();
+        loaders.creator(creatorId);
+        Project existingProject = loaders.project(projectId);
+        auth.mustBeOwner(creatorId, existingProject.getCreatorId());
         // Guard
         transitionGuard.ensureProjectOwner(projectId, creatorId);
 
@@ -166,16 +168,15 @@ public class RewardServiceImpl implements RewardService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> addReward(Long projectId, Long creatorId, RewardCreateRequestDto dto) {
-        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
-        Project existingProject = projectMapper.findById(projectId);
-        if (existingProject == null) throw new ProjectNotFoundException();
-        if (!existingProject.getCreatorId().equals(creatorId)) throw new AccessDeniedException();
+        loaders.creator(creatorId);
+        Project existingProject = loaders.project(projectId);
+        auth.mustBeOwner(creatorId, existingProject.getCreatorId());
         // Guard
         transitionGuard.ensureProjectOwner(projectId, creatorId);
         transitionGuard.requireStatusIn(projectId, "UPCOMING", "OPEN");
 
         // Validator
-        LocalDate endDate = projectMapper.getProjectEndDate(projectId);
+        LocalDateTime endDate = projectMapper.getProjectEndDate(projectId);
         List<String> errors = inputValidator.validateRewardFields(dto, endDate);
         if (!errors.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.join("; ", errors));

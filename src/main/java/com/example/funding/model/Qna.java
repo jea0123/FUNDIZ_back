@@ -5,8 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -19,5 +18,5 @@ public class Qna {
     private Long creatorId;
     private String title;
     private String content;
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 }

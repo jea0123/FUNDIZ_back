@@ -17,8 +17,8 @@
 
     <select id="getSubcategoryWithParent" resultType="subcategoryWithParentDto">
         SELECT
-            SUBCTGRID,
-            CTGRID
+            sc.SUBCTGRID,
+            sc.CTGRID
         FROM SUBCATEGORY sc
         LEFT JOIN CATEGORY c ON c.CTGRID = sc.CTGRID
         WHERE sc.SUBCTGRID = #{subctgrId}

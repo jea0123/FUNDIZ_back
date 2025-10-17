@@ -5,7 +5,7 @@
     import lombok.Getter;
     import lombok.Setter;
 
-    import java.time.LocalDate;
+    import java.time.LocalDateTime;
 
     @Getter
     @Setter
@@ -16,6 +16,6 @@
         private String nickname;
         private Character isSuspended;
         private String reason;
-        private LocalDate suspendedAt;
-        private LocalDate releasedAt;
+        private LocalDateTime suspendedAt;
+        private LocalDateTime releasedAt;
     }

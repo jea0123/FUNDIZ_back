@@ -5,16 +5,17 @@ import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.cs.NoticeAddRequestDto;
 import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
-import com.example.funding.exception.notfound.NoticeNotFoundException;
 import com.example.funding.mapper.NoticeMapper;
 import com.example.funding.model.Notice;
 import com.example.funding.service.NoticeService;
+import com.example.funding.validator.Loaders;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
@@ -22,8 +23,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Validated
 public class NoticeServiceImpl implements NoticeService {
-
+    private final Loaders loaders;
     private final NoticeMapper noticeMapper;
 
     /**
@@ -57,8 +59,7 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<Notice>> item(Long noticeId) {
-        Notice item = noticeMapper.noticeDetail(noticeId);
-        if (item == null) throw new NoticeNotFoundException();
+        Notice item = loaders.notice(noticeId);
         //조회수 증가
         noticeMapper.updateViewCnt(noticeId);
         //공지사항 상세페이지 조회
@@ -91,20 +92,19 @@ public class NoticeServiceImpl implements NoticeService {
      * <p>공지사항 수정</p>
      *
      * @param noticeId 공지사항 ID
-     * @param ntcDto NoticeUpdateRequestDto
+     * @param ntcDto   NoticeUpdateRequestDto
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author 이동혁
      * @since 2025-09-24
      */
     @Override
     public ResponseEntity<ResponseDto<String>> updateNotice(Long noticeId, NoticeUpdateRequestDto ntcDto) {
-        if(noticeMapper.noticeDetail(noticeId) == null) throw new NoticeNotFoundException();
+        loaders.notice(noticeId);
         ntcDto.setNoticeId(noticeId);
 
         noticeMapper.updateNotice(ntcDto);
         return ResponseEntity.ok(ResponseDto.success(200, "공지사항 수정 완료", "공지사항 수정 "));
     }
-
 
     /**
      * <p>공지사항 삭제</p>
@@ -116,7 +116,7 @@ public class NoticeServiceImpl implements NoticeService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> deleteNotice(Long noticeId) {
-        if(noticeMapper.noticeDetail(noticeId) == null) throw new NoticeNotFoundException();
+        loaders.notice(noticeId);
 
         noticeMapper.deleteNotice(noticeId);
         return ResponseEntity.ok(ResponseDto.success(200, "공지사항 삭제 완료", "공지사항 삭제"));

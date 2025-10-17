@@ -22,6 +22,10 @@ public interface UserMapper {
 
     List<MyPageLikedDto> getLikedList(@Param("userId") Long userId);
 
+    void upsertRecentView(@Param("userId") Long userId, @Param("projectId") Long projectId);
+
+    Long isExistRecentViewProject(@Param("userId") Long userId, @Param("projectId") Long projectId);
+
     List<RecentViewProject> getRecentViewProjects(@Param("userId") Long userId);
 
     void updateNickname(@Param("userId") Long userId, @Param("nickname") String nickname);

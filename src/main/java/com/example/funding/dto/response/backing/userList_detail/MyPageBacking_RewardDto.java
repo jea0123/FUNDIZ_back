@@ -2,7 +2,7 @@ package com.example.funding.dto.response.backing.userList_detail;
 
 import lombok.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -14,7 +14,7 @@ public class MyPageBacking_RewardDto {
     private Long rewardId;
     private String rewardName;
     private Long price;
-    private LocalDate deliveryDate;
+    private LocalDateTime deliveryDate;
 
     // 후원상세
     private Long quantity;

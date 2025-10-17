@@ -26,6 +26,9 @@ public class NotificationServiceImpl implements NotificationService {
     private final PermissionChecker auth;
     private final NotificationMapper notificationMapper;
 
+    /**
+     * 알림 목록 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<Notification>>> getNotificationsByUserId(Long userId) {
@@ -35,6 +38,9 @@ public class NotificationServiceImpl implements NotificationService {
         return ResponseEntity.ok(ResponseDto.success(200, "알림 목록 조회 성공", notifications));
     }
 
+    /**
+     * 알림 단건 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<Notification>> getNotificationById(Long notificationId, Long userId) {
@@ -45,6 +51,9 @@ public class NotificationServiceImpl implements NotificationService {
         return ResponseEntity.ok(ResponseDto.success(200, "알림 조회 성공", notification));
     }
 
+    /**
+     * 알림 읽음 처리
+     */
     @Override
     public ResponseEntity<ResponseDto<String>> markAsRead(Long notificationId, Long userId) {
         loaders.user(userId);
@@ -58,6 +67,9 @@ public class NotificationServiceImpl implements NotificationService {
         return ResponseEntity.ok(ResponseDto.success(200, "알림 읽음 처리 성공", null));
     }
 
+    /**
+     * 모든 알림 읽음 처리
+     */
     @Override
     public ResponseEntity<ResponseDto<String>> markAllAsRead(Long userId) {
         loaders.user(userId);
@@ -74,6 +86,9 @@ public class NotificationServiceImpl implements NotificationService {
         return ResponseEntity.ok(ResponseDto.success(200, "모든 알림 읽음 처리 성공", null));
     }
 
+    /**
+     * 알림 삭제
+     */
     @Override
     public ResponseEntity<ResponseDto<String>> deleteNotification(Long notificationId, Long userId) {
         loaders.user(userId);
@@ -84,6 +99,9 @@ public class NotificationServiceImpl implements NotificationService {
         return ResponseEntity.ok(ResponseDto.success(200, "알림 삭제 성공", null));
     }
 
+    /**
+     * 모든 알림 삭제
+     */
     @Override
     public ResponseEntity<ResponseDto<String>> deleteAllNotificationsByUserId(Long userId) {
         loaders.user(userId);

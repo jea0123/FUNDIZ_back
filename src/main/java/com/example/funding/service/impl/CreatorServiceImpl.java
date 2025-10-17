@@ -527,6 +527,9 @@ public class CreatorServiceImpl implements CreatorService {
         return ResponseEntity.ok(ResponseDto.success(200, "창작자의 배송(후원자) 리스트 조회 성공", shippingBackerLists));
     }
 
+    /**
+     * 크리에이터 등록
+     */
     @Override
     public ResponseEntity<ResponseDto<String>> registerCreator(CreatorRegisterRequestDto dto, Long userId) throws IOException {
         loaders.user(userId);
@@ -562,6 +565,9 @@ public class CreatorServiceImpl implements CreatorService {
         return ResponseEntity.ok(ResponseDto.success(200, "배송지 변경 완료", "배송지 변경"));
     }
 
+    /**
+     * 팔로워 수 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<Long>> getFollowerCnt(Long creatorId) {

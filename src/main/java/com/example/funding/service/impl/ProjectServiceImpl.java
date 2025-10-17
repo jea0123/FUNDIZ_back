@@ -101,6 +101,9 @@ public class ProjectServiceImpl implements ProjectService {
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 상세 조회 성공", detail));
     }
 
+    /**
+     * 최근 24시간 내 결제된 프로젝트 TOP10 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<RecentTop10ProjectDto>>> getRecentTop10() {
@@ -117,6 +120,9 @@ public class ProjectServiceImpl implements ProjectService {
         return ResponseEntity.ok(ResponseDto.success(200, "최근 24시간 내 결제된 프로젝트 TOP10 조회 성공", ranked));
     }
 
+    /**
+     * 추천 프로젝트 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<FeaturedProjectDto>>> getFeatured(int days, int limit) {
@@ -149,6 +155,9 @@ public class ProjectServiceImpl implements ProjectService {
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 검색 성공", result));
     }
 
+    /**
+     * 프로젝트 좋아요 수 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<Long>> getLikeCnt(Long projectId) {

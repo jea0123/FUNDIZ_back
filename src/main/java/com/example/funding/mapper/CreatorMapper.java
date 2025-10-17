@@ -34,8 +34,6 @@ public interface CreatorMapper {
 
     int existsCreator(@Param("creatorId") Long creatorId);
 
-    int hasRequiredCreatorProfile(@Param("creatorId") Long creatorId);
-
     CreatorProfileSummaryDto getCreatorProfileSummary(@Param("creatorId") Long creatorId);
 
     int qnaTotalOfCreator(Long creatorId);

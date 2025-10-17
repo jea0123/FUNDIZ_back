@@ -139,4 +139,9 @@
         WHERE QNAID = #{qnaId}
     </select>
 
+    <select id="findById" resultType="qna">
+        SELECT * FROM QNA
+        WHERE QNAID = #{qnaId}
+    </select>
+
 </mapper>

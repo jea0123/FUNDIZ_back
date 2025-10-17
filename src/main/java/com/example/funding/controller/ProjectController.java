@@ -8,8 +8,9 @@ import com.example.funding.dto.request.project.CommunityCreateRequestDto;
 import com.example.funding.dto.request.project.ReplyCreateRequestDto;
 import com.example.funding.dto.request.project.SearchProjectDto;
 import com.example.funding.dto.response.project.*;
-import com.example.funding.exception.FeaturedProjectNotFoundException;
-import com.example.funding.exception.RecentPaidProjectNotFoundException;
+import com.example.funding.exception.notfound.FeaturedProjectNotFoundException;
+import com.example.funding.exception.notfound.ProjectNotFoundException;
+import com.example.funding.exception.notfound.RecentPaidProjectNotFoundException;
 import com.example.funding.service.CommunityService;
 import com.example.funding.service.ProjectService;
 import com.example.funding.service.ReplyService;
@@ -187,4 +188,17 @@ public class ProjectController {
         return replyService.createCommunityReply(cmId, dto, userId);
     }
 
+    /**
+     * <p>프로젝트 상세 페이지 - 좋아요 수 조회</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @return 성공 시 200 OK
+     * @throws ProjectNotFoundException 프로젝트를 찾을 수 없을 경우
+     * @author 장민규
+     * @since 2025-10-15
+     */
+    @GetMapping("/{projectId}/likeCnt")
+    public ResponseEntity<ResponseDto<Long>> getLikeCnt(@PathVariable Long projectId) {
+        return projectService.getLikeCnt(projectId);
+    }
 }

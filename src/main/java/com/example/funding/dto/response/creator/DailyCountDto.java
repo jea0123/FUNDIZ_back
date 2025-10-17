@@ -2,7 +2,7 @@ package com.example.funding.dto.response.creator;
 
 import lombok.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -10,6 +10,6 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 public class DailyCountDto {
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
     private Long count;
 }

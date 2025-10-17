@@ -1,6 +1,5 @@
 package com.example.funding.service.validator;
 
-import com.example.funding.dto.request.reward.RewardCreateRequestDto;
 import com.example.funding.dto.response.category.SubcategoryWithParentDto;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Project;
@@ -11,17 +10,11 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
-import static com.example.funding.service.validator.ValidationRules.*;
-import static com.example.funding.service.validator.ValidationRules.MAX_CONTENT_LEN;
-import static com.example.funding.service.validator.ValidationRules.MAX_DAYS;
-import static com.example.funding.service.validator.ValidationRules.MIN_CONTENT_LEN;
-import static com.example.funding.service.validator.ValidationRules.MIN_DAYS;
-import static com.example.funding.service.validator.ValidationRules.MIN_GOAL_AMOUNT;
-import static com.example.funding.service.validator.ValidationRules.MIN_START_LEAD_DAYS;
-import static com.example.funding.service.validator.ValidationRules.daysInclusive;
+import static com.example.funding.service.validator.ValidationRules.normRewardName;
 import static com.example.funding.service.validator.ValidationRules.nvl;
 
 @Component
@@ -45,7 +38,7 @@ public class ProjectEntityValidator {
                 p.getStartDate(), p.getEndDate(), true, errors);
 
         LocalDate today = LocalDate.now(ZONE_SEOUL);
-        if (p.getStartDate() != null && p.getStartDate().isBefore(today)) {
+        if (p.getStartDate() != null && p.getStartDate().isBefore(today.atStartOfDay())) {
             errors.add("시작일이 이미 지났습니다. 일정을 조정하세요.");
         }
     }
@@ -84,8 +77,8 @@ public class ProjectEntityValidator {
     /**
      * 리워드 검증
      */
-    public void validateRewardsFromDb(Long projectId, LocalDate endDate, List<String> errors) {
-        List<Reward> rewards = Optional.ofNullable(rewardMapper.getRewardList(projectId))
+    public void validateRewardsFromDb(Long projectId, LocalDateTime endDate, List<String> errors) {
+        List<Reward> rewards = Optional.ofNullable(rewardMapper.getRewardListPublic(projectId))
             .orElseGet(Collections::emptyList);
 
         if (rewards.isEmpty()) {
@@ -113,17 +106,5 @@ public class ProjectEntityValidator {
         }
 
         if (hasDup) errors.add("중복된 리워드명이 있습니다.");
-    }
-
-    /**
-     * 창작자 프로필 검증
-     */
-    public void validateCreatorProfile(Long creatorId, List<String> errors) {
-        if (creatorMapper.hasRequiredCreatorProfile(creatorId) != 1) {
-            errors.add("창작자 프로필 필수 항목이 미완성입니다. (창작자명/사업자번호/이메일/전화번호)");
-        }
-        if (userMapper.suspendedCreator(creatorId) == 1) {
-            errors.add("정지된 창작자는 프로젝트 등록/수정이 불가합니다.");
-        }
     }
 }

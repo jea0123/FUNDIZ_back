@@ -4,18 +4,19 @@ import com.example.funding.common.Cursor;
 import com.example.funding.common.CursorPage;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.CommunityCreateRequestDto;
-import com.example.funding.dto.response.project.*;
+import com.example.funding.dto.response.project.CommunityDto;
+import com.example.funding.dto.response.project.ReviewDto;
 import com.example.funding.mapper.CommunityMapper;
-import com.example.funding.mapper.ReplyMapper;
-import com.example.funding.mapper.UserMapper;
 import com.example.funding.model.Community;
 import com.example.funding.service.CommunityService;
+import com.example.funding.validator.Loaders;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -24,20 +25,21 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
+@Validated
 public class CommunityServiceImpl implements CommunityService {
 
     private final CommunityMapper communityMapper;
-    private final UserMapper userMapper;
-    private final ReplyMapper replyMapper;
+    private final Loaders loaders;
 
     /**
      * <p>프로젝트 상세 페이지 내 커뮤니티 목록 조회</p>
      *
-     * @param projectId 프로젝트 ID
-     * @param code CM
+     * @param projectId     프로젝트 ID
+     * @param code          CM
      * @param lastCreatedAt 마지막 항목의 생성일시
-     * @param lastId 마지막 항목의 cmId
-     * @param size 한 번에 가져올 항목 수
+     * @param lastId        마지막 항목의 cmId
+     * @param size          한 번에 가져올 항목 수
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-10-03
@@ -45,6 +47,7 @@ public class CommunityServiceImpl implements CommunityService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CursorPage<CommunityDto>>> getCommunityList(Long projectId, String code, LocalDateTime lastCreatedAt, Long lastId, int size) {
+        loaders.project(projectId);
         List<CommunityDto> communityList = communityMapper.getCommunityList(projectId, "CM", lastCreatedAt, lastId, size);
 
         Cursor next = null;
@@ -60,21 +63,23 @@ public class CommunityServiceImpl implements CommunityService {
      * <p>프로젝트 상세 페이지 - 커뮤니티 등록</p>
      *
      * @param projectId 프로젝트 ID
-     * @param dto CommunityCreateRequestDto
-     * @param userId 사용자 ID
+     * @param dto       CommunityCreateRequestDto
+     * @param userId    사용자 ID
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-10-12
      */
     @Override
     public ResponseEntity<ResponseDto<String>> createCommunity(Long projectId, CommunityCreateRequestDto dto, Long userId) {
+        loaders.user(userId);
+        loaders.project(projectId);
         //TODO: guard, validator
 
         Community community = Community.builder()
-            .projectId(projectId)
-            .userId(userId)
-            .cmContent(dto.getCmContent())
-            .build();
+                .projectId(projectId)
+                .userId(userId)
+                .cmContent(dto.getCmContent())
+                .build();
 
         int result = communityMapper.createCommunity(community);
         if (result != 1) {
@@ -87,11 +92,11 @@ public class CommunityServiceImpl implements CommunityService {
     /**
      * <p>프로젝트 상세 페이지 내 후기 목록 조회</p>
      *
-     * @param projectId 프로젝트 ID
-     * @param code RV
+     * @param projectId     프로젝트 ID
+     * @param code          RV
      * @param lastCreatedAt 마지막 항목의 생성일시
-     * @param lastId 마지막 항목의 cmId
-     * @param size 한 번에 가져올 항목 수
+     * @param lastId        마지막 항목의 cmId
+     * @param size          한 번에 가져올 항목 수
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-10-03
@@ -99,6 +104,7 @@ public class CommunityServiceImpl implements CommunityService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CursorPage<ReviewDto>>> getReviewList(Long projectId, String code, LocalDateTime lastCreatedAt, Long lastId, int size) {
+        loaders.project(projectId);
         List<ReviewDto> reviewList = communityMapper.getReviewList(projectId, "RV", lastCreatedAt, lastId, size);
 
         Cursor next = null;

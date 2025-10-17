@@ -9,8 +9,9 @@ import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
 import com.example.funding.dto.row.ProjectRow;
-import com.example.funding.exception.FeaturedProjectNotFoundException;
-import com.example.funding.exception.RecentPaidProjectNotFoundException;
+import com.example.funding.exception.notfound.FeaturedProjectNotFoundException;
+import com.example.funding.exception.notfound.ProjectNotFoundException;
+import com.example.funding.exception.notfound.RecentPaidProjectNotFoundException;
 import com.example.funding.mapper.NewsMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.RewardMapper;
@@ -19,21 +20,24 @@ import com.example.funding.model.News;
 import com.example.funding.model.Reward;
 import com.example.funding.model.Tag;
 import com.example.funding.service.ProjectService;
+import com.example.funding.validator.Loaders;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Validated
 public class ProjectServiceImpl implements ProjectService {
-
+    private final Loaders loaders;
     private final ProjectMapper projectMapper;
     private final TagMapper tagMapper;
     private final RewardMapper rewardMapper;
@@ -50,24 +54,20 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<ProjectDetailDto>> getProjectDetail(Long projectId) {
+        ProjectRow row = projectMapper.getProjectRow(projectId);
+        if (row == null) throw new ProjectNotFoundException();
         //조회수 증가
         projectMapper.updateViewCnt(projectId);
 
-        //프로젝트 단건 조회
-        ProjectRow row = projectMapper.getProjectRow(projectId);
-        if (row == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "존재하지 않는 프로젝트입니다."));
-        }
-
         //컬렉션 조회
         List<Tag> tagList = tagMapper.getTagList(projectId);
-        List<Reward> rewardList = rewardMapper.getRewardList(projectId);
+        List<Reward> rewardList = rewardMapper.getRewardListPublic(projectId);
         List<News> newsList = newsMapper.getNewsList(projectId);
 
         //달성률, 창작자가 등록한 프로젝트 수, 결제일
         int percentNow = Utils.getPercentNow(row.getCurrAmount(), row.getGoalAmount());
         int projectCnt = projectMapper.getProjectCnt(row.getCreatorId());
-        LocalDate paymentDate = row.getEndDate().plusDays(1);
+        LocalDateTime paymentDate = row.getEndDate().plusDays(1);
 
         //응답Dto 조립
         ProjectDetailDto detail = ProjectDetailDto.builder()
@@ -101,6 +101,9 @@ public class ProjectServiceImpl implements ProjectService {
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 상세 조회 성공", detail));
     }
 
+    /**
+     * 최근 24시간 내 결제된 프로젝트 TOP10 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<RecentTop10ProjectDto>>> getRecentTop10() {
@@ -117,13 +120,15 @@ public class ProjectServiceImpl implements ProjectService {
         return ResponseEntity.ok(ResponseDto.success(200, "최근 24시간 내 결제된 프로젝트 TOP10 조회 성공", ranked));
     }
 
+    /**
+     * 추천 프로젝트 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<FeaturedProjectDto>>> getFeatured(int days, int limit) {
         List<FeaturedProjectDto> result = projectMapper.findFeaturedJoinedWithRecent(days, limit);
-        if (result == null || result.isEmpty()) {
-            throw new FeaturedProjectNotFoundException();
-        }
+        if (result == null || result.isEmpty()) throw new FeaturedProjectNotFoundException();
+
         return ResponseEntity.ok(ResponseDto.success(200, "추천 프로젝트 조회 성공", result));
     }
 
@@ -150,4 +155,14 @@ public class ProjectServiceImpl implements ProjectService {
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 검색 성공", result));
     }
 
+    /**
+     * 프로젝트 좋아요 수 조회
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<Long>> getLikeCnt(Long projectId) {
+        loaders.project(projectId);
+        Long likeCnt = projectMapper.getLikeCnt(projectId);
+        return ResponseEntity.ok(ResponseDto.success(200, "좋아요 수 조회 성공", likeCnt));
+    }
 }

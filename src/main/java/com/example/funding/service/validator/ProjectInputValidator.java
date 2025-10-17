@@ -2,13 +2,12 @@ package com.example.funding.service.validator;
 
 import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.reward.RewardCreateRequestDto;
-import com.example.funding.dto.response.category.SubcategoryWithParentDto;
-import com.example.funding.mapper.CreatorMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
@@ -64,8 +63,8 @@ public class ProjectInputValidator {
     public void validateBasics(@Nullable String title,
                                @Nullable String content,
                                @Nullable Integer goalAmount,
-                               @Nullable LocalDate startDate,
-                               @Nullable LocalDate endDate,
+                               @Nullable LocalDateTime startDate,
+                               @Nullable LocalDateTime endDate,
                                boolean forCreate,
                                List<String> errors) {
 
@@ -111,7 +110,7 @@ public class ProjectInputValidator {
             }
 
             LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
-            if (startDate.isBefore(today.plusDays(MIN_START_LEAD_DAYS))) {
+            if (startDate.isBefore(today.plusDays(MIN_START_LEAD_DAYS).atStartOfDay())) {
                 errors.add("시작일은 오늘로부터 최소 " + MIN_START_LEAD_DAYS + "일 이후여야 합니다.");
             }
         }
@@ -171,8 +170,8 @@ public class ProjectInputValidator {
                                                 Long price,
                                                 Integer rewardCnt,
                                                 Character isPosting,
-                                                LocalDate deliveryDate,
-                                                @Nullable LocalDate endDate) {
+                                                LocalDateTime deliveryDate,
+                                                @Nullable LocalDateTime endDate) {
 
         List<String> errors = new ArrayList<>();
 
@@ -208,7 +207,7 @@ public class ProjectInputValidator {
     /**
      * 리워드 단건 생성/수정 요청 DTO 검증
      */
-    public List<String> validateRewardFields(RewardCreateRequestDto dto, @Nullable LocalDate endDate) {
+    public List<String> validateRewardFields(RewardCreateRequestDto dto, @Nullable LocalDateTime endDate) {
         return validateRewardFieldCore(
             dto.getRewardName(),
             dto.getRewardContent(),
@@ -222,7 +221,7 @@ public class ProjectInputValidator {
     /**
      * 리워드 목록 생성/수정 요청 DTO 검증
      */
-    public List<String> validateRewards(List<RewardCreateRequestDto> list, @Nullable LocalDate endDate) {
+    public List<String> validateRewards(List<RewardCreateRequestDto> list, @Nullable LocalDateTime endDate) {
         List<String> errors = new ArrayList<>();
         if (list == null || list.isEmpty()) {
             errors.add("최소 1개 이상의 리워드가 필요합니다.");

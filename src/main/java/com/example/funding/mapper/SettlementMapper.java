@@ -7,7 +7,7 @@ import com.example.funding.model.Settlement;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -25,22 +25,22 @@ public interface SettlementMapper {
             @Param("statusColumn") String statusColumn
     );
 
-    int existsByProjectId(Long projectId);
+    Settlement getByProjectId(@Param("projectId") Long projectId);
 
     String getStatus(@Param("projectId") Long projectId, @Param("creatorId") Long creatorId, @Param("settlementId") Long settlementId);
 
     int count(
             @Param("q") String q,
             @Param("status") String status,
-            @Param("from") LocalDate from,
-            @Param("to") LocalDate to
+            @Param("from") LocalDateTime from,
+            @Param("to") LocalDateTime to
     );
 
     List<SettlementItem> findPage(
             @Param("q") String q,
             @Param("status") String status,
-            @Param("from") LocalDate from,
-            @Param("to") LocalDate to,
+            @Param("from") LocalDateTime from,
+            @Param("to") LocalDateTime to,
             @Param("startRow") int startRow,
             @Param("endRow") int endRow
     );

@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -13,29 +13,22 @@ import java.util.List;
 public class ProjectCreateRequestDto {
     private Long projectId;
     private Long subctgrId;
-    private Long creatorId;
 
     //프로젝트
     private String title;
-    private String content;
-    private MultipartFile thumbnail;
-    private String thumbnailUrl;
     private Integer goalAmount;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+    private String content;
+    private String contentBlocks;
+    private String thumbnailUrl;
+    private String businessDocUrl;
 
-    //태그
+    //태그/리워드
     private List<String> tagList;
-
-    //리워드
     private List<RewardCreateRequestDto> rewardList;
 
-    //창작자
-    private String creatorName;
-    private String businessNum;
-    private String email;
-    private String phone;
-
-    private List<MultipartFile> files;
+    //파일
+    private MultipartFile thumbnail;
     private MultipartFile businessDoc;
 }

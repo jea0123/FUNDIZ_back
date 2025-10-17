@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -18,17 +18,19 @@ public class Project {
     private String title;
     private Integer goalAmount;
     private Integer currAmount;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private String content;
+    private String contentBlocks;
     private String thumbnail;
-    private LocalDate createdAt;
-    private LocalDate updatedAt;
+    private String businessDoc;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private String projectStatus;
     private Integer backerCnt;
     private Integer likeCnt;
     private Integer viewCnt;
     private Character isVerified;
+    private LocalDateTime requestedAt;
     private String rejectedReason;
-    private LocalDate requestedAt;
 }

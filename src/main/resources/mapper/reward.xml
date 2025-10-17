@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.funding.mapper.RewardMapper">
 
-    <select id="getRewardList" resultType="reward">
+    <select id="getRewardListPublic" resultType="reward">
         SELECT
             r.REWARDID,
             r.PROJECTID,
@@ -81,7 +81,7 @@
         WHERE PROJECTID = #{projectId}
     </delete>
 
-    <select id="getCreatorRewardList" resultType="reward">
+    <select id="getRewardListManage" resultType="reward">
         SELECT
             r.REWARDID,
             r.PROJECTID,
@@ -119,10 +119,38 @@
         AND NVL(DEL_YN,'N') = 'N'
     </select>
 
-    <select id="getProjectIdByRewardId" resultType="long">
-        SELECT PROJECTID
-        FROM REWARD
+    <select id="findById" resultType="reward">
+        SELECT * FROM REWARD
         WHERE REWARDID = #{rewardId}
+    </select>
+
+    <select id="getMyPageDetailRewardList" resultType = "com.example.funding.dto.response.backing.userList_detail.MyPageBacking_RewardDto">
+        select
+            p.projectId,
+            r.rewardName,
+            b.backingId,
+            b.userId
+        from reward r
+        JOIN project p ON r.projectId = p.projectId
+        JOIN backingDetail bd ON bd.rewardId = r.rewardId
+        JOIN backing b ON b.backingId = bd.backingId
+        where b.backingId = #{backingId}
+    </select>
+
+    <select id="getMyPageDetailRewardDetail" resultType = "com.example.funding.dto.response.backing.userList_detail.MyPageBacking_RewardDto">
+        select
+        p.projectId,
+        r.rewardName,
+        r.price,
+        r.deliveryDate,
+        bd.quantity,
+        b.backingId,
+        b.userId
+        from reward r
+        JOIN project p ON r.projectId = p.projectId
+        JOIN backingDetail bd ON bd.rewardId = r.rewardId
+        JOIN backing b ON b.backingId = bd.backingId
+        where b.backingId = #{backingId}
     </select>
 
 </mapper>

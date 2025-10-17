@@ -15,10 +15,10 @@ import com.example.funding.dto.response.admin.ProjectVerifyListDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.admin.analytic.Kpi;
 import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
-import com.example.funding.exception.AnalyticsNotFoundException;
-import com.example.funding.exception.CategorySuccessNotFoundException;
-import com.example.funding.exception.KPINotFoundException;
-import com.example.funding.exception.RewardSalesNotFoundException;
+import com.example.funding.exception.notfound.AnalyticsNotFoundException;
+import com.example.funding.exception.notfound.CategorySuccessNotFoundException;
+import com.example.funding.exception.notfound.KPINotFoundException;
+import com.example.funding.exception.notfound.RewardSalesNotFoundException;
 import com.example.funding.model.User;
 import org.springframework.http.ResponseEntity;
 

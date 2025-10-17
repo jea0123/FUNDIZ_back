@@ -9,7 +9,10 @@
     </update>
 
     <select id="findById" resultType="project">
-        SELECT *
+        SELECT
+            projectId, creatorId, subctgrId, title, goalAmount, currAmount, startDate, endDate, content, contentBlocks,
+            thumbnail, businessDoc, TRUNC(createdAt), TRUNC(updatedat), projectStatus, backerCnt, likeCnt, viewCnt,
+            isVerified, requestedAt, rejectedReason
         FROM PROJECT
         WHERE PROJECTID = #{projectId}
     </select>
@@ -301,6 +304,13 @@
         <include refid="searchFilterWhere" />
     </select>
 
+    <select id="getProjectToOpen" resultType="map">
+        SELECT *
+        FROM PROJECT
+        WHERE PROJECTSTATUS = 'UPCOMING'
+          AND STARTDATE <![CDATA[ <= ]]> TRUNC(SYSDATE)
+    </select>
+
     <update id="updateProjectsToOpen">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'OPEN',
@@ -308,6 +318,14 @@
         WHERE PROJECTSTATUS = 'UPCOMING'
           AND STARTDATE <![CDATA[ <= ]]> TRUNC(SYSDATE)
     </update>
+
+    <select id="getProjectToSuccess" resultType="map">
+        SELECT *
+        FROM PROJECT
+        WHERE PROJECTSTATUS = 'OPEN'
+          AND (ENDDATE + 1) <![CDATA[ < ]]> TRUNC(SYSDATE)
+          AND CURRAMOUNT <![CDATA[ >= ]]> GOALAMOUNT
+    </select>
 
     <update id="updateProjectsToSuccess">
         UPDATE PROJECT
@@ -317,6 +335,14 @@
           AND (ENDDATE + 1) <![CDATA[ < ]]> TRUNC(SYSDATE)
           AND CURRAMOUNT <![CDATA[ >= ]]> GOALAMOUNT
     </update>
+
+    <select id="getProjectToFailed" resultType="map">
+        SELECT *
+        FROM PROJECT
+        WHERE PROJECTSTATUS = 'OPEN'
+          AND (ENDDATE + 1) <![CDATA[ < ]]> TRUNC(SYSDATE)
+          AND CURRAMOUNT <![CDATA[ < ]]> GOALAMOUNT
+    </select>
 
     <update id="updateProjectsToFailed">
         UPDATE PROJECT
@@ -357,7 +383,6 @@
             CREATORID = #{creatorId}
     </select>
 
-    <!-- TODO : 학교컴 데이터로 확인해보기 (조건 변경 여지 있음)-->
     <select id ="getCShippingList" parameterType="long" resultType = "com.example.funding.dto.response.shipping.CreatorShippingProjectList">
         SELECT
         p.creatorId,
@@ -367,10 +392,13 @@
         count(case when s.shippingStatus = 'DELIVERED' THEN b.userId END) AS completedShippingCnt
         FROM project p
         JOIN creator c ON p.creatorId = c.creatorId
-        JOIN users u ON u.userId = c.userId
-        JOIN backing b ON b.userId = u.userId
+        JOIN reward r ON r.projectId = p.projectId
+        JOIN backingDetail bd ON bd.rewardId = r.rewardId
+        JOIN backing b ON b.backingId = bd.backingId
+        JOIN users u ON u.userId = b.userId
         JOIN shipping s ON b.backingId = s.backingId
         where c.creatorId = #{creatorId}
+          AND p.projectStatus = 'SUCCESS'
         group by p.projectId, p.creatorId, p.title, p.backerCnt
     </select>
 
@@ -382,5 +410,23 @@
           AND projectStatus IN ('SUCCESS', 'SETTLED')
           AND (ENDDATE + 1) <![CDATA[ < ]]> TRUNC(SYSDATE)
     </update>
+
+    <update id="increaseLikeCnt" parameterType="long">
+        UPDATE project
+        SET likeCnt = likeCnt + 1
+        WHERE projectId = #{projectId}
+    </update>
+
+    <update id="decreaseLikeCnt" parameterType="long">
+        UPDATE project
+        SET likeCnt = CASE WHEN likeCnt > 0 THEN likeCnt - 1 ELSE 0 END
+        WHERE projectId = #{projectId}
+    </update>
+
+    <select id="getLikeCnt" resultType="long" parameterType="long">
+        SELECT likeCnt
+        FROM project
+        WHERE projectId = #{projectId}
+    </select>
 
 </mapper>

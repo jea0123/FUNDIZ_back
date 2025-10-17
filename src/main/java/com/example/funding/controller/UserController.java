@@ -8,7 +8,9 @@ import com.example.funding.dto.request.user.UserPasswordDto;
 import com.example.funding.dto.request.user.UserProfileImgDto;
 import com.example.funding.dto.response.creator.CreatorQnaDto;
 import com.example.funding.dto.response.user.*;
-import com.example.funding.exception.UserNotFoundException;
+import com.example.funding.exception.conflict.DuplicatedFollowCreatorException;
+import com.example.funding.exception.conflict.DuplicatedLikedProjectException;
+import com.example.funding.exception.notfound.*;
 import com.example.funding.service.ProjectService;
 import com.example.funding.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +45,15 @@ public class UserController {
 //        Long userId = principal.userId();
         Long userId = 501L; // TODO: 임시
         return userService.getLoginUser(userId);
+    }
+
+    @PostMapping("/recentView/{projectId}")
+    public ResponseEntity<ResponseDto<?>> addRecentViewProject(@PathVariable Long projectId
+//                                                                   @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+//        Long userId = principal.userId();
+        Long userId = 501L; // TODO: 임시
+        return userService.addRecentViewProject(userId, projectId);
     }
 
     /**
@@ -142,4 +153,127 @@ public class UserController {
         return userService.getQnADetail(userId, projectId);
     }
 
+    /**
+     * <p>프로젝트 좋아요</p>
+     *
+     * @param projectId 좋아요할 프로젝트 ID
+     * @param principal 인증된 사용자의 정보
+     * @return 좋아요한 프로젝트 ID
+     * @throws UserNotFoundException    사용자가 존재하지 않을 때
+     * @throws ProjectNotFoundException 프로젝트가 존재하지 않을 때
+     * @throws DuplicatedLikedProjectException 이미 좋아요한 프로젝트일 때
+     * @author by: 장민규
+     * @since 2025-10-15
+     */
+    @PostMapping("/like/{projectId}")
+    public ResponseEntity<ResponseDto<Long>> likeProject(@PathVariable Long projectId
+//                                                      @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+//        Long userId = principal.userId();
+        Long userId = 501L; // TODO: 임시
+        return userService.likeProject(userId, projectId);
+    }
+
+    /**
+     * <p>프로젝트 좋아요 취소</p>
+     *
+     * @param projectId 좋아요 취소할 프로젝트 ID
+     * @param principal 인증된 사용자의 정보
+     * @return 좋아요 취소한 프로젝트 ID
+     * @throws UserNotFoundException      사용자가 존재하지 않을 때
+     * @throws ProjectNotFoundException   프로젝트가 존재하지 않을 때
+     * @throws LikedProjectNotFoundException 좋아요한 프로젝트가 아닐 때
+     * @author by: 장민규
+     * @since 2025-10-15
+     */
+    @DeleteMapping("/dislike/{projectId}")
+    public ResponseEntity<ResponseDto<Long>> dislikeProject(@PathVariable Long projectId
+//                                                         @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+//        Long userId = principal.userId();
+        Long userId = 501L; // TODO: 임시
+        return userService.dislikeProject(userId, projectId);
+    }
+
+    /**
+     * <p>프로젝트 좋아요 여부 확인</p>
+     *
+     * @param projectId 확인할 프로젝트 ID
+     * @param principal 인증된 사용자의 정보
+     * @return 프로젝트 좋아요 여부 (true/false)
+     * @throws UserNotFoundException    사용자가 존재하지 않을 때
+     * @throws ProjectNotFoundException 프로젝트가 존재하지 않을 때
+     * @author by: 장민규
+     * @since 2025-10-15
+     */
+    @GetMapping("/checkLike/{projectId}")
+    public ResponseEntity<ResponseDto<Boolean>> isProjectLiked(@PathVariable Long projectId
+//                                                              @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+//        Long userId = principal.userId();
+        Long userId = 501L; // TODO: 임시
+        return userService.checkLikedProject(userId, projectId);
+    }
+
+    /**
+     * <p>크리에이터 팔로우</p>
+     *
+     * @param creatorId 팔로우할 크리에이터 ID
+     * @param principal 인증된 사용자의 정보
+     * @return 팔로우한 크리에이터 ID
+     * @throws UserNotFoundException        사용자가 존재하지 않을 때
+     * @throws CreatorNotFoundException     크리에이터가 존재하지 않을 때
+     * @throws DuplicatedFollowCreatorException 이미 팔로우한 크리에이터일 때
+     * @author by: 장민규
+     * @since 2025-10-15
+     */
+    @PostMapping("/follow/{creatorId}")
+    public ResponseEntity<ResponseDto<String>> followCreator(@PathVariable Long creatorId
+//                                                            @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+//        Long userId = principal.userId();
+        Long userId = 501L; // TODO: 임시
+        return userService.followCreator(userId, creatorId);
+    }
+
+    /**
+     * <p>크리에이터 언팔로우</p>
+     *
+     * @param creatorId 언팔로우할 크리에이터 ID
+     * @param principal 인증된 사용자의 정보
+     * @return 언팔로우한 크리에이터 ID
+     * @throws UserNotFoundException        사용자가 존재하지 않을 때
+     * @throws CreatorNotFoundException     크리에이터가 존재하지 않을 때
+     * @throws FollowingCreatorNotFoundException 팔로우한 크리에이터가 아닐 때
+     * @author by: 장민규
+     * @since 2025-10-15
+     */
+    @DeleteMapping("/unfollow/{creatorId}")
+    public ResponseEntity<ResponseDto<String>> unfollowCreator(@PathVariable Long creatorId
+//                                                              @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+//        Long userId = principal.userId();
+        Long userId = 501L; // TODO: 임시
+        return userService.unfollowCreator(userId, creatorId);
+    }
+
+    /**
+     * <p>크리에이터 팔로우 여부 확인</p>
+     *
+     * @param creatorId 확인할 크리에이터 ID
+     * @param principal 인증된 사용자의 정보
+     * @return 크리에이터 팔로우 여부 (true/false)
+     * @throws UserNotFoundException    사용자가 존재하지 않을 때
+     * @throws CreatorNotFoundException 크리에이터가 존재하지 않을 때
+     * @author by: 장민규
+     * @since 2025-10-15
+     */
+    @GetMapping("/checkFollow/{creatorId}")
+    public ResponseEntity<ResponseDto<Boolean>> isFollowingCreator(@PathVariable Long creatorId
+//                                                                 @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+//        Long userId = principal.userId();
+        Long userId = 501L; // TODO: 임시
+        return userService.isFollowingCreator(userId, creatorId);
+    }
 }

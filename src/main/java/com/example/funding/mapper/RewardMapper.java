@@ -1,6 +1,6 @@
 package com.example.funding.mapper;
 
-import com.example.funding.dto.response.backing.BackingRewardDto;
+import com.example.funding.dto.response.backing.userList_detail.MyPageBacking_RewardDto;
 import com.example.funding.model.Reward;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -9,23 +9,23 @@ import java.util.List;
 
 @Mapper
 public interface RewardMapper {
-    List<Reward> getRewardList(@Param("projectId") Long projectId);
+    List<Reward> getRewardListPublic(@Param("projectId") Long projectId);
 
     List<Reward> findByProjectId(@Param("projectId") Long projectId);
 
-    List<Reward> findProjectIdsByRewardIds(@Param("ids") List<Long> rewardIds);
+    void saveReward(Reward reward);
 
-    int saveReward(Reward reward);
-
-    int deleteReward(@Param("projectId") Long projectId, @Param("rewardId") Long rewardId);
+    void deleteReward(@Param("projectId") Long projectId, @Param("rewardId") Long rewardId);
 
     void deleteRewards(@Param("projectId") Long projectId);
 
-    List<Reward> getCreatorRewardList(@Param("projectId") Long projectId, @Param("creatorId") Long creatorId);
+    List<Reward> getRewardListManage(@Param("projectId") Long projectId, @Param("creatorId") Long creatorId);
 
-    boolean existsByProjectIdAndNameNormalized(@Param("projectId") Long projectId, @Param("key") String key);
+    Reward findById(@Param("rewardId") Long rewardId);
 
-    Long getProjectIdByRewardId(@Param("rewardId") Long rewardId);
+    List<MyPageBacking_RewardDto> getMyPageDetailRewardList(@Param("backingId") Long backingId);
 
-    List<BackingRewardDto> getBackingProjectRewards(@Param("projectId")Long projectId);
+    List<MyPageBacking_RewardDto> getMyPageDetailRewardDetail(@Param("backingId") Long backingId);
+
+
 }

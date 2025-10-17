@@ -1,8 +1,11 @@
 package com.example.funding.dto.response.backing;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,7 +19,7 @@ public class BackingCreatorBackerList {
 
     //후원
     private Long amount;
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     private Long projectId;
 }

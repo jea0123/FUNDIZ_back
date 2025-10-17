@@ -18,7 +18,6 @@ public class NoticeController {
 
     private final NoticeService noticeService;
 
-
     /**
      * <p>공지사항 목록 조회</p>
      *
@@ -38,7 +37,6 @@ public class NoticeController {
         return noticeService.noticeList(pager);
     }
 
-
     /**
      * <p>공지사항 상세 페이지 조회</p>
      *
@@ -50,6 +48,47 @@ public class NoticeController {
     @GetMapping("/{noticeId}")
     public ResponseEntity<ResponseDto<Notice>> item(@PathVariable Long noticeId) {
         return noticeService.item(noticeId);
+    }
+
+    /**
+     * <p>공지사항 등록</p>
+     *
+     * @param ntcDto NoticeAddRequestDto
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-09-24
+     */
+    @PostMapping("/add")
+    public ResponseEntity<ResponseDto<String>> addNotice(@RequestBody NoticeAddRequestDto ntcDto){
+        return noticeService.addNotice(ntcDto);
+    }
+
+
+    /**
+     * <p>공지사항 수정</p>
+     *
+     * @param noticeId 공지사항 ID
+     * @param ntcDto NoticeUpdateRequestDto
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-09-24
+     */
+    @PostMapping("/update/{noticeId}")
+    public ResponseEntity<ResponseDto<String>> updateNotice(@PathVariable Long noticeId, @RequestBody NoticeUpdateRequestDto ntcDto){
+        return noticeService.updateNotice(noticeId, ntcDto);
+    }
+
+    /**
+     * <p>공지사항 삭제</p>
+     *
+     * @param noticeId 공지사항 ID
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-09-24
+     */
+    @DeleteMapping("/delete/{noticeId}")
+    public ResponseEntity<ResponseDto<String>> deleteNotice(@PathVariable Long noticeId) {
+        return noticeService.deleteNotice(noticeId);
     }
 
 }

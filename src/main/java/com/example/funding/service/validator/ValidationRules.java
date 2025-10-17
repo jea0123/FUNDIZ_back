@@ -3,7 +3,7 @@ package com.example.funding.service.validator;
 import lombok.experimental.UtilityClass;
 
 import java.text.Normalizer;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 import java.util.Objects;
@@ -16,10 +16,11 @@ public class ValidationRules {
     public static final int MAX_TITLE_LEN = 255;
     public static final int MIN_CONTENT_LEN = 30;
     public static final int MAX_CONTENT_LEN = 3000;
-    public static final long MIN_GOAL_AMOUNT = 10_000L;
-    public static final long MIN_DAYS = 7;
-    public static final long MAX_DAYS = 60;
-    public static final long MIN_START_LEAD_DAYS = 7; // 리드타임: 오늘+최소 n일 이후 시작
+    public static final int MIN_GOAL_AMOUNT = 10_000;
+    public static final int MAX_GOAL_AMOUNT = Integer.MAX_VALUE;
+    public static final int MIN_DAYS = 7;
+    public static final int MAX_DAYS = 60;
+    public static final int MIN_START_LEAD_DAYS = 7; // 리드타임: 오늘+최소 n일 이후 시작
 
     // 대표이미지
     public static final int MAX_THUMBNAIL_LEN = 500;
@@ -34,10 +35,11 @@ public class ValidationRules {
     public static final int MAX_REWARD_NAME_LEN = 255;
     public static final int MAX_REWARD_CONTENT_LEN = 255;
     public static final int MIN_REWARD_PRICE = 1_000;
+    public static final int MAX_REWARD_PRICE = 30_000_000;
 
     // helpers
     /** 두 날짜 사이의 포함 일수(끝 미포함) */
-    public static long daysInclusive(LocalDate start, LocalDate end) {
+    public static long daysInclusive(LocalDateTime start, LocalDateTime end) {
         Objects.requireNonNull(start, "start");
         Objects.requireNonNull(end, "end");
         long d = ChronoUnit.DAYS.between(start, end);

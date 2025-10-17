@@ -7,8 +7,9 @@ import com.example.funding.dto.request.project.SearchProjectDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
-import com.example.funding.exception.FeaturedProjectNotFoundException;
-import com.example.funding.exception.RecentPaidProjectNotFoundException;
+import com.example.funding.exception.notfound.FeaturedProjectNotFoundException;
+import com.example.funding.exception.notfound.ProjectNotFoundException;
+import com.example.funding.exception.notfound.RecentPaidProjectNotFoundException;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -63,4 +64,15 @@ public interface ProjectService {
     ResponseEntity<ResponseDto<List<FeaturedProjectDto>>> getFeatured(int days, int limit);
 
     ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> searchProject(SearchProjectDto dto, Pager pager);
+
+    /**
+     * <p>특정 프로젝트의 좋아요 수 조회</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @return 프로젝트의 좋아요 수
+     * @throws ProjectNotFoundException 프로젝트를 찾을 수 없을 경우
+     * @author 장민규
+     * @since 2025-10-15
+     */
+    ResponseEntity<ResponseDto<Long>> getLikeCnt(Long projectId);
 }

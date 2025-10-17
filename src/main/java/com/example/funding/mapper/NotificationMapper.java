@@ -12,7 +12,7 @@ public interface NotificationMapper {
 
     Notification getNotificationById(@Param("notificationId") Long notificationId);
 
-    Long insertNotification(Notification notification);
+    void insertNotification(Notification notification);
 
     void markAsRead(@Param("notificationId") Long notificationId);
 

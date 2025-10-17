@@ -9,15 +9,22 @@ import com.example.funding.dto.request.user.UserPasswordDto;
 import com.example.funding.dto.request.user.UserProfileImgDto;
 import com.example.funding.dto.response.creator.CreatorQnaDto;
 import com.example.funding.dto.response.user.*;
-import com.example.funding.exception.DuplicatedPasswordException;
-import com.example.funding.exception.InCorrectPasswordException;
-import com.example.funding.exception.UserNotFoundException;
+import com.example.funding.enums.NotificationType;
+import com.example.funding.exception.conflict.DuplicatedFollowCreatorException;
+import com.example.funding.exception.conflict.DuplicatedLikedProjectException;
+import com.example.funding.exception.conflict.DuplicatedPasswordException;
+import com.example.funding.exception.forbidden.InCorrectPasswordException;
+import com.example.funding.exception.notfound.FollowingCreatorNotFoundException;
+import com.example.funding.exception.notfound.LikedProjectNotFoundException;
+import com.example.funding.exception.notfound.QnANotFoundException;
+import com.example.funding.handler.NotificationPublisher;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
 import com.example.funding.model.Qna;
 import com.example.funding.model.User;
 import com.example.funding.service.UserService;
+import com.example.funding.validator.Loaders;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,24 +41,28 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Validated
 public class UserServiceImpl implements UserService {
 
+    private final Loaders loaders;
     private final UserMapper userMapper;
     private final ProjectMapper projectMapper;
-    private final BackingMapper backingMapper;
-
     private final CreatorMapper creatorMapper;
     private final QnaMapper qnaMapper;
+    private final FollowMapper followMapper;
     private final PasswordEncoder passwordEncoder;
     private final FileUploader fileUploader;
 
+    private final NotificationPublisher notificationPublisher;
+
+    /**
+     * 로그인 사용자 정보
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(Long userId) {
-        User user = userMapper.getUserById(userId);
-        if (user == null) {
-            throw new UserNotFoundException();
-        }
+        User user = loaders.user(userId);
+
         Long creatorId = userMapper.getCreatorIdByUserId(userId);
         LoginUserDto loginUserDto = LoginUserDto.builder()
                 .userId(user.getUserId())
@@ -75,11 +87,9 @@ public class UserServiceImpl implements UserService {
      * @since 2025-09-03
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageUser(Long userId) {
-        User user = userMapper.getUserById(userId);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "유저 정보를 불러올 수 없습니다."));
-        }
+        User user = loaders.user(userId);
         MyPageUserDto mypageUserDto = MyPageUserDto.builder()
                 .userId(user.getUserId())
                 .email(user.getEmail())
@@ -98,12 +108,9 @@ public class UserServiceImpl implements UserService {
      * @since 2025-09-05
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(Long userId) {
-        User user = userMapper.getUserById(userId);
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "좋아요한 프로젝트 목록을 찾을 수없습니다."));
-        }
+        loaders.user(userId);
         List<MyPageLikedDto> LikedList = userMapper.getLikedList(userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "좋아요한 프로젝트 리스트 조회 성공", LikedList));
@@ -118,29 +125,33 @@ public class UserServiceImpl implements UserService {
      * @since 2025-09-05
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfUser(Long userId, Pager pager) {
-        User user = userMapper.getUserById(userId);
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "QnA 리스트 조회 불가"));
-        }
+        loaders.user(userId);
 
         int total = qnaMapper.qnaTotalOfUser(userId);
-
         List<CreatorQnaDto> qnaList = qnaMapper.getQnaListOfUser(userId, pager);
-
         PageResult<CreatorQnaDto> result = PageResult.of(qnaList, pager, total);
 
         return ResponseEntity.ok(ResponseDto.success(200, "Q&A 목록 조회 성공", result));
     }
 
     @Override
+    public ResponseEntity<ResponseDto<?>> addRecentViewProject(Long userId, Long projectId) {
+        loaders.user(userId);
+        loaders.project(projectId);
+        userMapper.upsertRecentView(userId, projectId);
+        return ResponseEntity.ok(ResponseDto.success(200, "최근 본 프로젝트 추가 성공", null));
+    }
+
+    /**
+     * 최근 본 프로젝트
+     */
+    @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(Long userId) {
-        User user = userMapper.getUserById(userId);
-        if (user == null) {
-            throw new UserNotFoundException();
-        }
+        loaders.user(userId);
+
         List<RecentViewProject> recentViewProjects = userMapper.getRecentViewProjects(userId);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "최근 본 프로젝트 조회 성공", recentViewProjects));
     }
@@ -155,15 +166,14 @@ public class UserServiceImpl implements UserService {
      */
     //서비스에서구현
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<MyPageQnADetailDto>> getQnADetail(Long userId, Long projectId) {
-        Project project = projectMapper.findById(projectId);
-        User user = userMapper.getUserById(userId);
-        Creator creator = creatorMapper.findById(project.getCreatorId());
-        Qna qna = qnaMapper.getQnAById(userId, projectId);
+        Project project = loaders.project(projectId);
+        User user = loaders.user(userId);
+        Creator creator = loaders.creator(project.getCreatorId());
 
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "잘못된 프로젝트 페이지 입니다."));
-        }
+        Qna qna = qnaMapper.getQnAById(userId, projectId);
+        if (qna == null) throw new QnANotFoundException();
 
         MyPageQnADetailDto myPageQnADetail = MyPageQnADetailDto.builder()
                 //qna
@@ -183,19 +193,18 @@ public class UserServiceImpl implements UserService {
 
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "QnA 상세 페이지 조회 성공", myPageQnADetail));
-
     }
 
     @Override
     public ResponseEntity<ResponseDto<String>> userNickname(Long userId, UserNicknameDto dto) {
-        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        loaders.user(userId);
         userMapper.updateNickname(userId, dto.getNickname());
         return ResponseEntity.ok(ResponseDto.success(200, "닉네임 변경 성공", dto.getNickname()));
     }
 
     @Override
     public ResponseEntity<ResponseDto<String>> userProfileImg(Long userId, UserProfileImgDto dto) throws IOException {
-        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        loaders.user(userId);
         String profileImgUrl = fileUploader.upload(dto.getProfileImg());
         userMapper.updateProfile(userId, profileImgUrl);
         return ResponseEntity.ok(ResponseDto.success(200, "프로필 이미지 변경 성공", profileImgUrl));
@@ -203,13 +212,96 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<ResponseDto<String>> userPassword(Long userId, UserPasswordDto dto) {
-        User user = userMapper.getUserById(userId);
-        if (user == null) throw new UserNotFoundException();
+        User user = loaders.user(userId);
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) throw new InCorrectPasswordException();
         if (passwordEncoder.matches(dto.getNewPassword(), user.getPassword())) throw new DuplicatedPasswordException();
 
         String encodedNewPassword = passwordEncoder.encode(dto.getNewPassword());
         userMapper.updatePwd(userId, encodedNewPassword);
         return ResponseEntity.ok(ResponseDto.success(200, "비밀번호 변경 성공", "********"));
+    }
+
+    /**
+     * 프로젝트 좋아요 추가
+     */
+    @Override
+    public ResponseEntity<ResponseDto<Long>> likeProject(Long userId, Long projectId) {
+        loaders.user(userId);
+        loaders.project(projectId);
+        if (userMapper.isProjectLiked(userId, projectId) == 1) throw new DuplicatedLikedProjectException();
+        userMapper.likeProject(userId, projectId);
+        projectMapper.increaseLikeCnt(projectId);
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 좋아요 성공", projectId));
+    }
+
+    /**
+     * 프로젝트 좋아요 취소
+     */
+    @Override
+    public ResponseEntity<ResponseDto<Long>> dislikeProject(Long userId, Long projectId) {
+        loaders.user(userId);
+        loaders.project(projectId);
+        if (userMapper.isProjectLiked(userId, projectId) == 0) throw new LikedProjectNotFoundException();
+        userMapper.dislikeProject(userId, projectId);
+        projectMapper.decreaseLikeCnt(projectId);
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 좋아요 취소 성공", projectId));
+    }
+
+    /**
+     * 프로젝트 좋아요 여부 확인
+     */
+    @Override
+    public ResponseEntity<ResponseDto<Boolean>> checkLikedProject(Long userId, Long projectId) {
+        loaders.user(userId);
+        loaders.project(projectId);
+        int isLiked = userMapper.isProjectLiked(userId, projectId);
+        if (isLiked > 0) {
+            return ResponseEntity.ok(ResponseDto.success(200, "좋아요한 프로젝트입니다.", true));
+        } else {
+            return ResponseEntity.ok(ResponseDto.success(200, "좋아요하지 않은 프로젝트입니다.", false));
+        }
+    }
+
+    /**
+     * 크리에이터 팔로우
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> followCreator(Long userId, Long creatorId) {
+        User existingUser = loaders.user(userId);
+        Creator creator = loaders.creator(creatorId);
+        if (followMapper.isFollowingCreator(userId, creatorId) == 1) throw new DuplicatedFollowCreatorException();
+        followMapper.followCreator(userId, creatorId);
+        creatorMapper.increaseFollowersCount(creatorId);
+
+        notificationPublisher.publish(userId, NotificationType.NEW_FOLLOWER, existingUser.getNickname(), null);
+        return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 팔로우 성공", creator.getCreatorName()));
+    }
+
+    /**
+     * 크리에이터 언팔로우
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> unfollowCreator(Long userId, Long creatorId) {
+        loaders.user(userId);
+        Creator creator = loaders.creator(creatorId);
+        if (followMapper.isFollowingCreator(userId, creatorId) == 0) throw new FollowingCreatorNotFoundException();
+        followMapper.unfollowCreator(userId, creatorId);
+        creatorMapper.decreaseFollowersCount(creatorId);
+        return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 언팔로우 성공", creator.getCreatorName()));
+    }
+
+    /**
+     * 크리에이터 팔로우 여부 확인
+     */
+    @Override
+    public ResponseEntity<ResponseDto<Boolean>> isFollowingCreator(Long userId, Long creatorId) {
+        loaders.user(userId);
+        loaders.creator(creatorId);
+        int isFollowing = followMapper.isFollowingCreator(userId, creatorId);
+        if (isFollowing > 0) {
+            return ResponseEntity.ok(ResponseDto.success(200, "팔로우한 크리에이터입니다.", true));
+        } else {
+            return ResponseEntity.ok(ResponseDto.success(200, "팔로우하지 않은 크리에이터입니다.", false));
+        }
     }
 }

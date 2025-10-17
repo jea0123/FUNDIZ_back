@@ -12,28 +12,26 @@ import java.util.List;
 
 @Mapper
 public interface ReplyMapper {
-    List<Reply> getReplyListById(@Param("cmId") Long cmId, @Param("code") String code);
-
     List<ReplyDto> getReplyList(@Param("cmId") Long cmId,
                                 @Param("lastCreatedAt") LocalDateTime lastCreatedAt,
                                 @Param("lastId") Long lastId,
                                 @Param("size") int limitPlusOne);
 
-    int createCommunityReply(Reply reply);
+    void createCommunityReply(Reply reply);
 
-    List<InquiryReplyDto> getInquiryReplyList(@Param("inqId")Long inqId,
+    List<InquiryReplyDto> getInquiryReplyList(@Param("inqId") Long inqId,
                                               @Param("lastCreatedAt") LocalDateTime lastCreatedAt,
                                               @Param("lastId") Long lastId,
                                               @Param("size") int limitPlusOne);
 
-    int createInquiryReply(Reply reply);
+    void createInquiryReply(Reply reply);
 
     List<QnaReplyDto> getQnaReplyList(@Param("qnaId") Long qnaId,
                                       @Param("lastCreatedAt") LocalDateTime lastCreatedAt,
                                       @Param("lastId") Long lastId,
                                       @Param("size") int limitPlusOne);
 
-    int createQnaReply(Reply reply);
+    void createQnaReply(Reply reply);
 }
 
 

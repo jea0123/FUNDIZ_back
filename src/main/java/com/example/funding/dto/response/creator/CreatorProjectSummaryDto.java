@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -12,6 +12,6 @@ import java.time.LocalDate;
 public class CreatorProjectSummaryDto {
     private Long projectId;
     private String title;
-    private LocalDate endDate;
+    private LocalDateTime endDate;
     private String projectStatus;
 }

@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.funding.mapper.SettlementMapper">
 
-    <select id="existsByProjectId" resultType="int">
-        SELECT COUNT(*)
+    <select id="getByProjectId" resultType="settlement">
+        SELECT *
         FROM settlement
         WHERE projectId = #{projectId}
     </select>

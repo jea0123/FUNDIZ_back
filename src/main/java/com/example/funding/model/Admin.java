@@ -1,5 +1,6 @@
 package com.example.funding.model;
 
+import com.example.funding.common.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,5 +15,5 @@ public class Admin {
     private String adminId;
     private String adminPwd;
     private Long author;
-    private String role;
+    private Role role;
 }

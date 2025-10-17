@@ -21,8 +21,10 @@ import com.example.funding.dto.response.admin.analytic.Kpi;
 import com.example.funding.dto.response.admin.analytic.RewardSalesTop;
 import com.example.funding.dto.response.settlement.SettlementItem;
 import com.example.funding.dto.row.SettlementSummary;
-import com.example.funding.exception.*;
-import com.example.funding.model.Notice;
+import com.example.funding.exception.badrequest.ProjectNotSuccessException;
+import com.example.funding.exception.badrequest.SettlementStatusAlreadyChangedException;
+import com.example.funding.exception.forbidden.AccessDeniedException;
+import com.example.funding.exception.notfound.*;
 import com.example.funding.model.User;
 import com.example.funding.service.AdminService;
 import com.example.funding.service.SettlementService;
@@ -31,7 +33,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -271,8 +273,8 @@ public class AdminController {
     public ResponseEntity<ResponseDto<PageResult<SettlementItem>>> getSettlements(
             @RequestParam(required = false) String q,
             @RequestParam(required = false, defaultValue = "ALL") String status,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDateTime from,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDateTime to,
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer size,
             @RequestParam(required = false, defaultValue = "5") Integer perGroup

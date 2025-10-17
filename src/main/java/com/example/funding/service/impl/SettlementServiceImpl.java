@@ -8,33 +8,48 @@ import com.example.funding.dto.request.settlement.SettlementSearchCond;
 import com.example.funding.dto.response.settlement.CreatorSettlementDto;
 import com.example.funding.dto.response.settlement.SettlementItem;
 import com.example.funding.dto.row.SettlementSummary;
-import com.example.funding.exception.*;
-import com.example.funding.mapper.CreatorMapper;
+import com.example.funding.enums.NotificationType;
+import com.example.funding.exception.badrequest.ProjectNotSuccessException;
+import com.example.funding.exception.badrequest.SettlementStatusAlreadyChangedException;
+import com.example.funding.exception.notfound.SettlementNotFoundException;
+import com.example.funding.handler.NotificationPublisher;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.SettlementMapper;
+import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
 import com.example.funding.model.Settlement;
 import com.example.funding.service.SettlementService;
+import com.example.funding.validator.Loaders;
+import com.example.funding.validator.PermissionChecker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
+@Validated
 public class SettlementServiceImpl implements SettlementService {
-
-    private final CreatorMapper creatorMapper;
+    private final Loaders loaders;
+    private final PermissionChecker auth;
     private final SettlementMapper settlementMapper;
     private final ProjectMapper projectMapper;
 
+    private final NotificationPublisher notificationPublisher;
+
+    /**
+     * 정산정보 조회
+     */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CreatorSettlementDto>> getSettlementByCreatorId(Long creatorId) {
-        if (creatorMapper.existsCreator(creatorId) == 0) {
-            throw new CreatorNotFountException();
-        }
+        loaders.creator(creatorId);
+
         List<Settlement> settlement = settlementMapper.getByCreatorId(creatorId);
         SettlementSummary settlementSummary = settlementMapper.getSettlementSummaryByCreatorId(creatorId);
         CreatorSettlementDto dtos = CreatorSettlementDto.builder()
@@ -44,28 +59,42 @@ public class SettlementServiceImpl implements SettlementService {
         return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 정산 정보 조회 성공", dtos));
     }
 
+    /**
+     * 정산 상태 변경
+     */
     @Override
     public ResponseEntity<ResponseDto<String>> updateStatus(SettlementPaidRequestDto dto) {
-        Project project = projectMapper.findById(dto.getProjectId());
-        if (project == null) throw new ProjectNotFoundException();
-        if (!project.getCreatorId().equals(dto.getCreatorId())) throw new AccessDeniedException();
+        Project project = loaders.project(dto.getProjectId());
+        Creator existingCreator = loaders.creator(dto.getCreatorId());
+
+        auth.mustBeOwner(dto.getCreatorId(), existingCreator.getCreatorId());
         if (!List.of("SUCCESS", "SETTLED").contains(project.getProjectStatus())) throw new ProjectNotSuccessException();
-        if (settlementMapper.existsByProjectId(dto.getProjectId()) == 0) throw new SettlementNotFoundException();
+
+        if (settlementMapper.getByProjectId(dto.getProjectId()) == null) throw new SettlementNotFoundException();
         if (settlementMapper.getStatus(dto.getProjectId(), dto.getCreatorId(), dto.getSettlementId()).equals(dto.getSettlementStatus()))
             throw new SettlementStatusAlreadyChangedException();
 
         settlementMapper.updateSettlementStatus(dto);
         String projectStatus = dto.getSettlementStatus().equals("PAID") ? "SETTLED" : projectMapper.getStatus(dto.getProjectId());
         projectMapper.updateProjectSettled(dto.getProjectId(), projectStatus);
+        if (projectStatus.equals("SETTLED")) {
+            notificationPublisher.publish(existingCreator.getUserId(), NotificationType.FUNDING_SETTLED, project.getTitle(), dto.getSettlementId());
+        } else {
+            notificationPublisher.publish(existingCreator.getUserId(), NotificationType.FUNDING_SETTLED_CANCELLED, project.getTitle(), dto.getSettlementId());
+        }
         return ResponseEntity.ok(ResponseDto.success(200, "정산 상태 변경 성공", null));
     }
 
+    /**
+     * 정산 목록 조회
+     */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<SettlementItem>>> getSettlements(SettlementSearchCond cond, Pager pager) {
         String q = cond.getQ();
         String status = normalizeStatus(cond.getStatus());
-        LocalDate from = cond.getFrom();
-        LocalDate to = cond.getTo();
+        LocalDateTime from = cond.getFrom();
+        LocalDateTime to = cond.getTo();
 
         int total = settlementMapper.count(q, status, from, to);
         if (total == 0) {
@@ -83,15 +112,24 @@ public class SettlementServiceImpl implements SettlementService {
         return ResponseEntity.ok().body(ResponseDto.success(200, "정산 목록 조회 성공", PageResult.of(items, pager, total)));
     }
 
+    /**
+     * 정산 요약 정보 조회
+     */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<SettlementSummary>> getSettlementSummary() {
         SettlementSummary summary = settlementMapper.getSettlementSummary();
         return ResponseEntity.ok(ResponseDto.success(200, "정산 요약 정보 조회 성공", summary));
     }
 
+    /**
+     * 상태값 정규화
+     * @param status 상태값
+     * @return 정규화된 상태값 (ALL인 경우 null 반환)
+     */
     private String normalizeStatus(String status) {
         if (status == null || status.isBlank()) return null;
         String up = status.trim().toUpperCase();
-        return "ALL".equals(up) ? null : up; // ALL이면 where절에서 제외하기 위해 null
+        return "ALL".equals(up) ? null : up;
     }
 }

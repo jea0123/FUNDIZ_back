@@ -1,14 +1,12 @@
 package com.example.funding.dto.request.reward;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class RewardCreateRequestDto {
@@ -16,7 +14,7 @@ public class RewardCreateRequestDto {
     private String rewardName;
     private Long price;
     private String rewardContent;
-    private LocalDate deliveryDate;
+    private LocalDateTime deliveryDate;
     private Integer rewardCnt;
     private Character isPosting;
 }

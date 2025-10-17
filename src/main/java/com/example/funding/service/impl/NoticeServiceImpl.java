@@ -3,16 +3,19 @@ package com.example.funding.service.impl;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.request.cs.*;
+import com.example.funding.dto.request.cs.NoticeAddRequestDto;
+import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
 import com.example.funding.mapper.NoticeMapper;
 import com.example.funding.model.Notice;
 import com.example.funding.service.NoticeService;
+import com.example.funding.validator.Loaders;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
@@ -20,8 +23,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Validated
 public class NoticeServiceImpl implements NoticeService {
-
+    private final Loaders loaders;
     private final NoticeMapper noticeMapper;
 
     /**
@@ -33,6 +37,7 @@ public class NoticeServiceImpl implements NoticeService {
      * @since 2025-09-19
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<Notice>>> noticeList(Pager pager) {
         int total = noticeMapper.noticeTotal();
 
@@ -52,15 +57,12 @@ public class NoticeServiceImpl implements NoticeService {
      * @since 2025-09-19
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<Notice>> item(Long noticeId) {
+        Notice item = loaders.notice(noticeId);
         //조회수 증가
         noticeMapper.updateViewCnt(noticeId);
-
         //공지사항 상세페이지 조회
-        Notice item = noticeMapper.noticeDetail(noticeId);
-        if (item == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "공지사항 상세 조회 불가"));
-        }
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "공지사항 상세 조회 성공", item));
     }
 }

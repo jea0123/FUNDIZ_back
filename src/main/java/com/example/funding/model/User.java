@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -19,12 +19,12 @@ public class User {
     private String nickname;
     private String profileImg;
     private Character isSuspended;
-    private LocalDate joinedAt;
-    private LocalDate lastLoginAt;
+    private LocalDateTime joinedAt;
+    private LocalDateTime lastLoginAt;
     private Integer followCnt;
     private String reason;
-    private LocalDate suspendedAt;
-    private LocalDate releasedAt;
+    private LocalDateTime suspendedAt;
+    private LocalDateTime releasedAt;
     private Character isCreator;
     private Role role;
 }

@@ -40,7 +40,6 @@
         WHERE USERID = #{userId}
     </update>
 
-
     <update id="updateAddr" parameterType="com.example.funding.dto.request.address.AddrUpdateRequestDto">
         UPDATE ADDRESS
         SET ADDRNAME =#{addrName},
@@ -58,5 +57,11 @@
         WHERE USERID = #{userId}
         AND ADDRID = #{addrId}
     </delete>
+
+    <select id="getAddr" resultType="address" parameterType="long">
+        SELECT *
+        FROM address
+        WHERE a.addrId=#{addrId}
+    </select>
 
 </mapper>

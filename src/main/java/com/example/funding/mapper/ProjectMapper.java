@@ -12,7 +12,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface ProjectMapper {
@@ -28,11 +30,6 @@ public interface ProjectMapper {
 
     List<FeaturedProjectDto> findFeaturedJoinedWithRecent(@Param("days") int days,
                                                           @Param("limit") int limit);
-
-    List<Project> findFeaturedExcluding(
-            @Param("limit") int limit,
-            @Param("excludeIds") List<Long> excludeIds
-    );
 
     int getProjectCnt(@Param("creatorId") Long creatorId);
 
@@ -50,7 +47,7 @@ public interface ProjectMapper {
 
     void updateProjectSettled(@Param("projectId") Long projectId, @Param("status") String status);
 
-    LocalDate getProjectEndDate(@Param("projectId") Long projectId);
+    LocalDateTime getProjectEndDate(@Param("projectId") Long projectId);
 
     long getVerifyingCnt(Long creatorId);
 
@@ -58,4 +55,15 @@ public interface ProjectMapper {
 
     List<CreatorShippingProjectList> getCShippingList(Long creatorId);
 
+    void increaseLikeCnt(@Param("projectId") Long projectId);
+
+    void decreaseLikeCnt(@Param("projectId") Long projectId);
+
+    Long getLikeCnt(@Param("projectId") Long projectId);
+
+    List<Map<String, Object>> getProjectToOpen();
+
+    List<Map<String, Object>> getProjectToSuccess();
+
+    List<Map<String, Object>> getProjectToFailed();
 }

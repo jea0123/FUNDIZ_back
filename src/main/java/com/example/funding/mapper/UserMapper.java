@@ -22,17 +22,27 @@ public interface UserMapper {
 
     List<MyPageLikedDto> getLikedList(@Param("userId") Long userId);
 
+    void upsertRecentView(@Param("userId") Long userId, @Param("projectId") Long projectId);
+
+    Long isExistRecentViewProject(@Param("userId") Long userId, @Param("projectId") Long projectId);
+
     List<RecentViewProject> getRecentViewProjects(@Param("userId") Long userId);
 
-    int updateNickname(@Param("userId") Long userId, @Param("nickname") String nickname);
+    void updateNickname(@Param("userId") Long userId, @Param("nickname") String nickname);
 
-    int updatePwd(@Param("userId") Long userId, @Param("password") String pwd);
+    void updatePwd(@Param("userId") Long userId, @Param("password") String pwd);
 
-    int updateProfile(@Param("userId") Long userId, @Param("profileImg") String profile);
+    void updateProfile(@Param("userId") Long userId, @Param("profileImg") String profile);
 
     Long getCreatorIdByUserId(Long userId);
 
     int suspendedCreator(@Param("creatorId") Long creatorId);
 
-    int withdrawUser(@Param("userId") Long userId);
+    void withdrawUser(@Param("userId") Long userId);
+
+    void likeProject(@Param("userId") Long userId, @Param("projectId") Long projectId);
+
+    int isProjectLiked(@Param("userId") Long userId, @Param("projectId") Long projectId);
+
+    void dislikeProject(@Param("userId") Long userId, @Param("projectId") Long projectId);
 }

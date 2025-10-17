@@ -6,18 +6,21 @@ import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.creator.*;
 import com.example.funding.dto.request.reward.RewardCreateRequestDto;
+import com.example.funding.dto.request.shipping.ShippingStatusDto;
 import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
 import com.example.funding.dto.response.creator.*;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
 import com.example.funding.enums.CreatorType;
-import com.example.funding.exception.AlreadyCreatorException;
-import com.example.funding.exception.UserNotFoundException;
+import com.example.funding.exception.badrequest.AlreadyCreatorException;
+import com.example.funding.exception.notfound.CreatorNotFoundException;
+import com.example.funding.exception.notfound.UserNotFoundException;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Reward;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.NewsService;
 import com.example.funding.service.RewardService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -164,12 +167,20 @@ public class CreatorController {
      * @since 2025-09-09
      */
     @PostMapping("/project/new")
-    public ResponseEntity<ResponseDto<String>> createProject(@RequestBody ProjectCreateRequestDto dto,
-                                                             @RequestAttribute Long creatorId,
-                                                             List<MultipartFile> files) throws IOException {
-        //TODO: userId -> creatorId
-        String thumbnailUrl = fileUploader.upload(dto.getThumbnail());
+    public ResponseEntity<ResponseDto<String>> createProject(ProjectCreateRequestDto dto,
+                                                             @RequestAttribute Long creatorId) throws IOException {
+
+        String thumbnailUrl = null;
+        if (dto.getThumbnail() != null && !dto.getThumbnail().isEmpty()) {
+            thumbnailUrl = fileUploader.upload(dto.getThumbnail());
+        }
+        String businessDocUrl = null;
+        if (dto.getBusinessDoc() != null && !dto.getBusinessDoc().isEmpty()) {
+            businessDocUrl = fileUploader.upload(dto.getBusinessDoc());
+        }
         dto.setThumbnailUrl(thumbnailUrl);
+        dto.setBusinessDocUrl(businessDocUrl);
+
         return creatorService.createProject(dto, creatorId);
     }
 
@@ -184,16 +195,23 @@ public class CreatorController {
      */
     @PostMapping("/project/{projectId}")
     public ResponseEntity<ResponseDto<String>> updateProject(@PathVariable Long projectId,
-                                                             @RequestAttribute Long creatorId,
-                                                             @RequestBody ProjectCreateRequestDto dto) throws IOException {
-        //TODO: userId -> creatorId
-
+                                                             ProjectCreateRequestDto dto,
+                                                             @RequestAttribute Long creatorId) throws IOException {
         if (dto.getProjectId() != null && !dto.getProjectId().equals(projectId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 프로젝트 ID 입니다.");
         }
         dto.setProjectId(projectId);
-        String thumbnailUrl = fileUploader.upload(dto.getThumbnail());
+
+        String thumbnailUrl = null;
+        if (dto.getThumbnail() != null && !dto.getThumbnail().isEmpty()) {
+            thumbnailUrl = fileUploader.upload(dto.getThumbnail());
+        }
+        String businessDocUrl = null;
+        if (dto.getBusinessDoc() != null && !dto.getBusinessDoc().isEmpty()) {
+            businessDocUrl = fileUploader.upload(dto.getBusinessDoc());
+        }
         dto.setThumbnailUrl(thumbnailUrl);
+        dto.setBusinessDocUrl(businessDocUrl);
 
         return creatorService.updateProject(dto, creatorId);
     }
@@ -209,8 +227,6 @@ public class CreatorController {
     @DeleteMapping("/project/{projectId}")
     public ResponseEntity<ResponseDto<String>> deleteProject(@PathVariable Long projectId,
                                                              @RequestAttribute Long creatorId) {
-        //TODO: userId -> creatorId
-
         return creatorService.deleteProject(projectId, creatorId);
     }
 
@@ -225,8 +241,6 @@ public class CreatorController {
     @PostMapping("/project/{projectId}/submit")
     public ResponseEntity<ResponseDto<String>> verifyProject(@PathVariable Long projectId,
                                                              @RequestAttribute Long creatorId) {
-        //TODO: userId -> creatorId
-
         return creatorService.verifyProject(projectId, creatorId);
     }
 
@@ -255,9 +269,9 @@ public class CreatorController {
      * @since 2025-10-08
      */
     @GetMapping("/projects/{projectId}/reward")
-    public ResponseEntity<ResponseDto<List<Reward>>> getCreatorRewardList(@PathVariable Long projectId,
+    public ResponseEntity<ResponseDto<List<Reward>>> getRewardListManage(@PathVariable Long projectId,
                                                                           @RequestAttribute Long creatorId) {
-        return rewardService.getCreatorRewardList(projectId, creatorId);
+        return rewardService.getRewardListManage(projectId, creatorId);
     }
 
     /**
@@ -286,9 +300,7 @@ public class CreatorController {
      * <li>사업자번호</li>
      * <li>이메일</li>
      * <li>전화번호</li>
-     * <li>정지 여부</li>
      *
-     * @param creatorId 창작자 ID
      * @return 성공 시 200 Ok
      * @author 조은애
      * @since 2025-10-11
@@ -346,8 +358,13 @@ public class CreatorController {
     public ResponseEntity<ResponseDto<List<CreatorShippingBackerList>>> getShippingBackerList(@RequestAttribute Long creatorId, @PathVariable Long projectId) {
         return creatorService.getShippingBackerList(creatorId, projectId);
     }
-    
-    // TODO: 이윤기 - 창작자 배송 리스트에서 배송상태 변경을 위한 @PostMapping 필요
+
+    @PostMapping("/shippingBackerList/{projectId}")
+    public ResponseEntity<ResponseDto<String>> setShippingStatus (@PathVariable Long projectId,
+                                                                  @RequestAttribute Long creatorId,
+                                                                  @Valid @RequestBody ShippingStatusDto status) {
+        return creatorService.setShippingStatus(projectId ,creatorId, status);
+    }
 
     /**
      * <p>프로젝트 새소식 등록</p>
@@ -367,9 +384,18 @@ public class CreatorController {
     }
 
 
-
-
-
-
+    /**
+     * <p>크리에이터 팔로워 수 조회</p>
+     *
+     * @param creatorId 크리에이터 ID
+     * @return 팔로워 수
+     * @throws CreatorNotFoundException 크리에이터를 찾을 수 없는 경우(404)
+     * @author 장민규
+     * @since 2025-10-15
+     */
+    @GetMapping("/followerCnt/{creatorId}")
+    public ResponseEntity<ResponseDto<Long>> getFollowerCnt(@PathVariable Long creatorId) {
+        return creatorService.getFollowerCnt(creatorId);
+    }
 
 }

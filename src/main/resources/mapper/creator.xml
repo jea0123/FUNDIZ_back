@@ -226,20 +226,6 @@
         WHERE CREATORID = #{creatorId}
     </select>
 
-    <select id="hasRequiredCreatorProfile" resultType="int">
-        <![CDATA[
-            SELECT CASE
-                WHEN NVL(TRIM(CREATORNAME), '') <> ''
-                 AND NVL(TRIM(BUSINESSNUM), '') <> ''
-                 AND NVL(TRIM(EMAIL), '') <> ''
-                 AND NVL(TRIM(PHONE), '') <> ''
-                THEN 1 ELSE 0
-                END
-            FROM CREATOR
-            WHERE CREATORID = #{creatorId}
-        ]]>
-    </select>
-
     <select id="getCreatorProfileSummary" resultType="creatorProfileSummaryDto">
         SELECT CREATORNAME, BUSINESSNUM, EMAIL, PHONE
         FROM CREATOR

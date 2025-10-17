@@ -93,13 +93,6 @@
         SET profileImg = #{profileImg}
         WHERE userId = #{userId}
     </update>
-
-    <select id="suspendedCreator" resultType="int">
-        SELECT CASE WHEN ISSUSPENDED = 'Y' THEN 1 ELSE 0 END
-        FROM USERS u
-        JOIN CREATOR c ON c.USERID = u.USERID
-        WHERE c.CREATORID = #{creatorId}
-    </select>
     
     <delete id="withdrawUser" parameterType="long">
         DELETE FROM USERS

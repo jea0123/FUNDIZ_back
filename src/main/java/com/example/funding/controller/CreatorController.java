@@ -167,7 +167,7 @@ public class CreatorController {
      * @since 2025-09-09
      */
     @PostMapping("/project/new")
-    public ResponseEntity<ResponseDto<String>> createProject(ProjectCreateRequestDto dto,
+    public ResponseEntity<ResponseDto<Long>> createProject(ProjectCreateRequestDto dto,
                                                              @RequestAttribute Long creatorId) throws IOException {
 
         String thumbnailUrl = null;

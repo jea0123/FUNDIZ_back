@@ -353,7 +353,7 @@
           AND CURRAMOUNT <![CDATA[ < ]]> GOALAMOUNT
     </update>
 
-    <select id="getProjectEndDate" resultType="date">
+    <select id="getProjectEndDate" resultType="java.time.LocalDateTime">
         SELECT ENDDATE
         FROM PROJECT
         WHERE PROJECTID = #{projectId}

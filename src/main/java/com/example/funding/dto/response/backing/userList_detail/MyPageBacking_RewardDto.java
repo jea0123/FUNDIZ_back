@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 public class MyPageBacking_RewardDto {
     private Long projectId;
+    private Long rewardId;
     private String rewardName;
     private Long price;
     private LocalDateTime deliveryDate;

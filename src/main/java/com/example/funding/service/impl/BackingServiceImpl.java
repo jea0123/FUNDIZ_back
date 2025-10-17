@@ -95,7 +95,7 @@ public class BackingServiceImpl implements BackingService {
 
         //backing
         backing.setUserId(userId);
-        backing.setCreatedAt(LocalDate.now());
+        backing.setCreatedAt(LocalDateTime.now());
         backingMapper.addBacking(backing);
 
         Long backingId = backing.getBackingId();

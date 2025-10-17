@@ -3,6 +3,7 @@ package com.example.funding.dto.response.backing.userList_detail;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class MyPageBackingDetailDto {
     private Long backingId;
     private Long userId;
     private Long amount;
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
     private String backingStatus;
 
     //후원상세, 리워드
@@ -29,8 +30,8 @@ public class MyPageBackingDetailDto {
     //배송
     private String shippingStatus;
     private String trackingNum;
-    private LocalDate shippedAt;
-    private LocalDate deliveredAt;
+    private LocalDateTime shippedAt;
+    private LocalDateTime deliveredAt;
 
     //프로젝트
     private String title;

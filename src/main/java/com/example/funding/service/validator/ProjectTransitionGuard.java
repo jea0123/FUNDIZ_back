@@ -20,12 +20,6 @@ public class ProjectTransitionGuard {
 
     public void assertCanCreate(Long creatorId) {
         ensureCreatorExistsOrThrow(creatorId);
-
-        List<String> errors = new ArrayList<>();
-        entityValidator.validateCreatorProfile(creatorId, errors);
-        if (!errors.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.PRECONDITION_REQUIRED, String.join("; ", errors));
-        }
     }
 
     public void assertCanUpdate(Long projectId, Long creatorId) {
@@ -48,7 +42,6 @@ public class ProjectTransitionGuard {
         // TODO: 대표이미지 검증 추가
         entityValidator.validateTagsFromDb(projectId, errors);
         entityValidator.validateRewardsFromDb(projectId, p.getEndDate(), errors);
-        entityValidator.validateCreatorProfile(p.getCreatorId(), errors);
 
         return errors;
     }

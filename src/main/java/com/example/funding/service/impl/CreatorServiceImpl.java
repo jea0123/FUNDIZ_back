@@ -589,6 +589,7 @@ public class CreatorServiceImpl implements CreatorService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "창작자 정보 수정 실패"));
         }
         return ResponseEntity.ok(ResponseDto.success(200, "창작자 정보 수정 완료", "창작자 정보 수정 "));
+    }
 
     @Override
     public ResponseEntity<ResponseDto<String>> setShippingStatus(Long projectId, Long creatorId, ShippingStatusDto shippingStatusDto) {

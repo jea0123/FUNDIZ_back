@@ -22,9 +22,9 @@ public interface NoticeMapper {
 
     void add(ResponseEntity<ResponseDto<Notice>> item);
 
-    void addNotice(Notice item);
+    int addNotice(Notice item);
 
-    void updateNotice(NoticeUpdateRequestDto ntcDto);
+    int updateNotice(NoticeUpdateRequestDto ntcDto);
 
-    void deleteNotice(Long noticeId);
+    int deleteNotice(Long noticeId);
 }

@@ -20,6 +20,7 @@ import com.example.funding.exception.badrequest.ProjectRejectException;
 import com.example.funding.exception.notfound.*;
 import com.example.funding.handler.NotificationPublisher;
 import com.example.funding.mapper.AdminMapper;
+import com.example.funding.mapper.NoticeMapper;
 import com.example.funding.mapper.RewardMapper;
 import com.example.funding.mapper.TagMapper;
 import com.example.funding.model.*;

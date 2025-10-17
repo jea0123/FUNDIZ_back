@@ -82,24 +82,6 @@ public class NotificationController {
     }
 
     /**
-     * 알림 생성
-     *
-     * @param dto       알림 생성 요청 DTO
-     * @param principal 인증된 사용자 정보
-     * @return 성공 메시지
-     * @author 장민규
-     * @since 2025-10-02
-     */
-//    @PostMapping("/create")
-//    public ResponseEntity<ResponseDto<String>> createNotification(@RequestBody CreateNotificationRequestDto dto,
-//                                                                  @AuthenticationPrincipal CustomUserPrincipal principal) {
-//        Long userId = principal.userId();
-//        userId = 501L;
-//        dto.setUserId(userId);
-//        return notificationService.insertNotification(dto);
-//    }
-
-    /**
      * 알림 읽음 처리
      *
      * @param notificationId 알림 ID

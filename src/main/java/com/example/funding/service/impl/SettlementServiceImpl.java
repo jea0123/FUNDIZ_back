@@ -42,6 +42,9 @@ public class SettlementServiceImpl implements SettlementService {
 
     private final NotificationPublisher notificationPublisher;
 
+    /**
+     * 정산정보 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CreatorSettlementDto>> getSettlementByCreatorId(Long creatorId) {
@@ -56,6 +59,9 @@ public class SettlementServiceImpl implements SettlementService {
         return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 정산 정보 조회 성공", dtos));
     }
 
+    /**
+     * 정산 상태 변경
+     */
     @Override
     public ResponseEntity<ResponseDto<String>> updateStatus(SettlementPaidRequestDto dto) {
         Project project = loaders.project(dto.getProjectId());
@@ -79,6 +85,9 @@ public class SettlementServiceImpl implements SettlementService {
         return ResponseEntity.ok(ResponseDto.success(200, "정산 상태 변경 성공", null));
     }
 
+    /**
+     * 정산 목록 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<SettlementItem>>> getSettlements(SettlementSearchCond cond, Pager pager) {
@@ -103,6 +112,9 @@ public class SettlementServiceImpl implements SettlementService {
         return ResponseEntity.ok().body(ResponseDto.success(200, "정산 목록 조회 성공", PageResult.of(items, pager, total)));
     }
 
+    /**
+     * 정산 요약 정보 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<SettlementSummary>> getSettlementSummary() {
@@ -110,6 +122,11 @@ public class SettlementServiceImpl implements SettlementService {
         return ResponseEntity.ok(ResponseDto.success(200, "정산 요약 정보 조회 성공", summary));
     }
 
+    /**
+     * 상태값 정규화
+     * @param status 상태값
+     * @return 정규화된 상태값 (ALL인 경우 null 반환)
+     */
     private String normalizeStatus(String status) {
         if (status == null || status.isBlank()) return null;
         String up = status.trim().toUpperCase();

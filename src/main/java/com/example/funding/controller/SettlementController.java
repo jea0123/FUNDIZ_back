@@ -32,7 +32,7 @@ public class SettlementController {
 //            @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
 //        Long creatorId = principal.creatorId();
-        Long creatorId = 502L; // TODO: 인증 기능 구현 후 수정
+        Long creatorId = 502L;
         return settlementService.getSettlementByCreatorId(creatorId);
     }
 }

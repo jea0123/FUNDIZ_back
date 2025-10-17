@@ -55,6 +55,9 @@ public class UserServiceImpl implements UserService {
 
     private final NotificationPublisher notificationPublisher;
 
+    /**
+     * 로그인 사용자 정보
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(Long userId) {
@@ -141,6 +144,9 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.ok(ResponseDto.success(200, "최근 본 프로젝트 추가 성공", null));
     }
 
+    /**
+     * 최근 본 프로젝트
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(Long userId) {
@@ -215,6 +221,9 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.ok(ResponseDto.success(200, "비밀번호 변경 성공", "********"));
     }
 
+    /**
+     * 프로젝트 좋아요 추가
+     */
     @Override
     public ResponseEntity<ResponseDto<Long>> likeProject(Long userId, Long projectId) {
         loaders.user(userId);
@@ -225,6 +234,9 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 좋아요 성공", projectId));
     }
 
+    /**
+     * 프로젝트 좋아요 취소
+     */
     @Override
     public ResponseEntity<ResponseDto<Long>> dislikeProject(Long userId, Long projectId) {
         loaders.user(userId);
@@ -235,6 +247,9 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 좋아요 취소 성공", projectId));
     }
 
+    /**
+     * 프로젝트 좋아요 여부 확인
+     */
     @Override
     public ResponseEntity<ResponseDto<Boolean>> checkLikedProject(Long userId, Long projectId) {
         loaders.user(userId);
@@ -247,6 +262,9 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * 크리에이터 팔로우
+     */
     @Override
     public ResponseEntity<ResponseDto<String>> followCreator(Long userId, Long creatorId) {
         User existingUser = loaders.user(userId);
@@ -259,6 +277,9 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 팔로우 성공", creator.getCreatorName()));
     }
 
+    /**
+     * 크리에이터 언팔로우
+     */
     @Override
     public ResponseEntity<ResponseDto<String>> unfollowCreator(Long userId, Long creatorId) {
         loaders.user(userId);
@@ -269,6 +290,9 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 언팔로우 성공", creator.getCreatorName()));
     }
 
+    /**
+     * 크리에이터 팔로우 여부 확인
+     */
     @Override
     public ResponseEntity<ResponseDto<Boolean>> isFollowingCreator(Long userId, Long creatorId) {
         loaders.user(userId);

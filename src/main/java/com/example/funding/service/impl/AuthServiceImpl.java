@@ -39,6 +39,9 @@ public class AuthServiceImpl implements AuthService {
     private final JwtProvider jwtProvider;
     private final AdminMapper adminMapper;
 
+    /**
+     * 회원가입
+     */
     @Override
     public ResponseEntity<ResponseDto<String>> signUp(SignUpRequestDto dto) {
         User existingUser = userMapper.findByEmail(dto.getEmail());
@@ -52,6 +55,9 @@ public class AuthServiceImpl implements AuthService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "회원가입 성공", dto.getEmail()));
     }
 
+    /**
+     * 로그인
+     */
     @Override
     public ResponseEntity<ResponseDto<String>> signIn(SignInRequestDto dto) {
         User user = userMapper.findByEmail(dto.getEmail());
@@ -65,6 +71,9 @@ public class AuthServiceImpl implements AuthService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "로그인 성공", token));
     }
 
+    /**
+     * 이메일 중복 확인
+     */
     @Override
     public ResponseEntity<ResponseDto<String>> checkEmail(CheckEmailRequestDto dto) {
         User existingUser = userMapper.findByEmail(dto.getEmail());
@@ -73,6 +82,9 @@ public class AuthServiceImpl implements AuthService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "사용 가능한 이메일입니다.", dto.getEmail()));
     }
 
+    /**
+     * 닉네임 중복 확인
+     */
     @Override
     public ResponseEntity<ResponseDto<String>> checkNickname(CheckNicknameRequestDto dto) {
         User existingUser = userMapper.findByNickname(dto.getNickname());
@@ -81,6 +93,9 @@ public class AuthServiceImpl implements AuthService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "사용 가능한 닉네임입니다.", dto.getNickname()));
     }
 
+    /**
+     * 회원 탈퇴
+     */
     @Override
     public ResponseEntity<ResponseDto<String>> withdrawUser(Long userId) {
         loaders.user(userId);
@@ -88,6 +103,9 @@ public class AuthServiceImpl implements AuthService {
         return ResponseEntity.ok(ResponseDto.success(200, "회원 탈퇴 성공", null));
     }
 
+    /**
+     * 관리자 등록
+     */
     @Override
     public ResponseEntity<ResponseDto<String>> registerAdmin(RegisterAdminRequestDto dto) {
         if (adminMapper.getAdminByAdminId(dto.getAdminId()) != null) throw new DuplicatedAdminIdException();
@@ -98,6 +116,9 @@ public class AuthServiceImpl implements AuthService {
         return ResponseEntity.ok(ResponseDto.success(200, "관리자 등록 성공", null));
     }
 
+    /**
+     * 관리자 로그인
+     */
     @Override
     public ResponseEntity<ResponseDto<String>> loginAdmin(RegisterAdminRequestDto dto) {
         Admin admin = loaders.admin(dto.getAdminId());

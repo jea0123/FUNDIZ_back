@@ -51,6 +51,9 @@ public class AdminServiceImpl implements AdminService {
     private final NotificationPublisher notificationPublisher;
     private final ProjectTransitionGuard transitionGuard;
 
+    /**
+     * 관리자 대시보드 분석 데이터 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<AdminAnalyticsDto>> getAdminAnalytics(LocalDate from, LocalDate to, int limit, String metric, int months, Long ctgrId) {
@@ -73,6 +76,9 @@ public class AdminServiceImpl implements AdminService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "관리자 대시보드 분석 데이터 조회 성공", analytics));
     }
 
+    /**
+     * 카테고리별 성공률 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(Long ctgrId) {
@@ -82,6 +88,9 @@ public class AdminServiceImpl implements AdminService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "카테고리별 성공률 조회 성공", categorySuccesses));
     }
 
+    /**
+     * KPI 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<Kpi>> getKpi(int months) {
@@ -91,6 +100,9 @@ public class AdminServiceImpl implements AdminService {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "KPI 조회 성공", kpi));
     }
 
+    /**
+     * 리워드 판매 상위 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<RewardSalesTop>>> getRewardSalesTops(LocalDate from, LocalDate to, int limit, String metric) {

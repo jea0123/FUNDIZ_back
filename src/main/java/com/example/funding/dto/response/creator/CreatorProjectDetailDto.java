@@ -5,7 +5,7 @@ import com.example.funding.model.Tag;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -15,8 +15,8 @@ public class CreatorProjectDetailDto {
     private Long creatorId;
     private String title;
     private Integer goalAmount;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private String content;
     private String contentBlocks;
     private String thumbnail;

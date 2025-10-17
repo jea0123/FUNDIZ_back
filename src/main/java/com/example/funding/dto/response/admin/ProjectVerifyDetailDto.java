@@ -5,7 +5,7 @@ import com.example.funding.model.Tag;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -17,10 +17,10 @@ public class ProjectVerifyDetailDto {
     private String content;
     private String thumbnail;
     private Integer goalAmount;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private String projectStatus;
-    private LocalDate requestedAt;
+    private LocalDateTime requestedAt;
 
     private Long ctgrId;
     private String ctgrName;

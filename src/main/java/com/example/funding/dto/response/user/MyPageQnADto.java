@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -18,7 +18,7 @@ public class MyPageQnADto {
     private Long userId;
     private Long creatorId;
     private String title;
-    private LocalDate date;
+    private LocalDateTime date;
 
     // 창작자 테이블
     private String creatorName;

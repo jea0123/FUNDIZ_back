@@ -2,7 +2,7 @@ package com.example.funding.dto.response.backing.userList_detail;
 
 import lombok.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -16,7 +16,7 @@ public class MyPageBackingListDto {
     private String title;
     private Long goalAmount;
     private Long currAmount;
-    private LocalDate endDate;
+    private LocalDateTime endDate;
     private String thumbnail;
 
     //리워드 테이블
@@ -26,7 +26,7 @@ public class MyPageBackingListDto {
     private Long userId;
     private Long backingId;
     private Long amount;
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
     private String backingStatus;
 
     //배송 테이블

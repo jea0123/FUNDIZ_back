@@ -5,8 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -18,6 +17,6 @@ public class Community {
     private Long projectId;
     private String cmContent;
     private Integer rating;
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
     private String code;
 }

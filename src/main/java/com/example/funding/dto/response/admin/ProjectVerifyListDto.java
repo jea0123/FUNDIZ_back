@@ -3,7 +3,7 @@ package com.example.funding.dto.response.admin;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,8 +16,8 @@ public class ProjectVerifyListDto {
     private Long subctgrId;
     private String subctgrName;
     private Integer goalAmount;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private String projectStatus;
-    private LocalDate requestedAt;
+    private LocalDateTime requestedAt;
 }

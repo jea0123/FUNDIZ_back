@@ -5,7 +5,7 @@
     import lombok.Getter;
     import lombok.Setter;
 
-    import java.time.LocalDate;
+    import java.time.LocalDateTime;
 
     @Getter
     @Setter
@@ -15,7 +15,7 @@
         private Long userId;
         private Long target;
         private String reason;
-        private LocalDate reportDate;
+        private LocalDateTime reportDate;
         private String reportStatus;
         private String reportType;
     }

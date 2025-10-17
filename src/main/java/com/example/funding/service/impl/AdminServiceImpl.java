@@ -17,16 +17,20 @@ import com.example.funding.exception.badrequest.ProjectApproveException;
 import com.example.funding.exception.badrequest.ProjectRejectException;
 import com.example.funding.exception.notfound.*;
 import com.example.funding.handler.NotificationPublisher;
-import com.example.funding.mapper.*;
+import com.example.funding.mapper.AdminMapper;
+import com.example.funding.mapper.RewardMapper;
+import com.example.funding.mapper.TagMapper;
 import com.example.funding.model.*;
 import com.example.funding.service.AdminService;
 import com.example.funding.service.validator.ProjectTransitionGuard;
+import com.example.funding.validator.Loaders;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -36,17 +40,16 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Validated
 public class AdminServiceImpl implements AdminService {
 
+    private final Loaders loaders;
     private final AdminMapper adminMapper;
-    private final ProjectMapper projectMapper;
     private final TagMapper tagMapper;
     private final RewardMapper rewardMapper;
-    private final UserMapper userMapper;
 
     private final NotificationPublisher notificationPublisher;
     private final ProjectTransitionGuard transitionGuard;
-    private final CreatorMapper creatorMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -83,9 +86,8 @@ public class AdminServiceImpl implements AdminService {
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<Kpi>> getKpi(int months) {
         Kpi kpi = adminMapper.getKpiByMonths(months);
-        if (kpi == null) {
-            throw new KPINotFoundException();
-        }
+        if (kpi == null) throw new KPINotFoundException();
+
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "KPI 조회 성공", kpi));
     }
 
@@ -136,7 +138,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> cancelProject(Long projectId) {
-        if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
+        loaders.project(projectId);
         adminMapper.cancelProject(projectId);
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 취소 성공", null));
     }
@@ -151,8 +153,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> updateProject(AdminProjectUpdateDto dto) {
-        Project existing = projectMapper.findById(dto.getProjectId());
-        if (existing == null) throw new ProjectNotFoundException();
+        Project existing = loaders.project(dto.getProjectId());
 
         //TODO: 목표금액, 종료일 무결성 체크
 
@@ -226,11 +227,9 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> approveProject(Long projectId) {
-        Project existing = projectMapper.findById(projectId);
-        if (existing == null) throw new ProjectNotFoundException();
+        Project existing = loaders.project(projectId);
 
-        Creator existingCreator = creatorMapper.findById(existing.getCreatorId());
-        if (existingCreator == null) throw new CreatorNotFoundException();
+        Creator existingCreator = loaders.creator(projectId);
 
         // Guard
         transitionGuard.assertCanApprove(projectId);
@@ -252,11 +251,9 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> rejectProject(Long projectId, String rejectedReason) {
-        Project existing = projectMapper.findById(projectId);
-        if (existing == null) throw new ProjectNotFoundException();
+        Project existing = loaders.project(projectId);
 
-        Creator existingCreator = creatorMapper.findById(existing.getCreatorId());
-        if (existingCreator == null) throw new CreatorNotFoundException();
+        Creator existingCreator = loaders.creator(projectId);
         // Guard
         transitionGuard.requireVerifying(projectId);
         if (adminMapper.isRejectable(projectId) == 0) throw new ProjectRejectException();
@@ -296,8 +293,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<User>> item(Long userId) {
-        User user = userMapper.getUserById(userId);
-        if (user == null) throw new UserNotFoundException();
+        User user = loaders.user(userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "회원 정보 조회 성공", user));
     }
@@ -313,7 +309,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> updateUser(Long userId, UserAdminUpdateRequestDto userDto) {
-        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        loaders.user(userId);
         userDto.setUserId(userId);
 
         adminMapper.updateUser(userDto);

@@ -5,17 +5,17 @@ import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.cs.RpAddRequestDto;
 import com.example.funding.enums.NotificationType;
-import com.example.funding.exception.notfound.UserNotFoundException;
 import com.example.funding.handler.NotificationPublisher;
 import com.example.funding.mapper.ReportMapper;
-import com.example.funding.mapper.UserMapper;
 import com.example.funding.model.Report;
 import com.example.funding.service.ReportService;
+import com.example.funding.validator.Loaders;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
@@ -23,10 +23,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Validated
 public class ReportServiceImpl implements ReportService {
-
+    private final Loaders loaders;
     private final ReportMapper reportMapper;
-    private final UserMapper userMapper;
 
     private final NotificationPublisher notificationPublisher;
 
@@ -61,7 +61,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<Report>>> myReportList(Long userId, Pager pager) {
-        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        loaders.user(userId);
         int total = reportMapper.myReportTotal(userId);
         List<Report> myReportList = reportMapper.myReportList(userId, pager);
         PageResult<Report> result = PageResult.of(myReportList, pager, total);
@@ -80,7 +80,7 @@ public class ReportServiceImpl implements ReportService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> addReport(Long userId, RpAddRequestDto rpDto) {
-        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        loaders.user(userId);
         Report item = Report.builder()
                 .userId(userId)
                 .target(rpDto.getTarget())

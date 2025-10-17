@@ -6,22 +6,18 @@ import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.QnaAddRequestDto;
 import com.example.funding.dto.response.project.QnaDto;
 import com.example.funding.enums.NotificationType;
-import com.example.funding.exception.notfound.CreatorNotFoundException;
-import com.example.funding.exception.notfound.ProjectNotFoundException;
-import com.example.funding.exception.notfound.UserNotFoundException;
 import com.example.funding.handler.NotificationPublisher;
-import com.example.funding.mapper.CreatorMapper;
-import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.QnaMapper;
-import com.example.funding.mapper.UserMapper;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
 import com.example.funding.service.QnaService;
+import com.example.funding.validator.Loaders;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,12 +26,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Validated
 public class QnaServiceImpl implements QnaService {
-
+    private final Loaders loaders;
     private final QnaMapper qnaMapper;
-    private final ProjectMapper projectMapper;
-    private final UserMapper userMapper;
-    private final CreatorMapper creatorMapper;
 
     private final NotificationPublisher notificationPublisher;
 
@@ -53,7 +47,7 @@ public class QnaServiceImpl implements QnaService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CursorPage<QnaDto>>> getQnaListOfProject(Long projectId, LocalDateTime lastCreatedAt, Long lastId, int size) {
-        if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
+        loaders.project(projectId);
         List<QnaDto> qnaList = qnaMapper.getQnaListOfProject(projectId, lastCreatedAt, lastId, size);
 
         Cursor next = null;
@@ -77,14 +71,10 @@ public class QnaServiceImpl implements QnaService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> addQuestion(Long projectId, Long userId, QnaAddRequestDto qnaDto) {
-        Project existingProject = projectMapper.findById(projectId);
-        if (existingProject == null) throw new ProjectNotFoundException();
+        loaders.user(userId);
+        Project existingProject = loaders.project(projectId);
 
-        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
-
-        Creator existingCreator = creatorMapper.findById(existingProject.getCreatorId());
-        if (existingCreator == null) throw new CreatorNotFoundException();
-
+        Creator existingCreator = loaders.creator(existingProject.getCreatorId());
         QnaDto item = QnaDto.builder()
                 .projectId(projectId)
                 .userId(userId)

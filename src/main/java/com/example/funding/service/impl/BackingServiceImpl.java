@@ -12,21 +12,19 @@ import com.example.funding.dto.response.backing.userList_detail.MyPageBackingLis
 import com.example.funding.dto.response.backing.userList_detail.MyPageBacking_RewardDto;
 import com.example.funding.dto.response.payment.BackingPagePaymentDto;
 import com.example.funding.dto.response.user.BackingDto;
-import com.example.funding.exception.notfound.BackingNotFoundException;
-import com.example.funding.exception.notfound.ProjectNotFoundException;
-import com.example.funding.exception.notfound.UserNotFoundException;
 import com.example.funding.handler.NotificationPublisher;
 import com.example.funding.mapper.*;
 import com.example.funding.model.*;
 import com.example.funding.service.BackingService;
+import com.example.funding.validator.Loaders;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -35,9 +33,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Validated
 public class BackingServiceImpl implements BackingService {
-    private final UserMapper userMapper;
-    private final ProjectMapper projectMapper;
+    private final Loaders loaders;
     private final BackingMapper backingMapper;
     private final AddressMapper addressMapper;
     private final RewardMapper rewardMapper;
@@ -49,11 +47,9 @@ public class BackingServiceImpl implements BackingService {
 
     @Override
     public ResponseEntity<ResponseDto<BackingResponseDto>> prepareBacking(Long userId, Long projectId) {
-        User user = userMapper.getUserById(userId);
-        if (user == null) throw new UserNotFoundException();
+        User user = loaders.user(userId);
 
-        Project project = projectMapper.findById(projectId);
-        if (project == null) throw new ProjectNotFoundException();
+        Project project = loaders.project(projectId);
 
         List<AddressResponseDto> addressList = addressMapper.getAddressList(userId);
         List<Reward> rewardList = rewardMapper.getRewardListPublic(projectId);
@@ -89,6 +85,10 @@ public class BackingServiceImpl implements BackingService {
     @Override
     @Transactional
     public ResponseEntity<ResponseDto<String>> createBacking(Long userId, BackingRequestDto requestDto) {
+        loaders.user(userId);
+        requestDto.getRewards().forEach(reward -> {
+            loaders.reward(reward.getRewardId());
+        });
         Backing backing = requestDto.getBacking();
         Payment payment = requestDto.getPayment();
         Address address = requestDto.getAddress();
@@ -96,7 +96,7 @@ public class BackingServiceImpl implements BackingService {
 
         //backing
         backing.setUserId(userId);
-        backing.setCreatedAt(LocalDate.now());
+        backing.setCreatedAt(LocalDateTime.now());
         backingMapper.addBacking(backing);
 
         Long backingId = backing.getBackingId();
@@ -127,9 +127,8 @@ public class BackingServiceImpl implements BackingService {
             // 기존 주소 선택한 경우 
             addrId = address.getAddrId();
         } else {
-            
-        }
 
+        }
 
 
         // insert (shipping직접 생성)
@@ -154,7 +153,7 @@ public class BackingServiceImpl implements BackingService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<BackingDto>>> getBackingList(Long userId) {
-        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        loaders.user(userId);
         List<BackingDto> backingList = backingMapper.getBackingListUserId(userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "후원한 프로젝트 리스트 조회 성공", backingList));
@@ -172,8 +171,8 @@ public class BackingServiceImpl implements BackingService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(Long userId, Long projectId, Long rewardId, Long backingId) {
-        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
-        if (projectMapper.findById(projectId) == null) throw new ProjectNotFoundException();
+        loaders.user(userId);
+        loaders.project(projectId);
 
         BackingDto backingDetailDto = backingMapper.getBackingProjectAndUserId(userId, projectId, rewardId, backingId);
 
@@ -182,8 +181,8 @@ public class BackingServiceImpl implements BackingService {
 
     @Override
     public ResponseEntity<ResponseDto<String>> updateBacking(BackingRequestUpdateDto updateDto, Long backingId, Long userId) {
-        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
-        if (backingMapper.findById(backingId) == null) throw new BackingNotFoundException();
+        loaders.user(userId);
+        loaders.backing(backingId);
         updateDto.setBackingId(backingId);
         updateDto.setUserId(backingId);
 
@@ -198,6 +197,7 @@ public class BackingServiceImpl implements BackingService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<MyPageBackingListDto>>> getMyPageBackingList(Long userId) {
+        loaders.user(userId);
 
         List<MyPageBackingListDto> backingList = backingMapper.getBackingList(userId);
 
@@ -233,6 +233,7 @@ public class BackingServiceImpl implements BackingService {
 
     @Override
     public ResponseEntity<ResponseDto<List<MyPageBackingDetailDto>>> getMyPageBackingDetail(Long userId) {
+        loaders.user(userId);
 
         List<MyPageBackingDetailDto> backingList = backingMapper.getBackingDetail(userId);
 

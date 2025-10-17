@@ -3,7 +3,7 @@ package com.example.funding.dto.response.admin;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -12,12 +12,12 @@ public class AdminProjectListDto {
     private String title;
     private String creatorName;
     private String projectStatus;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private Integer goalAmount;
     private Integer currAmount;
     private Integer backerCnt;
-    private LocalDate updatedAt;
+    private LocalDateTime updatedAt;
 
     //계산 필드
     private Integer percentNow;

@@ -5,8 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -15,5 +14,5 @@ import java.util.Date;
 public class Liked {
     private Long userId;
     private Long projectId;
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 }

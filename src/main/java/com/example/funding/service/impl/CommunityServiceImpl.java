@@ -7,16 +7,16 @@ import com.example.funding.dto.request.project.CommunityCreateRequestDto;
 import com.example.funding.dto.response.project.CommunityDto;
 import com.example.funding.dto.response.project.ReviewDto;
 import com.example.funding.mapper.CommunityMapper;
-import com.example.funding.mapper.ReplyMapper;
-import com.example.funding.mapper.UserMapper;
 import com.example.funding.model.Community;
 import com.example.funding.service.CommunityService;
+import com.example.funding.validator.Loaders;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -26,11 +26,11 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Validated
 public class CommunityServiceImpl implements CommunityService {
 
     private final CommunityMapper communityMapper;
-    private final UserMapper userMapper;
-    private final ReplyMapper replyMapper;
+    private final Loaders loaders;
 
     /**
      * <p>프로젝트 상세 페이지 내 커뮤니티 목록 조회</p>
@@ -47,6 +47,7 @@ public class CommunityServiceImpl implements CommunityService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CursorPage<CommunityDto>>> getCommunityList(Long projectId, String code, LocalDateTime lastCreatedAt, Long lastId, int size) {
+        loaders.project(projectId);
         List<CommunityDto> communityList = communityMapper.getCommunityList(projectId, "CM", lastCreatedAt, lastId, size);
 
         Cursor next = null;
@@ -70,6 +71,8 @@ public class CommunityServiceImpl implements CommunityService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> createCommunity(Long projectId, CommunityCreateRequestDto dto, Long userId) {
+        loaders.user(userId);
+        loaders.project(projectId);
         //TODO: guard, validator
 
         Community community = Community.builder()
@@ -101,6 +104,7 @@ public class CommunityServiceImpl implements CommunityService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CursorPage<ReviewDto>>> getReviewList(Long projectId, String code, LocalDateTime lastCreatedAt, Long lastId, int size) {
+        loaders.project(projectId);
         List<ReviewDto> reviewList = communityMapper.getReviewList(projectId, "RV", lastCreatedAt, lastId, size);
 
         Cursor next = null;

@@ -1,19 +1,18 @@
 package com.example.funding.service.impl;
 
-import com.example.funding.common.NotificationSseHub;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.exception.forbidden.AccessDeniedException;
-import com.example.funding.exception.notfound.NotificationNotFoundException;
-import com.example.funding.exception.notfound.UserNotFoundException;
 import com.example.funding.mapper.NotificationMapper;
-import com.example.funding.mapper.UserMapper;
 import com.example.funding.model.Notification;
 import com.example.funding.service.NotificationService;
+import com.example.funding.validator.Loaders;
+import com.example.funding.validator.PermissionChecker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
@@ -21,15 +20,16 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Validated
 public class NotificationServiceImpl implements NotificationService {
-
+    private final Loaders loaders;
+    private final PermissionChecker auth;
     private final NotificationMapper notificationMapper;
-    private final UserMapper userMapper;
 
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<Notification>>> getNotificationsByUserId(Long userId) {
-        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        loaders.user(userId);
 
         List<Notification> notifications = notificationMapper.getNotificationsByUserId(userId);
         return ResponseEntity.ok(ResponseDto.success(200, "알림 목록 조회 성공", notifications));
@@ -38,20 +38,18 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<Notification>> getNotificationById(Long notificationId, Long userId) {
-        Notification notification = notificationMapper.getNotificationById(notificationId);
-        if (notification == null) throw new NotificationNotFoundException();
-
-        if (!notification.getUserId().equals(userId)) throw new AccessDeniedException();
+        loaders.user(userId);
+        Notification notification = loaders.notification(notificationId);
+        auth.mustBeOwner(userId, notification.getUserId());
 
         return ResponseEntity.ok(ResponseDto.success(200, "알림 조회 성공", notification));
     }
 
     @Override
     public ResponseEntity<ResponseDto<String>> markAsRead(Long notificationId, Long userId) {
-        Notification notification = notificationMapper.getNotificationById(notificationId);
-        if (notification == null) throw new NotificationNotFoundException();
-
-        if (!notification.getUserId().equals(userId)) throw new AccessDeniedException();
+        loaders.user(userId);
+        Notification notification = loaders.notification(notificationId);
+        auth.mustBeOwner(userId, notification.getUserId());
 
         if (notification.getIsRead() == 'Y') {
             return ResponseEntity.ok(ResponseDto.success(200, "이미 읽음 처리된 알림입니다.", null));
@@ -62,7 +60,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public ResponseEntity<ResponseDto<String>> markAllAsRead(Long userId) {
-        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        loaders.user(userId);
 
         List<Notification> notifications = notificationMapper.getNotificationsByUserId(userId);
         for (Notification notification : notifications) {
@@ -78,10 +76,9 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public ResponseEntity<ResponseDto<String>> deleteNotification(Long notificationId, Long userId) {
-        Notification notification = notificationMapper.getNotificationById(notificationId);
-        if (notification == null) throw new NotificationNotFoundException();
-
-        if (!notification.getUserId().equals(userId)) throw new AccessDeniedException();
+        loaders.user(userId);
+        Notification notification = loaders.notification(notificationId);
+        auth.mustBeOwner(userId, notification.getUserId());
 
         notificationMapper.deleteNotification(notificationId);
         return ResponseEntity.ok(ResponseDto.success(200, "알림 삭제 성공", null));
@@ -89,7 +86,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public ResponseEntity<ResponseDto<String>> deleteAllNotificationsByUserId(Long userId) {
-        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
+        loaders.user(userId);
 
         notificationMapper.deleteAllNotificationsByUserId(userId);
         return ResponseEntity.ok(ResponseDto.success(200, "모든 알림 삭제 성공", null));

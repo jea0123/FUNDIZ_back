@@ -47,6 +47,15 @@ public class UserController {
         return userService.getLoginUser(userId);
     }
 
+    @PostMapping("/recentView/{projectId}")
+    public ResponseEntity<ResponseDto<?>> addRecentViewProject(@PathVariable Long projectId
+//                                                                   @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+//        Long userId = principal.userId();
+        Long userId = 501L; // TODO: 임시
+        return userService.addRecentViewProject(userId, projectId);
+    }
+
     /**
      * <p>최근 본 프로젝트 목록 조회</p>
      *

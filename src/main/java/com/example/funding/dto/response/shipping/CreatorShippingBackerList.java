@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -33,8 +33,8 @@ public class CreatorShippingBackerList {
     //배송
     private String shippingStatus;
     private String trackingNum;
-    private LocalDate shippedAt;
-    private LocalDate deliveredAt;
+    private LocalDateTime shippedAt;
+    private LocalDateTime deliveredAt;
 
     //후원상세
     private Long quantity;

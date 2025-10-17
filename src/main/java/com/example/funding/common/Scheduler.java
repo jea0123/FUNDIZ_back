@@ -6,7 +6,6 @@ import com.example.funding.mapper.CreatorMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.SettlementMapper;
 import com.example.funding.model.Creator;
-import com.example.funding.model.Project;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -35,22 +35,22 @@ public class Scheduler {
         int success = projectMapper.updateProjectsToSuccess();
         int failed = projectMapper.updateProjectsToFailed();
 
-        List<Project> openingProjects = projectMapper.getProjectToOpen();
-        for(Project project : openingProjects) {
-            Creator creator = creatorMapper.findById(project.getCreatorId());
-            notificationPublisher.publish(creator.getUserId(), NotificationType.FUNDING_OPEN, project.getTitle(), project.getProjectId());
+        List<Map<String, Object>> openingProjects = projectMapper.getProjectToOpen();
+        for (Map<String, Object> project : openingProjects) {
+            Creator creator = creatorMapper.findById((Long) project.get("creatorId"));
+            notificationPublisher.publish(creator.getUserId(), NotificationType.FUNDING_OPEN, (String) project.get("title"), (Long) project.get("projectId"));
         }
 
-        List<Project> successfulProjects = projectMapper.getProjectToSuccess();
-        for(Project project : successfulProjects) {
-            Creator creator = creatorMapper.findById(project.getCreatorId());
-            notificationPublisher.publish(creator.getUserId(), NotificationType.FUNDING_SUCCESS, project.getTitle(), project.getProjectId());
+        List<Map<String, Object>> successfulProjects = projectMapper.getProjectToSuccess();
+        for (Map<String, Object> project : successfulProjects) {
+            Creator creator = creatorMapper.findById((Long) project.get("creatorId"));
+            notificationPublisher.publish(creator.getUserId(), NotificationType.FUNDING_SUCCESS, (String) project.get("title"), (Long) project.get("projectId"));
         }
 
-        List<Project> failedProjects = projectMapper.getProjectToFailed();
-        for(Project project : failedProjects) {
-            Creator creator = creatorMapper.findById(project.getCreatorId());
-            notificationPublisher.publish(creator.getUserId(), NotificationType.FUNDING_FAILURE, project.getTitle(), project.getProjectId());
+        List<Map<String, Object>> failedProjects = projectMapper.getProjectToFailed();
+        for (Map<String, Object> project : failedProjects) {
+            Creator creator = creatorMapper.findById((Long) project.get("creatorId"));
+            notificationPublisher.publish(creator.getUserId(), NotificationType.FUNDING_FAILURE, (String) project.get("title"), (Long) project.get("projectId"));
         }
 
         log.info("[ProjectStatusScheduler] OPEN={}, SUCCESS={}, FAILED={}", opened, success, failed);

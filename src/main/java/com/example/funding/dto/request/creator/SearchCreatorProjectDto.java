@@ -4,13 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 public class SearchCreatorProjectDto {
     private String projectStatus;
-    private LocalDate fromDate;
-    private LocalDate toDate;
+    private LocalDateTime fromDate;
+    private LocalDateTime toDate;
     private String rangeType;
 
     public void applyRangeType() {
@@ -19,22 +20,22 @@ public class SearchCreatorProjectDto {
 
             switch (rangeType) {
                 case "7d" -> {
-                    fromDate = today.minusDays(7);
-                    toDate = today;
+                    fromDate = today.minusDays(7).atStartOfDay();
+                    toDate = today.atStartOfDay();
                 }
                 case "30d" -> {
-                    fromDate = today.minusDays(30);
-                    toDate = today;
+                    fromDate = today.minusDays(30).atStartOfDay();
+                    toDate = today.atStartOfDay();
                 }
                 case "90d" -> {
-                    fromDate = today.minusDays(90);
-                    toDate = today;
+                    fromDate = today.minusDays(90).atStartOfDay();
+                    toDate = today.atStartOfDay();
                 }
             }
         }
     }
 
     public LocalDate getToDateEndExclusive() {
-        return toDate == null ? null : toDate.plusDays(1);
+        return toDate == null ? null : LocalDate.from(toDate.plusDays(1));
     }
 }

@@ -18,7 +18,6 @@ public class NoticeController {
 
     private final NoticeService noticeService;
 
-
     /**
      * <p>공지사항 목록 조회</p>
      *
@@ -38,7 +37,6 @@ public class NoticeController {
         return noticeService.noticeList(pager);
     }
 
-
     /**
      * <p>공지사항 상세 페이지 조회</p>
      *
@@ -52,7 +50,6 @@ public class NoticeController {
         return noticeService.item(noticeId);
     }
 
-
     /**
      * <p>공지사항 등록</p>
      *
@@ -63,7 +60,6 @@ public class NoticeController {
      */
     @PostMapping("/add")
     public ResponseEntity<ResponseDto<String>> addNotice(@RequestBody NoticeAddRequestDto ntcDto){
-
         return noticeService.addNotice(ntcDto);
     }
 

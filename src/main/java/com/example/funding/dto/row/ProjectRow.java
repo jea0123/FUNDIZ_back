@@ -3,7 +3,7 @@ package com.example.funding.dto.row;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,8 +16,8 @@ public class ProjectRow {
     private String title;
     private Integer goalAmount;
     private Integer currAmount;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private String content;
     private String thumbnail;
     private String projectStatus;

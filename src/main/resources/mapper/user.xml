@@ -8,7 +8,6 @@
         (USERS_SEQ.NEXTVAL, #{email}, #{password}, #{nickname})
     </insert>
 
-
     <update id="updateLastLogin" parameterType="Long">
         UPDATE USERS
         SET LASTLOGINAT = SYSDATE
@@ -29,6 +28,22 @@
     <select id="findByNickname" parameterType="String" resultType="user">
         SELECT * FROM USERS WHERE NICKNAME = #{nickname}
     </select>
+
+    <update id="upsertRecentView" parameterType="map">
+        MERGE INTO recentview rv
+        USING (
+        SELECT
+        #{userId, jdbcType=NUMERIC}    AS userId,
+        #{projectId, jdbcType=NUMERIC} AS projectId
+        FROM dual
+        ) src
+        ON (rv.userId = src.userId AND rv.projectId = src.projectId)
+        WHEN MATCHED THEN
+        UPDATE SET rv.viewedAt = SYSDATE
+        WHEN NOT MATCHED THEN
+        INSERT (userId, projectId, viewedAt)
+        VALUES (src.userId, src.projectId, SYSDATE)
+    </update>
 
     <select id="getRecentViewProjects" resultType="recentViewProject">
         SELECT *

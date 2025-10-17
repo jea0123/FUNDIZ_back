@@ -3,7 +3,7 @@ package com.example.funding.service.validator;
 import lombok.experimental.UtilityClass;
 
 import java.text.Normalizer;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 import java.util.Objects;
@@ -37,7 +37,7 @@ public class ValidationRules {
 
     // helpers
     /** 두 날짜 사이의 포함 일수(끝 미포함) */
-    public static long daysInclusive(LocalDate start, LocalDate end) {
+    public static long daysInclusive(LocalDateTime start, LocalDateTime end) {
         Objects.requireNonNull(start, "start");
         Objects.requireNonNull(end, "end");
         long d = ChronoUnit.DAYS.between(start, end);

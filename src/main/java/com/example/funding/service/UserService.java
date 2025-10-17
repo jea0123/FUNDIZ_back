@@ -34,6 +34,8 @@ public interface UserService {
 
     ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfUser(Long userId, Pager pager);
 
+    ResponseEntity<ResponseDto<?>> addRecentViewProject(Long userId, Long projectId);
+
     /**
      * <p>최근 본 프로젝트 목록 조회</p>
      *

@@ -10,38 +10,36 @@ import com.example.funding.dto.response.cs.InquiryReplyDto;
 import com.example.funding.dto.response.cs.QnaReplyDto;
 import com.example.funding.dto.response.project.ReplyDto;
 import com.example.funding.enums.NotificationType;
-import com.example.funding.exception.notfound.CommunityNotFoundException;
-import com.example.funding.exception.notfound.InquiryNotFoundException;
-import com.example.funding.exception.notfound.QnANotFoundException;
-import com.example.funding.exception.notfound.UserNotFoundException;
+import com.example.funding.exception.badrequest.ContentRequiredException;
+import com.example.funding.exception.badrequest.InvalidParamException;
 import com.example.funding.handler.NotificationPublisher;
-import com.example.funding.mapper.*;
+import com.example.funding.mapper.ReplyMapper;
 import com.example.funding.model.Community;
 import com.example.funding.model.Inquiry;
 import com.example.funding.model.Qna;
 import com.example.funding.model.Reply;
 import com.example.funding.service.ReplyService;
+import com.example.funding.validator.Loaders;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.example.funding.common.Preconditions.requireHasText;
+import static com.example.funding.common.Preconditions.requirePositive;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Validated
 public class ReplyServiceImpl implements ReplyService {
 
+    private final Loaders loaders;
     private final ReplyMapper replyMapper;
-    private final CommunityMapper communityMapper;
-    private final InquiryMapper inquiryMapper;
-    private final QnaMapper qnaMapper;
-    private final UserMapper userMapper;
-
     private final NotificationPublisher notificationPublisher;
 
     /**
@@ -58,10 +56,8 @@ public class ReplyServiceImpl implements ReplyService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CursorPage<ReplyDto>>> getReplyList(Long cmId, LocalDateTime lastCreatedAt, Long lastId, int size) {
-        if (cmId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cmId가 필요합니다.");
-        }
-        if (communityMapper.existsCommunityById(cmId) <= 0) throw new CommunityNotFoundException();
+        requirePositive(cmId, InvalidParamException::new);
+        loaders.community(cmId);
 
         int limitPlusOne = Math.max(1, size) + 1;
         List<ReplyDto> replyList = replyMapper.getReplyList(cmId, lastCreatedAt, lastId, limitPlusOne);
@@ -92,18 +88,12 @@ public class ReplyServiceImpl implements ReplyService {
      */
     @Override
     public ResponseEntity<ResponseDto<ReplyDto>> createCommunityReply(Long cmId, ReplyCreateRequestDto dto, Long userId) {
-        if (userMapper.getUserById(userId) == null) throw new UserNotFoundException();
-        if (cmId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cmId가 필요합니다.");
-        }
-        //TODO: userId 체크
-        Community existingCommunity = communityMapper.getCommunityById(cmId);
-        if (existingCommunity == null) throw new CommunityNotFoundException();
+        requirePositive(cmId, InvalidParamException::new);
+        loaders.user(userId);
+        Community existingCommunity = loaders.community(cmId);
 
         String content = (dto.getContent() == null ? "" : dto.getContent().trim());
-        if (content.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "내용은 필수입니다.");
-        }
+        requireHasText(content, ContentRequiredException::new);
         //TODO: 문자 길이 체크
 
         Reply reply = Reply.builder()
@@ -122,10 +112,8 @@ public class ReplyServiceImpl implements ReplyService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CursorPage<InquiryReplyDto>>> getInquiryReplyList(Long inqId, LocalDateTime lastCreatedAt, Long lastId, int size) {
-        if (inqId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "inqId가 필요합니다.");
-        }
-        if (inquiryMapper.existsInquiryById(inqId) <= 0) throw new InquiryNotFoundException();
+        requirePositive(inqId, InvalidParamException::new);
+        loaders.inquiry(inqId);
 
         int limitPlusOne = Math.max(1, size) + 1;
         List<InquiryReplyDto> replyList = replyMapper.getInquiryReplyList(inqId, lastCreatedAt, lastId, limitPlusOne);
@@ -146,16 +134,11 @@ public class ReplyServiceImpl implements ReplyService {
 
     @Override
     public ResponseEntity<ResponseDto<InquiryReplyDto>> createInquiryReply(Long inqId, IqrReplyCreateRequestDto dto) {
-        if (inqId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "inqId가 필요합니다.");
-        }
-        Inquiry existingInquiry = inquiryMapper.findById(inqId);
-        if (existingInquiry == null) throw new InquiryNotFoundException();
+        requirePositive(inqId, InvalidParamException::new);
+        Inquiry existingInquiry = loaders.inquiry(inqId);
 
         String content = (dto.getContent() == null ? "" : dto.getContent().trim());
-        if (content.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "내용은 필수입니다.");
-        }
+        requireHasText(content, ContentRequiredException::new);
         //TODO: 문자 길이 체크
 
         Reply reply = Reply.builder()
@@ -172,10 +155,8 @@ public class ReplyServiceImpl implements ReplyService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CursorPage<QnaReplyDto>>> getQnaReplyList(Long qnaId, LocalDateTime lastCreatedAt, Long lastId, int size) {
-        if (qnaId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qnaId가 필요합니다.");
-        }
-        if (qnaMapper.existsQnaById(qnaId) <= 0) throw new QnANotFoundException();
+        requirePositive(qnaId, InvalidParamException::new);
+        loaders.qna(qnaId);
 
         int limitPlusOne = Math.max(1, size) + 1;
         List<QnaReplyDto> replyList = replyMapper.getQnaReplyList(qnaId, lastCreatedAt, lastId, limitPlusOne);
@@ -196,20 +177,13 @@ public class ReplyServiceImpl implements ReplyService {
 
     @Override
     public ResponseEntity<ResponseDto<QnaReplyDto>> createQnaReply(Long qnaId, Long creatorId, QnaReplyCreateRequestDto dto) {
-        dto.setCreatorId(creatorId);
+        requirePositive(qnaId, InvalidParamException::new);
 
-        if (qnaId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qnaId가 필요합니다.");
-        }
-
-        Qna existingQna = qnaMapper.findById(qnaId);
-        if (existingQna == null) throw new QnANotFoundException();
-        if (userMapper.getUserById(creatorId) == null) throw new UserNotFoundException();
+        Qna existingQna = loaders.qna(qnaId);
+        loaders.creator(creatorId);
 
         String content = (dto.getContent() == null ? "" : dto.getContent().trim());
-        if (content.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "내용은 필수입니다.");
-        }
+        requireHasText(content, ContentRequiredException::new);
         //TODO: 문자 길이 체크
 
         Reply reply = Reply.builder()

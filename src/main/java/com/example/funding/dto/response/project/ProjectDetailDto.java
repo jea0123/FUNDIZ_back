@@ -3,9 +3,12 @@ package com.example.funding.dto.response.project;
 import com.example.funding.model.News;
 import com.example.funding.model.Reward;
 import com.example.funding.model.Tag;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -21,8 +24,8 @@ public class ProjectDetailDto {
     private String title;
     private Integer goalAmount;
     private Integer currAmount;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private String content;
     private String thumbnail;
     private String projectStatus;
@@ -33,7 +36,7 @@ public class ProjectDetailDto {
     //계산 필드
     private Integer percentNow;
     private Integer projectCnt;
-    private LocalDate paymentDate;
+    private LocalDateTime paymentDate;
 
     //창작자
     private String creatorName;

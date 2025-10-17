@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -15,7 +15,7 @@ public class MyPageLikedDto {
     //좋아요 테이블
     private Long userId;
     private Long projectId;
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     //창작자 테이블
 
@@ -27,5 +27,5 @@ public class MyPageLikedDto {
     private Long goalAmount;
     private Long currAmount;
     private String thumbnail;
-    private LocalDate endDate;
+    private LocalDateTime endDate;
 }

@@ -107,16 +107,4 @@ public class ProjectEntityValidator {
 
         if (hasDup) errors.add("중복된 리워드명이 있습니다.");
     }
-
-    /**
-     * 창작자 프로필 검증
-     */
-    public void validateCreatorProfile(Long creatorId, List<String> errors) {
-        if (creatorMapper.hasRequiredCreatorProfile(creatorId) != 1) {
-            errors.add("창작자 프로필 필수 항목이 미완성입니다. (창작자명/사업자번호/이메일/전화번호)");
-        }
-        if (userMapper.suspendedCreator(creatorId) == 1) {
-            errors.add("정지된 창작자는 프로젝트 등록/수정이 불가합니다.");
-        }
-    }
 }

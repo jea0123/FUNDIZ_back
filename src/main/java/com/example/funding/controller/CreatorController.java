@@ -4,6 +4,7 @@ import com.example.funding.common.FileUploader;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.PagerRequest;
 import com.example.funding.dto.request.creator.*;
 import com.example.funding.dto.request.reward.RewardCreateRequestDto;
 import com.example.funding.dto.request.shipping.ShippingStatusDto;
@@ -56,7 +57,7 @@ public class CreatorController {
      * @since 2025-10-12
      */
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseDto<String>> registerCreator(@ModelAttribute CreatorRegisterRequestDto dto
+    public ResponseEntity<ResponseDto<String>> registerCreator(@Valid @ModelAttribute CreatorRegisterRequestDto dto
 //                                                               @AuthenticationPrincipal CustomUserPrincipal principal
     ) throws IOException {
         MultipartFile file = dto.getProfileImg();
@@ -81,7 +82,6 @@ public class CreatorController {
      */
     @GetMapping("/info")
     public ResponseEntity<ResponseDto<Creator>> item(@RequestAttribute Long creatorId) {
-
         creatorId = 1L;
         return creatorService.item(creatorId);
     }
@@ -100,7 +100,6 @@ public class CreatorController {
     public ResponseEntity<ResponseDto<String>> updateCreatorInfo(@RequestAttribute Long creatorId,
                                                                  @ModelAttribute CreatorUpdateRequestDto dto,
                                                                  @RequestParam(required = false) MultipartFile profileImg) throws IOException {
-
         creatorId = 1L;
 
         if (profileImg != null && !profileImg.isEmpty()) {
@@ -125,7 +124,7 @@ public class CreatorController {
      *
      * @param creatorId 창작자 ID
      * @param dto       SearchCreatorProjectDto
-     * @param reqPager  요청 pager
+     * @param req  요청 pager
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-10-05
@@ -133,13 +132,8 @@ public class CreatorController {
     @GetMapping("/projects")
     public ResponseEntity<ResponseDto<PageResult<CreatorProjectListDto>>> getProjectList(@RequestAttribute Long creatorId,
                                                                                          SearchCreatorProjectDto dto,
-                                                                                         Pager reqPager) {
-        Pager pager = Pager.ofRequest(
-                reqPager != null ? reqPager.getPage() : 1,
-                reqPager != null ? reqPager.getSize() : 5,
-                reqPager != null ? reqPager.getPerGroup() : null
-        );
-
+                                                                                         @Valid PagerRequest req) {
+        Pager pager = Pager.ofRequest(req.getPage(), req.getSize(), req.getPerGroup());
         return creatorService.getProjectList(creatorId, dto, pager);
     }
 
@@ -289,7 +283,6 @@ public class CreatorController {
                                                          @RequestAttribute Long creatorId,
                                                          @RequestBody RewardCreateRequestDto dto) {
         dto.setProjectId(projectId);
-
         return rewardService.addReward(projectId, creatorId, dto);
     }
 
@@ -314,19 +307,14 @@ public class CreatorController {
      * <p>QnA 내역 목록 조회(창작자 기준)</p>
      *
      * @param creatorId 창작자 ID
-     * @param reqPager  Pager
+     * @param req  Pager
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-10-08
      */
     @GetMapping("/qna")
-    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfCreator(@RequestAttribute("creatorId") Long creatorId, Pager reqPager) {
-        Pager pager = Pager.ofRequest(
-                reqPager != null ? reqPager.getPage() : 1,
-                reqPager != null ? reqPager.getSize() : 10,
-                reqPager != null ? reqPager.getPerGroup() : 5
-        );
-
+    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfCreator(@RequestAttribute("creatorId") Long creatorId, @Valid PagerRequest req) {
+        Pager pager = Pager.ofRequest(req.getPage(), req.getSize(), req.getPerGroup());
         return creatorService.getQnaListOfCreator(creatorId, pager);
     }
 
@@ -338,7 +326,6 @@ public class CreatorController {
      * @author by: 이윤기
      * @since 2025-10-02
      */
-
     @GetMapping("/dashBoard")
     public ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(@RequestAttribute Long creatorId) {
         return creatorService.getCreatorDashBoard(creatorId);

@@ -3,9 +3,11 @@ package com.example.funding.controller;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.PagerRequest;
 import com.example.funding.dto.request.cs.*;
 import com.example.funding.model.Notice;
 import com.example.funding.service.NoticeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 
@@ -21,19 +23,14 @@ public class NoticeController {
     /**
      * <p>공지사항 목록 조회</p>
      *
-     * @param reqPager 요청 pager
+     * @param req 요청 pager
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-09-19
      */
     @GetMapping("/list")
-    public ResponseEntity<ResponseDto<PageResult<Notice>>> noticeList(Pager reqPager) {
-        Pager pager = Pager.ofRequest(
-                reqPager != null ? reqPager.getPage() : 1,
-                reqPager != null ? reqPager.getSize() : 10,
-                reqPager != null ? reqPager.getPerGroup() : 5
-        );
-
+    public ResponseEntity<ResponseDto<PageResult<Notice>>> noticeList(@Valid PagerRequest req) {
+        Pager pager = Pager.ofRequest(req.getPage(), req.getSize(), req.getPerGroup());
         return noticeService.noticeList(pager);
     }
 
@@ -49,5 +46,4 @@ public class NoticeController {
     public ResponseEntity<ResponseDto<Notice>> item(@PathVariable Long noticeId) {
         return noticeService.item(noticeId);
     }
-
 }

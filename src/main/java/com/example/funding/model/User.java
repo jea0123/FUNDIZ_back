@@ -1,6 +1,6 @@
 package com.example.funding.model;
 
-import com.example.funding.common.Role;
+import com.example.funding.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

@@ -2,11 +2,13 @@ package com.example.funding.dto.response.project;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Data
-@Builder
+@Getter
+@Setter
 public class RecentTop10ProjectDto {
     private Long projectId;
     private String title;

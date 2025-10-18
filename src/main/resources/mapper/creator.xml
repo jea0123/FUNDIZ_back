@@ -43,11 +43,17 @@
         WHERE creatorId = #{creatorId}
     </select>
 
+    <sql id="splitStatus">
+        SELECT REGEXP_SUBSTR(#{dto.projectStatus}, '[^,]+', 1, LEVEL) AS token
+        FROM dual
+        CONNECT BY REGEXP_SUBSTR(#{dto.projectStatus}, '[^,]+', 1, LEVEL) IS NOT NULL
+    </sql>
+
     <sql id="projectListWhere">
         <where>
             p.CREATORID = #{creatorId}
             <if test="dto.projectStatus != null and dto.projectStatus != ''">
-                AND p.PROJECTSTATUS = #{dto.projectStatus}
+                AND p.PROJECTSTATUS IN (<include refid="splitStatus" />)
             </if>
             <if test="dto.fromDate != null">
                 AND p.UPDATEDAT <![CDATA[ >= ]]> #{dto.fromDate}
@@ -61,8 +67,6 @@
     <select id="countProject" resultType="Integer">
         SELECT COUNT(*)
         FROM PROJECT p
-        JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
-        JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
         <include refid="projectListWhere" />
     </select>
 
@@ -74,22 +78,33 @@
                 SELECT
                     p.PROJECTID,
                     p.TITLE,
-                    p.PROJECTSTATUS,
-                    p.STARTDATE,
-                    p.ENDDATE,
                     p.GOALAMOUNT,
                     p.CURRAMOUNT,
+                    p.STARTDATE,
+                    p.ENDDATE,
+                    p.CREATEDAT,
+                    p.UPDATEDAT,
+                    p.PROJECTSTATUS,
                     p.BACKERCNT,
-                    cg.CTGRNAME,
-                    sc.SUBCTGRNAME,
+                    p.LIKECNT,
+                    p.VIEWCNT,
 
-                    <!-- 심사요청일(VERIFYING) -->
-                    CASE WHEN p.PROJECTSTATUS = 'VERIFYING'
-                        THEN p.REQUESTEDAT
+                    <!-- 심사요청일 -->
+                    CASE
+                        WHEN p.PROJECTSTATUS = 'VERIFYING' THEN p.REQUESTEDAT
                         ELSE NULL
                     END AS requestedAt,
 
-                    <!-- 새소식 집계: 개수/최근 작성일 -->
+                    <!-- 반려사유 -->
+                    CASE
+                        WHEN p.PROJECTSTATUS = 'REJECTED' THEN p.REJECTEDREASON
+                        ELSE NULL
+                    END AS rejectedReason,
+
+                    sc.SUBCTGRNAME,
+                    cg.CTGRNAME,
+
+                    <!-- 새소식 집계: 개수, 최근 작성일 -->
                     NVL(n.newsCount, 0) AS newsCount,
                     n.lastNewsAt,
 
@@ -135,7 +150,7 @@
                     GROUP BY r.PROJECTID
                 ) rv ON rv.PROJECTID = p.PROJECTID
                 <include refid="projectListWhere" />
-                ORDER BY p.PROJECTID DESC
+                ORDER BY p.UPDATEDAT DESC
             ) T
             WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
         )
@@ -148,16 +163,18 @@
             p.CREATORID,
             p.TITLE,
             p.GOALAMOUNT,
+            p.CURRAMOUNT,
             p.STARTDATE,
             p.ENDDATE,
+            p.CREATEDAT,
+            p.UPDATEDAT,
+            p.PROJECTSTATUS,
             p.CONTENT,
             p.CONTENTBLOCKS,
             p.THUMBNAIL,
             p.BUSINESSDOC,
-            cg.CTGRID,
-            cg.CTGRNAME,
-            sc.SUBCTGRID,
             sc.SUBCTGRNAME,
+            cg.CTGRNAME,
             c.CREATORNAME,
             c.BUSINESSNUM,
             c.EMAIL,
@@ -214,7 +231,8 @@
         UPDATE PROJECT
         SET PROJECTSTATUS = 'VERIFYING',
             ISVERIFIED = 'Y',
-            REQUESTEDAT = SYSDATE
+            REQUESTEDAT = SYSDATE,
+            UPDATEDAT = SYSDATE
         WHERE PROJECTID = #{projectId}
         AND PROJECTSTATUS = 'DRAFT'
         AND ISVERIFIED = 'N'

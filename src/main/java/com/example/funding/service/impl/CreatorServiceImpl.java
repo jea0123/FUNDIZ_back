@@ -141,7 +141,7 @@ public class CreatorServiceImpl implements CreatorService {
      * @since 2025-09-09
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> createProject(ProjectCreateRequestDto dto, Long creatorId) {
+    public ResponseEntity<ResponseDto<Long>> createProject(ProjectCreateRequestDto dto, Long creatorId) {
         loaders.creator(creatorId);
         // Guard
 //        transitionGuard.assertCanCreate(creatorId);
@@ -171,18 +171,20 @@ public class CreatorServiceImpl implements CreatorService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "프로젝트 생성 실패");
         }
 
+        Long newId = project.getProjectId();
+
         // 태그 저장
         List<String> normalized = normalizeTags(dto.getTagList());
         for (String tagName : normalized) {
-            tagMapper.saveTag(project.getProjectId(), tagName);
+            tagMapper.saveTag(newId, tagName);
         }
 
         // 리워드 생성
         if (dto.getRewardList() != null && !dto.getRewardList().isEmpty()) {
-            rewardService.createReward(project.getProjectId(), dto.getRewardList(), dto.getEndDate(), true);
+            rewardService.createReward(newId, dto.getRewardList(), dto.getEndDate(), true);
         }
 
-        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 생성 성공", null));
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 생성 성공", newId));
     }
 
     /**

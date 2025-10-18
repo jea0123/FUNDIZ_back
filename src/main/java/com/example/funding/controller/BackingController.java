@@ -23,7 +23,6 @@ import java.util.List;
 public class BackingController {
     private final BackingService backingService;
 
-
     @GetMapping("/{userId}/create/{projectId}")
     public ResponseEntity<ResponseDto<BackingResponseDto>>prepareBacking(@PathVariable Long projectId,
                                                                          @PathVariable Long userId) {
@@ -42,7 +41,6 @@ public class BackingController {
                                                              @PathVariable Long userId) {
         return backingService.updateBacking(requestDto, backingId, userId);
     }
-
 
     @GetMapping("/page/{userId}")
     public ResponseEntity<ResponseDto<List<BackingDto>>>getBackingList(@PathVariable Long userId) {
@@ -63,5 +61,4 @@ public class BackingController {
     public ResponseEntity<ResponseDto<List<MyPageBackingDetailDto>>>geMyPageBackingDetail(@PathVariable Long userId) {
         return backingService.getMyPageBackingDetail(userId);
     }
-
 }

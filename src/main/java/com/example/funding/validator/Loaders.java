@@ -6,12 +6,14 @@ import com.example.funding.mapper.*;
 import com.example.funding.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.example.funding.validator.Preconditions.requireNonNullOrElseThrow;
 import static com.example.funding.validator.Preconditions.requirePositive;
 
 @Component
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class Loaders {
     private final UserMapper userMapper;
     private final ProjectMapper projectMapper;
@@ -170,6 +172,13 @@ public class Loaders {
         return requireNonNullOrElseThrow(adminMapper.getAdminByAdminId(id), AdminNotFoundException::new);
     }
 
+    /**
+     * 정산 로더
+     *
+     * @param id 프로젝트 아이디
+     * @return 정산 객체
+     * @throws SettlementNotFoundException 정산이 존재하지 않을 경우 발생
+     */
     public Settlement settlement(Long id) {
         requirePositive(id, InvalidParamException::new);
         return requireNonNullOrElseThrow(settlementMapper.getByProjectId(id), SettlementNotFoundException::new);

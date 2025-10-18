@@ -3,7 +3,7 @@ package com.example.funding.validator;
 import com.example.funding.exception.forbidden.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
-import static com.example.funding.common.Preconditions.require;
+import static com.example.funding.validator.Preconditions.require;
 
 @Component
 public class PermissionChecker {

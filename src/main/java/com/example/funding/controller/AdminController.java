@@ -28,6 +28,7 @@ import com.example.funding.exception.notfound.*;
 import com.example.funding.model.User;
 import com.example.funding.service.AdminService;
 import com.example.funding.service.SettlementService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -308,7 +309,7 @@ public class AdminController {
      * @since 2025-10-13
      */
     @PostMapping("/settlement")
-    public ResponseEntity<ResponseDto<String>> updateStatus(@RequestBody SettlementPaidRequestDto dto) {
+    public ResponseEntity<ResponseDto<String>> updateStatus(@Valid @RequestBody SettlementPaidRequestDto dto) {
         return settlementService.updateStatus(dto);
     }
 

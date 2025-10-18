@@ -15,17 +15,19 @@ public class CreatorProjectDetailDto {
     private Long creatorId;
     private String title;
     private Integer goalAmount;
+    private Integer currAmount;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private String projectStatus;
     private String content;
     private String contentBlocks;
     private String thumbnail;
     private String businessDoc;
 
-    private Long ctgrId;
-    private String ctgrName;
-    private Long subctgrId;
     private String subctgrName;
+    private String ctgrName;
 
     private String creatorName;
     private String businessNum;

@@ -44,7 +44,6 @@ public class QnaController {
                                                                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastCreatedAt,
                                                                                @RequestParam(required = false) Long lastId,
                                                                                @RequestParam(defaultValue = "10") int size) {
-
         return qnaService.getQnaListOfProject(projectId, lastCreatedAt, lastId, size);
     }
 

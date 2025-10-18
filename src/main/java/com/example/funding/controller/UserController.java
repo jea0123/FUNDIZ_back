@@ -13,6 +13,7 @@ import com.example.funding.exception.conflict.DuplicatedLikedProjectException;
 import com.example.funding.exception.notfound.*;
 import com.example.funding.service.ProjectService;
 import com.example.funding.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -88,7 +89,7 @@ public class UserController {
     }
 
     @PostMapping("/nickname")
-    public ResponseEntity<ResponseDto<String>> updateNickname(@RequestBody UserNicknameDto dto
+    public ResponseEntity<ResponseDto<String>> updateNickname(@Valid @RequestBody UserNicknameDto dto
 //                                                              @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
 //        Long userId = principal.userId();
@@ -97,7 +98,7 @@ public class UserController {
     }
 
     @PostMapping("/profileImg")
-    public ResponseEntity<ResponseDto<String>> updateProfileImg(@ModelAttribute UserProfileImgDto dto
+    public ResponseEntity<ResponseDto<String>> updateProfileImg(@Valid @ModelAttribute UserProfileImgDto dto
 //                                                                @AuthenticationPrincipal CustomUserPrincipal principal
     ) throws IOException {
 //        Long userId = principal.userId();
@@ -106,7 +107,7 @@ public class UserController {
     }
 
     @PostMapping("/password")
-    public ResponseEntity<ResponseDto<String>> updatePassword(@RequestBody UserPasswordDto dto
+    public ResponseEntity<ResponseDto<String>> updatePassword(@Valid @RequestBody UserPasswordDto dto
 //                                                              @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
 //        Long userId = principal.userId();

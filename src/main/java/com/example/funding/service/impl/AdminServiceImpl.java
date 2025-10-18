@@ -15,6 +15,7 @@ import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
 import com.example.funding.dto.response.admin.ProjectVerifyListDto;
 import com.example.funding.dto.response.admin.analytic.*;
 import com.example.funding.enums.NotificationType;
+import com.example.funding.exception.badrequest.InvalidParamException;
 import com.example.funding.exception.badrequest.ProjectApproveException;
 import com.example.funding.exception.badrequest.ProjectRejectException;
 import com.example.funding.exception.notfound.*;
@@ -38,6 +39,8 @@ import org.springframework.validation.annotation.Validated;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+
+import static com.example.funding.validator.Preconditions.requirePositive;
 
 @Slf4j
 @Service
@@ -86,6 +89,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(Long ctgrId) {
+        requirePositive(ctgrId, InvalidParamException::new);
         List<CategorySuccess> categorySuccesses = adminMapper.getCategorySuccessByCategory(ctgrId);
         if (categorySuccesses.isEmpty()) throw new CategorySuccessNotFoundException();
 
@@ -221,6 +225,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<ProjectVerifyDetailDto>> getProjectVerifyDetail(Long projectId) {
+        requirePositive(projectId, InvalidParamException::new);
         ProjectVerifyDetailDto detail = adminMapper.getProjectVerifyDetail(projectId);
         if (detail == null) throw new ProjectNotFoundException();
 
@@ -245,7 +250,7 @@ public class AdminServiceImpl implements AdminService {
     public ResponseEntity<ResponseDto<String>> approveProject(Long projectId) {
         Project existing = loaders.project(projectId);
 
-        Creator existingCreator = loaders.creator(projectId);
+        Creator existingCreator = loaders.creator(existing.getCreatorId());
 
         // Guard
         transitionGuard.assertCanApprove(projectId);
@@ -269,7 +274,7 @@ public class AdminServiceImpl implements AdminService {
     public ResponseEntity<ResponseDto<String>> rejectProject(Long projectId, String rejectedReason) {
         Project existing = loaders.project(projectId);
 
-        Creator existingCreator = loaders.creator(projectId);
+        Creator existingCreator = loaders.creator(existing.getCreatorId());
         // Guard
         transitionGuard.requireVerifying(projectId);
         if (adminMapper.isRejectable(projectId) == 0) throw new ProjectRejectException();
@@ -369,6 +374,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> updateNotice(Long noticeId, NoticeUpdateRequestDto ntcDto) {
+        loaders.notice(noticeId);
         ntcDto.setNoticeId(noticeId);
 
         int result = noticeMapper.updateNotice(ntcDto);
@@ -389,6 +395,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ResponseEntity<ResponseDto<String>> deleteNotice(Long noticeId) {
+        loaders.notice(noticeId);
         int deleted = noticeMapper.deleteNotice(noticeId);
         if (deleted == 0) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "공지사항 삭제 실패"));

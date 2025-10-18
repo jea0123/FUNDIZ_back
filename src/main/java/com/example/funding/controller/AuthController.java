@@ -12,9 +12,11 @@ import com.example.funding.exception.conflict.DuplicatedEmailException;
 import com.example.funding.exception.conflict.DuplicatedNicknameException;
 import com.example.funding.exception.forbidden.InvalidAdminCredentialsException;
 import com.example.funding.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -35,7 +37,7 @@ public class AuthController {
      * @since 2025-08-26
      */
     @PostMapping("/signUp")
-    public ResponseEntity<ResponseDto<String>> signUp(@RequestBody SignUpRequestDto dto) {
+    public ResponseEntity<ResponseDto<String>> signUp(@Valid @RequestBody SignUpRequestDto dto) {
         return authService.signUp(dto);
     }
 
@@ -49,7 +51,7 @@ public class AuthController {
      * @since 2025-08-26
      */
     @PostMapping("/signIn")
-    public ResponseEntity<ResponseDto<String>> signIn(@RequestBody SignInRequestDto dto) {
+    public ResponseEntity<ResponseDto<String>> signIn(@Valid @RequestBody SignInRequestDto dto) {
         return authService.signIn(dto);
     }
 
@@ -63,7 +65,7 @@ public class AuthController {
      * @since 2025-08-27
      */
     @PostMapping("/checkEmail")
-    public ResponseEntity<ResponseDto<String>> checkEmail(@RequestBody CheckEmailRequestDto dto) {
+    public ResponseEntity<ResponseDto<String>> checkEmail(@Valid @RequestBody CheckEmailRequestDto dto) {
         return authService.checkEmail(dto);
     }
 
@@ -77,7 +79,7 @@ public class AuthController {
      * @since 2025-08-27
      */
     @PostMapping("/checkNickname")
-    public ResponseEntity<ResponseDto<String>> checkNickname(@RequestBody CheckNicknameRequestDto dto) {
+    public ResponseEntity<ResponseDto<String>> checkNickname(@Valid @RequestBody CheckNicknameRequestDto dto) {
         return authService.checkNickname(dto);
     }
 
@@ -100,7 +102,7 @@ public class AuthController {
      * @since 2025-08-27
      */
     @PostMapping("/registerAdmin")
-    public ResponseEntity<ResponseDto<String>> registerAdmin(@RequestBody RegisterAdminRequestDto dto) {
+    public ResponseEntity<ResponseDto<String>> registerAdmin(@Valid @RequestBody RegisterAdminRequestDto dto) {
         return authService.registerAdmin(dto);
     }
 
@@ -115,7 +117,7 @@ public class AuthController {
      * @since 2025-10-14
      */
     @PostMapping("/loginAdmin")
-    public ResponseEntity<ResponseDto<String>> loginAdmin(@RequestBody RegisterAdminRequestDto dto) {
+    public ResponseEntity<ResponseDto<String>> loginAdmin(@Valid @RequestBody RegisterAdminRequestDto dto) {
         return authService.loginAdmin(dto);
     }
 }

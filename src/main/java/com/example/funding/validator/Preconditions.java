@@ -1,7 +1,6 @@
-package com.example.funding.common;
+package com.example.funding.validator;
 
 import java.util.Collection;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 public final class Preconditions {
@@ -40,14 +39,15 @@ public final class Preconditions {
     }
 
     /**
-     * Optional이 비어있을 경우, Supplier에서 제공하는 예외를 던진다.
-     * @param opt 검사할 Optional
+     * value가 null일 경우, Supplier에서 제공하는 예외를 던진다.
+     * @param value 검사할 값
      * @param ex 예외를 제공하는 Supplier
-     * @return Optional이 감싸고 있는 값
-     * @param <T> Optional이 감싸고 있는 값의 타입
+     * @return value
+     * @param <T> value의 타입
      */
-    public static <T> T requireFound(Optional<T> opt, Supplier<? extends RuntimeException> ex) {
-        return opt.orElseThrow(ex);
+    public static <T> T requireNonNullOrElseThrow(T value, Supplier<? extends RuntimeException> ex) {
+        if (value == null) throw ex.get();
+        return value;
     }
 
     /**

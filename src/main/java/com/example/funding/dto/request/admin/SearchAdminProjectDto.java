@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 @Setter
 public class SearchAdminProjectDto {
     private String projectStatus = "VERIFYING";
-    private LocalDateTime fromDate;
-    private LocalDateTime toDate;
+    private LocalDate fromDate;
+    private LocalDate toDate;
     private String rangeType;
 
     public void applyRangeType() {
@@ -20,22 +20,22 @@ public class SearchAdminProjectDto {
 
             switch (rangeType) {
                 case "7d" -> {
-                    fromDate = today.minusDays(7).atStartOfDay();
-                    toDate = today.atStartOfDay();
+                    fromDate = today.minusDays(7);
+                    toDate = today;
                 }
                 case "30d" -> {
-                    fromDate = today.minusDays(30).atStartOfDay();
-                    toDate = today.atStartOfDay();
+                    fromDate = today.minusDays(30);
+                    toDate = today;
                 }
                 case "90d" -> {
-                    fromDate = today.minusDays(90).atStartOfDay();
-                    toDate = today.atStartOfDay();
+                    fromDate = today.minusDays(90);
+                    toDate = today;
                 }
             }
         }
     }
 
     public LocalDate getToDateEndExclusive() {
-        return toDate == null ? null : LocalDate.from(toDate.plusDays(1));
+        return toDate == null ? null : toDate.plusDays(1);
     }
 }

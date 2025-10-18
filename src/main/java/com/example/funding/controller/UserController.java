@@ -3,6 +3,7 @@ package com.example.funding.controller;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.PagerRequest;
 import com.example.funding.dto.request.user.UserNicknameDto;
 import com.example.funding.dto.request.user.UserPasswordDto;
 import com.example.funding.dto.request.user.UserProfileImgDto;
@@ -13,6 +14,7 @@ import com.example.funding.exception.conflict.DuplicatedLikedProjectException;
 import com.example.funding.exception.notfound.*;
 import com.example.funding.service.ProjectService;
 import com.example.funding.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -88,7 +90,7 @@ public class UserController {
     }
 
     @PostMapping("/nickname")
-    public ResponseEntity<ResponseDto<String>> updateNickname(@RequestBody UserNicknameDto dto
+    public ResponseEntity<ResponseDto<String>> updateNickname(@Valid @RequestBody UserNicknameDto dto
 //                                                              @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
 //        Long userId = principal.userId();
@@ -97,7 +99,7 @@ public class UserController {
     }
 
     @PostMapping("/profileImg")
-    public ResponseEntity<ResponseDto<String>> updateProfileImg(@ModelAttribute UserProfileImgDto dto
+    public ResponseEntity<ResponseDto<String>> updateProfileImg(@Valid @ModelAttribute UserProfileImgDto dto
 //                                                                @AuthenticationPrincipal CustomUserPrincipal principal
     ) throws IOException {
 //        Long userId = principal.userId();
@@ -106,7 +108,7 @@ public class UserController {
     }
 
     @PostMapping("/password")
-    public ResponseEntity<ResponseDto<String>> updatePassword(@RequestBody UserPasswordDto dto
+    public ResponseEntity<ResponseDto<String>> updatePassword(@Valid @RequestBody UserPasswordDto dto
 //                                                              @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
 //        Long userId = principal.userId();
@@ -122,7 +124,6 @@ public class UserController {
      * @author by: 이윤기
      * @since 2025-09-02
      */
-
     @GetMapping("/likedList/{userId}")
     public ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(@PathVariable Long userId) {
         return userService.getLikedList(userId);
@@ -132,19 +133,14 @@ public class UserController {
      * <p>사용자 Q&A 목록</p>
      *
      * @param userId 사용자 ID
+     * @param req    요청 pager
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author by: 이윤기
      * @since 2025-09-05
      */
-
     @GetMapping("/qna/{userId}")
-    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfUser(@PathVariable Long userId, Pager reqPager) {
-        Pager pager = Pager.ofRequest(
-                reqPager != null ? reqPager.getPage() : 1,
-                reqPager != null ? reqPager.getSize() : 10,
-                reqPager != null ? reqPager.getPerGroup() : 5
-        );
-
+    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfUser(@PathVariable Long userId, @Valid PagerRequest req) {
+        Pager pager = Pager.ofRequest(req.getPage(), req.getSize(), req.getPerGroup());
         return userService.getQnaListOfUser(userId, pager);
     }
 
@@ -159,8 +155,8 @@ public class UserController {
      * @param projectId 좋아요할 프로젝트 ID
      * @param principal 인증된 사용자의 정보
      * @return 좋아요한 프로젝트 ID
-     * @throws UserNotFoundException    사용자가 존재하지 않을 때
-     * @throws ProjectNotFoundException 프로젝트가 존재하지 않을 때
+     * @throws UserNotFoundException           사용자가 존재하지 않을 때
+     * @throws ProjectNotFoundException        프로젝트가 존재하지 않을 때
      * @throws DuplicatedLikedProjectException 이미 좋아요한 프로젝트일 때
      * @author by: 장민규
      * @since 2025-10-15
@@ -180,8 +176,8 @@ public class UserController {
      * @param projectId 좋아요 취소할 프로젝트 ID
      * @param principal 인증된 사용자의 정보
      * @return 좋아요 취소한 프로젝트 ID
-     * @throws UserNotFoundException      사용자가 존재하지 않을 때
-     * @throws ProjectNotFoundException   프로젝트가 존재하지 않을 때
+     * @throws UserNotFoundException         사용자가 존재하지 않을 때
+     * @throws ProjectNotFoundException      프로젝트가 존재하지 않을 때
      * @throws LikedProjectNotFoundException 좋아요한 프로젝트가 아닐 때
      * @author by: 장민규
      * @since 2025-10-15
@@ -221,8 +217,8 @@ public class UserController {
      * @param creatorId 팔로우할 크리에이터 ID
      * @param principal 인증된 사용자의 정보
      * @return 팔로우한 크리에이터 ID
-     * @throws UserNotFoundException        사용자가 존재하지 않을 때
-     * @throws CreatorNotFoundException     크리에이터가 존재하지 않을 때
+     * @throws UserNotFoundException            사용자가 존재하지 않을 때
+     * @throws CreatorNotFoundException         크리에이터가 존재하지 않을 때
      * @throws DuplicatedFollowCreatorException 이미 팔로우한 크리에이터일 때
      * @author by: 장민규
      * @since 2025-10-15
@@ -242,8 +238,8 @@ public class UserController {
      * @param creatorId 언팔로우할 크리에이터 ID
      * @param principal 인증된 사용자의 정보
      * @return 언팔로우한 크리에이터 ID
-     * @throws UserNotFoundException        사용자가 존재하지 않을 때
-     * @throws CreatorNotFoundException     크리에이터가 존재하지 않을 때
+     * @throws UserNotFoundException             사용자가 존재하지 않을 때
+     * @throws CreatorNotFoundException          크리에이터가 존재하지 않을 때
      * @throws FollowingCreatorNotFoundException 팔로우한 크리에이터가 아닐 때
      * @author by: 장민규
      * @since 2025-10-15

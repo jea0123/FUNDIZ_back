@@ -11,7 +11,6 @@ import com.example.funding.dto.row.SettlementSummary;
 import com.example.funding.enums.NotificationType;
 import com.example.funding.exception.badrequest.ProjectNotSuccessException;
 import com.example.funding.exception.badrequest.SettlementStatusAlreadyChangedException;
-import com.example.funding.exception.notfound.SettlementNotFoundException;
 import com.example.funding.handler.NotificationPublisher;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.SettlementMapper;
@@ -29,6 +28,8 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.example.funding.validator.Preconditions.requireIn;
 
 @Service
 @RequiredArgsConstructor
@@ -68,9 +69,10 @@ public class SettlementServiceImpl implements SettlementService {
         Creator existingCreator = loaders.creator(dto.getCreatorId());
 
         auth.mustBeOwner(dto.getCreatorId(), existingCreator.getCreatorId());
-        if (!List.of("SUCCESS", "SETTLED").contains(project.getProjectStatus())) throw new ProjectNotSuccessException();
+        requireIn(dto.getSettlementStatus(), List.of("PAID", "SETTLED"), () -> new IllegalArgumentException("유효하지 않은 정산 상태입니다."));
+        requireIn(project.getProjectStatus(), List.of("SUCCESS", "SETTLED"), ProjectNotSuccessException::new);
 
-        if (settlementMapper.getByProjectId(dto.getProjectId()) == null) throw new SettlementNotFoundException();
+        loaders.settlement(dto.getProjectId());
         if (settlementMapper.getStatus(dto.getProjectId(), dto.getCreatorId(), dto.getSettlementId()).equals(dto.getSettlementStatus()))
             throw new SettlementStatusAlreadyChangedException();
 
@@ -91,10 +93,10 @@ public class SettlementServiceImpl implements SettlementService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<SettlementItem>>> getSettlements(SettlementSearchCond cond, Pager pager) {
-        String q = cond.getQ();
-        String status = normalizeStatus(cond.getStatus());
-        LocalDateTime from = cond.getFrom();
-        LocalDateTime to = cond.getTo();
+        String q = cond.q();
+        String status = normalizeStatus(cond.status());
+        LocalDateTime from = cond.from();
+        LocalDateTime to = cond.to();
 
         int total = settlementMapper.count(q, status, from, to);
         if (total == 0) {

@@ -1,4 +1,4 @@
-package com.example.funding.common;
+package com.example.funding.enums;
 
 public enum Role {
     USER, ADMIN

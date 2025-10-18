@@ -43,11 +43,17 @@
         WHERE creatorId = #{creatorId}
     </select>
 
+    <sql id="splitStatus">
+        SELECT REGEXP_SUBSTR(#{dto.projectStatus}, '[^,]+', 1, LEVEL) AS token
+        FROM dual
+        CONNECT BY REGEXP_SUBSTR(#{dto.projectStatus}, '[^,]+', 1, LEVEL) IS NOT NULL
+    </sql>
+
     <sql id="projectListWhere">
         <where>
             p.CREATORID = #{creatorId}
             <if test="dto.projectStatus != null and dto.projectStatus != ''">
-                AND p.PROJECTSTATUS = #{dto.projectStatus}
+                AND p.PROJECTSTATUS IN (<include refid="splitStatus" />)
             </if>
             <if test="dto.fromDate != null">
                 AND p.UPDATEDAT <![CDATA[ >= ]]> #{dto.fromDate}
@@ -135,7 +141,7 @@
                     GROUP BY r.PROJECTID
                 ) rv ON rv.PROJECTID = p.PROJECTID
                 <include refid="projectListWhere" />
-                ORDER BY p.PROJECTID DESC
+                ORDER BY p.UPDATEDAT DESC
             ) T
             WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
         )
@@ -214,7 +220,8 @@
         UPDATE PROJECT
         SET PROJECTSTATUS = 'VERIFYING',
             ISVERIFIED = 'Y',
-            REQUESTEDAT = SYSDATE
+            REQUESTEDAT = SYSDATE,
+            UPDATEDAT = SYSDATE
         WHERE PROJECTID = #{projectId}
         AND PROJECTSTATUS = 'DRAFT'
         AND ISVERIFIED = 'N'

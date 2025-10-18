@@ -67,8 +67,6 @@
     <select id="countProject" resultType="Integer">
         SELECT COUNT(*)
         FROM PROJECT p
-        JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
-        JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
         <include refid="projectListWhere" />
     </select>
 
@@ -80,22 +78,33 @@
                 SELECT
                     p.PROJECTID,
                     p.TITLE,
-                    p.PROJECTSTATUS,
-                    p.STARTDATE,
-                    p.ENDDATE,
                     p.GOALAMOUNT,
                     p.CURRAMOUNT,
+                    p.STARTDATE,
+                    p.ENDDATE,
+                    p.CREATEDAT,
+                    p.UPDATEDAT,
+                    p.PROJECTSTATUS,
                     p.BACKERCNT,
-                    cg.CTGRNAME,
-                    sc.SUBCTGRNAME,
+                    p.LIKECNT,
+                    p.VIEWCNT,
 
-                    <!-- 심사요청일(VERIFYING) -->
-                    CASE WHEN p.PROJECTSTATUS = 'VERIFYING'
-                        THEN p.REQUESTEDAT
+                    <!-- 심사요청일 -->
+                    CASE
+                        WHEN p.PROJECTSTATUS = 'VERIFYING' THEN p.REQUESTEDAT
                         ELSE NULL
                     END AS requestedAt,
 
-                    <!-- 새소식 집계: 개수/최근 작성일 -->
+                    <!-- 반려사유 -->
+                    CASE
+                        WHEN p.PROJECTSTATUS = 'REJECTED' THEN p.REJECTEDREASON
+                        ELSE NULL
+                    END AS rejectedReason,
+
+                    sc.SUBCTGRNAME,
+                    cg.CTGRNAME,
+
+                    <!-- 새소식 집계: 개수, 최근 작성일 -->
                     NVL(n.newsCount, 0) AS newsCount,
                     n.lastNewsAt,
 
@@ -154,16 +163,18 @@
             p.CREATORID,
             p.TITLE,
             p.GOALAMOUNT,
+            p.CURRAMOUNT,
             p.STARTDATE,
             p.ENDDATE,
+            p.CREATEDAT,
+            p.UPDATEDAT,
+            p.PROJECTSTATUS,
             p.CONTENT,
             p.CONTENTBLOCKS,
             p.THUMBNAIL,
             p.BUSINESSDOC,
-            cg.CTGRID,
-            cg.CTGRNAME,
-            sc.SUBCTGRID,
             sc.SUBCTGRNAME,
+            cg.CTGRNAME,
             c.CREATORNAME,
             c.BUSINESSNUM,
             c.EMAIL,

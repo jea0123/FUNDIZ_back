@@ -228,7 +228,6 @@
         <selectKey keyProperty="backingId" resultType="long" order="BEFORE">
             SELECT BACKING_SEQ.NEXTVAL FROM DUAL
         </selectKey>
-
         INSERT INTO backing (
         backingId,
         userId,
@@ -290,19 +289,21 @@
     </select>
     <!-- 후원날짜가 다를 경우도있기때문에 중복으로 나올 수도 있음 -->
     <select id = "getCBackerList" parameterType = "long" resultType="com.example.funding.dto.response.backing.BackingCreatorBackerList">
-        SELECT
+        SELECT DISTINCT
             u.userId,
             u.nickname,
 
             b.amount,
             b.createdAt,
             p.projectId
-        FROM
-            users u
-        JOIN backing b ON u.userId = b.userId
-        JOIN creator c ON c.userId = u.userId
-        JOIN project p ON p.creatorId = c.creatorId
-        WHERE c.CREATORID = #{creatorId}
+        FROM project p
+        JOIN creator c ON p.creatorId = c.creatorId
+        JOIN reward r ON p.projectId = r.projectId
+        JOIN backingDetail bd ON r.rewardId = bd.rewardId
+        JOIN backing b ON bd.backingId = b.backingId
+        JOIN users u ON b.userId = u.userId
+        WHERE c.creatorId = #{creatorId}
+        ORDER BY p.projectId, b.createdAt DESC
         <!--AND p.PROJECTID = #{projectId}-->
     </select>
 
@@ -485,12 +486,18 @@
         JOIN reward r ON r.rewardId = bd.rewardId
         JOIN project p ON p.projectId = r.projectId
         JOIN shipping s ON s.backingId = b.backingId
-        JOIN creator c ON p.creatorId = c.creatorId
         JOIN address a ON a.addrId = s.addrId
         JOIN payment py ON py.backingId = b.backingId
         JOIN creator c ON c.creatorId = p.creatorId
         WHERE b.userId = #{userId}
     </select>
+
+    <update id = "updateBackingStatus" parameterType="long">
+        update backing
+        set backingStatus = "CANCELED"
+        where backingId = #{backingId}
+        AND backingStatus = "COMPLETED"
+    </update>
 
 
 </mapper>

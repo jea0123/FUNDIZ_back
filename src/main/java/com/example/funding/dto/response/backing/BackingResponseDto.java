@@ -33,6 +33,8 @@ public class BackingResponseDto {
     private Long projectId;
     private String title;
     private String thumbnail;
+    private Integer currAmount;
+    private Integer goalAmount;
 
     private List<BackingRewardDto> rewardsList;
 

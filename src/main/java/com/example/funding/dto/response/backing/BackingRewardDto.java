@@ -1,9 +1,6 @@
 package com.example.funding.dto.response.backing;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -11,6 +8,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @Builder
+@NoArgsConstructor
 public class BackingRewardDto {
     private Long rewardId;
     private String rewardName;

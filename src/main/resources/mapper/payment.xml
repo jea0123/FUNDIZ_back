@@ -13,7 +13,6 @@
         select
             p.orderId,
             p.method,
-            p.status,
             p.amount,
             p.cardCompany
         From Payment p
@@ -26,23 +25,54 @@
         <selectKey keyProperty="paymentId" resultType="long" order="BEFORE">
             SELECT PAYMENT_SEQ.NEXTVAL FROM DUAL
         </selectKey>
-
         INSERT INTO payment (
         paymentId,
         orderId,
         backingId,
         method,
         amount,
-        status
+        status,
+        cardCompany
         ) VALUES (
         #{paymentId},
         #{orderId},
         #{backingId},
         #{method},
         #{amount},
-        #{status}
+        #{status},
+        #{cardCompany}
         )
     </insert>
+
+    <select id="findUserMethod" resultType="com.example.funding.model.Payment">
+        SELECT *
+        FROM (
+        SELECT p.*
+        FROM payment p
+        JOIN backing b ON p.backingId = b.backingId
+        WHERE b.userId = #{userId}
+        AND UPPER(TRIM(p.method)) = UPPER(TRIM(#{method}))
+        AND UPPER(TRIM(p.cardCompany)) = UPPER(TRIM(#{cardCompany}))
+        ORDER BY p.paymentId DESC
+        )
+        WHERE ROWNUM = 1
+    </select>
+
+    <select id="findUserPayment" parameterType="map" resultType="com.example.funding.model.Payment">
+        SELECT * FROM payment
+        WHERE userId = #{userId}
+        AND method = #{method}
+        AND cardCompany = #{cardCompany}
+        FETCH FIRST 1 ROWS ONLY
+    </select>
+
+    <update id="updateBackingPayment" parameterType="com.example.funding.model.Payment">
+        UPDATE payment
+        SET backingId = #{backingId},
+        amount = #{amount},
+        status = #{status}
+        WHERE paymentId = #{paymentId}
+    </update>
 
 
 </mapper>

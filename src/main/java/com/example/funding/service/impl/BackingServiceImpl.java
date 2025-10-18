@@ -25,7 +25,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -77,6 +76,8 @@ public class BackingServiceImpl implements BackingService {
                 .profileImg(creator.getProfileImg())
                 .title(project.getTitle())
                 .thumbnail(project.getThumbnail())
+                .currAmount(project.getCurrAmount())
+                .goalAmount(project.getGoalAmount())
                 .backingPagePaymentList(backingPagePayment)
                 .build();
 
@@ -100,6 +101,19 @@ public class BackingServiceImpl implements BackingService {
 
         Long backingId = backing.getBackingId();
 
+        Long projectId = null;
+        if(rewards != null && !rewards.isEmpty()){
+            //프로젝트 id 찾기 (첫번째 리워드 id 를 검색해서 역으로 찾는 로직)
+            projectId = rewardMapper.findProjectIdByRewardId(rewards.getFirst().getRewardId());
+        }
+
+        if(projectId != null && backing.getAmount() != null){
+            //프로젝트 id 받아서 currAmount 에 더함
+            projectMapper.increaseProjectCurrAmount(projectId, backing.getAmount());
+            //프로젝트의 상태변경 ( open 에서 currAmount가 goalAmount 를넘겼을때)
+            //projectMapper.updateProjectStatusGoal(projectId);
+        }
+
         // backingDetail
         if (rewards != null && !rewards.isEmpty()) {
             for (RewardBackingRequestDto reward : rewards) {
@@ -109,37 +123,81 @@ public class BackingServiceImpl implements BackingService {
                 detail.setQuantity(reward.getQuantity());
                 detail.setPrice(reward.getPrice());
                 backingMapper.addBackingDetail(detail);
+                // 남은개수 빼는 로직
+                rewardMapper.decreaseRewardRemain(detail.getRewardId(), reward.getQuantity());
             }
+            //출력용
             rewards.forEach(r -> System.out.println("  - rewardId: " + r.getRewardId() + ", qty: " + r.getQuantity()));
         }
 
         //payment
-        String orderId = "ORD-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        payment.setOrderId(orderId);
-        payment.setBackingId(backingId);
-        paymentMapper.addPayment(payment);
+        Payment findPayment = paymentMapper.findUserMethod(userId, payment.getMethod(), payment.getCardCompany());
+        System.out.println(" findPayment 확인용 - findPayment: " + findPayment);
+        if(findPayment != null){
+            findPayment.setBackingId(backingId);
+            findPayment.setAmount(backing.getAmount());
+            paymentMapper.updateBackingPayment(findPayment);
+        }
+        else {
+            String orderId = "ORD-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+            payment.setOrderId(orderId);
+            payment.setBackingId(backingId);
+            paymentMapper.addPayment(payment);
+        }
 
         //TODO: address새로 생성시 로직추가 ,address 선택시 해당 address 만 연결
         // 신규 주소 직접 입력한 경우
-        Long addrId;
+        Long addrId = null;
         if (address != null && address.getAddrId() != null) {
             // 기존 주소 선택한 경우 
             addrId = address.getAddrId();
-        } else {
-            
+        }
+        else {
+            // 주소 직접 입력
+            //addressMapper.addTempAddr(address);
         }
 
-
-
         // insert (shipping직접 생성)
-        if (address != null) {
+        if (address != null && address.getAddrId() != null) {
             Shipping shipping = new Shipping();
             shipping.setBackingId(backingId);
-            shipping.setAddrId(address.getAddrId());
+            shipping.setAddrId(addrId);
             shippingMapper.addShipping(shipping);
         }
 
+
         return ResponseEntity.ok(ResponseDto.success(200, "후원 추가 성공", null));
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<ResponseDto<String>> cancelBacking(Long userId, Long backingId) {
+        Backing backing = backingMapper.findById(backingId);
+        if(backing == null) throw new BackingNotFoundException();
+
+        List<BackingDetail> rewardDetails = rewardMapper.findRewardByBackingId(backingId);
+        if(rewardDetails == null || rewardDetails.isEmpty()) {
+            throw new BackingNotFoundException();
+        }
+        //프로젝트 id 찾기
+        Long projectId = rewardMapper.findProjectIdByRewardId(rewardDetails.getFirst().getRewardId());
+        if(projectId == null) throw new ProjectNotFoundException();
+
+        // 프로젝트 총 후원금 - 개인의 총 후원금
+        projectMapper.decreaseProjectCurrAmount(projectId, backing.getAmount());
+
+        // 후원 취소 -> 남은개수를 개수만큼 돌리기
+        for(BackingDetail detail : rewardDetails) {
+            rewardMapper.increaseRewardRemain(detail.getBackingId(), detail.getQuantity());
+        }
+
+        // 프로젝트의 상태를 확인 후 바꾸기 success -> open
+        //projectMapper.updateProjectStatusBelowGoal(projectId);
+
+        // 개인 후원 상태를 확인 후 바꾸기 completed -> canceled
+        backingMapper.updateBackingStatus(backing.getBackingId());
+
+        return ResponseEntity.ok(ResponseDto.success(200, "후원 취소 성공", null));
     }
 
     /**
@@ -281,6 +339,8 @@ public class BackingServiceImpl implements BackingService {
 
         return ResponseEntity.ok(ResponseDto.success(200, "후원 내역 상세 조회 성공", result));
     }
+
+
 
 
 }

@@ -398,7 +398,7 @@
         JOIN users u ON u.userId = b.userId
         JOIN shipping s ON b.backingId = s.backingId
         where c.creatorId = #{creatorId}
-          AND p.projectStatus = 'SUCCESS'
+        AND (p.projectStatus = 'SUCCESS' OR p.projectStatus = 'OPEN')
         group by p.projectId, p.creatorId, p.title, p.backerCnt
     </select>
 
@@ -428,5 +428,44 @@
         FROM project
         WHERE projectId = #{projectId}
     </select>
+
+    <update id ="increaseProjectCurrAmount" parameterType="map">
+        update project
+        set currAmount = NVL(currAmount, 0) + #{amount},
+            backerCnt = NVL(backerCnt, 0) + 1
+        WHERE projectId = #{projectId}
+    </update>
+
+    <update id = "decreaseProjectCurrAmount" parameterType="map">
+        update project
+        set currAmount = case
+                            when currAmount >= #{amount} then NVL currAmount - #{amount}
+                            ELSE 0
+                        END,
+            backerCnt = case
+                            when backerCnt > 0 THEN backerCnt - 1
+                            ELSE 0
+                        END
+        WHERE projectId = #{projectId}
+    </update>
+
+    <update id = "updateProjectStatusGoal" parameterType="long">
+        update project
+        set projectStatus = 'SUCCESS'
+        where projectId = #{projectId}
+        and projectStatus = 'OPEN'
+        AND (
+            currAmount >= goalAmount
+            OR endDate &lt; SYSDATE
+        )
+    </update>
+
+    <update id = "updateProjectStatusBelowGoal" parameterType = "long">
+        UPDATE project
+        SET projectStatus = 'OPEN'
+        WHERE projectId = #{projectId}
+        AND currAmount &lt; goalAmount
+        AND projectStatus = 'SUCCESS'
+    </update>
 
 </mapper>

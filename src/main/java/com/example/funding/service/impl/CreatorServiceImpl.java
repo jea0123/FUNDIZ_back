@@ -382,10 +382,10 @@ public class CreatorServiceImpl implements CreatorService {
     public ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(Long creatorId) {
         loaders.creator(creatorId);
 
-        long projectTotal = projectMapper.getProjectCnt(creatorId);
-        long totalAmount = settlementMapper.getTotalAmountCreatorId(creatorId);
-        long totalBackingCnt = backingMapper.getBackerCnt(creatorId);
-        long totalVerifyingCnt = projectMapper.getVerifyingCnt(creatorId);
+        Integer projectTotal = projectMapper.getProjectCnt(creatorId);
+        Long totalAmount = settlementMapper.getTotalAmountCreatorId(creatorId);
+        Long totalBackingCnt = backingMapper.getBackerCnt(creatorId);
+        Long totalVerifyingCnt = projectMapper.getVerifyingCnt(creatorId);
 
         CreatorDashboardDto dashboardPie = creatorMapper.creatorDashboardDto(creatorId);
         double totalProjectCnt = dashboardPie.getTotalProjectCnt();

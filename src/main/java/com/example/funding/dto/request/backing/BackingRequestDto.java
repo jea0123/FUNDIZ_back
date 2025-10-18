@@ -26,4 +26,6 @@ public class BackingRequestDto {
     private Address address;
     private Shipping shipping;
     private List<RewardBackingRequestDto> rewards;
+    private Long amount;
+    private Long backerCnt;
 }

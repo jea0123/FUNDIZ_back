@@ -63,7 +63,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<AdminAnalyticsDto>> getAdminAnalytics(LocalDate from, LocalDate to, int limit, String metric, int months, Long ctgrId) {
+    public ResponseEntity<ResponseDto<AdminAnalyticsDto>> getAdminAnalytics(LocalDate from, LocalDate to, Integer limit, String metric, Integer months, Long ctgrId) {
         requireIn(metric, List.of("qty", "revenue"), InvalidParamException::new);
         Kpi kpi = adminMapper.getKpiByMonths(months);
         List<RevenueTrend> revenueTrends = adminMapper.getMonthlyTrends(months);

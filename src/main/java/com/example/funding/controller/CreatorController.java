@@ -1,9 +1,6 @@
 package com.example.funding.controller;
 
-import com.example.funding.common.CustomUserPrincipal;
-import com.example.funding.common.FileUploader;
-import com.example.funding.common.PageResult;
-import com.example.funding.common.Pager;
+import com.example.funding.common.*;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.PagerRequest;
 import com.example.funding.dto.request.creator.*;
@@ -23,8 +20,11 @@ import com.example.funding.service.CreatorService;
 import com.example.funding.service.NewsService;
 import com.example.funding.service.RewardService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -406,17 +407,26 @@ public class CreatorController {
      *
      * @param creatorId 크리에이터 ID
      * @param sort      정렬 기준 (recent, popular, endingSoon 등)
-     * @param page      페이지 번호 (기본값: 1)
-     * @param size      페이지 크기 (기본값: 12)
+     * @param req       페이저 정보 (페이지 번호, 페이지 크기 등)
      * @return 페이징된 크리에이터 프로젝트 목록
      * @author 장민규
      * @since 2025-10-19
      */
     @GetMapping("/projectsList/{creatorId}")
-    public ResponseEntity<ResponseDto<PageResult<CreatorProjectDto>>> getCreatorProject(@PathVariable Long creatorId, @RequestParam(required = false, defaultValue = "recent") String sort,
-                                                                                  @RequestParam(required = false, defaultValue = "1") Integer page,
-                                                                                  @RequestParam(required = false, defaultValue = "12") Integer size) {
-        Pager pager = Pager.ofRequest(page, size, 5);
+    public ResponseEntity<ResponseDto<PageResult<CreatorProjectDto>>> getCreatorProject(@NotNull @Positive @PathVariable Long creatorId,
+                                                                                        @NotNull @RequestParam(required = false, defaultValue = "recent") String sort,
+                                                                                        @Valid PagerRequest req) {
+        Pager pager = Pager.ofRequest(req.getPage(), req.getSize(), 5);
         return creatorService.getCreatorProject(creatorId, sort, pager);
+    }
+
+    @GetMapping("/reviews/{creatorId}")
+    public ResponseEntity<ResponseDto<CursorPage<ReviewListDto>>> getCreatorReviews(@PathVariable Long creatorId,
+                                                                                    @RequestParam(required = false) Long lastId,
+                                                                                    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastCreatedAt,
+                                                                                    @RequestParam(required = false) Long projectId,
+                                                                                    @RequestParam(required = false, defaultValue = "false") Boolean photoOnly,
+                                                                                    @RequestParam(required = false, defaultValue = "10") int size) {
+        return creatorService.getCreatorReviews(creatorId, lastCreatedAt, lastId, size, projectId, photoOnly);
     }
 }

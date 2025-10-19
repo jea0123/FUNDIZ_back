@@ -3,6 +3,7 @@ package com.example.funding.mapper;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.request.project.SearchProjectDto;
 import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
+import com.example.funding.dto.response.creator.ReviewListDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
@@ -75,4 +76,6 @@ public interface ProjectMapper {
     void decreaseProjectCurrAmount(@Param("projectId") Long projectId, @Param("amount")Long amount);
 
     void updateProjectStatusBelowGoal (Long projectId);
+
+    List<Map<String, Object>> selectProjectsByIds(@Param("list") List<Long> projectIds);
 }

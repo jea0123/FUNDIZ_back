@@ -1,5 +1,6 @@
 package com.example.funding.mapper;
 
+import com.example.funding.dto.response.creator.ReviewListDto;
 import com.example.funding.dto.response.user.MyPageLikedDto;
 import com.example.funding.dto.response.user.RecentViewProject;
 import com.example.funding.model.User;
@@ -8,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface UserMapper {
@@ -44,4 +46,6 @@ public interface UserMapper {
     void dislikeProject(@Param("userId") Long userId, @Param("projectId") Long projectId);
 
     LocalDateTime getLastLoginTime(@Param("userId") Long userId);
+
+    List<Map<String, Object>> selectUsersByIds(@Param("list") List<Long> userIds);
 }

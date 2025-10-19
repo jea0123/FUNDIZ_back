@@ -1,9 +1,6 @@
 package com.example.funding.service.impl;
 
-import com.example.funding.common.FileUploader;
-import com.example.funding.common.PageResult;
-import com.example.funding.common.Pager;
-import com.example.funding.common.Utils;
+import com.example.funding.common.*;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.creator.*;
 import com.example.funding.dto.request.shipping.ShippingStatusDto;
@@ -20,6 +17,7 @@ import com.example.funding.exception.badrequest.InvalidStatusException;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
+import com.example.funding.service.CommunityService;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.RewardService;
 import com.example.funding.service.validator.ProjectInputValidator;
@@ -38,13 +36,13 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.example.funding.validator.Preconditions.requireIn;
 import static com.example.funding.validator.Preconditions.requireInEnum;
+import static java.awt.SystemColor.window;
 
 @Slf4j
 @Service
@@ -61,6 +59,7 @@ public class CreatorServiceImpl implements CreatorService {
     private final BackingMapper backingMapper;
     private final ShippingMapper shippingMapper;
     private final FollowMapper followMapper;
+    private final CommunityMapper communityMapper;
     private final ProjectInputValidator inputValidator;
     private final ProjectTransitionGuard transitionGuard;
     private final FileUploader fileUploader;
@@ -660,5 +659,77 @@ public class CreatorServiceImpl implements CreatorService {
         int total = projectMapper.getProjectCnt(creatorId);
         PageResult<CreatorProjectDto> result = PageResult.of(dtos, pager, total);
         return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 프로젝트 조회 성공", result));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<CursorPage<ReviewListDto>>> getCreatorReviews(
+            Long creatorId, LocalDateTime lastCreatedAt, Long lastId, int size,
+            Long projectId, Boolean photoOnly) {
+        loaders.creator(creatorId);
+
+        int limit = Math.max(1, size) + 1;
+        List<Map<String, Object>> communityRows = communityMapper.findCreatorCommunityWindow(creatorId, lastCreatedAt, lastId, limit, projectId, photoOnly);
+
+        if (communityRows.isEmpty()) {
+            return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 리뷰 조회 성공",
+                    CursorPage.fromWindow(List.of(), size, ReviewListDto::getCreatedAt, ReviewListDto::getCmId)));
+        }
+
+        List<Long> userIds = communityRows.stream()
+                .map(row -> ((Number) row.get("USERID")).longValue()).distinct().toList();
+        List<Long> projectIds = communityRows.stream()
+                .map(row -> ((Number) row.get("PROJECTID")).longValue()).distinct().toList();
+        List<Long> cmIds = communityRows.stream()
+                .map(row -> ((Number) row.get("CMID")).longValue()).toList();
+
+        Map<Long, Map<String, Object>> userMap = userMapper.selectUsersByIds(userIds).stream()
+                .collect(Collectors.toMap(r -> ((Number) r.get("USERID")).longValue(), r -> r));
+
+        Map<Long, Map<String, Object>> projectMap = projectMapper.selectProjectsByIds(projectIds).stream()
+                .collect(Collectors.toMap(r -> ((Number) r.get("PROJECTID")).longValue(), r -> r));
+
+        Map<Long, List<String>> imagesByCmId = new HashMap<>();
+        communityMapper.selectReviewImagesByCmIds(cmIds).forEach(r -> {
+            Long cmId = ((Number) r.get("CMID")).longValue();
+            String url = (String) r.get("URL");
+            imagesByCmId.computeIfAbsent(cmId, k -> new ArrayList<>()).add(url);
+        });
+
+        List<ReviewListDto> reviews = communityRows.stream().map(row -> {
+            Long cmId = ((Number) row.get("CMID")).longValue();
+            Long userId = ((Number) row.get("USERID")).longValue();
+            Long projectIdVal = ((Number) row.get("PROJECTID")).longValue();
+
+            Map<String, Object> user = userMap.get(userId);
+            Map<String, Object> project = projectMap.get(projectIdVal);
+
+            ReviewListDto.UserInfo userInfo = new ReviewListDto.UserInfo();
+            if (user != null) {
+                userInfo.setNickname((String) user.get("NICKNAME"));
+                userInfo.setProfileImg((String) user.get("PROFILEIMG"));
+            }
+
+            ReviewListDto.ProjectInfo projectInfo = new ReviewListDto.ProjectInfo();
+            if (project != null) {
+                projectInfo.setProjectId(projectIdVal);
+                projectInfo.setTitle((String) project.get("TITLE"));
+                projectInfo.setThumbnail((String) project.get("THUMBNAIL"));
+            }
+
+            return ReviewListDto.builder()
+                    .cmId(cmId)
+                    .cmContent((String) row.get("CMCONTENT"))
+                    .createdAt((LocalDateTime) row.get("CREATEDAT"))
+                    .user(userInfo)
+                    .project(projectInfo)
+                    .images(imagesByCmId.getOrDefault(cmId, List.of()))
+                    .build();
+        }).toList();
+
+
+        CursorPage<ReviewListDto> page = CursorPage.fromWindow(
+                reviews, size, ReviewListDto::getCreatedAt, ReviewListDto::getCmId);
+        return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 리뷰 조회 성공", page));
     }
 }

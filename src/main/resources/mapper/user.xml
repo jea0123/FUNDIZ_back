@@ -33,7 +33,7 @@
         MERGE INTO recentview rv
         USING (
         SELECT
-        #{userId, jdbcType=NUMERIC}    AS userId,
+        #{userId, jdbcType=NUMERIC} AS userId,
         #{projectId, jdbcType=NUMERIC} AS projectId
         FROM dual
         ) src
@@ -93,7 +93,7 @@
         SET profileImg = #{profileImg}
         WHERE userId = #{userId}
     </update>
-    
+
     <delete id="withdrawUser" parameterType="long">
         DELETE FROM USERS
         WHERE USERID = #{userId}
@@ -103,5 +103,17 @@
         SELECT LASTLOGINAT
         FROM USERS
         WHERE USERID = #{userId}
+    </select>
+
+    <select id="selectUsersByIds" parameterType="list" resultType="map">
+        SELECT
+        u.userId AS userId,
+        u.nickname AS nickname,
+        u.profileImg AS profileImg
+        FROM users u
+        WHERE u.userId IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
     </select>
 </mapper>

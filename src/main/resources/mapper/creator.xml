@@ -408,7 +408,7 @@
         ) inner_table
         WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
         )
-        WHERE rn > #{pager.startRow}
+        WHERE rn >= #{pager.startRow}
     </select>
 
 </mapper>

@@ -27,7 +27,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class QnaServiceImpl implements QnaService {
     private final Loaders loaders;
     private final QnaMapper qnaMapper;
@@ -47,7 +46,7 @@ public class QnaServiceImpl implements QnaService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CursorPage<QnaDto>>> getQnaListOfProject(@NotBlank Long projectId, LocalDateTime lastCreatedAt, Long lastId, int size) {
+    public ResponseEntity<ResponseDto<CursorPage<QnaDto>>> getQnaListOfProject(Long projectId, LocalDateTime lastCreatedAt, Long lastId, int size) {
         loaders.project(projectId);
         List<QnaDto> qnaList = qnaMapper.getQnaListOfProject(projectId, lastCreatedAt, lastId, size);
 
@@ -71,7 +70,7 @@ public class QnaServiceImpl implements QnaService {
      * @since 2025-10-08
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> addQuestion(@NotBlank Long projectId, @NotBlank Long userId, QnaAddRequestDto qnaDto) {
+    public ResponseEntity<ResponseDto<String>> addQuestion(Long projectId, Long userId, QnaAddRequestDto qnaDto) {
         loaders.user(userId);
         Project existingProject = loaders.project(projectId);
 

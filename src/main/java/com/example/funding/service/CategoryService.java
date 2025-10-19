@@ -5,6 +5,8 @@ import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.exception.notfound.CategorySuccessNotFoundException;
 import com.example.funding.model.Category;
 import com.example.funding.model.Subcategory;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -30,5 +32,5 @@ public interface CategoryService {
      * @author 장민규
      * @since 2025-09-11
      */
-    ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(Long ctgrId);
+    ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(@NotNull @Positive Long ctgrId);
 }

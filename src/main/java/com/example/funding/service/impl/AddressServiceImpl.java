@@ -10,7 +10,6 @@ import com.example.funding.model.Address;
 import com.example.funding.service.AddressService;
 import com.example.funding.validator.Loaders;
 import com.example.funding.validator.PermissionChecker;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,14 +24,13 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class AddressServiceImpl implements AddressService {
     private final Loaders loaders;
     private final PermissionChecker auth;
     private final AddressMapper addressMapper;
 
     @Override
-    public ResponseEntity<ResponseDto<List<AddressResponseDto>>> getAddrList(@NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<List<AddressResponseDto>>> getAddrList(Long userId) {
         loaders.user(userId);
 
         List<AddressResponseDto> addrResponse = addressMapper.getAddressList(userId);
@@ -40,7 +38,7 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public ResponseEntity<ResponseDto<String>> addAddress(@NotBlank Long userId, AddrAddRequestDto addrDto) {
+    public ResponseEntity<ResponseDto<String>> addAddress(Long userId, AddrAddRequestDto addrDto) {
         loaders.user(userId);
         Address addr = Address.builder()
                 .userId(userId)
@@ -58,7 +56,7 @@ public class AddressServiceImpl implements AddressService {
 
 
     @Override
-    public ResponseEntity<ResponseDto<String>> updateAddr(@NotBlank Long userId, @NotBlank Long addrId, AddrUpdateRequestDto addrDto) {
+    public ResponseEntity<ResponseDto<String>> updateAddr(Long userId, Long addrId, AddrUpdateRequestDto addrDto) {
         loaders.user(userId);
         Address existingAddr = loaders.address(addrId);
         auth.mustBeOwner(userId, existingAddr.getUserId());
@@ -71,7 +69,7 @@ public class AddressServiceImpl implements AddressService {
 
 
     @Override
-    public ResponseEntity<ResponseDto<String>> deleteAddr(@NotBlank Long userId, @NotBlank Long addrId) {
+    public ResponseEntity<ResponseDto<String>> deleteAddr(Long userId, Long addrId) {
         loaders.user(userId);
         Address existingAddr = loaders.address(addrId);
         auth.mustBeOwner(userId, existingAddr.getUserId());
@@ -82,7 +80,7 @@ public class AddressServiceImpl implements AddressService {
 
     //TODO: 컨트롤러 분리 (기본주소지설정)
     @Override
-    public ResponseEntity<ResponseDto<String>> defaultAddr(@NotBlank Long userId, @NotBlank Long addrId, AddrDefaultSetDto addrDefaultDto) {
+    public ResponseEntity<ResponseDto<String>> defaultAddr(Long userId, Long addrId, AddrDefaultSetDto addrDefaultDto) {
         loaders.user(userId);
         Address existingAddr = loaders.address(addrId);
         auth.mustBeOwner(userId, existingAddr.getUserId());

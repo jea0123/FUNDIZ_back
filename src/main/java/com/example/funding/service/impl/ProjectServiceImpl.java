@@ -39,7 +39,6 @@ import static com.example.funding.validator.Preconditions.requireIn;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class ProjectServiceImpl implements ProjectService {
     private final Loaders loaders;
     private final ProjectMapper projectMapper;
@@ -57,7 +56,7 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<ProjectDetailDto>> getProjectDetail(@NotBlank Long projectId) {
+    public ResponseEntity<ResponseDto<ProjectDetailDto>> getProjectDetail(Long projectId) {
         ProjectRow row = projectMapper.getProjectRow(projectId);
         if (row == null) throw new ProjectNotFoundException();
         //조회수 증가
@@ -165,7 +164,7 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<Long>> getLikeCnt(@NotBlank Long projectId) {
+    public ResponseEntity<ResponseDto<Long>> getLikeCnt(Long projectId) {
         loaders.project(projectId);
         Long likeCnt = projectMapper.getLikeCnt(projectId);
         return ResponseEntity.ok(ResponseDto.success(200, "좋아요 수 조회 성공", likeCnt));

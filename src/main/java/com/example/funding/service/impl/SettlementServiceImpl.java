@@ -35,7 +35,6 @@ import static com.example.funding.validator.Preconditions.requireIn;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class SettlementServiceImpl implements SettlementService {
     private final Loaders loaders;
     private final PermissionChecker auth;
@@ -49,7 +48,7 @@ public class SettlementServiceImpl implements SettlementService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CreatorSettlementDto>> getSettlementByCreatorId(@NotBlank Long creatorId) {
+    public ResponseEntity<ResponseDto<CreatorSettlementDto>> getSettlementByCreatorId(Long creatorId) {
         loaders.creator(creatorId);
 
         List<Settlement> settlement = settlementMapper.getByCreatorId(creatorId);

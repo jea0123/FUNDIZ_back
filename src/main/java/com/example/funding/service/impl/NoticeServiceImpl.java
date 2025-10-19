@@ -22,7 +22,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class NoticeServiceImpl implements NoticeService {
     private final Loaders loaders;
     private final NoticeMapper noticeMapper;
@@ -57,7 +56,7 @@ public class NoticeServiceImpl implements NoticeService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<Notice>> item(@NotBlank Long noticeId) {
+    public ResponseEntity<ResponseDto<Notice>> item(Long noticeId) {
         Notice item = loaders.notice(noticeId);
         //조회수 증가
         noticeMapper.updateViewCnt(noticeId);

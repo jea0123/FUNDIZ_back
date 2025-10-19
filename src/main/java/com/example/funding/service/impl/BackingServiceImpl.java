@@ -38,7 +38,6 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class BackingServiceImpl implements BackingService {
     private final ProjectMapper projectMapper;
     private final BackingMapper backingMapper;
@@ -52,7 +51,7 @@ public class BackingServiceImpl implements BackingService {
     private final NotificationPublisher notificationPublisher;
 
     @Override
-    public ResponseEntity<ResponseDto<BackingResponseDto>> prepareBacking(@NotBlank Long userId, @NotBlank Long projectId) {
+    public ResponseEntity<ResponseDto<BackingResponseDto>> prepareBacking(Long userId, Long projectId) {
         User user = loaders.user(userId);
         Project project = loaders.project(projectId);
 
@@ -91,7 +90,7 @@ public class BackingServiceImpl implements BackingService {
     //TODO : 후원 하기 (생성)
     @Override
     @Transactional
-    public ResponseEntity<ResponseDto<String>> createBacking(@NotBlank Long userId, BackingRequestDto requestDto) {
+    public ResponseEntity<ResponseDto<String>> createBacking(Long userId, BackingRequestDto requestDto) {
         loaders.user(userId);
         requestDto.getRewards().forEach(reward -> {
             Reward existingReward = loaders.reward(reward.getRewardId());
@@ -179,7 +178,7 @@ public class BackingServiceImpl implements BackingService {
 
     @Override
     @Transactional
-    public ResponseEntity<ResponseDto<String>> cancelBacking(@NotBlank Long userId, @NotBlank Long backingId) {
+    public ResponseEntity<ResponseDto<String>> cancelBacking(Long userId, Long backingId) {
         Backing backing = loaders.backing(backingId);
 
         List<BackingDetail> rewardDetails = rewardMapper.findRewardByBackingId(backingId);
@@ -217,7 +216,7 @@ public class BackingServiceImpl implements BackingService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<BackingDto>>> getBackingList(@NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<List<BackingDto>>> getBackingList(Long userId) {
         loaders.user(userId);
         List<BackingDto> backingList = backingMapper.getBackingListUserId(userId);
 
@@ -235,7 +234,7 @@ public class BackingServiceImpl implements BackingService {
 
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(@NotBlank Long userId, @NotBlank Long projectId, @NotBlank Long rewardId, @NotBlank Long backingId) {
+    public ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(Long userId, Long projectId, Long rewardId, Long backingId) {
         loaders.user(userId);
         loaders.project(projectId);
         loaders.reward(rewardId);
@@ -263,7 +262,7 @@ public class BackingServiceImpl implements BackingService {
 
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<MyPageBackingListDto>>> getMyPageBackingList(@NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<List<MyPageBackingListDto>>> getMyPageBackingList(Long userId) {
         loaders.user(userId);
         List<MyPageBackingSaveDto> backingLists = backingMapper.getBackingLists(userId);
 
@@ -304,7 +303,7 @@ public class BackingServiceImpl implements BackingService {
     }
 
     @Override
-    public ResponseEntity<ResponseDto<List<MyPageBackingDetailDto>>> getMyPageBackingDetail(@NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<List<MyPageBackingDetailDto>>> getMyPageBackingDetail(Long userId) {
         loaders.user(userId);
         List<MyPageBackingDetailSaveDto> backingDetils = backingMapper.getBackingDetails(userId);
 

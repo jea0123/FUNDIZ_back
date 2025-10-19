@@ -30,7 +30,6 @@ import static com.example.funding.validator.Preconditions.requireInEnum;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class ReportServiceImpl implements ReportService {
     private final Loaders loaders;
     private final ReportMapper reportMapper;
@@ -67,7 +66,7 @@ public class ReportServiceImpl implements ReportService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<PageResult<Report>>> myReportList(@NotBlank Long userId, Pager pager) {
+    public ResponseEntity<ResponseDto<PageResult<Report>>> myReportList(Long userId, Pager pager) {
         loaders.user(userId);
         int total = reportMapper.myReportTotal(userId);
         List<Report> myReportList = reportMapper.myReportList(userId, pager);
@@ -86,7 +85,7 @@ public class ReportServiceImpl implements ReportService {
      * @since 2025-09-24
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> addReport(@NotBlank Long userId, RpAddRequestDto rpDto) {
+    public ResponseEntity<ResponseDto<String>> addReport(Long userId, RpAddRequestDto rpDto) {
         loaders.user(userId);
         requireHasText(rpDto.getReason(), ContentRequiredException::new);
         requireInEnum(rpDto.getReportType(), ReportType.class, InvalidTypeException::new);

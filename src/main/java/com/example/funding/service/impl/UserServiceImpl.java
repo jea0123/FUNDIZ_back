@@ -42,7 +42,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class UserServiceImpl implements UserService {
 
     private final Loaders loaders;
@@ -61,7 +60,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(@NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(Long userId) {
         User user = loaders.user(userId);
 
         Long creatorId = userMapper.getCreatorIdByUserId(userId);
@@ -89,7 +88,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageUser(@NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageUser(Long userId) {
         User user = loaders.user(userId);
         MyPageUserDto mypageUserDto = MyPageUserDto.builder()
                 .userId(user.getUserId())
@@ -110,7 +109,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(@NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(Long userId) {
         loaders.user(userId);
         List<MyPageLikedDto> LikedList = userMapper.getLikedList(userId);
 
@@ -127,7 +126,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfUser(@NotBlank Long userId, Pager pager) {
+    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfUser(Long userId, Pager pager) {
         loaders.user(userId);
 
         int total = qnaMapper.qnaTotalOfUser(userId);
@@ -150,7 +149,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(@NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(Long userId) {
         loaders.user(userId);
 
         List<RecentViewProject> recentViewProjects = userMapper.getRecentViewProjects(userId);
@@ -168,7 +167,7 @@ public class UserServiceImpl implements UserService {
     //서비스에서구현
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<MyPageQnADetailDto>> getQnADetail(@NotBlank Long userId, @NotBlank Long projectId) {
+    public ResponseEntity<ResponseDto<MyPageQnADetailDto>> getQnADetail(Long userId, Long projectId) {
         Project project = loaders.project(projectId);
         User user = loaders.user(userId);
         Creator creator = loaders.creator(project.getCreatorId());
@@ -197,7 +196,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<ResponseDto<String>> userNickname(@NotBlank Long userId, UserNicknameDto dto) {
+    public ResponseEntity<ResponseDto<String>> userNickname(Long userId, UserNicknameDto dto) {
         loaders.user(userId);
         userMapper.updateNickname(userId, dto.getNickname());
         return ResponseEntity.ok(ResponseDto.success(200, "닉네임 변경 성공", dto.getNickname()));
@@ -212,7 +211,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<ResponseDto<String>> userPassword(@NotBlank Long userId, UserPasswordDto dto) {
+    public ResponseEntity<ResponseDto<String>> userPassword(Long userId, UserPasswordDto dto) {
         User user = loaders.user(userId);
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) throw new InCorrectPasswordException();
         if (passwordEncoder.matches(dto.getNewPassword(), user.getPassword())) throw new DuplicatedPasswordException();
@@ -226,7 +225,7 @@ public class UserServiceImpl implements UserService {
      * 프로젝트 좋아요 추가
      */
     @Override
-    public ResponseEntity<ResponseDto<Long>> likeProject(@NotBlank Long userId, @NotBlank Long projectId) {
+    public ResponseEntity<ResponseDto<Long>> likeProject(Long userId, Long projectId) {
         loaders.user(userId);
         loaders.project(projectId);
         if (userMapper.isProjectLiked(userId, projectId) == 1) throw new DuplicatedLikedProjectException();
@@ -239,7 +238,7 @@ public class UserServiceImpl implements UserService {
      * 프로젝트 좋아요 취소
      */
     @Override
-    public ResponseEntity<ResponseDto<Long>> dislikeProject(@NotBlank Long userId, @NotBlank Long projectId) {
+    public ResponseEntity<ResponseDto<Long>> dislikeProject(Long userId, Long projectId) {
         loaders.user(userId);
         loaders.project(projectId);
         if (userMapper.isProjectLiked(userId, projectId) == 0) throw new LikedProjectNotFoundException();
@@ -252,7 +251,7 @@ public class UserServiceImpl implements UserService {
      * 프로젝트 좋아요 여부 확인
      */
     @Override
-    public ResponseEntity<ResponseDto<Boolean>> checkLikedProject(@NotBlank Long userId, @NotBlank Long projectId) {
+    public ResponseEntity<ResponseDto<Boolean>> checkLikedProject(Long userId, Long projectId) {
         loaders.user(userId);
         loaders.project(projectId);
         int isLiked = userMapper.isProjectLiked(userId, projectId);
@@ -267,7 +266,7 @@ public class UserServiceImpl implements UserService {
      * 크리에이터 팔로우
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> followCreator(@NotBlank Long userId, @NotBlank Long creatorId) {
+    public ResponseEntity<ResponseDto<String>> followCreator(Long userId, Long creatorId) {
         User existingUser = loaders.user(userId);
         Creator creator = loaders.creator(creatorId);
         if (followMapper.isFollowingCreator(userId, creatorId) == 1) throw new DuplicatedFollowCreatorException();
@@ -282,7 +281,7 @@ public class UserServiceImpl implements UserService {
      * 크리에이터 언팔로우
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> unfollowCreator(@NotBlank Long userId, @NotBlank Long creatorId) {
+    public ResponseEntity<ResponseDto<String>> unfollowCreator(Long userId, Long creatorId) {
         loaders.user(userId);
         Creator creator = loaders.creator(creatorId);
         if (followMapper.isFollowingCreator(userId, creatorId) == 0) throw new FollowingCreatorNotFoundException();
@@ -295,7 +294,7 @@ public class UserServiceImpl implements UserService {
      * 크리에이터 팔로우 여부 확인
      */
     @Override
-    public ResponseEntity<ResponseDto<Boolean>> isFollowingCreator(@NotBlank Long userId, @NotBlank Long creatorId) {
+    public ResponseEntity<ResponseDto<Boolean>> isFollowingCreator(Long userId, Long creatorId) {
         loaders.user(userId);
         loaders.creator(creatorId);
         int isFollowing = followMapper.isFollowingCreator(userId, creatorId);

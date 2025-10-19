@@ -21,7 +21,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class NotificationServiceImpl implements NotificationService {
     private final Loaders loaders;
     private final PermissionChecker auth;
@@ -32,7 +31,7 @@ public class NotificationServiceImpl implements NotificationService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<Notification>>> getNotificationsByUserId(@NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<List<Notification>>> getNotificationsByUserId(Long userId) {
         loaders.user(userId);
 
         List<Notification> notifications = notificationMapper.getNotificationsByUserId(userId);
@@ -44,7 +43,7 @@ public class NotificationServiceImpl implements NotificationService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<Notification>> getNotificationById(@NotBlank Long notificationId, @NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<Notification>> getNotificationById(Long notificationId, Long userId) {
         loaders.user(userId);
         Notification notification = loaders.notification(notificationId);
         auth.mustBeOwner(userId, notification.getUserId());
@@ -56,7 +55,7 @@ public class NotificationServiceImpl implements NotificationService {
      * 알림 읽음 처리
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> markAsRead(@NotBlank Long notificationId, @NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<String>> markAsRead(Long notificationId, Long userId) {
         loaders.user(userId);
         Notification notification = loaders.notification(notificationId);
         auth.mustBeOwner(userId, notification.getUserId());
@@ -72,7 +71,7 @@ public class NotificationServiceImpl implements NotificationService {
      * 모든 알림 읽음 처리
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> markAllAsRead(@NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<String>> markAllAsRead(Long userId) {
         loaders.user(userId);
 
         List<Notification> notifications = notificationMapper.getNotificationsByUserId(userId);
@@ -91,7 +90,7 @@ public class NotificationServiceImpl implements NotificationService {
      * 알림 삭제
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> deleteNotification(@NotBlank Long notificationId, @NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<String>> deleteNotification(Long notificationId, Long userId) {
         loaders.user(userId);
         Notification notification = loaders.notification(notificationId);
         auth.mustBeOwner(userId, notification.getUserId());
@@ -104,7 +103,7 @@ public class NotificationServiceImpl implements NotificationService {
      * 모든 알림 삭제
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> deleteAllNotificationsByUserId(@NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<String>> deleteAllNotificationsByUserId(Long userId) {
         loaders.user(userId);
 
         notificationMapper.deleteAllNotificationsByUserId(userId);

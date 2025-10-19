@@ -32,7 +32,6 @@ import org.springframework.validation.annotation.Validated;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class AuthServiceImpl implements AuthService {
     private final Loaders loaders;
     private final UserMapper userMapper;
@@ -104,7 +103,7 @@ public class AuthServiceImpl implements AuthService {
      * 회원 탈퇴
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> withdrawUser(@NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<String>> withdrawUser(Long userId) {
         loaders.user(userId);
         userMapper.withdrawUser(userId);
         return ResponseEntity.ok(ResponseDto.success(200, "회원 탈퇴 성공", null));

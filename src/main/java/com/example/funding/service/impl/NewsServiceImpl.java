@@ -21,7 +21,6 @@ import static com.example.funding.validator.Preconditions.requireHasText;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class NewsServiceImpl implements NewsService {
     private final Loaders loaders;
     private final PermissionChecker auth;
@@ -38,7 +37,7 @@ public class NewsServiceImpl implements NewsService {
      * @since 2025-10-11
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> createNews(@NotBlank Long projectId, @NotBlank Long creatorId, NewsCreateRequestDto dto) {
+    public ResponseEntity<ResponseDto<String>> createNews(Long projectId, Long creatorId, NewsCreateRequestDto dto) {
         Project existing = loaders.project(projectId);
         if (!existing.getProjectStatus().equals("OPEN"))
             throw new IllegalArgumentException("진행 중인 프로젝트에만 새소식을 등록할 수 있습니다.");

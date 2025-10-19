@@ -12,11 +12,10 @@ import java.util.List;
 @NoArgsConstructor
 public class CommunityDto {
     private Long cmId;
-    private Long projectId;
     private String cmContent;
     private LocalDateTime createdAt;
     private String code;
-
     private String nickname;
     private String profileImg;
+    private Long replyCnt;
 }

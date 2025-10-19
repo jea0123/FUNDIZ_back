@@ -5,6 +5,7 @@ import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.SearchProjectDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
+import com.example.funding.dto.response.project.ProjectCountsDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
 import com.example.funding.exception.notfound.FeaturedProjectNotFoundException;
@@ -75,4 +76,6 @@ public interface ProjectService {
      * @since 2025-10-15
      */
     ResponseEntity<ResponseDto<Long>> getLikeCnt(Long projectId);
+
+    ResponseEntity<ResponseDto<ProjectCountsDto>> getCounts(Long projectId);
 }

@@ -64,13 +64,14 @@ public class AuthServiceImpl implements AuthService {
         User user = userMapper.findByEmail(dto.getEmail());
         String encodedPassword = passwordEncoder.encode(dto.getPassword());
 
-//        if (user == null || passwordEncoder.matches(user.getPassword(), encodedPassword))
-//            throw new InvalidCredentialsException();
-
-        //임시 로그인 암호화 해제
-        if (user == null || !dto.getPassword().equals(user.getPassword())) {
+      //임시로그인 암호화
+        if (user == null || passwordEncoder.matches(user.getPassword(), encodedPassword))
             throw new InvalidCredentialsException();
-        }
+
+//        //임시 로그인 암호화 해제
+//        if (user == null || !dto.getPassword().equals(user.getPassword())) {
+//            throw new InvalidCredentialsException();
+//        }
 
         String token = jwtProvider.createAccessToken(user.getUserId(), user.getEmail(), user.getRole().toString());
         userMapper.updateLastLogin(user.getUserId());

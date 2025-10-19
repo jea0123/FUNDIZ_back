@@ -273,7 +273,7 @@
         WHERE CREATORID = #{creatorId}
     </select>
 
-    <select id = "getProjectRankDate" parameterType="long" resultType="com.example.funding.dto.response.creator.CreatorDashboardRankDto">
+    <select id ="getProjectRankDate" parameterType="long" resultType="com.example.funding.dto.response.creator.CreatorDashboardRankDto">
         SELECT
             creatorId,
             title,
@@ -284,7 +284,7 @@
         WHERE CREATORID = #{creatorId}
     </select>
 
-    <select id ="creatorDashboardDto" parameterType="long" resultType="com.example.funding.dto.response.creator.CreatorDashboardDto">
+    <select id="creatorDashboardDto" parameterType="long" resultType="com.example.funding.dto.response.creator.CreatorDashboardDto">
         SELECT
             NVL(count(*),0) AS totalProjectCnt,
             NVL(count(CASE WHEN projectStatus = 'FAILED' THEN creatorId END),0) AS projectFailedCnt

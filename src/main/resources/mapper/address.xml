@@ -60,7 +60,7 @@
 
     <select id="getAddr" resultType="address" parameterType="long">
         SELECT *
-        FROM address
+        FROM address a
         WHERE a.addrId=#{addrId}
     </select>
 

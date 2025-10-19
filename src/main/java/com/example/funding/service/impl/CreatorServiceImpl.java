@@ -30,21 +30,16 @@ import com.example.funding.service.validator.ProjectTransitionGuard;
 import com.example.funding.service.validator.ValidationRules;
 import com.example.funding.validator.Loaders;
 import com.example.funding.validator.PermissionChecker;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import static com.example.funding.validator.Preconditions.requireIn;
 import static com.example.funding.validator.Preconditions.requireInEnum;
@@ -99,7 +94,12 @@ public class CreatorServiceImpl implements CreatorService {
     public ResponseEntity<ResponseDto<PageResult<CreatorProjectListDto>>> getProjectList(Long creatorId, SearchCreatorProjectDto dto, Pager pager) {
         loaders.creator(creatorId);
         requireIn(dto.getRangeType(), List.of("7d", "30d", "90d"), InvalidParamException::new);
-        requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new, "", "all", "ALL");
+//        requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new, "", "all", "ALL");
+        List<ProjectStatus> st = dto.getProjectStatuses();
+        if (st != null && st.stream().anyMatch(Objects::isNull)) {
+            throw new InvalidStatusException();
+        }
+
         dto.applyRangeType();
 
         int total = creatorMapper.countProject(creatorId, dto);

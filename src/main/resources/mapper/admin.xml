@@ -121,8 +121,11 @@
 
     <sql id="projectListWhere">
         <where>
-            <if test="dto.projectStatus != null and dto.projectStatus != ''">
-                p.PROJECTSTATUS = #{dto.projectStatus}
+            <if test="dto.projectStatuses != null and dto.projectStatuses.size() > 0">
+                p.PROJECTSTATUS IN
+                <foreach collection="dto.projectStatuses" item="st" open="(" separator="," close=")">
+                    #{st}
+                </foreach>
             </if>
             <if test="dto.fromDate != null">
                 AND p.UPDATEDAT <![CDATA[ >= ]]> #{dto.fromDate}
@@ -192,8 +195,12 @@
     
     <sql id="verifyFilterWhere">
         <where>
-            p.PROJECTSTATUS = 'VERIFYING'
-            AND p.ISVERIFIED = 'Y'
+            <if test="dto.projectStatuses != null and dto.projectStatuses.size() > 0">
+                p.PROJECTSTATUS IN
+                <foreach collection="dto.projectStatuses" item="st" open="(" separator="," close=")">
+                    #{st}
+                </foreach>
+            </if>
             <if test="dto.fromDate != null">
                 AND p.REQUESTEDAT <![CDATA[ >= ]]> #{dto.fromDate}
             </if>
@@ -268,7 +275,6 @@
     <update id="approveProject">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'UPCOMING',
-            ISVERIFIED = 'N'
         WHERE PROJECTID = #{projectId}
           AND PROJECTSTATUS = 'VERIFYING'
           AND ISVERIFIED = 'Y'
@@ -285,7 +291,6 @@
     <update id="rejectProject">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'REJECTED',
-            ISVERIFIED = 'N',
             REJECTEDREASON = #{rejectedReason}
         WHERE PROJECTID = #{projectId}
           AND PROJECTSTATUS = 'VERIFYING'

@@ -5,11 +5,15 @@ import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.cs.RpAddRequestDto;
 import com.example.funding.enums.NotificationType;
+import com.example.funding.enums.ReportType;
+import com.example.funding.exception.badrequest.ContentRequiredException;
+import com.example.funding.exception.badrequest.InvalidTypeException;
 import com.example.funding.handler.NotificationPublisher;
 import com.example.funding.mapper.ReportMapper;
 import com.example.funding.model.Report;
 import com.example.funding.service.ReportService;
 import com.example.funding.validator.Loaders;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
+
+import static com.example.funding.validator.Preconditions.requireHasText;
+import static com.example.funding.validator.Preconditions.requireInEnum;
 
 @Slf4j
 @Service
@@ -60,7 +67,7 @@ public class ReportServiceImpl implements ReportService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<PageResult<Report>>> myReportList(Long userId, Pager pager) {
+    public ResponseEntity<ResponseDto<PageResult<Report>>> myReportList(@NotBlank Long userId, Pager pager) {
         loaders.user(userId);
         int total = reportMapper.myReportTotal(userId);
         List<Report> myReportList = reportMapper.myReportList(userId, pager);
@@ -79,8 +86,10 @@ public class ReportServiceImpl implements ReportService {
      * @since 2025-09-24
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> addReport(Long userId, RpAddRequestDto rpDto) {
+    public ResponseEntity<ResponseDto<String>> addReport(@NotBlank Long userId, RpAddRequestDto rpDto) {
         loaders.user(userId);
+        requireHasText(rpDto.getReason(), ContentRequiredException::new);
+        requireInEnum(rpDto.getReportType(), ReportType.class, InvalidTypeException::new);
         Report item = Report.builder()
                 .userId(userId)
                 .target(rpDto.getTarget())
@@ -89,7 +98,6 @@ public class ReportServiceImpl implements ReportService {
                 .reportStatus(rpDto.getReportStatus())
                 .reportType(rpDto.getReportType())
                 .build();
-
         reportMapper.addReport(item);
         notificationPublisher.publish(userId, NotificationType.REPORT_RECEIVED, null, item.getReportId());
         return ResponseEntity.ok(ResponseDto.success(200, "신고 등록 성공", "데이터 출력확인"));

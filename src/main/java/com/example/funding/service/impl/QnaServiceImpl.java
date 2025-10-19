@@ -12,6 +12,7 @@ import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
 import com.example.funding.service.QnaService;
 import com.example.funding.validator.Loaders;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +47,7 @@ public class QnaServiceImpl implements QnaService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CursorPage<QnaDto>>> getQnaListOfProject(Long projectId, LocalDateTime lastCreatedAt, Long lastId, int size) {
+    public ResponseEntity<ResponseDto<CursorPage<QnaDto>>> getQnaListOfProject(@NotBlank Long projectId, LocalDateTime lastCreatedAt, Long lastId, int size) {
         loaders.project(projectId);
         List<QnaDto> qnaList = qnaMapper.getQnaListOfProject(projectId, lastCreatedAt, lastId, size);
 
@@ -70,7 +71,7 @@ public class QnaServiceImpl implements QnaService {
      * @since 2025-10-08
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> addQuestion(Long projectId, Long userId, QnaAddRequestDto qnaDto) {
+    public ResponseEntity<ResponseDto<String>> addQuestion(@NotBlank Long projectId, @NotBlank Long userId, QnaAddRequestDto qnaDto) {
         loaders.user(userId);
         Project existingProject = loaders.project(projectId);
 

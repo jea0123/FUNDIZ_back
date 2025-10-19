@@ -6,10 +6,12 @@ import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.CommunityCreateRequestDto;
 import com.example.funding.dto.response.project.CommunityDto;
 import com.example.funding.dto.response.project.ReviewDto;
+import com.example.funding.exception.badrequest.ContentRequiredException;
 import com.example.funding.mapper.CommunityMapper;
 import com.example.funding.model.Community;
 import com.example.funding.service.CommunityService;
 import com.example.funding.validator.Loaders;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.example.funding.validator.Preconditions.requireHasText;
 
 @Slf4j
 @Service
@@ -46,7 +50,7 @@ public class CommunityServiceImpl implements CommunityService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CursorPage<CommunityDto>>> getCommunityList(Long projectId, String code, LocalDateTime lastCreatedAt, Long lastId, int size) {
+    public ResponseEntity<ResponseDto<CursorPage<CommunityDto>>> getCommunityList(@NotBlank Long projectId, String code, LocalDateTime lastCreatedAt, Long lastId, int size) {
         loaders.project(projectId);
         List<CommunityDto> communityList = communityMapper.getCommunityList(projectId, "CM", lastCreatedAt, lastId, size);
 
@@ -70,16 +74,13 @@ public class CommunityServiceImpl implements CommunityService {
      * @since 2025-10-12
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> createCommunity(Long projectId, CommunityCreateRequestDto dto, Long userId) {
+    public ResponseEntity<ResponseDto<String>> createCommunity(@NotBlank Long projectId, CommunityCreateRequestDto dto, @NotBlank Long userId) {
         loaders.user(userId);
         loaders.project(projectId);
+        requireHasText(dto.getCmContent(), ContentRequiredException::new);
         //TODO: guard, validator
 
-        Community community = Community.builder()
-                .projectId(projectId)
-                .userId(userId)
-                .cmContent(dto.getCmContent())
-                .build();
+        Community community = Community.builder().projectId(projectId).userId(userId).cmContent(dto.getCmContent()).build();
 
         int result = communityMapper.createCommunity(community);
         if (result != 1) {
@@ -103,7 +104,7 @@ public class CommunityServiceImpl implements CommunityService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CursorPage<ReviewDto>>> getReviewList(Long projectId, String code, LocalDateTime lastCreatedAt, Long lastId, int size) {
+    public ResponseEntity<ResponseDto<CursorPage<ReviewDto>>> getReviewList(@NotBlank Long projectId, String code, LocalDateTime lastCreatedAt, Long lastId, int size) {
         loaders.project(projectId);
         List<ReviewDto> reviewList = communityMapper.getReviewList(projectId, "RV", lastCreatedAt, lastId, size);
 

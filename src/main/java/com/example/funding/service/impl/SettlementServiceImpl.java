@@ -20,6 +20,7 @@ import com.example.funding.model.Settlement;
 import com.example.funding.service.SettlementService;
 import com.example.funding.validator.Loaders;
 import com.example.funding.validator.PermissionChecker;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,7 @@ public class SettlementServiceImpl implements SettlementService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CreatorSettlementDto>> getSettlementByCreatorId(Long creatorId) {
+    public ResponseEntity<ResponseDto<CreatorSettlementDto>> getSettlementByCreatorId(@NotBlank Long creatorId) {
         loaders.creator(creatorId);
 
         List<Settlement> settlement = settlementMapper.getByCreatorId(creatorId);
@@ -126,6 +127,7 @@ public class SettlementServiceImpl implements SettlementService {
 
     /**
      * 상태값 정규화
+     *
      * @param status 상태값
      * @return 정규화된 상태값 (ALL인 경우 null 반환)
      */

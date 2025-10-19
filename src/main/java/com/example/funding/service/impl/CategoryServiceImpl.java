@@ -8,12 +8,14 @@ import com.example.funding.mapper.CategoryMapper;
 import com.example.funding.model.Category;
 import com.example.funding.model.Subcategory;
 import com.example.funding.service.CategoryService;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
@@ -23,6 +25,7 @@ import static com.example.funding.validator.Preconditions.requirePositive;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Validated
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryMapper categoryMapper;
@@ -52,7 +55,7 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(Long ctgrId) {
+    public ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(@NotBlank Long ctgrId) {
         requirePositive(ctgrId, InvalidParamException::new);
         List<CategorySuccess> categorySuccesses = categoryMapper.getCategorySuccessByCategory(ctgrId);
         if (categorySuccesses.isEmpty()) throw new CategorySuccessNotFoundException();

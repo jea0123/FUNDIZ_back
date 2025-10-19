@@ -8,6 +8,7 @@ import com.example.funding.mapper.InquiryMapper;
 import com.example.funding.model.Inquiry;
 import com.example.funding.service.InquiryService;
 import com.example.funding.validator.Loaders;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -57,7 +58,7 @@ public class InquiryServiceImpl implements InquiryService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<PageResult<Inquiry>>> myInquiryList(Long userId, Pager pager) {
+    public ResponseEntity<ResponseDto<PageResult<Inquiry>>> myInquiryList(@NotBlank Long userId, Pager pager) {
         loaders.user(userId);
         int total = inquiryMapper.myInquiryTotal(userId);
 
@@ -78,7 +79,7 @@ public class InquiryServiceImpl implements InquiryService {
      * @since 2025-09-24
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> addInquiry(Long userId, IqrAddRequestDto iqrDto) {
+    public ResponseEntity<ResponseDto<String>> addInquiry(@NotBlank Long userId, IqrAddRequestDto iqrDto) {
         loaders.user(userId);
         Inquiry item = Inquiry.builder()
                 .userId(userId)

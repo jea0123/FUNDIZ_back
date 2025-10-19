@@ -18,6 +18,7 @@ import com.example.funding.model.User;
 import com.example.funding.provider.JwtProvider;
 import com.example.funding.service.AuthService;
 import com.example.funding.validator.Loaders;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -103,7 +104,7 @@ public class AuthServiceImpl implements AuthService {
      * 회원 탈퇴
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> withdrawUser(Long userId) {
+    public ResponseEntity<ResponseDto<String>> withdrawUser(@NotBlank Long userId) {
         loaders.user(userId);
         userMapper.withdrawUser(userId);
         return ResponseEntity.ok(ResponseDto.success(200, "회원 탈퇴 성공", null));

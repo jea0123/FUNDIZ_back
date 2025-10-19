@@ -9,6 +9,7 @@ import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
 import com.example.funding.dto.row.ProjectRow;
+import com.example.funding.exception.badrequest.InvalidSortException;
 import com.example.funding.exception.notfound.FeaturedProjectNotFoundException;
 import com.example.funding.exception.notfound.ProjectNotFoundException;
 import com.example.funding.exception.notfound.RecentPaidProjectNotFoundException;
@@ -21,6 +22,7 @@ import com.example.funding.model.Reward;
 import com.example.funding.model.Tag;
 import com.example.funding.service.ProjectService;
 import com.example.funding.validator.Loaders;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+
+import static com.example.funding.validator.Preconditions.requireIn;
 
 @Service
 @RequiredArgsConstructor
@@ -53,7 +57,7 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<ProjectDetailDto>> getProjectDetail(Long projectId) {
+    public ResponseEntity<ResponseDto<ProjectDetailDto>> getProjectDetail(@NotBlank Long projectId) {
         ProjectRow row = projectMapper.getProjectRow(projectId);
         if (row == null) throw new ProjectNotFoundException();
         //조회수 증가
@@ -144,6 +148,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> searchProject(SearchProjectDto dto, Pager pager) {
+        requireIn(dto.getSort(), List.of("recent", "liked", "amount", "deadline", "percent", "view"), InvalidSortException::new);
         int total = projectMapper.countSearchProjects(dto);
 
         List<FeaturedProjectDto> items = Collections.emptyList();
@@ -160,7 +165,7 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<Long>> getLikeCnt(Long projectId) {
+    public ResponseEntity<ResponseDto<Long>> getLikeCnt(@NotBlank Long projectId) {
         loaders.project(projectId);
         Long likeCnt = projectMapper.getLikeCnt(projectId);
         return ResponseEntity.ok(ResponseDto.success(200, "좋아요 수 조회 성공", likeCnt));

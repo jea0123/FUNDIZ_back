@@ -11,6 +11,7 @@ import com.example.funding.service.validator.ProjectInputValidator;
 import com.example.funding.service.validator.ProjectTransitionGuard;
 import com.example.funding.validator.Loaders;
 import com.example.funding.validator.PermissionChecker;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -45,7 +46,7 @@ public class RewardServiceImpl implements RewardService {
      * @since 2025-09-09
      */
     @Override
-    public void createReward(Long projectId, List<RewardCreateRequestDto> rewardList, LocalDateTime endDate, boolean validated) {
+    public void createReward(@NotBlank Long projectId, List<RewardCreateRequestDto> rewardList, LocalDateTime endDate, boolean validated) {
         loaders.project(projectId);
         // Guard
         transitionGuard.requireDraft(projectId);
@@ -83,7 +84,7 @@ public class RewardServiceImpl implements RewardService {
      * @since 2025-10-07
      */
     @Override
-    public void replaceRewards(Long projectId, List<RewardCreateRequestDto> rewardList, LocalDateTime endDate) {
+    public void replaceRewards(@NotBlank Long projectId, List<RewardCreateRequestDto> rewardList, LocalDateTime endDate) {
         loaders.project(projectId);
         // Guard
         transitionGuard.requireDraft(projectId);
@@ -121,7 +122,7 @@ public class RewardServiceImpl implements RewardService {
      * @since 2025-09-11
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> deleteReward(Long projectId, Long rewardId) {
+    public ResponseEntity<ResponseDto<String>> deleteReward(@NotBlank Long projectId, @NotBlank Long rewardId) {
         // TODO: 리워드 삭제 시, 해당 리워드를 선택한 서포터가 있을 경우 예외 처리 필요
         // TODO: 크리에이터 권한 검사 추가 필요
         loaders.project(projectId);
@@ -144,7 +145,7 @@ public class RewardServiceImpl implements RewardService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<Reward>>> getRewardListManage(Long projectId, Long creatorId) {
+    public ResponseEntity<ResponseDto<List<Reward>>> getRewardListManage(@NotBlank Long projectId, @NotBlank Long creatorId) {
         loaders.creator(creatorId);
         Project existingProject = loaders.project(projectId);
         auth.mustBeOwner(creatorId, existingProject.getCreatorId());
@@ -167,7 +168,7 @@ public class RewardServiceImpl implements RewardService {
      * @since 2025-10-08
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> addReward(Long projectId, Long creatorId, RewardCreateRequestDto dto) {
+    public ResponseEntity<ResponseDto<String>> addReward(@NotBlank Long projectId, @NotBlank Long creatorId, RewardCreateRequestDto dto) {
         loaders.creator(creatorId);
         Project existingProject = loaders.project(projectId);
         auth.mustBeOwner(creatorId, existingProject.getCreatorId());

@@ -15,7 +15,11 @@ import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
 import com.example.funding.dto.response.creator.*;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
+import com.example.funding.enums.ProjectStatus;
+import com.example.funding.enums.ShippingStatus;
 import com.example.funding.exception.badrequest.AlreadyCreatorException;
+import com.example.funding.exception.badrequest.InvalidParamException;
+import com.example.funding.exception.badrequest.InvalidStatusException;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
@@ -26,6 +30,7 @@ import com.example.funding.service.validator.ProjectTransitionGuard;
 import com.example.funding.service.validator.ValidationRules;
 import com.example.funding.validator.Loaders;
 import com.example.funding.validator.PermissionChecker;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -40,6 +45,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import static com.example.funding.validator.Preconditions.requireIn;
+import static com.example.funding.validator.Preconditions.requireInEnum;
 
 @Slf4j
 @Service
@@ -89,8 +97,10 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<PageResult<CreatorProjectListDto>>> getProjectList(Long creatorId, SearchCreatorProjectDto dto, Pager pager) {
+    public ResponseEntity<ResponseDto<PageResult<CreatorProjectListDto>>> getProjectList(@NotBlank Long creatorId, SearchCreatorProjectDto dto, Pager pager) {
         loaders.creator(creatorId);
+        requireIn(dto.getRangeType(), List.of("7d", "30d", "90d"), InvalidParamException::new);
+        requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new, "", "all", "ALL");
         dto.applyRangeType();
 
         int total = creatorMapper.countProject(creatorId, dto);
@@ -118,7 +128,7 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CreatorProjectDetailDto>> getProjectDetail(Long projectId, Long creatorId) {
+    public ResponseEntity<ResponseDto<CreatorProjectDetailDto>> getProjectDetail(@NotBlank Long projectId, @NotBlank Long creatorId) {
         loaders.creator(creatorId);
         loaders.project(projectId);
         // Guard: 소유자
@@ -141,7 +151,7 @@ public class CreatorServiceImpl implements CreatorService {
      * @since 2025-09-09
      */
     @Override
-    public ResponseEntity<ResponseDto<Long>> createProject(ProjectCreateRequestDto dto, Long creatorId) {
+    public ResponseEntity<ResponseDto<Long>> createProject(ProjectCreateRequestDto dto, @NotBlank Long creatorId) {
         loaders.creator(creatorId);
         // Guard
 //        transitionGuard.assertCanCreate(creatorId);
@@ -197,7 +207,7 @@ public class CreatorServiceImpl implements CreatorService {
      * @since 2025-09-16
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> updateProject(ProjectCreateRequestDto dto, Long creatorId) {
+    public ResponseEntity<ResponseDto<String>> updateProject(ProjectCreateRequestDto dto, @NotBlank Long creatorId) {
         loaders.creator(creatorId);
         Project existing = loaders.project(dto.getProjectId());
         auth.mustBeOwner(creatorId, existing.getCreatorId());
@@ -253,7 +263,7 @@ public class CreatorServiceImpl implements CreatorService {
      * @since 2025-09-16
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> deleteProject(Long projectId, Long creatorId) {
+    public ResponseEntity<ResponseDto<String>> deleteProject(@NotBlank Long projectId, @NotBlank Long creatorId) {
         loaders.creator(creatorId);
         Project existing = loaders.project(projectId);
         auth.mustBeOwner(creatorId, existing.getCreatorId());
@@ -282,7 +292,7 @@ public class CreatorServiceImpl implements CreatorService {
      * @since 2025-09-18
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> verifyProject(Long projectId, Long creatorId) {
+    public ResponseEntity<ResponseDto<String>> verifyProject(@NotBlank Long projectId, @NotBlank Long creatorId) {
         Project existing = loaders.project(projectId);
         loaders.creator(creatorId);
         auth.mustBeOwner(creatorId, existing.getCreatorId());
@@ -306,7 +316,7 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CreatorProjectSummaryDto>> getProjectSummary(Long projectId, Long creatorId) {
+    public ResponseEntity<ResponseDto<CreatorProjectSummaryDto>> getProjectSummary(@NotBlank Long projectId, @NotBlank Long creatorId) {
         Project project = loaders.project(projectId);
         loaders.creator(creatorId);
         auth.mustBeOwner(creatorId, project.getCreatorId());
@@ -336,7 +346,7 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CreatorProfileSummaryDto>> getCreatorProfileSummary(Long creatorId) {
+    public ResponseEntity<ResponseDto<CreatorProfileSummaryDto>> getCreatorProfileSummary(@NotBlank Long creatorId) {
         loaders.creator(creatorId);
         // Guard
         transitionGuard.ensureCreatorExistsOrThrow(creatorId);
@@ -357,7 +367,7 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfCreator(Long creatorId, Pager pager) {
+    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfCreator(@NotBlank Long creatorId, Pager pager) {
         loaders.creator(creatorId);
         int total = creatorMapper.qnaTotalOfCreator(creatorId);
 
@@ -379,7 +389,7 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(Long creatorId) {
+    public ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(@NotBlank Long creatorId) {
         loaders.creator(creatorId);
 
         Integer projectTotal = projectMapper.getProjectCnt(creatorId);
@@ -449,7 +459,7 @@ public class CreatorServiceImpl implements CreatorService {
     // 컨트롤러 하나에서 구현
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<BackingCreatorProjectListDto>>> getCreatorProjectList(Long creatorId) {
+    public ResponseEntity<ResponseDto<List<BackingCreatorProjectListDto>>> getCreatorProjectList(@NotBlank Long creatorId) {
         loaders.creator(creatorId);
 
         //창작자의 모든 프로젝트 리스트
@@ -501,7 +511,7 @@ public class CreatorServiceImpl implements CreatorService {
     // 컨트롤러 나눠서 구현 -1
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<CreatorShippingProjectList>>> getCreatorShippingList(Long creatorId) {
+    public ResponseEntity<ResponseDto<List<CreatorShippingProjectList>>> getCreatorShippingList(@NotBlank Long creatorId) {
         loaders.creator(creatorId);
 
         List<CreatorShippingProjectList> shippingProjectLists = projectMapper.getCShippingList(creatorId);
@@ -520,7 +530,7 @@ public class CreatorServiceImpl implements CreatorService {
     // 컨트롤러 나눠서 구현 - 2
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<CreatorShippingBackerList>>> getShippingBackerList(Long creatorId, Long projectId) {
+    public ResponseEntity<ResponseDto<List<CreatorShippingBackerList>>> getShippingBackerList(@NotBlank Long creatorId, @NotBlank Long projectId) {
         loaders.creator(creatorId);
         Project project = loaders.project(projectId);
         auth.mustBeOwner(creatorId, project.getCreatorId());
@@ -534,22 +544,25 @@ public class CreatorServiceImpl implements CreatorService {
      * 크리에이터 등록
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> registerCreator(CreatorRegisterRequestDto dto, Long userId) throws IOException {
+    public ResponseEntity<ResponseDto<String>> registerCreator(CreatorRegisterRequestDto dto, @NotBlank Long userId) throws IOException {
         loaders.user(userId);
         if (userMapper.getCreatorIdByUserId(userId) != null) throw new AlreadyCreatorException();
 
-        String profileImgPath = fileUploader.upload(dto.getProfileImg());
         Creator creator = Creator.builder()
                 .userId(userId)
                 .creatorName(dto.getCreatorName())
                 .creatorType(dto.getCreatorType().name())
                 .businessNum(dto.getBusinessNumber())
-                .profileImg(profileImgPath)
                 .email(dto.getEmail())
                 .phone(dto.getPhone())
                 .account(dto.getAccount())
                 .bank(dto.getBank())
                 .build();
+        if (dto.getProfileImg() != null && !dto.getProfileImg().isEmpty()) {
+            String profileImgPath = fileUploader.upload(dto.getProfileImg());
+            creator.setProfileImg(profileImgPath);
+        }
+
         creatorMapper.insertCreator(creator);
         return ResponseEntity.ok(ResponseDto.success(200, "창작자 등록 성공", dto.getCreatorName()));
     }
@@ -564,7 +577,8 @@ public class CreatorServiceImpl implements CreatorService {
      * @since 2025-10-15
      */
     @Override
-    public ResponseEntity<ResponseDto<Creator>> item(Long creatorId) {
+    public ResponseEntity<ResponseDto<Creator>> item(@NotBlank Long creatorId) {
+        loaders.creator(creatorId);
         Creator item = creatorMapper.creatorInfo(creatorId);
         if (item == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "창작자 정보 조회 불가"));
@@ -576,14 +590,14 @@ public class CreatorServiceImpl implements CreatorService {
      * <p>크리에이터 정보 수정</p>
      *
      * @param creatorId 창작자 ID
-     * @param dto CreatorUpdateRequestDto
+     * @param dto       CreatorUpdateRequestDto
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-10-15
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> updateCreatorInfo(Long creatorId, CreatorUpdateRequestDto dto) {
-
+    public ResponseEntity<ResponseDto<String>> updateCreatorInfo(@NotBlank Long creatorId, CreatorUpdateRequestDto dto) {
+        loaders.creator(creatorId);
         int result = creatorMapper.updateCreatorInfo(dto);
         if (result == 0) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "창작자 정보 수정 실패"));
@@ -592,10 +606,11 @@ public class CreatorServiceImpl implements CreatorService {
     }
 
     @Override
-    public ResponseEntity<ResponseDto<String>> setShippingStatus(Long projectId, Long creatorId, ShippingStatusDto shippingStatusDto) {
+    public ResponseEntity<ResponseDto<String>> setShippingStatus(@NotBlank Long projectId, @NotBlank Long creatorId, ShippingStatusDto shippingStatusDto) {
         loaders.creator(creatorId);
         Project project = loaders.project(projectId);
         auth.mustBeOwner(creatorId, project.getCreatorId());
+        requireInEnum(shippingStatusDto.getShippingStatus(), ShippingStatus.class, InvalidStatusException::new);
 
         int result = shippingMapper.updateShippingStatus(projectId, creatorId, shippingStatusDto);
         if (result == 0) {
@@ -610,7 +625,7 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<Long>> getFollowerCnt(Long creatorId) {
+    public ResponseEntity<ResponseDto<Long>> getFollowerCnt(@NotBlank Long creatorId) {
         loaders.creator(creatorId);
         Long followerCnt = followMapper.getFollowerCnt(creatorId);
         return ResponseEntity.ok(ResponseDto.success(200, "팔로워 수 조회 성공", followerCnt));

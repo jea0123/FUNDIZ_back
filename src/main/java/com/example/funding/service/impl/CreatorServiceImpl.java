@@ -15,7 +15,11 @@ import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
 import com.example.funding.dto.response.creator.*;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
+import com.example.funding.enums.ProjectStatus;
+import com.example.funding.enums.ShippingStatus;
 import com.example.funding.exception.badrequest.AlreadyCreatorException;
+import com.example.funding.exception.badrequest.InvalidParamException;
+import com.example.funding.exception.badrequest.InvalidStatusException;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
@@ -26,6 +30,7 @@ import com.example.funding.service.validator.ProjectTransitionGuard;
 import com.example.funding.service.validator.ValidationRules;
 import com.example.funding.validator.Loaders;
 import com.example.funding.validator.PermissionChecker;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -41,11 +46,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.example.funding.validator.Preconditions.requireIn;
+import static com.example.funding.validator.Preconditions.requireInEnum;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class CreatorServiceImpl implements CreatorService {
     private final CreatorMapper creatorMapper;
     private final ProjectMapper projectMapper;
@@ -91,6 +98,8 @@ public class CreatorServiceImpl implements CreatorService {
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<CreatorProjectListDto>>> getProjectList(Long creatorId, SearchCreatorProjectDto dto, Pager pager) {
         loaders.creator(creatorId);
+        requireIn(dto.getRangeType(), List.of("7d", "30d", "90d"), InvalidParamException::new);
+        requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new, "", "all", "ALL");
         dto.applyRangeType();
 
         int total = creatorMapper.countProject(creatorId, dto);
@@ -538,18 +547,21 @@ public class CreatorServiceImpl implements CreatorService {
         loaders.user(userId);
         if (userMapper.getCreatorIdByUserId(userId) != null) throw new AlreadyCreatorException();
 
-        String profileImgPath = fileUploader.upload(dto.getProfileImg());
         Creator creator = Creator.builder()
                 .userId(userId)
                 .creatorName(dto.getCreatorName())
                 .creatorType(dto.getCreatorType().name())
                 .businessNum(dto.getBusinessNumber())
-                .profileImg(profileImgPath)
                 .email(dto.getEmail())
                 .phone(dto.getPhone())
                 .account(dto.getAccount())
                 .bank(dto.getBank())
                 .build();
+        if (dto.getProfileImg() != null && !dto.getProfileImg().isEmpty()) {
+            String profileImgPath = fileUploader.upload(dto.getProfileImg());
+            creator.setProfileImg(profileImgPath);
+        }
+
         creatorMapper.insertCreator(creator);
         return ResponseEntity.ok(ResponseDto.success(200, "창작자 등록 성공", dto.getCreatorName()));
     }
@@ -565,6 +577,7 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     public ResponseEntity<ResponseDto<Creator>> item(Long creatorId) {
+        loaders.creator(creatorId);
         Creator item = creatorMapper.creatorInfo(creatorId);
         if (item == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "창작자 정보 조회 불가"));
@@ -576,14 +589,14 @@ public class CreatorServiceImpl implements CreatorService {
      * <p>크리에이터 정보 수정</p>
      *
      * @param creatorId 창작자 ID
-     * @param dto CreatorUpdateRequestDto
+     * @param dto       CreatorUpdateRequestDto
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-10-15
      */
     @Override
     public ResponseEntity<ResponseDto<String>> updateCreatorInfo(Long creatorId, CreatorUpdateRequestDto dto) {
-
+        loaders.creator(creatorId);
         int result = creatorMapper.updateCreatorInfo(dto);
         if (result == 0) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "창작자 정보 수정 실패"));
@@ -596,6 +609,7 @@ public class CreatorServiceImpl implements CreatorService {
         loaders.creator(creatorId);
         Project project = loaders.project(projectId);
         auth.mustBeOwner(creatorId, project.getCreatorId());
+        requireInEnum(shippingStatusDto.getShippingStatus(), ShippingStatus.class, InvalidStatusException::new);
 
         int result = shippingMapper.updateShippingStatus(projectId, creatorId, shippingStatusDto);
         if (result == 0) {
@@ -614,6 +628,24 @@ public class CreatorServiceImpl implements CreatorService {
         loaders.creator(creatorId);
         Long followerCnt = followMapper.getFollowerCnt(creatorId);
         return ResponseEntity.ok(ResponseDto.success(200, "팔로워 수 조회 성공", followerCnt));
+    }
 
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<CreatorSummaryDto>> getCreatorSummary(Long creatorId, Long userId) {
+        Creator existing = loaders.creator(creatorId);
+        CreatorSummaryDto summary = CreatorSummaryDto.builder()
+                .creator(creatorMapper.getCreatorRowById(creatorId))
+                .stats(creatorMapper.getCreatorStatsById(creatorId))
+                .followerCount(followMapper.getFollowerCnt(creatorId))
+                .lastLogin(userMapper.getLastLoginTime(existing.getUserId()))
+                .build();
+        if (userId != null) {
+            int isFollowing = followMapper.isFollowingCreator(userId, creatorId);
+            summary.setIsFollowed(isFollowing > 0);
+        } else {
+            summary.setIsFollowed(false);
+        }
+        return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 요약 정보 조회 성공", summary));
     }
 }

@@ -24,7 +24,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class AddressServiceImpl implements AddressService {
     private final Loaders loaders;
     private final PermissionChecker auth;

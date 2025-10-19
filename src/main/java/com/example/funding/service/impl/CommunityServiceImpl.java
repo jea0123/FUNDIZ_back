@@ -6,10 +6,12 @@ import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.CommunityCreateRequestDto;
 import com.example.funding.dto.response.project.CommunityDto;
 import com.example.funding.dto.response.project.ReviewDto;
+import com.example.funding.exception.badrequest.ContentRequiredException;
 import com.example.funding.mapper.CommunityMapper;
 import com.example.funding.model.Community;
 import com.example.funding.service.CommunityService;
 import com.example.funding.validator.Loaders;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,11 +24,12 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.example.funding.validator.Preconditions.requireHasText;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class CommunityServiceImpl implements CommunityService {
 
     private final CommunityMapper communityMapper;
@@ -73,13 +76,10 @@ public class CommunityServiceImpl implements CommunityService {
     public ResponseEntity<ResponseDto<String>> createCommunity(Long projectId, CommunityCreateRequestDto dto, Long userId) {
         loaders.user(userId);
         loaders.project(projectId);
+        requireHasText(dto.getCmContent(), ContentRequiredException::new);
         //TODO: guard, validator
 
-        Community community = Community.builder()
-                .projectId(projectId)
-                .userId(userId)
-                .cmContent(dto.getCmContent())
-                .build();
+        Community community = Community.builder().projectId(projectId).userId(userId).cmContent(dto.getCmContent()).build();
 
         int result = communityMapper.createCommunity(community);
         if (result != 1) {

@@ -15,19 +15,19 @@ import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
 import com.example.funding.dto.response.admin.ProjectVerifyListDto;
 import com.example.funding.dto.response.admin.analytic.*;
 import com.example.funding.enums.NotificationType;
+import com.example.funding.enums.ProjectStatus;
 import com.example.funding.exception.badrequest.InvalidParamException;
+import com.example.funding.exception.badrequest.InvalidStatusException;
 import com.example.funding.exception.badrequest.ProjectApproveException;
 import com.example.funding.exception.badrequest.ProjectRejectException;
 import com.example.funding.exception.notfound.*;
 import com.example.funding.handler.NotificationPublisher;
-import com.example.funding.mapper.AdminMapper;
-import com.example.funding.mapper.NoticeMapper;
-import com.example.funding.mapper.RewardMapper;
-import com.example.funding.mapper.TagMapper;
+import com.example.funding.mapper.*;
 import com.example.funding.model.*;
 import com.example.funding.service.AdminService;
 import com.example.funding.service.validator.ProjectTransitionGuard;
 import com.example.funding.validator.Loaders;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -40,13 +40,12 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
-import static com.example.funding.validator.Preconditions.requirePositive;
+import static com.example.funding.validator.Preconditions.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class AdminServiceImpl implements AdminService {
 
     private final Loaders loaders;
@@ -54,6 +53,7 @@ public class AdminServiceImpl implements AdminService {
     private final TagMapper tagMapper;
     private final RewardMapper rewardMapper;
     private final NoticeMapper noticeMapper;
+    private final CategoryMapper categoryMapper;
 
     private final NotificationPublisher notificationPublisher;
     private final ProjectTransitionGuard transitionGuard;
@@ -64,11 +64,12 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<AdminAnalyticsDto>> getAdminAnalytics(LocalDate from, LocalDate to, int limit, String metric, int months, Long ctgrId) {
+        requireIn(metric, List.of("qty", "revenue"), InvalidParamException::new);
         Kpi kpi = adminMapper.getKpiByMonths(months);
         List<RevenueTrend> revenueTrends = adminMapper.getMonthlyTrends(months);
         List<RewardSalesTop> rewardSalesTops = adminMapper.getRewardSalesTops(from, to, limit, metric);
         List<PaymentMethod> paymentMethods = adminMapper.getPaymentMethods(from, to);
-        List<CategorySuccess> categorySuccesses = adminMapper.getCategorySuccessByCategory(ctgrId);
+        List<CategorySuccess> categorySuccesses = categoryMapper.getCategorySuccessByCategory(ctgrId);
 
         if (kpi == null || revenueTrends.isEmpty() || rewardSalesTops.isEmpty() || paymentMethods.isEmpty() || categorySuccesses.isEmpty())
             throw new AnalyticsNotFoundException();
@@ -81,19 +82,6 @@ public class AdminServiceImpl implements AdminService {
                 .categorySuccesses(categorySuccesses)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "관리자 대시보드 분석 데이터 조회 성공", analytics));
-    }
-
-    /**
-     * 카테고리별 성공률 조회
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(Long ctgrId) {
-        requirePositive(ctgrId, InvalidParamException::new);
-        List<CategorySuccess> categorySuccesses = adminMapper.getCategorySuccessByCategory(ctgrId);
-        if (categorySuccesses.isEmpty()) throw new CategorySuccessNotFoundException();
-
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "카테고리별 성공률 조회 성공", categorySuccesses));
     }
 
     /**
@@ -114,6 +102,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<RewardSalesTop>>> getRewardSalesTops(LocalDate from, LocalDate to, int limit, String metric) {
+        requireIn(metric, List.of("qty", "revenue"), InvalidParamException::new);
         List<RewardSalesTop> rewardSalesTops = adminMapper.getRewardSalesTops(from, to, limit, metric);
         if (rewardSalesTops.isEmpty()) throw new RewardSalesNotFoundException();
 
@@ -132,6 +121,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchAdminProjectDto dto, Pager pager) {
+        requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new);
         dto.applyRangeType();
 
         int total = adminMapper.countProject(dto);
@@ -201,6 +191,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchAdminProjectDto dto, Pager pager) {
+        requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new);
         dto.applyRangeType();
 
         int total = adminMapper.countProjectVerify(dto);
@@ -249,7 +240,6 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public ResponseEntity<ResponseDto<String>> approveProject(Long projectId) {
         Project existing = loaders.project(projectId);
-
         Creator existingCreator = loaders.creator(existing.getCreatorId());
 
         // Guard

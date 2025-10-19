@@ -9,6 +9,7 @@ import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
 import com.example.funding.dto.row.ProjectRow;
+import com.example.funding.exception.badrequest.InvalidSortException;
 import com.example.funding.exception.notfound.FeaturedProjectNotFoundException;
 import com.example.funding.exception.notfound.ProjectNotFoundException;
 import com.example.funding.exception.notfound.RecentPaidProjectNotFoundException;
@@ -21,6 +22,7 @@ import com.example.funding.model.Reward;
 import com.example.funding.model.Tag;
 import com.example.funding.service.ProjectService;
 import com.example.funding.validator.Loaders;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -32,10 +34,11 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
+import static com.example.funding.validator.Preconditions.requireIn;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class ProjectServiceImpl implements ProjectService {
     private final Loaders loaders;
     private final ProjectMapper projectMapper;
@@ -144,6 +147,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> searchProject(SearchProjectDto dto, Pager pager) {
+        requireIn(dto.getSort(), List.of("recent", "liked", "amount", "deadline", "percent", "view"), InvalidSortException::new);
         int total = projectMapper.countSearchProjects(dto);
 
         List<FeaturedProjectDto> items = Collections.emptyList();

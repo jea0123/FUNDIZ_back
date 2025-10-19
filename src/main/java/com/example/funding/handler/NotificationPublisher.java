@@ -11,6 +11,14 @@ import org.springframework.stereotype.Component;
 public class NotificationPublisher {
     private final ApplicationEventPublisher publisher;
 
+    /**
+     * 알림 이벤트 발행
+     *
+     * @param userId   알림을 받을 사용자 ID
+     * @param type     알림 유형
+     * @param title    알림 제목
+     * @param targetId 알림 대상 ID
+     */
     public void publish(Long userId, NotificationType type, String title, Long targetId) {
         String key = NotificationEvent.defaultIdemKey(userId, type, targetId);
         publisher.publishEvent(new NotificationEvent(userId, type, title, targetId, key));

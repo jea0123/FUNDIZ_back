@@ -19,6 +19,7 @@ import com.example.funding.model.Qna;
 import com.example.funding.model.Reply;
 import com.example.funding.service.ReplyService;
 import com.example.funding.validator.Loaders;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,6 @@ import static com.example.funding.validator.Preconditions.requireHasText;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class ReplyServiceImpl implements ReplyService {
 
     private final Loaders loaders;
@@ -108,10 +108,10 @@ public class ReplyServiceImpl implements ReplyService {
     /**
      * <p>문의내역 답변 조회</p>
      *
-     * @param inqId 문의내역 ID
+     * @param inqId         문의내역 ID
      * @param lastCreatedAt 마지막 항목의 생성일시
-     * @param lastId 마지막 항목의 id
-     * @param size 한 번에 가져올 항목 수
+     * @param lastId        마지막 항목의 id
+     * @param size          한 번에 가져올 항목 수
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-10-13
@@ -142,7 +142,7 @@ public class ReplyServiceImpl implements ReplyService {
      * <p>문의내역 답변 등록</p>
      *
      * @param inqId 문의내역 ID
-     * @param dto IqrReplyCreateRequestDto
+     * @param dto   IqrReplyCreateRequestDto
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-10-13
@@ -169,10 +169,10 @@ public class ReplyServiceImpl implements ReplyService {
     /**
      * <p>Q&A 답변 조회</p>
      *
-     * @param qnaId Q&A ID
+     * @param qnaId         Q&A ID
      * @param lastCreatedAt 마지막 항목의 생성일시
-     * @param lastId 마지막 항목의 id
-     * @param size 한 번에 가져올 항목 수
+     * @param lastId        마지막 항목의 id
+     * @param size          한 번에 가져올 항목 수
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-10-14
@@ -204,7 +204,7 @@ public class ReplyServiceImpl implements ReplyService {
      * <p>Q&A 답변 등록</p>
      *
      * @param qnaId 커뮤니티 ID
-     * @param dto QnaReplyCreateRequestDto
+     * @param dto   QnaReplyCreateRequestDto
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-10-14

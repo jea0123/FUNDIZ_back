@@ -5,10 +5,7 @@ import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.request.creator.CreatorRegisterRequestDto;
-import com.example.funding.dto.request.creator.CreatorUpdateRequestDto;
-import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
-import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
+import com.example.funding.dto.request.creator.*;
 import com.example.funding.dto.request.shipping.ShippingStatusDto;
 import com.example.funding.dto.response.backing.BackingCreatorBackerList;
 import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
@@ -391,7 +388,7 @@ public class CreatorServiceImpl implements CreatorService {
     public ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(Long creatorId) {
         loaders.creator(creatorId);
 
-        Integer projectTotal = projectMapper.getProjectCnt(creatorId);
+        int projectTotal = projectMapper.getProjectCnt(creatorId);
         Long totalAmount = settlementMapper.getTotalAmountCreatorId(creatorId);
         Long totalBackingCnt = backingMapper.getBackerCnt(creatorId);
         Long totalVerifyingCnt = projectMapper.getVerifyingCnt(creatorId);
@@ -630,6 +627,9 @@ public class CreatorServiceImpl implements CreatorService {
         return ResponseEntity.ok(ResponseDto.success(200, "팔로워 수 조회 성공", followerCnt));
     }
 
+    /**
+     * 크리에이터 요약 정보 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<CreatorSummaryDto>> getCreatorSummary(Long creatorId, Long userId) {
@@ -647,5 +647,18 @@ public class CreatorServiceImpl implements CreatorService {
             summary.setIsFollowed(false);
         }
         return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 요약 정보 조회 성공", summary));
+    }
+
+    /**
+     * 크리에이터 프로젝트 조회
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<PageResult<CreatorProjectDto>>> getCreatorProject(Long creatorId, String sort, Pager pager) {
+        loaders.creator(creatorId);
+        List<CreatorProjectDto> dtos = creatorMapper.findCreatorProjects(creatorId, sort, pager);
+        int total = projectMapper.getProjectCnt(creatorId);
+        PageResult<CreatorProjectDto> result = PageResult.of(dtos, pager, total);
+        return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 프로젝트 조회 성공", result));
     }
 }

@@ -395,6 +395,13 @@ public class GlobalExceptionHandler {
         return json(HttpStatus.NOT_FOUND, body, req);
     }
 
+    @ExceptionHandler(ClassCastException.class)
+    public ResponseEntity<ApiError> handleClassCast(ClassCastException e, HttpServletRequest req) {
+        String body = "클래스 형변환 중 오류가 발생했습니다.";
+        log.error("[500 ClassCast] {} | raw: {}", body, clean(e));
+        return json(HttpStatus.INTERNAL_SERVER_ERROR, body, req);
+    }
+
     /* ========= ResponseStatusException 패스스루 ========= */
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ApiError> handleResponseStatus(ResponseStatusException e, HttpServletRequest req) {

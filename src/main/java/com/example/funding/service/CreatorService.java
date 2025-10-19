@@ -3,10 +3,7 @@ package com.example.funding.service;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.request.creator.CreatorRegisterRequestDto;
-import com.example.funding.dto.request.creator.CreatorUpdateRequestDto;
-import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
-import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
+import com.example.funding.dto.request.creator.*;
 import com.example.funding.dto.request.shipping.ShippingStatusDto;
 import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
 import com.example.funding.dto.response.creator.*;
@@ -76,5 +73,15 @@ public interface CreatorService {
      */
     ResponseEntity<ResponseDto<Long>> getFollowerCnt(Long creatorId);
 
+    /**
+     * 크리에이터 요약 정보 조회
+     * @param creatorId 크리에이터 ID
+     * @param userId 유저 ID (팔로우 여부 확인용)
+     * @return 크리에이터 요약 정보
+     * @since 2025-10-19
+     * @author 장민규
+     */
     ResponseEntity<ResponseDto<CreatorSummaryDto>> getCreatorSummary(Long creatorId, Long userId);
+
+    ResponseEntity<ResponseDto<PageResult<CreatorProjectDto>>> getCreatorProject(Long creatorId, String sort, Pager pager);
 }

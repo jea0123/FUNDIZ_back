@@ -53,7 +53,7 @@ public class CreatorController {
      * @param dto       크리에이터 등록 요청 DTO
      * @param principal 인증된 사용자 정보
      * @return 크리에이터 이름
-     * @throws UserNotFoundException 유저를 찾을 수 없는 경우(404)
+     * @throws UserNotFoundException   유저를 찾을 수 없는 경우(404)
      * @throws AlreadyCreatorException 이미 크리에이터로 등록된 유저인 경우(400)
      * @author 장민규
      * @since 2025-10-12
@@ -91,8 +91,8 @@ public class CreatorController {
     /**
      * <p>크리에이터 정보 수정</p>
      *
-     * @param creatorId 창작자 ID
-     * @param dto CreatorUpdateRequestDto
+     * @param creatorId  창작자 ID
+     * @param dto        CreatorUpdateRequestDto
      * @param profileImg 프로필 이미지
      * @return 성공 시 200 OK
      * @author 이동혁
@@ -110,13 +110,13 @@ public class CreatorController {
             String profileImgUrl = fileUploader.upload(dto.getProfileImg());
 
             if (profileImgUrl != null && !profileImgUrl.isEmpty()) {
-                    dto.setProfileImgUrl(profileImgUrl);
-                } else {
-                    dto.setProfileImgUrl(dto.getProfileImgUrl());
-                }
+                dto.setProfileImgUrl(profileImgUrl);
             } else {
                 dto.setProfileImgUrl(dto.getProfileImgUrl());
             }
+        } else {
+            dto.setProfileImgUrl(dto.getProfileImgUrl());
+        }
 
         return creatorService.updateCreatorInfo(creatorId, dto);
     }
@@ -126,7 +126,7 @@ public class CreatorController {
      *
      * @param creatorId 창작자 ID
      * @param dto       SearchCreatorProjectDto
-     * @param req  요청 pager
+     * @param req       요청 pager
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-10-05
@@ -164,7 +164,7 @@ public class CreatorController {
      */
     @PostMapping("/project/new")
     public ResponseEntity<ResponseDto<Long>> createProject(ProjectCreateRequestDto dto,
-                                                             @RequestAttribute Long creatorId) throws IOException {
+                                                           @RequestAttribute Long creatorId) throws IOException {
 
         String thumbnailUrl = null;
         if (dto.getThumbnail() != null && !dto.getThumbnail().isEmpty()) {
@@ -266,7 +266,7 @@ public class CreatorController {
      */
     @GetMapping("/projects/{projectId}/reward")
     public ResponseEntity<ResponseDto<List<Reward>>> getRewardListManage(@PathVariable Long projectId,
-                                                                          @RequestAttribute Long creatorId) {
+                                                                         @RequestAttribute Long creatorId) {
         return rewardService.getRewardListManage(projectId, creatorId);
     }
 
@@ -309,7 +309,7 @@ public class CreatorController {
      * <p>QnA 내역 목록 조회(창작자 기준)</p>
      *
      * @param creatorId 창작자 ID
-     * @param req  Pager
+     * @param req       Pager
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-10-08
@@ -349,10 +349,10 @@ public class CreatorController {
     }
 
     @PostMapping("/shippingBackerList/{projectId}")
-    public ResponseEntity<ResponseDto<String>> setShippingStatus (@PathVariable Long projectId,
-                                                                  @RequestAttribute Long creatorId,
-                                                                  @Valid @RequestBody ShippingStatusDto status) {
-        return creatorService.setShippingStatus(projectId ,creatorId, status);
+    public ResponseEntity<ResponseDto<String>> setShippingStatus(@PathVariable Long projectId,
+                                                                 @RequestAttribute Long creatorId,
+                                                                 @Valid @RequestBody ShippingStatusDto status) {
+        return creatorService.setShippingStatus(projectId, creatorId, status);
     }
 
     /**
@@ -386,9 +386,26 @@ public class CreatorController {
         return creatorService.getFollowerCnt(creatorId);
     }
 
+    /**
+     * <p>크리에이터 요약 정보 조회</p>
+     *
+     * @param creatorId 크리에이터 ID
+     * @param principal 인증된 사용자 정보
+     * @return 크리에이터 요약 정보
+     * @author 장민규
+     * @since 2025-10-19
+     */
     @GetMapping("/summary/{creatorId}")
     public ResponseEntity<ResponseDto<CreatorSummaryDto>> getCreatorSummary(@PathVariable Long creatorId,
                                                                             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        return creatorService.getCreatorSummary(creatorId, principal != null ? principal.userId() : null);
+        return creatorService.getCreatorSummary(creatorId, 10L);
+    }
+
+    @GetMapping("/projectsList/{creatorId}")
+    public ResponseEntity<ResponseDto<PageResult<CreatorProjectDto>>> getCreatorProject(@PathVariable Long creatorId, @RequestParam(required = false, defaultValue = "recent") String sort,
+                                                                                  @RequestParam(required = false, defaultValue = "1") Integer page,
+                                                                                  @RequestParam(required = false, defaultValue = "12") Integer size) {
+        Pager pager = Pager.ofRequest(page, size, 5);
+        return creatorService.getCreatorProject(creatorId, sort, pager);
     }
 }

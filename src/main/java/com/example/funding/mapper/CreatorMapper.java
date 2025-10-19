@@ -52,4 +52,7 @@ public interface CreatorMapper {
 
     void decreaseFollowersCount(@Param("creatorId") Long creatorId);
 
+    CreatorSummaryDto.CreatorRow getCreatorRowById(@Param("creatorId") Long creatorId);
+
+    CreatorSummaryDto.Stats getCreatorStatsById(@Param("creatorId") Long creatorId);
 }

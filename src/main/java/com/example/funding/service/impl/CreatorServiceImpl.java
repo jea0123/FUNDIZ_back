@@ -53,7 +53,6 @@ import static com.example.funding.validator.Preconditions.requireInEnum;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class CreatorServiceImpl implements CreatorService {
     private final CreatorMapper creatorMapper;
     private final ProjectMapper projectMapper;
@@ -97,7 +96,7 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<PageResult<CreatorProjectListDto>>> getProjectList(@NotBlank Long creatorId, SearchCreatorProjectDto dto, Pager pager) {
+    public ResponseEntity<ResponseDto<PageResult<CreatorProjectListDto>>> getProjectList(Long creatorId, SearchCreatorProjectDto dto, Pager pager) {
         loaders.creator(creatorId);
         requireIn(dto.getRangeType(), List.of("7d", "30d", "90d"), InvalidParamException::new);
         requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new, "", "all", "ALL");
@@ -128,7 +127,7 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CreatorProjectDetailDto>> getProjectDetail(@NotBlank Long projectId, @NotBlank Long creatorId) {
+    public ResponseEntity<ResponseDto<CreatorProjectDetailDto>> getProjectDetail(Long projectId, Long creatorId) {
         loaders.creator(creatorId);
         loaders.project(projectId);
         // Guard: 소유자
@@ -151,7 +150,7 @@ public class CreatorServiceImpl implements CreatorService {
      * @since 2025-09-09
      */
     @Override
-    public ResponseEntity<ResponseDto<Long>> createProject(ProjectCreateRequestDto dto, @NotBlank Long creatorId) {
+    public ResponseEntity<ResponseDto<Long>> createProject(ProjectCreateRequestDto dto, Long creatorId) {
         loaders.creator(creatorId);
         // Guard
 //        transitionGuard.assertCanCreate(creatorId);
@@ -207,7 +206,7 @@ public class CreatorServiceImpl implements CreatorService {
      * @since 2025-09-16
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> updateProject(ProjectCreateRequestDto dto, @NotBlank Long creatorId) {
+    public ResponseEntity<ResponseDto<String>> updateProject(ProjectCreateRequestDto dto, Long creatorId) {
         loaders.creator(creatorId);
         Project existing = loaders.project(dto.getProjectId());
         auth.mustBeOwner(creatorId, existing.getCreatorId());
@@ -263,7 +262,7 @@ public class CreatorServiceImpl implements CreatorService {
      * @since 2025-09-16
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> deleteProject(@NotBlank Long projectId, @NotBlank Long creatorId) {
+    public ResponseEntity<ResponseDto<String>> deleteProject(Long projectId, Long creatorId) {
         loaders.creator(creatorId);
         Project existing = loaders.project(projectId);
         auth.mustBeOwner(creatorId, existing.getCreatorId());
@@ -292,7 +291,7 @@ public class CreatorServiceImpl implements CreatorService {
      * @since 2025-09-18
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> verifyProject(@NotBlank Long projectId, @NotBlank Long creatorId) {
+    public ResponseEntity<ResponseDto<String>> verifyProject(Long projectId, Long creatorId) {
         Project existing = loaders.project(projectId);
         loaders.creator(creatorId);
         auth.mustBeOwner(creatorId, existing.getCreatorId());
@@ -316,7 +315,7 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CreatorProjectSummaryDto>> getProjectSummary(@NotBlank Long projectId, @NotBlank Long creatorId) {
+    public ResponseEntity<ResponseDto<CreatorProjectSummaryDto>> getProjectSummary(Long projectId, Long creatorId) {
         Project project = loaders.project(projectId);
         loaders.creator(creatorId);
         auth.mustBeOwner(creatorId, project.getCreatorId());
@@ -346,7 +345,7 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CreatorProfileSummaryDto>> getCreatorProfileSummary(@NotBlank Long creatorId) {
+    public ResponseEntity<ResponseDto<CreatorProfileSummaryDto>> getCreatorProfileSummary(Long creatorId) {
         loaders.creator(creatorId);
         // Guard
         transitionGuard.ensureCreatorExistsOrThrow(creatorId);
@@ -367,7 +366,7 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfCreator(@NotBlank Long creatorId, Pager pager) {
+    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfCreator(Long creatorId, Pager pager) {
         loaders.creator(creatorId);
         int total = creatorMapper.qnaTotalOfCreator(creatorId);
 
@@ -389,7 +388,7 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(@NotBlank Long creatorId) {
+    public ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(Long creatorId) {
         loaders.creator(creatorId);
 
         Integer projectTotal = projectMapper.getProjectCnt(creatorId);
@@ -459,7 +458,7 @@ public class CreatorServiceImpl implements CreatorService {
     // 컨트롤러 하나에서 구현
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<BackingCreatorProjectListDto>>> getCreatorProjectList(@NotBlank Long creatorId) {
+    public ResponseEntity<ResponseDto<List<BackingCreatorProjectListDto>>> getCreatorProjectList(Long creatorId) {
         loaders.creator(creatorId);
 
         //창작자의 모든 프로젝트 리스트
@@ -511,7 +510,7 @@ public class CreatorServiceImpl implements CreatorService {
     // 컨트롤러 나눠서 구현 -1
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<CreatorShippingProjectList>>> getCreatorShippingList(@NotBlank Long creatorId) {
+    public ResponseEntity<ResponseDto<List<CreatorShippingProjectList>>> getCreatorShippingList(Long creatorId) {
         loaders.creator(creatorId);
 
         List<CreatorShippingProjectList> shippingProjectLists = projectMapper.getCShippingList(creatorId);
@@ -530,7 +529,7 @@ public class CreatorServiceImpl implements CreatorService {
     // 컨트롤러 나눠서 구현 - 2
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<CreatorShippingBackerList>>> getShippingBackerList(@NotBlank Long creatorId, @NotBlank Long projectId) {
+    public ResponseEntity<ResponseDto<List<CreatorShippingBackerList>>> getShippingBackerList(Long creatorId, Long projectId) {
         loaders.creator(creatorId);
         Project project = loaders.project(projectId);
         auth.mustBeOwner(creatorId, project.getCreatorId());
@@ -544,7 +543,7 @@ public class CreatorServiceImpl implements CreatorService {
      * 크리에이터 등록
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> registerCreator(CreatorRegisterRequestDto dto, @NotBlank Long userId) throws IOException {
+    public ResponseEntity<ResponseDto<String>> registerCreator(CreatorRegisterRequestDto dto, Long userId) throws IOException {
         loaders.user(userId);
         if (userMapper.getCreatorIdByUserId(userId) != null) throw new AlreadyCreatorException();
 
@@ -577,7 +576,7 @@ public class CreatorServiceImpl implements CreatorService {
      * @since 2025-10-15
      */
     @Override
-    public ResponseEntity<ResponseDto<Creator>> item(@NotBlank Long creatorId) {
+    public ResponseEntity<ResponseDto<Creator>> item(Long creatorId) {
         loaders.creator(creatorId);
         Creator item = creatorMapper.creatorInfo(creatorId);
         if (item == null) {
@@ -596,7 +595,7 @@ public class CreatorServiceImpl implements CreatorService {
      * @since 2025-10-15
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> updateCreatorInfo(@NotBlank Long creatorId, CreatorUpdateRequestDto dto) {
+    public ResponseEntity<ResponseDto<String>> updateCreatorInfo(Long creatorId, CreatorUpdateRequestDto dto) {
         loaders.creator(creatorId);
         int result = creatorMapper.updateCreatorInfo(dto);
         if (result == 0) {
@@ -606,7 +605,7 @@ public class CreatorServiceImpl implements CreatorService {
     }
 
     @Override
-    public ResponseEntity<ResponseDto<String>> setShippingStatus(@NotBlank Long projectId, @NotBlank Long creatorId, ShippingStatusDto shippingStatusDto) {
+    public ResponseEntity<ResponseDto<String>> setShippingStatus(Long projectId, Long creatorId, ShippingStatusDto shippingStatusDto) {
         loaders.creator(creatorId);
         Project project = loaders.project(projectId);
         auth.mustBeOwner(creatorId, project.getCreatorId());
@@ -625,10 +624,28 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<Long>> getFollowerCnt(@NotBlank Long creatorId) {
+    public ResponseEntity<ResponseDto<Long>> getFollowerCnt(Long creatorId) {
         loaders.creator(creatorId);
         Long followerCnt = followMapper.getFollowerCnt(creatorId);
         return ResponseEntity.ok(ResponseDto.success(200, "팔로워 수 조회 성공", followerCnt));
+    }
 
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<CreatorSummaryDto>> getCreatorSummary(Long creatorId, Long userId) {
+        Creator existing = loaders.creator(creatorId);
+        CreatorSummaryDto summary = CreatorSummaryDto.builder()
+                .creator(creatorMapper.getCreatorRowById(creatorId))
+                .stats(creatorMapper.getCreatorStatsById(creatorId))
+                .followerCount(followMapper.getFollowerCnt(creatorId))
+                .lastLogin(userMapper.getLastLoginTime(existing.getUserId()))
+                .build();
+        if (userId != null) {
+            int isFollowing = followMapper.isFollowingCreator(userId, creatorId);
+            summary.setIsFollowed(isFollowing > 0);
+        } else {
+            summary.setIsFollowed(false);
+        }
+        return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 요약 정보 조회 성공", summary));
     }
 }

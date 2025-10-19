@@ -25,7 +25,6 @@ import static com.example.funding.validator.Preconditions.requirePositive;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryMapper categoryMapper;
@@ -55,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(@NotBlank Long ctgrId) {
+    public ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(Long ctgrId) {
         requirePositive(ctgrId, InvalidParamException::new);
         List<CategorySuccess> categorySuccesses = categoryMapper.getCategorySuccessByCategory(ctgrId);
         if (categorySuccesses.isEmpty()) throw new CategorySuccessNotFoundException();

@@ -20,10 +20,7 @@ import com.example.funding.exception.badrequest.InvalidParamException;
 import com.example.funding.exception.badrequest.InvalidStatusException;
 import com.example.funding.exception.badrequest.ProjectApproveException;
 import com.example.funding.exception.badrequest.ProjectRejectException;
-import com.example.funding.exception.notfound.AnalyticsNotFoundException;
-import com.example.funding.exception.notfound.KPINotFoundException;
-import com.example.funding.exception.notfound.ProjectNotFoundException;
-import com.example.funding.exception.notfound.RewardSalesNotFoundException;
+import com.example.funding.exception.notfound.*;
 import com.example.funding.handler.NotificationPublisher;
 import com.example.funding.mapper.*;
 import com.example.funding.model.*;
@@ -49,7 +46,6 @@ import static com.example.funding.validator.Preconditions.*;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class AdminServiceImpl implements AdminService {
 
     private final Loaders loaders;
@@ -67,7 +63,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<AdminAnalyticsDto>> getAdminAnalytics(LocalDate from, LocalDate to, int limit, String metric, int months, @NotBlank Long ctgrId) {
+    public ResponseEntity<ResponseDto<AdminAnalyticsDto>> getAdminAnalytics(LocalDate from, LocalDate to, int limit, String metric, int months, Long ctgrId) {
         requireIn(metric, List.of("qty", "revenue"), InvalidParamException::new);
         Kpi kpi = adminMapper.getKpiByMonths(months);
         List<RevenueTrend> revenueTrends = adminMapper.getMonthlyTrends(months);
@@ -151,7 +147,7 @@ public class AdminServiceImpl implements AdminService {
      * @since 2025-09-17
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> cancelProject(@NotBlank Long projectId) {
+    public ResponseEntity<ResponseDto<String>> cancelProject(Long projectId) {
         loaders.project(projectId);
         adminMapper.cancelProject(projectId);
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 취소 성공", null));
@@ -219,7 +215,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<ProjectVerifyDetailDto>> getProjectVerifyDetail(@NotBlank Long projectId) {
+    public ResponseEntity<ResponseDto<ProjectVerifyDetailDto>> getProjectVerifyDetail(Long projectId) {
         requirePositive(projectId, InvalidParamException::new);
         ProjectVerifyDetailDto detail = adminMapper.getProjectVerifyDetail(projectId);
         if (detail == null) throw new ProjectNotFoundException();
@@ -242,7 +238,7 @@ public class AdminServiceImpl implements AdminService {
      * @since 2025-09-19
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> approveProject(@NotBlank Long projectId) {
+    public ResponseEntity<ResponseDto<String>> approveProject(Long projectId) {
         Project existing = loaders.project(projectId);
         Creator existingCreator = loaders.creator(existing.getCreatorId());
 
@@ -265,7 +261,7 @@ public class AdminServiceImpl implements AdminService {
      * @since 2025-09-19
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> rejectProject(@NotBlank Long projectId, String rejectedReason) {
+    public ResponseEntity<ResponseDto<String>> rejectProject(Long projectId, String rejectedReason) {
         Project existing = loaders.project(projectId);
 
         Creator existingCreator = loaders.creator(existing.getCreatorId());
@@ -307,7 +303,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<User>> item(@NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<User>> item(Long userId) {
         User user = loaders.user(userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "회원 정보 조회 성공", user));
@@ -323,7 +319,7 @@ public class AdminServiceImpl implements AdminService {
      * @since 2025-10-13
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> updateUser(@NotBlank Long userId, UserAdminUpdateRequestDto userDto) {
+    public ResponseEntity<ResponseDto<String>> updateUser(Long userId, UserAdminUpdateRequestDto userDto) {
         loaders.user(userId);
         userDto.setUserId(userId);
 
@@ -361,13 +357,13 @@ public class AdminServiceImpl implements AdminService {
      * <p>공지사항 수정</p>
      *
      * @param noticeId 공지사항 ID
-     * @param ntcDto   NoticeUpdateRequestDto
+     * @param ntcDto NoticeUpdateRequestDto
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author 이동혁
      * @since 2025-09-24
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> updateNotice(@NotBlank Long noticeId, NoticeUpdateRequestDto ntcDto) {
+    public ResponseEntity<ResponseDto<String>> updateNotice(Long noticeId, NoticeUpdateRequestDto ntcDto) {
         loaders.notice(noticeId);
         ntcDto.setNoticeId(noticeId);
 
@@ -388,7 +384,7 @@ public class AdminServiceImpl implements AdminService {
      * @since 2025-09-24
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> deleteNotice(@NotBlank Long noticeId) {
+    public ResponseEntity<ResponseDto<String>> deleteNotice(Long noticeId) {
         loaders.notice(noticeId);
         int deleted = noticeMapper.deleteNotice(noticeId);
         if (deleted == 0) {

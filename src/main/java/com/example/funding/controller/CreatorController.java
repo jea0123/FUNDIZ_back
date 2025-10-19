@@ -1,5 +1,6 @@
 package com.example.funding.controller;
 
+import com.example.funding.common.CustomUserPrincipal;
 import com.example.funding.common.FileUploader;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
@@ -27,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -370,7 +372,6 @@ public class CreatorController {
         return newsService.createNews(projectId, creatorId, dto);
     }
 
-
     /**
      * <p>크리에이터 팔로워 수 조회</p>
      *
@@ -385,4 +386,9 @@ public class CreatorController {
         return creatorService.getFollowerCnt(creatorId);
     }
 
+    @GetMapping("/summary/{creatorId}")
+    public ResponseEntity<ResponseDto<CreatorSummaryDto>> getCreatorSummary(@PathVariable Long creatorId,
+                                                                            @AuthenticationPrincipal CustomUserPrincipal principal) {
+        return creatorService.getCreatorSummary(creatorId, principal != null ? principal.userId() : null);
+    }
 }

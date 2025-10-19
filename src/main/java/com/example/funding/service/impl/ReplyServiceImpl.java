@@ -34,7 +34,6 @@ import static com.example.funding.validator.Preconditions.requireHasText;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class ReplyServiceImpl implements ReplyService {
 
     private final Loaders loaders;
@@ -54,7 +53,7 @@ public class ReplyServiceImpl implements ReplyService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CursorPage<ReplyDto>>> getReplyList(@NotBlank Long cmId, LocalDateTime lastCreatedAt, Long lastId, int size) {
+    public ResponseEntity<ResponseDto<CursorPage<ReplyDto>>> getReplyList(Long cmId, LocalDateTime lastCreatedAt, Long lastId, int size) {
         loaders.community(cmId);
 
         int limitPlusOne = Math.max(1, size) + 1;
@@ -85,7 +84,7 @@ public class ReplyServiceImpl implements ReplyService {
      * @since 2025-10-13
      */
     @Override
-    public ResponseEntity<ResponseDto<ReplyDto>> createCommunityReply(@NotBlank Long cmId, ReplyCreateRequestDto dto, Long userId) {
+    public ResponseEntity<ResponseDto<ReplyDto>> createCommunityReply(Long cmId, ReplyCreateRequestDto dto, Long userId) {
         loaders.user(userId);
         Community existingCommunity = loaders.community(cmId);
 
@@ -119,7 +118,7 @@ public class ReplyServiceImpl implements ReplyService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CursorPage<InquiryReplyDto>>> getInquiryReplyList(@NotBlank Long inqId, LocalDateTime lastCreatedAt, Long lastId, int size) {
+    public ResponseEntity<ResponseDto<CursorPage<InquiryReplyDto>>> getInquiryReplyList(Long inqId, LocalDateTime lastCreatedAt, Long lastId, int size) {
         loaders.inquiry(inqId);
 
         int limitPlusOne = Math.max(1, size) + 1;
@@ -149,7 +148,7 @@ public class ReplyServiceImpl implements ReplyService {
      * @since 2025-10-13
      */
     @Override
-    public ResponseEntity<ResponseDto<InquiryReplyDto>> createInquiryReply(@NotBlank Long inqId, IqrReplyCreateRequestDto dto) {
+    public ResponseEntity<ResponseDto<InquiryReplyDto>> createInquiryReply(Long inqId, IqrReplyCreateRequestDto dto) {
         Inquiry existingInquiry = loaders.inquiry(inqId);
 
         String content = (dto.getContent() == null ? "" : dto.getContent().trim());
@@ -180,7 +179,7 @@ public class ReplyServiceImpl implements ReplyService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CursorPage<QnaReplyDto>>> getQnaReplyList(@NotBlank Long qnaId, LocalDateTime lastCreatedAt, Long lastId, int size) {
+    public ResponseEntity<ResponseDto<CursorPage<QnaReplyDto>>> getQnaReplyList(Long qnaId, LocalDateTime lastCreatedAt, Long lastId, int size) {
         loaders.qna(qnaId);
 
         int limitPlusOne = Math.max(1, size) + 1;
@@ -211,7 +210,7 @@ public class ReplyServiceImpl implements ReplyService {
      * @since 2025-10-14
      */
     @Override
-    public ResponseEntity<ResponseDto<QnaReplyDto>> createQnaReply(@NotBlank Long qnaId, @NotBlank Long creatorId, QnaReplyCreateRequestDto dto) {
+    public ResponseEntity<ResponseDto<QnaReplyDto>> createQnaReply(Long qnaId, Long creatorId, QnaReplyCreateRequestDto dto) {
         Qna existingQna = loaders.qna(qnaId);
         loaders.creator(creatorId);
 

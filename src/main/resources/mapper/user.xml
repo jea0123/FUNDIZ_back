@@ -99,4 +99,9 @@
         WHERE USERID = #{userId}
     </delete>
 
+    <select id="getLastLoginTime" resultType="java.time.LocalDateTime" parameterType="long">
+        SELECT LASTLOGINAT
+        FROM USERS
+        WHERE USERID = #{userId}
+    </select>
 </mapper>

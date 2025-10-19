@@ -30,7 +30,6 @@ import static com.example.funding.validator.Preconditions.requireHasText;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class CommunityServiceImpl implements CommunityService {
 
     private final CommunityMapper communityMapper;
@@ -50,7 +49,7 @@ public class CommunityServiceImpl implements CommunityService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CursorPage<CommunityDto>>> getCommunityList(@NotBlank Long projectId, String code, LocalDateTime lastCreatedAt, Long lastId, int size) {
+    public ResponseEntity<ResponseDto<CursorPage<CommunityDto>>> getCommunityList(Long projectId, String code, LocalDateTime lastCreatedAt, Long lastId, int size) {
         loaders.project(projectId);
         List<CommunityDto> communityList = communityMapper.getCommunityList(projectId, "CM", lastCreatedAt, lastId, size);
 
@@ -74,7 +73,7 @@ public class CommunityServiceImpl implements CommunityService {
      * @since 2025-10-12
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> createCommunity(@NotBlank Long projectId, CommunityCreateRequestDto dto, @NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<String>> createCommunity(Long projectId, CommunityCreateRequestDto dto, Long userId) {
         loaders.user(userId);
         loaders.project(projectId);
         requireHasText(dto.getCmContent(), ContentRequiredException::new);
@@ -104,7 +103,7 @@ public class CommunityServiceImpl implements CommunityService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CursorPage<ReviewDto>>> getReviewList(@NotBlank Long projectId, String code, LocalDateTime lastCreatedAt, Long lastId, int size) {
+    public ResponseEntity<ResponseDto<CursorPage<ReviewDto>>> getReviewList(Long projectId, String code, LocalDateTime lastCreatedAt, Long lastId, int size) {
         loaders.project(projectId);
         List<ReviewDto> reviewList = communityMapper.getReviewList(projectId, "RV", lastCreatedAt, lastId, size);
 

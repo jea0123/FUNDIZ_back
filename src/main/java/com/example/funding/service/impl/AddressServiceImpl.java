@@ -8,6 +8,7 @@ import com.example.funding.dto.response.address.AddressResponseDto;
 import com.example.funding.mapper.AddressMapper;
 import com.example.funding.model.Address;
 import com.example.funding.service.AddressService;
+import com.example.funding.service.validator.AddressValidator;
 import com.example.funding.validator.Loaders;
 import com.example.funding.validator.PermissionChecker;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class AddressServiceImpl implements AddressService {
     private final Loaders loaders;
     private final PermissionChecker auth;
     private final AddressMapper addressMapper;
+    private final AddressValidator addressValidator;
 
     @Override
     public ResponseEntity<ResponseDto<List<AddressResponseDto>>> getAddrList(Long userId) {
@@ -40,6 +42,9 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public ResponseEntity<ResponseDto<String>> addAddress(Long userId, AddrAddRequestDto addrDto) {
         loaders.user(userId);
+
+        addressValidator.validate(addrDto);
+
         Address addr = Address.builder()
                 .userId(userId)
                 .addrName(addrDto.getAddrName())
@@ -60,6 +65,8 @@ public class AddressServiceImpl implements AddressService {
         loaders.user(userId);
         Address existingAddr = loaders.address(addrId);
         auth.mustBeOwner(userId, existingAddr.getUserId());
+
+        addressValidator.validateUpdate(addrDto);
 
         addrDto.setAddrId(addrId);
         addrDto.setUserId(userId);

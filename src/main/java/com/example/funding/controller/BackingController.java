@@ -35,8 +35,8 @@ public class BackingController {
         return backingService.createBacking(userId, requestDto);
     }
 
-    @PostMapping("/cancel/{userId}")
-    public ResponseEntity<ResponseDto<String>> cancelBacking(@PathVariable Long userId, Long backingId) {
+    @PostMapping("{userId}/cancel/{backingId}")
+    public ResponseEntity<ResponseDto<String>> cancelBacking(@PathVariable Long userId, @PathVariable Long backingId) {
         return backingService.cancelBacking(userId, backingId);
     }
 

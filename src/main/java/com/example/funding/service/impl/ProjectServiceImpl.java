@@ -83,6 +83,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .startDate(row.getStartDate())
                 .endDate(row.getEndDate())
                 .content(row.getContent())
+                .contentBlocks(row.getContentBlocks())
                 .thumbnail(row.getThumbnail())
                 .projectStatus(row.getProjectStatus())
                 .backerCnt(row.getBackerCnt())

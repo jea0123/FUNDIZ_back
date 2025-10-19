@@ -10,14 +10,21 @@ import java.time.LocalDateTime;
 public class AdminProjectListDto {
     private Long projectId;
     private String title;
-    private String creatorName;
-    private String projectStatus;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
     private Integer goalAmount;
     private Integer currAmount;
-    private Integer backerCnt;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String projectStatus;
+    private Integer backerCnt;
+    private Integer likeCnt;
+    private Integer viewCnt;
+
+    private String subctgrName;
+    private String ctgrName;
+
+    private String creatorName;
 
     //계산 필드
     private Integer percentNow;

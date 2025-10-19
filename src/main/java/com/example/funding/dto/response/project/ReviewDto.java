@@ -12,14 +12,11 @@ import java.util.List;
 @NoArgsConstructor
 public class ReviewDto {
     private Long cmId;
-    private Long projectId;
     private String cmContent;
     private LocalDateTime createdAt;
     private String code;
     private Integer rating;
-
     private String nickname;
     private String profileImg;
-
-    private List<ReplyDto> replyList;
+    private Long replyCnt;
 }

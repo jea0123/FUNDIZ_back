@@ -1,15 +1,16 @@
 package com.example.funding.dto.request.admin;
 
+import com.example.funding.enums.ProjectStatus;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
 public class SearchAdminProjectDto {
-    private String projectStatus = "VERIFYING";
+    private List<ProjectStatus> projectStatuses;
     private LocalDate fromDate;
     private LocalDate toDate;
     private String rangeType;

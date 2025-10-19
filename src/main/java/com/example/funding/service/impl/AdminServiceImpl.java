@@ -27,18 +27,17 @@ import com.example.funding.model.*;
 import com.example.funding.service.AdminService;
 import com.example.funding.service.validator.ProjectTransitionGuard;
 import com.example.funding.validator.Loaders;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static com.example.funding.validator.Preconditions.*;
 
@@ -112,7 +111,7 @@ public class AdminServiceImpl implements AdminService {
     /**
      * <p>프로젝트 목록 조회</p>
      *
-     * @param dto   SearchProjectVerifyDto
+     * @param dto   SearchAdminProjectDto
      * @param pager pager
      * @return 성공 시 200 OK
      * @author 조은애
@@ -121,12 +120,17 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchAdminProjectDto dto, Pager pager) {
-        requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new);
+        // TODO: 검증 변경 (단일 -> 리스트 검증)
+//        requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new);
+        List<ProjectStatus> st = dto.getProjectStatuses();
+        if (st != null && st.stream().anyMatch(Objects::isNull)) {
+            throw new InvalidStatusException();
+        }
+
         dto.applyRangeType();
 
         int total = adminMapper.countProject(dto);
         List<AdminProjectListDto> items = Collections.emptyList();
-
         if (total > 0) {
             items = adminMapper.getProjectList(dto, pager);
             for (AdminProjectListDto item : items) {
@@ -191,11 +195,15 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchAdminProjectDto dto, Pager pager) {
-        requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new);
+//        requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new);
+        List<ProjectStatus> st = dto.getProjectStatuses();
+        if (st != null && st.stream().anyMatch(Objects::isNull)) {
+            throw new InvalidStatusException();
+        }
+
         dto.applyRangeType();
 
         int total = adminMapper.countProjectVerify(dto);
-
         List<ProjectVerifyListDto> items = Collections.emptyList();
         if (total > 0) {
             items = adminMapper.getProjectVerifyList(dto, pager);

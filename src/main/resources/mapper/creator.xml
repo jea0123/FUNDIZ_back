@@ -43,17 +43,14 @@
         WHERE creatorId = #{creatorId}
     </select>
 
-    <sql id="splitStatus">
-        SELECT REGEXP_SUBSTR(#{dto.projectStatus}, '[^,]+', 1, LEVEL) AS token
-        FROM dual
-        CONNECT BY REGEXP_SUBSTR(#{dto.projectStatus}, '[^,]+', 1, LEVEL) IS NOT NULL
-    </sql>
-
     <sql id="projectListWhere">
         <where>
             p.CREATORID = #{creatorId}
-            <if test="dto.projectStatus != null and dto.projectStatus != ''">
-                AND p.PROJECTSTATUS IN (<include refid="splitStatus" />)
+            <if test="dto.projectStatuses != null and dto.projectStatuses.size() > 0">
+                p.PROJECTSTATUS IN
+                <foreach collection="dto.projectStatuses" item="st" open="(" separator="," close=")">
+                    #{st}
+                </foreach>
             </if>
             <if test="dto.fromDate != null">
                 AND p.UPDATEDAT <![CDATA[ >= ]]> #{dto.fromDate}

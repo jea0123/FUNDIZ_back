@@ -27,6 +27,7 @@ public class ProjectDetailDto {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private String content;
+    private String contentBlocks;
     private String thumbnail;
     private String projectStatus;
     private Integer backerCnt;

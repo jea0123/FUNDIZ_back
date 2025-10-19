@@ -18,6 +18,7 @@ import com.example.funding.model.User;
 import com.example.funding.provider.JwtProvider;
 import com.example.funding.service.AuthService;
 import com.example.funding.validator.Loaders;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,6 @@ import org.springframework.validation.annotation.Validated;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class AuthServiceImpl implements AuthService {
     private final Loaders loaders;
     private final UserMapper userMapper;

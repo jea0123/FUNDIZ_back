@@ -6,21 +6,22 @@ import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.project.SearchProjectDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
+import com.example.funding.dto.response.project.ProjectCountsDto;
 import com.example.funding.dto.response.project.ProjectDetailDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
+import com.example.funding.dto.row.CountsAgg;
 import com.example.funding.dto.row.ProjectRow;
+import com.example.funding.exception.badrequest.InvalidSortException;
 import com.example.funding.exception.notfound.FeaturedProjectNotFoundException;
 import com.example.funding.exception.notfound.ProjectNotFoundException;
 import com.example.funding.exception.notfound.RecentPaidProjectNotFoundException;
-import com.example.funding.mapper.NewsMapper;
-import com.example.funding.mapper.ProjectMapper;
-import com.example.funding.mapper.RewardMapper;
-import com.example.funding.mapper.TagMapper;
+import com.example.funding.mapper.*;
 import com.example.funding.model.News;
 import com.example.funding.model.Reward;
 import com.example.funding.model.Tag;
 import com.example.funding.service.ProjectService;
 import com.example.funding.validator.Loaders;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -32,16 +33,18 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
+import static com.example.funding.validator.Preconditions.requireIn;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class ProjectServiceImpl implements ProjectService {
     private final Loaders loaders;
     private final ProjectMapper projectMapper;
     private final TagMapper tagMapper;
     private final RewardMapper rewardMapper;
     private final NewsMapper newsMapper;
+    private final CommunityMapper communityMapper;
 
     /**
      * <p>프로젝트 상세 페이지 조회</p>
@@ -80,6 +83,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .startDate(row.getStartDate())
                 .endDate(row.getEndDate())
                 .content(row.getContent())
+                .contentBlocks(row.getContentBlocks())
                 .thumbnail(row.getThumbnail())
                 .projectStatus(row.getProjectStatus())
                 .backerCnt(row.getBackerCnt())
@@ -144,6 +148,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> searchProject(SearchProjectDto dto, Pager pager) {
+        requireIn(dto.getSort(), List.of("recent", "liked", "amount", "deadline", "percent", "view"), InvalidSortException::new);
         int total = projectMapper.countSearchProjects(dto);
 
         List<FeaturedProjectDto> items = Collections.emptyList();
@@ -164,5 +169,27 @@ public class ProjectServiceImpl implements ProjectService {
         loaders.project(projectId);
         Long likeCnt = projectMapper.getLikeCnt(projectId);
         return ResponseEntity.ok(ResponseDto.success(200, "좋아요 수 조회 성공", likeCnt));
+    }
+
+    /**
+     * <p>프로젝트 상세 페이지 - 커뮤니티,후기 수 조회</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @return 성공 시 200 OK
+     * @author 조은애
+     * @since 2025-10-20
+     */
+    @Override
+    public ResponseEntity<ResponseDto<ProjectCountsDto>> getCounts(Long projectId) {
+        CountsAgg agg = communityMapper.countByProjectGrouped(projectId);
+
+        long cm = (agg != null && agg.getCommunityTotal() != null) ? agg.getCommunityTotal() : 0L;
+        long rv = (agg != null && agg.getReviewTotal() != null) ? agg.getReviewTotal() : 0L;
+
+        ProjectCountsDto dto = new ProjectCountsDto();
+        dto.setCommunity(ProjectCountsDto.Section.builder().total(cm).build());
+        dto.setReview(ProjectCountsDto.Section.builder().total(rv).build());
+
+        return ResponseEntity.ok(ResponseDto.success(200, "커뮤니티/후기 수 조회 성공", dto));
     }
 }

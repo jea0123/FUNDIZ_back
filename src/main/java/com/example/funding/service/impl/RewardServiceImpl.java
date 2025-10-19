@@ -11,6 +11,7 @@ import com.example.funding.service.validator.ProjectInputValidator;
 import com.example.funding.service.validator.ProjectTransitionGuard;
 import com.example.funding.validator.Loaders;
 import com.example.funding.validator.PermissionChecker;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class RewardServiceImpl implements RewardService {
     private final Loaders loaders;
     private final PermissionChecker auth;
@@ -45,7 +45,7 @@ public class RewardServiceImpl implements RewardService {
      * @since 2025-09-09
      */
     @Override
-    public void createReward(Long projectId, List<RewardCreateRequestDto> rewardList, LocalDateTime endDate, boolean validated) {
+    public void createReward(@NotBlank Long projectId, List<RewardCreateRequestDto> rewardList, LocalDateTime endDate, boolean validated) {
         loaders.project(projectId);
         // Guard
         transitionGuard.requireDraft(projectId);

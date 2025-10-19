@@ -20,6 +20,7 @@ import com.example.funding.model.Settlement;
 import com.example.funding.service.SettlementService;
 import com.example.funding.validator.Loaders;
 import com.example.funding.validator.PermissionChecker;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,6 @@ import static com.example.funding.validator.Preconditions.requireIn;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class SettlementServiceImpl implements SettlementService {
     private final Loaders loaders;
     private final PermissionChecker auth;
@@ -126,6 +126,7 @@ public class SettlementServiceImpl implements SettlementService {
 
     /**
      * 상태값 정규화
+     *
      * @param status 상태값
      * @return 정규화된 상태값 (ALL인 경우 null 반환)
      */

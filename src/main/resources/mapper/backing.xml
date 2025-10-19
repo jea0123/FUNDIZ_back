@@ -182,7 +182,7 @@
         </collection>
     </resultMap>
 
-    <select id = "prepareBacking" parameterType="map" resultMap = "BackingResponseMap">
+    <select id="prepareBacking" parameterType="map" resultMap = "BackingResponseMap">
         SELECT
         <!-- 유저 테이블 -->
         u.userId,
@@ -288,7 +288,7 @@
             CREATORID = #{creatorId}
     </select>
     <!-- 후원날짜가 다를 경우도있기때문에 중복으로 나올 수도 있음 -->
-    <select id = "getCBackerList" parameterType = "long" resultType="com.example.funding.dto.response.backing.BackingCreatorBackerList">
+    <select id ="getCBackerList" parameterType = "long" resultType="com.example.funding.dto.response.backing.BackingCreatorBackerList">
         SELECT DISTINCT
             u.userId,
             u.nickname,
@@ -307,7 +307,7 @@
         <!--AND p.PROJECTID = #{projectId}-->
     </select>
 
-    <select id = "dailyCount" resultType ="com.example.funding.dto.response.creator.DailyCountDto">
+    <select id="dailyCount" resultType ="com.example.funding.dto.response.creator.DailyCountDto">
         SELECT
         d.target_date AS createdAt,
         NVL(COUNT(DISTINCT b.backingId), 0) AS count
@@ -331,7 +331,7 @@
         ORDER BY d.target_date
     </select>
 
-    <select id = "monthCount" resultType = "com.example.funding.dto.response.creator.MonthCountDto">
+    <select id="monthCount" resultType = "com.example.funding.dto.response.creator.MonthCountDto">
         SELECT
         d.target_month AS createdAt,
         NVL(COUNT(DISTINCT b.backingId), 0) AS count
@@ -363,7 +363,7 @@
         WHERE backingId = #{backingId}
     </select>
 
-    <select id = "getBackingLists" resultType = "com.example.funding.dto.response.backing.userList_detail.MyPageBackingSaveDto">
+    <select id="getBackingLists" resultType = "com.example.funding.dto.response.backing.userList_detail.MyPageBackingSaveDto">
         SELECT
         b.backingId,
         p.projectId,
@@ -395,7 +395,7 @@
         order by createdAt desc
     </select>
 
-    <select id = "getBackingList" resultType = "com.example.funding.dto.response.backing.userList_detail.MyPageBackingListDto">
+    <select id="getBackingList" resultType = "com.example.funding.dto.response.backing.userList_detail.MyPageBackingListDto">
         SELECT
             b.backingId,
             p.projectId,
@@ -421,7 +421,7 @@
 
     </select>
 
-    <select id = "getBackingDetail" resultType = "com.example.funding.dto.response.backing.userList_detail.MyPageBackingDetailDto">
+    <select id="getBackingDetail" resultType = "com.example.funding.dto.response.backing.userList_detail.MyPageBackingDetailDto">
         SELECT
             b.backingId,
             b.userId,
@@ -454,7 +454,7 @@
         JOIN creator c ON c.creatorId = p.creatorId
         WHERE b.userId = #{userId}
     </select>
-    <select id = "getBackingDetails" resultType = "com.example.funding.dto.response.backing.userList_detail.MyPageBackingDetailSaveDto">
+    <select id="getBackingDetails" resultType = "com.example.funding.dto.response.backing.userList_detail.MyPageBackingDetailSaveDto">
         SELECT
         b.backingId,
         b.userId,
@@ -492,7 +492,7 @@
         WHERE b.userId = #{userId}
     </select>
 
-    <update id = "updateBackingStatus" parameterType="long">
+    <update id="updateBackingStatus" parameterType="long">
         update backing
         set backingStatus = 'CANCELED'
         where backingId = #{backingId}

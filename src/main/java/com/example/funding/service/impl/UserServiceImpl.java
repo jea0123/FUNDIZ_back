@@ -26,7 +26,6 @@ import com.example.funding.model.User;
 import com.example.funding.service.UserService;
 import com.example.funding.validator.Loaders;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -43,7 +42,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class UserServiceImpl implements UserService {
 
     private final Loaders loaders;
@@ -62,7 +60,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(@NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(Long userId) {
         User user = loaders.user(userId);
 
         Long creatorId = userMapper.getCreatorIdByUserId(userId);
@@ -90,7 +88,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageUser(@NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageUser(Long userId) {
         User user = loaders.user(userId);
         MyPageUserDto mypageUserDto = MyPageUserDto.builder()
                 .userId(user.getUserId())
@@ -111,7 +109,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(@NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(Long userId) {
         loaders.user(userId);
         List<MyPageLikedDto> LikedList = userMapper.getLikedList(userId);
 
@@ -128,7 +126,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfUser(@NotBlank Long userId, Pager pager) {
+    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfUser(Long userId, Pager pager) {
         loaders.user(userId);
 
         int total = qnaMapper.qnaTotalOfUser(userId);

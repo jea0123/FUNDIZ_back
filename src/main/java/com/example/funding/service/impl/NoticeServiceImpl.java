@@ -3,12 +3,11 @@ package com.example.funding.service.impl;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.request.cs.NoticeAddRequestDto;
-import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
 import com.example.funding.mapper.NoticeMapper;
 import com.example.funding.model.Notice;
 import com.example.funding.service.NoticeService;
 import com.example.funding.validator.Loaders;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,7 +22,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class NoticeServiceImpl implements NoticeService {
     private final Loaders loaders;
     private final NoticeMapper noticeMapper;

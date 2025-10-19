@@ -194,4 +194,17 @@ public class ProjectController {
     public ResponseEntity<ResponseDto<Long>> getLikeCnt(@PathVariable Long projectId) {
         return projectService.getLikeCnt(projectId);
     }
+
+    /**
+     * <p>프로젝트 상세 페이지 - 커뮤니티,후기 수 조회</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @return 성공 시 200 OK
+     * @author 조은애
+     * @since 2025-10-20
+     */
+    @GetMapping("{projectId}/counts")
+    public ResponseEntity<ResponseDto<ProjectCountsDto>> getCounts(@PathVariable Long projectId) {
+        return projectService.getCounts(projectId);
+    }
 }

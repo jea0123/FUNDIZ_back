@@ -7,6 +7,7 @@ import com.example.funding.model.Notification;
 import com.example.funding.service.NotificationService;
 import com.example.funding.validator.Loaders;
 import com.example.funding.validator.PermissionChecker;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class NotificationServiceImpl implements NotificationService {
     private final Loaders loaders;
     private final PermissionChecker auth;

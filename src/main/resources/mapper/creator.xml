@@ -43,17 +43,14 @@
         WHERE creatorId = #{creatorId}
     </select>
 
-    <sql id="splitStatus">
-        SELECT REGEXP_SUBSTR(#{dto.projectStatus}, '[^,]+', 1, LEVEL) AS token
-        FROM dual
-        CONNECT BY REGEXP_SUBSTR(#{dto.projectStatus}, '[^,]+', 1, LEVEL) IS NOT NULL
-    </sql>
-
     <sql id="projectListWhere">
         <where>
             p.CREATORID = #{creatorId}
-            <if test="dto.projectStatus != null and dto.projectStatus != ''">
-                AND p.PROJECTSTATUS IN (<include refid="splitStatus" />)
+            <if test="dto.projectStatuses != null and dto.projectStatuses.size() > 0">
+                p.PROJECTSTATUS IN
+                <foreach collection="dto.projectStatuses" item="st" open="(" separator="," close=")">
+                    #{st}
+                </foreach>
             </if>
             <if test="dto.fromDate != null">
                 AND p.UPDATEDAT <![CDATA[ >= ]]> #{dto.fromDate}
@@ -273,7 +270,7 @@
         WHERE CREATORID = #{creatorId}
     </select>
 
-    <select id = "getProjectRankDate" parameterType="long" resultType="com.example.funding.dto.response.creator.CreatorDashboardRankDto">
+    <select id ="getProjectRankDate" parameterType="long" resultType="com.example.funding.dto.response.creator.CreatorDashboardRankDto">
         SELECT
             creatorId,
             title,
@@ -284,7 +281,7 @@
         WHERE CREATORID = #{creatorId}
     </select>
 
-    <select id ="creatorDashboardDto" parameterType="long" resultType="com.example.funding.dto.response.creator.CreatorDashboardDto">
+    <select id="creatorDashboardDto" parameterType="long" resultType="com.example.funding.dto.response.creator.CreatorDashboardDto">
         SELECT
             NVL(count(*),0) AS totalProjectCnt,
             NVL(count(CASE WHEN projectStatus = 'FAILED' THEN creatorId END),0) AS projectFailedCnt
@@ -306,4 +303,46 @@
         WHERE CREATORID = #{creatorId} AND FOLLOWERCNT > 0
     </update>
 
+    <select id="getCreatorRowById" resultType="com.example.funding.dto.response.creator.CreatorSummaryDto$CreatorRow" parameterType="long">
+        SELECT
+            CREATORID AS creatorId,
+            CREATORNAME AS creatorName,
+            PROFILEIMG AS profileImg,
+            BIO AS bio
+        FROM CREATOR
+        WHERE CREATORID = #{creatorId}
+    </select>
+
+    <select id="getCreatorStatsById" resultType="com.example.funding.dto.response.creator.CreatorSummaryDto$Stats" parameterType="long">
+        SELECT
+        /* 창작자가 올린 프로젝트 개수 */
+        NVL((
+        SELECT COUNT(*)
+        FROM project p
+        WHERE p.creatorId = #{creatorId}
+        ), 0) AS projectCount,
+
+        NVL((
+        SELECT COUNT(DISTINCT b.userId)
+        FROM project        p
+        JOIN reward         r   ON r.projectId    = p.projectId
+        JOIN backingDetail  bd  ON bd.rewardId    = r.rewardId
+        JOIN backing        b   ON b.backingId    = bd.backingId
+        JOIN payment        pay ON pay.backingId  = b.backingId
+        WHERE p.creatorId = #{creatorId}
+        AND pay.status  = 'PAID'
+        ), 0) AS totalBackers,
+
+        COALESCE((
+        SELECT SUM(pay.amount)
+        FROM project p
+        JOIN reward r ON r.projectId = p.projectId
+        JOIN backingDetail bd ON bd.rewardId = r.rewardId
+        JOIN backing b ON b.backingId = bd.backingId
+        JOIN payment pay ON pay.backingId = b.backingId
+        WHERE p.creatorId = #{creatorId}
+        AND pay.status  = 'PAID'
+        ), 0) AS totalAmount
+        FROM dual
+    </select>
 </mapper>

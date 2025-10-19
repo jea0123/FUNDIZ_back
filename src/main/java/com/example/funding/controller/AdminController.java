@@ -28,6 +28,7 @@ import com.example.funding.exception.forbidden.AccessDeniedException;
 import com.example.funding.exception.notfound.*;
 import com.example.funding.model.User;
 import com.example.funding.service.AdminService;
+import com.example.funding.service.CategoryService;
 import com.example.funding.service.SettlementService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +53,7 @@ public class AdminController {
 
     private final AdminService adminService;
     private final SettlementService settlementService;
+    private final CategoryService categoryService;
 
     /**
      * 관리자 대시보드 분석 데이터 조회
@@ -84,7 +86,7 @@ public class AdminController {
      */
     @GetMapping("/category-success")
     public ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(@RequestParam Long ctgrId) {
-        return adminService.getCategorySuccessByCategory(ctgrId);
+        return categoryService.getCategorySuccessByCategory(ctgrId);
     }
 
     /**

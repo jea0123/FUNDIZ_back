@@ -83,5 +83,14 @@ public interface CreatorService {
      */
     ResponseEntity<ResponseDto<CreatorSummaryDto>> getCreatorSummary(Long creatorId, Long userId);
 
+    /**
+     * 크리에이터의 프로젝트 목록 조회 (페이징 및 정렬)
+     * @param creatorId 크리에이터 ID
+     * @param sort 정렬 기준
+     * @param pager 페이저 정보 (페이지 번호, 페이지 크기 등)
+     * @return 페이징된 크리에이터 프로젝트 목록
+     * @since 2025-10-19
+     * @author 장민규
+     */
     ResponseEntity<ResponseDto<PageResult<CreatorProjectDto>>> getCreatorProject(Long creatorId, String sort, Pager pager);
 }

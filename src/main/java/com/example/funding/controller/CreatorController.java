@@ -401,6 +401,17 @@ public class CreatorController {
         return creatorService.getCreatorSummary(creatorId, 10L);
     }
 
+    /**
+     * <p>크리에이터의 프로젝트 목록 조회 (페이징 및 정렬)</p>
+     *
+     * @param creatorId 크리에이터 ID
+     * @param sort      정렬 기준 (recent, popular, endingSoon 등)
+     * @param page      페이지 번호 (기본값: 1)
+     * @param size      페이지 크기 (기본값: 12)
+     * @return 페이징된 크리에이터 프로젝트 목록
+     * @author 장민규
+     * @since 2025-10-19
+     */
     @GetMapping("/projectsList/{creatorId}")
     public ResponseEntity<ResponseDto<PageResult<CreatorProjectDto>>> getCreatorProject(@PathVariable Long creatorId, @RequestParam(required = false, defaultValue = "recent") String sort,
                                                                                   @RequestParam(required = false, defaultValue = "1") Integer page,

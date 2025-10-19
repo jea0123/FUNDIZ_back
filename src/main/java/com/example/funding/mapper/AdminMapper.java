@@ -31,8 +31,6 @@ public interface AdminMapper {
     List<PaymentMethod> getPaymentMethods(@Param("from") LocalDate from,
                                           @Param("to") LocalDate to);
 
-    List<CategorySuccess> getCategorySuccessByCategory(@Param("ctgrId") Long ctgrId);
-
     int countProject(@Param("dto") SearchAdminProjectDto dto);
 
     List<AdminProjectListDto> getProjectList(@Param("dto") SearchAdminProjectDto dto, @Param("pager") Pager pager);

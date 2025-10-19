@@ -119,20 +119,6 @@
         GROUP BY method
     </select>
 
-    <!-- 카테고리별 성공/실패 건수 조회 쿼리 -->
-    <select id="getCategorySuccessByCategory" parameterType="java.lang.Long" resultType="categorySuccess">
-        SELECT
-            sc.subctgrName AS categoryName,
-            SUM(CASE WHEN p.projectStatus IN ('SUCCESS','SETTLED') THEN 1 ELSE 0 END) AS successCnt,
-            SUM(CASE WHEN p.projectStatus = 'FAILED' THEN 1 ELSE 0 END) AS failCnt
-        FROM subcategory sc
-        LEFT JOIN project p
-            ON p.subctgrId = sc.subctgrId
-        WHERE sc.ctgrId = #{ctgrId}
-        GROUP BY sc.subctgrName
-        ORDER BY sc.subctgrName
-    </select>
-
     <sql id="projectListWhere">
         <where>
             <if test="dto.projectStatus != null and dto.projectStatus != ''">

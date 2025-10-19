@@ -20,10 +20,7 @@ import com.example.funding.exception.badrequest.ProjectApproveException;
 import com.example.funding.exception.badrequest.ProjectRejectException;
 import com.example.funding.exception.notfound.*;
 import com.example.funding.handler.NotificationPublisher;
-import com.example.funding.mapper.AdminMapper;
-import com.example.funding.mapper.NoticeMapper;
-import com.example.funding.mapper.RewardMapper;
-import com.example.funding.mapper.TagMapper;
+import com.example.funding.mapper.*;
 import com.example.funding.model.*;
 import com.example.funding.service.AdminService;
 import com.example.funding.service.validator.ProjectTransitionGuard;
@@ -54,6 +51,7 @@ public class AdminServiceImpl implements AdminService {
     private final TagMapper tagMapper;
     private final RewardMapper rewardMapper;
     private final NoticeMapper noticeMapper;
+    private final CategoryMapper categoryMapper;
 
     private final NotificationPublisher notificationPublisher;
     private final ProjectTransitionGuard transitionGuard;
@@ -68,7 +66,7 @@ public class AdminServiceImpl implements AdminService {
         List<RevenueTrend> revenueTrends = adminMapper.getMonthlyTrends(months);
         List<RewardSalesTop> rewardSalesTops = adminMapper.getRewardSalesTops(from, to, limit, metric);
         List<PaymentMethod> paymentMethods = adminMapper.getPaymentMethods(from, to);
-        List<CategorySuccess> categorySuccesses = adminMapper.getCategorySuccessByCategory(ctgrId);
+        List<CategorySuccess> categorySuccesses = categoryMapper.getCategorySuccessByCategory(ctgrId);
 
         if (kpi == null || revenueTrends.isEmpty() || rewardSalesTops.isEmpty() || paymentMethods.isEmpty() || categorySuccesses.isEmpty())
             throw new AnalyticsNotFoundException();
@@ -81,19 +79,6 @@ public class AdminServiceImpl implements AdminService {
                 .categorySuccesses(categorySuccesses)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "관리자 대시보드 분석 데이터 조회 성공", analytics));
-    }
-
-    /**
-     * 카테고리별 성공률 조회
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(Long ctgrId) {
-        requirePositive(ctgrId, InvalidParamException::new);
-        List<CategorySuccess> categorySuccesses = adminMapper.getCategorySuccessByCategory(ctgrId);
-        if (categorySuccesses.isEmpty()) throw new CategorySuccessNotFoundException();
-
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "카테고리별 성공률 조회 성공", categorySuccesses));
     }
 
     /**

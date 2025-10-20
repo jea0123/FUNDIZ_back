@@ -23,18 +23,16 @@ import com.example.funding.exception.badrequest.InvalidStatusException;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
-import com.example.funding.model.Shipping;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.RewardService;
 import com.example.funding.service.validator.ProjectInputValidator;
 import com.example.funding.service.validator.ProjectTransitionGuard;
 import com.example.funding.service.validator.ShippingValidator;
-import com.example.funding.service.validator.ValidationRules;
+import com.example.funding.service.validator.ProjectValidationRules;
 import com.example.funding.validator.Loaders;
 import com.example.funding.validator.PermissionChecker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -76,7 +74,7 @@ public class CreatorServiceImpl implements CreatorService {
         List<String> out = new ArrayList<>(tagList.size());
         for (String tag : tagList) {
             if (tag == null) continue;
-            String display = ValidationRules.normTagDisplay(tag);
+            String display = ProjectValidationRules.normTagDisplay(tag);
             if (!display.isEmpty()) out.add(display);
         }
 

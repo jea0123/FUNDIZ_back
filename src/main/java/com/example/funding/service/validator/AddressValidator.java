@@ -5,9 +5,7 @@ import com.example.funding.dto.request.address.AddrUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.regex.Pattern;
-
-import static com.example.funding.service.validator.ValidationRules.*;
+import static com.example.funding.service.validator.AddressValidationRules.*;
 
 @Component
 @RequiredArgsConstructor
@@ -54,24 +52,24 @@ public class AddressValidator {
 
     public void validateCommon(String addrName, String recipient, String postalCode,
                                String roadAddr, String detailAddr, String recipientPhone) {
-        if (ValidationRules.isBlank(addrName)) throw new IllegalArgumentException("배송지 이름을 입력해주세요.");
-        if (ValidationRules.isBlank(recipient)) throw new IllegalArgumentException("수령인 이름을 입력해주세요.");
-        if (ValidationRules.isBlank(postalCode)) throw new IllegalArgumentException("우편번호를 입력해주세요.");
-        if (ValidationRules.isBlank(roadAddr)) throw new IllegalArgumentException("도로명 주소를 입력해주세요.");
-        if (ValidationRules.isBlank(recipientPhone)) throw new IllegalArgumentException("전화번호를 입력해주세요.");
+        if (AddressValidationRules.isBlank(addrName)) throw new IllegalArgumentException("배송지 이름을 입력해주세요.");
+        if (AddressValidationRules.isBlank(recipient)) throw new IllegalArgumentException("수령인 이름을 입력해주세요.");
+        if (AddressValidationRules.isBlank(postalCode)) throw new IllegalArgumentException("우편번호를 입력해주세요.");
+        if (AddressValidationRules.isBlank(roadAddr)) throw new IllegalArgumentException("도로명 주소를 입력해주세요.");
+        if (AddressValidationRules.isBlank(recipientPhone)) throw new IllegalArgumentException("전화번호를 입력해주세요.");
 
-        if (!ValidationRules.POSTAL_PATTERN.matcher(postalCode).matches())
+        if (!AddressValidationRules.POSTAL_PATTERN.matcher(postalCode).matches())
             throw new IllegalArgumentException("우편번호는 5자리 숫자여야 합니다.");
 
-        if (!ValidationRules.PHONE_PATTERN.matcher(recipientPhone).matches())
+        if (!AddressValidationRules.PHONE_PATTERN.matcher(recipientPhone).matches())
             throw new IllegalArgumentException("전화번호 형식이 올바르지 않습니다. 예: 010-1234-5678");
 
-        if (addrName.length() > ValidationRules.MAX_ADDR_NAME_LEN)
-            throw new IllegalArgumentException("배송지 이름은 " + ValidationRules.MAX_ADDR_NAME_LEN + "자 이내로 입력해주세요.");
-        if (roadAddr.length() > ValidationRules.MAX_ROAD_ADDR_LEN)
-            throw new IllegalArgumentException("도로명 주소는 " + ValidationRules.MAX_ROAD_ADDR_LEN + "자 이내로 입력해주세요.");
-        if (detailAddr != null && detailAddr.length() > ValidationRules.MAX_DETAIL_ADDR_LEN)
-            throw new IllegalArgumentException("상세 주소는 " + ValidationRules.MAX_DETAIL_ADDR_LEN + "자 이내로 입력해주세요.");
+        if (addrName.length() > AddressValidationRules.MAX_ADDR_NAME_LEN)
+            throw new IllegalArgumentException("배송지 이름은 " + AddressValidationRules.MAX_ADDR_NAME_LEN + "자 이내로 입력해주세요.");
+        if (roadAddr.length() > AddressValidationRules.MAX_ROAD_ADDR_LEN)
+            throw new IllegalArgumentException("도로명 주소는 " + AddressValidationRules.MAX_ROAD_ADDR_LEN + "자 이내로 입력해주세요.");
+        if (detailAddr != null && detailAddr.length() > AddressValidationRules.MAX_DETAIL_ADDR_LEN)
+            throw new IllegalArgumentException("상세 주소는 " + AddressValidationRules.MAX_DETAIL_ADDR_LEN + "자 이내로 입력해주세요.");
     }
 }
 

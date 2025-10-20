@@ -494,7 +494,7 @@
 
     <update id="updateBackingStatus" parameterType="long">
         update backing
-        set backingStatus = 'CANCELED'
+        set backingStatus = 'REFUNDED'
         where backingId = #{backingId}
         AND backingStatus = 'COMPLETED'
     </update>

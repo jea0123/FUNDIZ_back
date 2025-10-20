@@ -203,6 +203,9 @@ public class BackingServiceImpl implements BackingService {
         // 개인 후원 상태를 확인 후 바꾸기 completed -> canceled
         backingMapper.updateBackingStatus(backing.getBackingId());
 
+        // 후원자가 취소했을 때 shippingStatus 바꾸기 어떤상태던 상관없이 CANCELED 로
+        shippingMapper.updateBackingToShippingStatus(backing.getBackingId());
+
         return ResponseEntity.ok(ResponseDto.success(200, "후원 취소 성공", null));
     }
 

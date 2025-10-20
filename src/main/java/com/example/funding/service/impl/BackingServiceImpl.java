@@ -140,18 +140,18 @@ public class BackingServiceImpl implements BackingService {
         }
 
         //payment
-        Payment findPayment = paymentMapper.findUserMethod(userId, payment.getMethod(), payment.getCardCompany());
-        System.out.println(" findPayment 확인용 - findPayment: " + findPayment);
-        if (findPayment != null) {
-            findPayment.setBackingId(backingId);
-            findPayment.setAmount(backing.getAmount());
-            paymentMapper.updateBackingPayment(findPayment);
-        } else {
-            String orderId = "ORD-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-            payment.setOrderId(orderId);
-            payment.setBackingId(backingId);
-            paymentMapper.addPayment(payment);
-        }
+//        Payment findPayment = paymentMapper.findUserMethod(userId, payment.getMethod(), payment.getCardCompany());
+//        System.out.println(" findPayment 확인용 - findPayment: " + findPayment);
+//        if (findPayment != null) {
+//            findPayment.setBackingId(backingId);
+//            findPayment.setAmount(backing.getAmount());
+//            paymentMapper.updateBackingPayment(findPayment);
+//        } else {
+//            String orderId = "ORD-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+//            payment.setOrderId(orderId);
+//            payment.setBackingId(backingId);
+//            paymentMapper.addPayment(payment);
+//        }
 
         //TODO: address새로 생성시 로직추가 ,address 선택시 해당 address 만 연결
         // 신규 주소 직접 입력한 경우

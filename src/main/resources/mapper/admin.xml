@@ -121,9 +121,9 @@
 
     <sql id="projectListWhere">
         <where>
-            <if test="dto.projectStatuses != null and dto.projectStatuses.size() > 0">
-                p.PROJECTSTATUS IN
-                <foreach collection="dto.projectStatuses" item="st" open="(" separator="," close=")">
+            <if test="dto.projectStatus != null and dto.projectStatus.size() > 0">
+                AND p.PROJECTSTATUS IN
+                <foreach collection="dto.projectStatus" item="st" open="(" separator="," close=")">
                     #{st}
                 </foreach>
             </if>
@@ -195,9 +195,9 @@
     
     <sql id="verifyFilterWhere">
         <where>
-            <if test="dto.projectStatuses != null and dto.projectStatuses.size() > 0">
+            <if test="dto.projectStatus != null and dto.projectStatus.size() > 0">
                 p.PROJECTSTATUS IN
-                <foreach collection="dto.projectStatuses" item="st" open="(" separator="," close=")">
+                <foreach collection="dto.projectStatus" item="st" open="(" separator="," close=")">
                     #{st}
                 </foreach>
             </if>

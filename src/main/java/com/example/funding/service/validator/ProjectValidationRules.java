@@ -5,10 +5,7 @@ import lombok.experimental.UtilityClass;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @UtilityClass
@@ -25,12 +22,13 @@ public class ProjectValidationRules {
     public static final int MIN_START_LEAD_DAYS = 7; // 리드타임: 오늘+최소 n일 이후 시작
 
     // 대표이미지
-    public static final int MAX_THUMBNAIL_LEN = 500;
+    public static final long MAX_THUMBNAIL = 4L * 1024 * 1024 * 1024;
+    private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of("image/jpeg", "image/png");
 
     // 태그
-    public static final int MAX_TAGS = 10;
+    public static final int MAX_TAGS = 3;
     public static final int MIN_TAG_LEN = 2;
-    public static final int MAX_TAG_LEN = 20;
+    public static final int MAX_TAG_LEN = 15;
     public static final Pattern TAG_PATTERN = Pattern.compile("^[0-9A-Za-z가-힣 _-]+$");
 
     // 리워드

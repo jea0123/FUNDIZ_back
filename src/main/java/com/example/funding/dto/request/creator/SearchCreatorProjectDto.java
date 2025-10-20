@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 public class SearchCreatorProjectDto {
-    private List<ProjectStatus> projectStatuses;
+    private List<ProjectStatus> projectStatus;
     private LocalDate fromDate;
     private LocalDate toDate;
     private String rangeType;

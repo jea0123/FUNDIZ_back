@@ -122,7 +122,7 @@ public class AdminServiceImpl implements AdminService {
     public ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchAdminProjectDto dto, Pager pager) {
         // TODO: 검증 변경 (단일 -> 리스트 검증)
 //        requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new);
-        List<ProjectStatus> st = dto.getProjectStatuses();
+        List<ProjectStatus> st = dto.getProjectStatus();
         if (st != null && st.stream().anyMatch(Objects::isNull)) {
             throw new InvalidStatusException();
         }
@@ -196,7 +196,7 @@ public class AdminServiceImpl implements AdminService {
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchAdminProjectDto dto, Pager pager) {
 //        requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new);
-        List<ProjectStatus> st = dto.getProjectStatuses();
+        List<ProjectStatus> st = dto.getProjectStatus();
         if (st != null && st.stream().anyMatch(Objects::isNull)) {
             throw new InvalidStatusException();
         }

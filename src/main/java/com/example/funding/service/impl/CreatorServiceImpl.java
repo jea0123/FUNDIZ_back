@@ -97,7 +97,7 @@ public class CreatorServiceImpl implements CreatorService {
         loaders.creator(creatorId);
         requireIn(dto.getRangeType(), List.of("7d", "30d", "90d"), InvalidParamException::new);
 //        requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new, "", "all", "ALL");
-        List<ProjectStatus> st = dto.getProjectStatuses();
+        List<ProjectStatus> st = dto.getProjectStatus();
         if (st != null && st.stream().anyMatch(Objects::isNull)) {
             throw new InvalidStatusException();
         }

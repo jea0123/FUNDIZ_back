@@ -5,6 +5,7 @@ import com.example.funding.dto.request.reward.RewardCreateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,7 +28,8 @@ public class ProjectInputValidator {
         validateBasics(dto.getTitle(), dto.getContent(), dto.getGoalAmount(),
                 dto.getStartDate(), dto.getEndDate(), true, errors);
 
-        //TODO: 대표이미지 검증 추가
+//        validateThumbnail(dto.getThumbnail(), true, errors);
+//        validateThumbnailUrl(dto.getThumbnailUrl(), false, errors);
 
         validateTags(dto.getTagList(), errors);
         if (dto.getRewardList() != null && !dto.getRewardList().isEmpty()) {
@@ -47,7 +49,8 @@ public class ProjectInputValidator {
         validateBasics(dto.getTitle(), dto.getContent(), dto.getGoalAmount(),
             dto.getStartDate(), dto.getEndDate(), false, errors);
 
-        //TODO: 대표이미지 검증 추가
+//        validateThumbnail(dto.getThumbnail(), false, errors);
+//        validateThumbnailUrl(dto.getThumbnailUrl(), false, errors);
 
         validateTags(dto.getTagList(), errors);
         if (dto.getRewardList() != null && !dto.getRewardList().isEmpty()) {
@@ -56,6 +59,13 @@ public class ProjectInputValidator {
 
         return errors;
     }
+
+//    private void validateThumbnail(MultipartFile thumbnail, boolean required, List<String> errors) {
+//
+//    }
+//
+//    private void validateThumbnailUrl(String thumbnailUrl, boolean required, List<String> errors) {
+//    }
 
     /**
      * 기본 필드: 제목/본문/금액/기간
@@ -83,13 +93,15 @@ public class ProjectInputValidator {
         }
 
         if (forCreate) {
-            if (goalAmount == null || goalAmount < MIN_GOAL_AMOUNT) {
-                errors.add("목표 금액은 최소 " + MIN_GOAL_AMOUNT + "원 이상이어야 합니다.");
+            if (goalAmount == null) {
+                errors.add("목표 금액은 필수입니다.");
+            } else if (goalAmount < MIN_GOAL_AMOUNT || goalAmount > MAX_GOAL_AMOUNT) {
+                errors.add("목표 금액은 최소 " + MIN_GOAL_AMOUNT + "원, 최대 " + MAX_GOAL_AMOUNT + "원 이하여야 합니다.");
             }
         } else {
             // 프로젝트 수정인 경우
-            if (goalAmount != null && goalAmount < MIN_GOAL_AMOUNT) {
-                errors.add("목표 금액은 최소 " + MIN_GOAL_AMOUNT + "원 이상이어야 합니다.");
+            if (goalAmount != null && (goalAmount < MIN_GOAL_AMOUNT || goalAmount > MAX_GOAL_AMOUNT)) {
+                errors.add("목표 금액은 최소 " + MIN_GOAL_AMOUNT + "원, 최대 " + MAX_GOAL_AMOUNT + "원 이하여야 합니다.");
             }
         }
 

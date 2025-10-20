@@ -228,7 +228,7 @@ public class UserController {
 //                                                            @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
 //        Long userId = principal.userId();
-        Long userId = 501L; // TODO: 임시
+        Long userId = 10L; // TODO: 임시
         return userService.followCreator(userId, creatorId);
     }
 
@@ -249,7 +249,7 @@ public class UserController {
 //                                                              @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
 //        Long userId = principal.userId();
-        Long userId = 501L; // TODO: 임시
+        Long userId = 10L; // TODO: 임시
         return userService.unfollowCreator(userId, creatorId);
     }
 
@@ -269,7 +269,7 @@ public class UserController {
 //                                                                 @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
 //        Long userId = principal.userId();
-        Long userId = 501L; // TODO: 임시
+        Long userId = 10L; // TODO: 임시
         return userService.isFollowingCreator(userId, creatorId);
     }
 }

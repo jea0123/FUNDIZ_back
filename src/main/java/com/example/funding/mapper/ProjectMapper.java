@@ -11,7 +11,6 @@ import com.example.funding.dto.row.ProjectRow;
 import com.example.funding.model.Project;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -77,5 +76,5 @@ public interface ProjectMapper {
 
     void updateProjectStatusBelowGoal (Long projectId);
 
-    List<Map<String, Object>> selectProjectsByIds(@Param("list") List<Long> projectIds);
+    List<ReviewListDto.ProjectInfo> selectProjectsByIds(@Param("list") List<Long> projectIds);
 }

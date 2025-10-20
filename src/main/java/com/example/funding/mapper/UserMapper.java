@@ -9,7 +9,6 @@ import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Mapper
 public interface UserMapper {
@@ -47,5 +46,5 @@ public interface UserMapper {
 
     LocalDateTime getLastLoginTime(@Param("userId") Long userId);
 
-    List<Map<String, Object>> selectUsersByIds(@Param("list") List<Long> userIds);
+    List<ReviewListDto.UserInfo> selectUsersByIds(@Param("list") List<Long> userIds);
 }

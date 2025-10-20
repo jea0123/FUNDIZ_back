@@ -685,68 +685,78 @@ public class CreatorServiceImpl implements CreatorService {
             Long projectId, Boolean photoOnly) {
         loaders.creator(creatorId);
 
-        int limit = Math.max(1, size) + 1;
-        List<Map<String, Object>> communityRows = communityMapper.findCreatorCommunityWindow(creatorId, lastCreatedAt, lastId, limit, projectId, photoOnly);
+        final int pageSize = Math.max(1, size);
+        final int limit = pageSize + 1;
+
+        Long totalCount = communityMapper.countCreatorCommunity(creatorId, projectId, photoOnly);
+
+        List<ReviewListDto.Review> communityRows = communityMapper.findCreatorCommunityWindow(creatorId, lastCreatedAt, lastId, limit, projectId, photoOnly);
+
+        final boolean hasNext = communityRows.size() == limit;
 
         if (communityRows.isEmpty()) {
             return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 리뷰 조회 성공",
-                    CursorPage.fromWindow(List.of(), size, ReviewListDto::getCreatedAt, ReviewListDto::getCmId)));
+                    CursorPage.empty()));
         }
 
-        List<Long> userIds = communityRows.stream()
-                .map(row -> ((Number) row.get("USERID")).longValue()).distinct().toList();
-        List<Long> projectIds = communityRows.stream()
-                .map(row -> ((Number) row.get("PROJECTID")).longValue()).distinct().toList();
-        List<Long> cmIds = communityRows.stream()
-                .map(row -> ((Number) row.get("CMID")).longValue()).toList();
+        final List<ReviewListDto.Review> slice = hasNext ? communityRows.subList(0, pageSize) : communityRows;
 
-        Map<Long, Map<String, Object>> userMap = userMapper.selectUsersByIds(userIds).stream()
-                .collect(Collectors.toMap(r -> ((Number) r.get("USERID")).longValue(), r -> r));
+        List<Long> userIds = slice.stream().map(ReviewListDto.Review::getUserId).distinct().toList();
+        List<Long> projectIds = slice.stream().map(ReviewListDto.Review::getProjectId).distinct().toList();
+        List<Long> cmIds = slice.stream().map(ReviewListDto.Review::getCmId).distinct().toList();
 
-        Map<Long, Map<String, Object>> projectMap = projectMapper.selectProjectsByIds(projectIds).stream()
-                .collect(Collectors.toMap(r -> ((Number) r.get("PROJECTID")).longValue(), r -> r));
+        Map<Number, ReviewListDto.UserInfo> userMap = userMapper.selectUsersByIds(userIds).stream()
+                .collect(Collectors.toMap(ReviewListDto.UserInfo::getUserId, r -> r));
+
+        Map<Long, ReviewListDto.ProjectInfo> projectMap = projectMapper.selectProjectsByIds(projectIds).stream()
+                .collect(Collectors.toMap(ReviewListDto.ProjectInfo::getProjectId, r -> r));
 
         Map<Long, List<String>> imagesByCmId = new HashMap<>();
         communityMapper.selectReviewImagesByCmIds(cmIds).forEach(r -> {
-            Long cmId = ((Number) r.get("CMID")).longValue();
-            String url = (String) r.get("URL");
+            Long cmId = r.getCmId();
+            String url = r.getUrl();
             imagesByCmId.computeIfAbsent(cmId, k -> new ArrayList<>()).add(url);
         });
 
         List<ReviewListDto> reviews = communityRows.stream().map(row -> {
-            Long cmId = ((Number) row.get("CMID")).longValue();
-            Long userId = ((Number) row.get("USERID")).longValue();
-            Long projectIdVal = ((Number) row.get("PROJECTID")).longValue();
+            Long cmId = (row.getCmId() != null) ? row.getCmId() : null;
+            Long userId = (row.getUserId() != null) ? row.getUserId() : null;
+            Long projectIdVal = (row.getProjectId() != null) ? row.getProjectId() : null;
 
-            Map<String, Object> user = userMap.get(userId);
-            Map<String, Object> project = projectMap.get(projectIdVal);
+            ReviewListDto.UserInfo user = userMap.get(userId);
+            ReviewListDto.ProjectInfo project = projectMap.get(projectIdVal);
 
             ReviewListDto.UserInfo userInfo = new ReviewListDto.UserInfo();
             if (user != null) {
-                userInfo.setNickname((String) user.get("NICKNAME"));
-                userInfo.setProfileImg((String) user.get("PROFILEIMG"));
+                userInfo.setUserId(userId);
+                userInfo.setNickname(user.getNickname());
+                userInfo.setProfileImg(user.getProfileImg());
             }
 
             ReviewListDto.ProjectInfo projectInfo = new ReviewListDto.ProjectInfo();
             if (project != null) {
                 projectInfo.setProjectId(projectIdVal);
-                projectInfo.setTitle((String) project.get("TITLE"));
-                projectInfo.setThumbnail((String) project.get("THUMBNAIL"));
+                projectInfo.setTitle(project.getTitle());
+                projectInfo.setThumbnail(project.getThumbnail());
             }
 
             return ReviewListDto.builder()
                     .cmId(cmId)
-                    .cmContent((String) row.get("CMCONTENT"))
-                    .createdAt((LocalDateTime) row.get("CREATEDAT"))
+                    .cmContent(row.getCmContent())
+                    .createdAt(row.getCreatedAt())
                     .user(userInfo)
                     .project(projectInfo)
                     .images(imagesByCmId.getOrDefault(cmId, List.of()))
                     .build();
         }).toList();
 
+        Cursor cursor = null;
+        if (hasNext && !reviews.isEmpty()) {
+            ReviewListDto last = reviews.getLast();
+            cursor = new Cursor(last.getCreatedAt(), last.getCmId());
+        }
 
-        CursorPage<ReviewListDto> page = CursorPage.fromWindow(
-                reviews, size, ReviewListDto::getCreatedAt, ReviewListDto::getCmId);
+        CursorPage<ReviewListDto> page = new CursorPage<>(reviews, cursor, hasNext, totalCount);
         return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 리뷰 조회 성공", page));
     }
 }

@@ -23,6 +23,7 @@ public class ReviewListDto {
     @Getter
     @Setter
     public static class UserInfo {
+        private Long userId;
         private String nickname;
         private String profileImg;
     }
@@ -33,5 +34,22 @@ public class ReviewListDto {
         private Long projectId;
         private String title;
         private String thumbnail;
+    }
+
+    @Getter
+    @Setter
+    public static class Review {
+        private Long cmId;
+        private Long userId;
+        private Long projectId;
+        private String cmContent;
+        private LocalDateTime createdAt;
+    }
+
+    @Getter
+    @Setter
+    public static class Image {
+        private Long cmId;
+        private String url;
     }
 }

@@ -10,7 +10,6 @@ import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Mapper
 public interface CommunityMapper {
@@ -33,17 +32,22 @@ public interface CommunityMapper {
     Community getCommunityById(@Param("cmId") Long cmId);
 
     List<Long> findCreatorCommunityIds(@Param("creatorId") Long creatorId, @Param("lastCreatedAt") LocalDateTime lastCreatedAt, @Param("lastId") Long lastId, @Param("limit") int limit,
-                                     @Param("projectId") Long projectId, @Param("photoOnly") Boolean photoOnly);
+                                       @Param("projectId") Long projectId, @Param("photoOnly") Boolean photoOnly);
 
-    List<Map<String, Object>> selectReviewImagesByCmIds(@Param("list") List<Long> cmIds);
+    List<ReviewListDto.Image> selectReviewImagesByCmIds(@Param("list") List<Long> cmIds);
 
-    List<Map<String, Object>> findCreatorCommunityWindow(
+    List<ReviewListDto.Review> findCreatorCommunityWindow(
             @Param("creatorId") Long creatorId,
-            @Param("lastCreatedAt") LocalDateTime lastCreatedAt, // nullable
-            @Param("lastId") Long lastId,                        // nullable
+            @Param("lastCreatedAt") LocalDateTime lastCreatedAt,
+            @Param("lastId") Long lastId,
             @Param("limit") int limit,
-            @Param("projectId") Long projectId,                  // nullable
-            @Param("photoOnly") Boolean photoOnly                // nullable
+            @Param("projectId") Long projectId,
+            @Param("photoOnly") Boolean photoOnly
     );
+
     CountsAgg countByProjectGrouped(@Param("projectId") Long projectId);
+
+    Long countCreatorCommunity(@Param("creatorId") Long creatorId,
+                               @Param("projectId") Long projectId,
+                               @Param("photoOnly") Boolean photoOnly);
 }

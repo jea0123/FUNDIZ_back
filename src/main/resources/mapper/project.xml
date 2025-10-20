@@ -467,7 +467,7 @@
         AND projectStatus = 'SUCCESS'
     </update>
 
-    <select id="selectProjectsByIds" parameterType="list" resultType="map">
+    <select id="selectProjectsByIds" parameterType="list" resultType="com.example.funding.dto.response.creator.ReviewListDto$ProjectInfo">
         SELECT
         p.projectId AS projectId,
         p.title AS title,

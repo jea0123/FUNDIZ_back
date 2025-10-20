@@ -105,7 +105,7 @@
         WHERE USERID = #{userId}
     </select>
 
-    <select id="selectUsersByIds" parameterType="list" resultType="map">
+    <select id="selectUsersByIds" parameterType="list" resultType="com.example.funding.dto.response.creator.ReviewListDto$UserInfo">
         SELECT
         u.userId AS userId,
         u.nickname AS nickname,

@@ -467,4 +467,15 @@
         AND projectStatus = 'SUCCESS'
     </update>
 
+    <select id="selectProjectsByIds" parameterType="list" resultType="com.example.funding.dto.response.creator.ReviewListDto$ProjectInfo">
+        SELECT
+        p.projectId AS projectId,
+        p.title AS title,
+        p.thumbnail AS thumbnail
+        FROM project p
+        WHERE p.projectId IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

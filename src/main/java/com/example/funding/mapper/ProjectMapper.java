@@ -3,6 +3,7 @@ package com.example.funding.mapper;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.request.project.SearchProjectDto;
 import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
+import com.example.funding.dto.response.creator.ReviewListDto;
 import com.example.funding.dto.response.project.FeaturedProjectDto;
 import com.example.funding.dto.response.project.RecentTop10ProjectDto;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
@@ -10,7 +11,6 @@ import com.example.funding.dto.row.ProjectRow;
 import com.example.funding.model.Project;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -75,4 +75,6 @@ public interface ProjectMapper {
     void decreaseProjectCurrAmount(@Param("projectId") Long projectId, @Param("amount")Long amount);
 
     void updateProjectStatusBelowGoal (Long projectId);
+
+    List<ReviewListDto.ProjectInfo> selectProjectsByIds(@Param("list") List<Long> projectIds);
 }

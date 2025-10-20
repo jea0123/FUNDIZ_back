@@ -58,7 +58,7 @@ public class Utils {
     public static class AnalyticsWindow {
         private LocalDate from;
         private LocalDate to;
-        private int months;
+        private Integer months;
         private String metric;
     }
 }

@@ -2,7 +2,6 @@ package com.example.funding.mapper;
 
 import com.example.funding.common.Pager;
 import com.example.funding.dto.request.creator.CreatorUpdateRequestDto;
-import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
 import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
 import com.example.funding.dto.response.creator.*;
 import com.example.funding.model.Creator;
@@ -55,4 +54,8 @@ public interface CreatorMapper {
     CreatorSummaryDto.CreatorRow getCreatorRowById(@Param("creatorId") Long creatorId);
 
     CreatorSummaryDto.Stats getCreatorStatsById(@Param("creatorId") Long creatorId);
+
+    List<CreatorProjectDto> findCreatorProjects(@Param("creatorId") Long creatorId, @Param("sort") String sort, @Param("pager") Pager pager);
+
+    CreatorBioDto getCreatorBio(@Param("creatorId") Long creatorId);
 }

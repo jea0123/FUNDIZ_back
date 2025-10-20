@@ -33,4 +33,7 @@ public class CreatorRegisterRequestDto {
     private String businessNumber;
     @Nullable
     private MultipartFile profileImg;
+    @Nullable
+    @Size(max = 500, message = "소개 글은 최대 500자 이하여야 합니다.")
+    private String bio;
 }

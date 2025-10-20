@@ -5,12 +5,14 @@ import lombok.experimental.UtilityClass;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
 @UtilityClass
-public class ValidationRules {
+public class ProjectValidationRules {
     // 기본 필드
     public static final int MIN_TITLE_LEN = 2;
     public static final int MAX_TITLE_LEN = 255;

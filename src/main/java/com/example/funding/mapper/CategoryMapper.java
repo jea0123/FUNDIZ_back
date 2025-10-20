@@ -1,5 +1,6 @@
 package com.example.funding.mapper;
 
+import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.dto.response.category.SubcategoryWithParentDto;
 import com.example.funding.model.Category;
 import com.example.funding.model.Subcategory;
@@ -15,4 +16,6 @@ public interface CategoryMapper {
     List<Subcategory> getAllSubcategories();
 
     SubcategoryWithParentDto getSubcategoryWithParent(@Param("subctgrId") Long subctgrId);
+
+    List<CategorySuccess> getCategorySuccessByCategory(@Param("ctgrId") Long ctgrId);
 }

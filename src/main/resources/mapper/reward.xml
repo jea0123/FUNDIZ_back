@@ -153,4 +153,32 @@
         where b.backingId = #{backingId}
     </select>
 
+    <update id ="decreaseRewardRemain" parameterType="map">
+        update reward
+        set remain = case
+                        when remain is not null and remain >= #{quantity}
+                        then remain - #{quantity}
+                        else remain
+                    end
+        where rewardId = #{rewardId}
+    </update>
+
+    <update id ="increaseRewardRemain" parameterType="map">
+        UPDATE reward
+        SET remain = NVL(remain, 0) + #{quantity}
+        WHERE rewardId = #{rewardId}
+    </update>
+
+    <select id ="findProjectIdByRewardId" parameterType="long" resultType = "long">
+        select projectId
+        from reward
+        where rewardId = #{rewardId}
+    </select>
+
+    <select id ="findRewardByBackingId" parameterType ="long" resultType="com.example.funding.model.BackingDetail">
+        select rewardId, quantity
+        from backingDetail
+        where backingId = #{backingId}
+    </select>
+
 </mapper>

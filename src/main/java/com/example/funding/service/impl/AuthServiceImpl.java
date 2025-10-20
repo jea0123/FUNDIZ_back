@@ -18,6 +18,7 @@ import com.example.funding.model.User;
 import com.example.funding.provider.JwtProvider;
 import com.example.funding.service.AuthService;
 import com.example.funding.validator.Loaders;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,6 @@ import org.springframework.validation.annotation.Validated;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class AuthServiceImpl implements AuthService {
     private final Loaders loaders;
     private final UserMapper userMapper;
@@ -63,8 +63,14 @@ public class AuthServiceImpl implements AuthService {
         User user = userMapper.findByEmail(dto.getEmail());
         String encodedPassword = passwordEncoder.encode(dto.getPassword());
 
+      //임시로그인 암호화
         if (user == null || passwordEncoder.matches(user.getPassword(), encodedPassword))
             throw new InvalidCredentialsException();
+
+//        //임시 로그인 암호화 해제
+//        if (user == null || !dto.getPassword().equals(user.getPassword())) {
+//            throw new InvalidCredentialsException();
+//        }
 
         String token = jwtProvider.createAccessToken(user.getUserId(), user.getEmail(), user.getRole().toString());
         userMapper.updateLastLogin(user.getUserId());

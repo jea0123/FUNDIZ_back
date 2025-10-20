@@ -6,6 +6,7 @@ import com.example.funding.model.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -24,8 +25,6 @@ public interface UserMapper {
 
     void upsertRecentView(@Param("userId") Long userId, @Param("projectId") Long projectId);
 
-    Long isExistRecentViewProject(@Param("userId") Long userId, @Param("projectId") Long projectId);
-
     List<RecentViewProject> getRecentViewProjects(@Param("userId") Long userId);
 
     void updateNickname(@Param("userId") Long userId, @Param("nickname") String nickname);
@@ -43,4 +42,6 @@ public interface UserMapper {
     int isProjectLiked(@Param("userId") Long userId, @Param("projectId") Long projectId);
 
     void dislikeProject(@Param("userId") Long userId, @Param("projectId") Long projectId);
+
+    LocalDateTime getLastLoginTime(@Param("userId") Long userId);
 }

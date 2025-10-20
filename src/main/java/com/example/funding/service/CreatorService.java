@@ -76,4 +76,5 @@ public interface CreatorService {
      */
     ResponseEntity<ResponseDto<Long>> getFollowerCnt(Long creatorId);
 
+    ResponseEntity<ResponseDto<CreatorSummaryDto>> getCreatorSummary(Long creatorId, Long userId);
 }

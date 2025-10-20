@@ -4,6 +4,7 @@ import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.common.Utils;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.PagerRequest;
 import com.example.funding.dto.request.admin.AdminProjectUpdateDto;
 import com.example.funding.dto.request.admin.RejectProjectDto;
 import com.example.funding.dto.request.admin.SearchAdminProjectDto;
@@ -28,7 +29,9 @@ import com.example.funding.exception.forbidden.AccessDeniedException;
 import com.example.funding.exception.notfound.*;
 import com.example.funding.model.User;
 import com.example.funding.service.AdminService;
+import com.example.funding.service.CategoryService;
 import com.example.funding.service.SettlementService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +54,7 @@ public class AdminController {
 
     private final AdminService adminService;
     private final SettlementService settlementService;
+    private final CategoryService categoryService;
 
     /**
      * 관리자 대시보드 분석 데이터 조회
@@ -83,7 +87,7 @@ public class AdminController {
      */
     @GetMapping("/category-success")
     public ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(@RequestParam Long ctgrId) {
-        return adminService.getCategorySuccessByCategory(ctgrId);
+        return categoryService.getCategorySuccessByCategory(ctgrId);
     }
 
     /**
@@ -122,20 +126,15 @@ public class AdminController {
     /**
      * <p>프로젝트 목록 조회</p>
      *
-     * @param dto      SearchProjectVerifyDto
-     * @param reqPager 요청 pager
+     * @param dto SearchProjectVerifyDto
+     * @param req 요청 pager
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-10-01
      */
     @GetMapping("/project")
-    public ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchAdminProjectDto dto, Pager reqPager) {
-        Pager pager = Pager.ofRequest(
-                reqPager != null ? reqPager.getPage() : 1,
-                reqPager != null ? reqPager.getSize() : 5,
-                reqPager != null ? reqPager.getPerGroup() : null
-        );
-
+    public ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchAdminProjectDto dto, @Valid PagerRequest req) {
+        Pager pager = Pager.ofRequest(req.getPage(), req.getSize(), req.getPerGroup());
         return adminService.getProjectList(dto, pager);
     }
 
@@ -149,8 +148,6 @@ public class AdminController {
      */
     @PostMapping("/project/{projectId}/cancel")
     public ResponseEntity<ResponseDto<String>> cancelProject(@PathVariable Long projectId) {
-        //TODO: 관리자 체크
-
         return adminService.cancelProject(projectId);
     }
 
@@ -165,10 +162,7 @@ public class AdminController {
      */
     @PostMapping("/project/{projectId}")
     public ResponseEntity<ResponseDto<String>> updateProject(@PathVariable Long projectId, @RequestBody AdminProjectUpdateDto dto) {
-        //TODO: 관리자 체크
-
         dto.setProjectId(projectId);
-
         return adminService.updateProject(dto);
     }
 
@@ -176,19 +170,14 @@ public class AdminController {
      * <p>프로젝트 심사 목록 조회</p>
      *
      * @param dto      SearchProjectVerifyDto
-     * @param reqPager 요청 pager
+     * @param req 요청 pager
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-09-18
      */
     @GetMapping("/verify")
-    public ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchAdminProjectDto dto, Pager reqPager) {
-        Pager pager = Pager.ofRequest(
-                reqPager != null ? reqPager.getPage() : 1,
-                reqPager != null ? reqPager.getSize() : 5,
-                reqPager != null ? reqPager.getPerGroup() : null
-        );
-
+    public ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchAdminProjectDto dto, @Valid PagerRequest req) {
+        Pager pager = Pager.ofRequest(req.getPage(), req.getSize(), req.getPerGroup());
         return adminService.getProjectVerifyList(dto, pager);
     }
 
@@ -215,8 +204,6 @@ public class AdminController {
      */
     @PostMapping("/verify/{projectId}/approve")
     public ResponseEntity<ResponseDto<String>> approveProject(@PathVariable Long projectId) {
-        //TODO: 관리자 체크
-
         return adminService.approveProject(projectId);
     }
 
@@ -231,39 +218,32 @@ public class AdminController {
      */
     @PostMapping("/verify/{projectId}/reject")
     public ResponseEntity<ResponseDto<String>> rejectProject(@PathVariable Long projectId, @RequestBody RejectProjectDto dto) {
-        //TODO: 관리자 체크
-
         return adminService.rejectProject(projectId, dto.getRejectedReason());
     }
 
     /**
      * <p>회원 관리 목록 조회</p>
      *
-     * @param reqPager Pager
+     * @param req Pager
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-10-06
      */
     @GetMapping("/user/list")
-    public ResponseEntity<ResponseDto<PageResult<User>>> userList(Pager reqPager) {
-        Pager pager = Pager.ofRequest(
-                reqPager != null ? reqPager.getPage() : 1,
-                reqPager != null ? reqPager.getSize() : 10,
-                reqPager != null ? reqPager.getPerGroup() : 5
-        );
-
+    public ResponseEntity<ResponseDto<PageResult<User>>> userList(@Valid PagerRequest req) {
+        Pager pager = Pager.ofRequest(req.getPage(), req.getSize(), req.getPerGroup());
         return adminService.userList(pager);
     }
 
     /**
      * <p>정산 목록 조회 (검색 + 페이징)</p>
      *
-     * @param q       검색어 (프로젝트명, 크리에이터명)
-     * @param status  정산 상태 (ALL, PENDING, COMPLETED)
-     * @param from    시작 날짜 (yyyy-MM-dd)
-     * @param to      종료 날짜 (yyyy-MM-dd)
-     * @param page    페이지 번호 (1부터 시작)
-     * @param size    페이지 크기
+     * @param q        검색어 (프로젝트명, 크리에이터명)
+     * @param status   정산 상태 (ALL, PENDING, COMPLETED)
+     * @param from     시작 날짜 (yyyy-MM-dd)
+     * @param to       종료 날짜 (yyyy-MM-dd)
+     * @param page     페이지 번호 (1부터 시작)
+     * @param size     페이지 크기
      * @param perGroup 페이지 그룹당 페이지 수
      * @return 정산 목록
      * @throws IllegalArgumentException 잘못된 요청 파라미터일 때
@@ -300,16 +280,16 @@ public class AdminController {
      *
      * @param dto 정산 요청 DTO
      * @return 정산 정보
-     * @throws ProjectNotFoundException   존재하지 않는 프로젝트일 때
-     * @throws AccessDeniedException      접근 권한이 없을 때
-     * @throws ProjectNotSuccessException 프로젝트가 성공 상태가 아닐 때
-     * @throws SettlementNotFoundException 정산 정보를 찾을 수 없을 때
+     * @throws ProjectNotFoundException                존재하지 않는 프로젝트일 때
+     * @throws AccessDeniedException                   접근 권한이 없을 때
+     * @throws ProjectNotSuccessException              프로젝트가 성공 상태가 아닐 때
+     * @throws SettlementNotFoundException             정산 정보를 찾을 수 없을 때
      * @throws SettlementStatusAlreadyChangedException 이미 변경된 상태일 때
      * @author 장민규
      * @since 2025-10-13
      */
     @PostMapping("/settlement")
-    public ResponseEntity<ResponseDto<String>> updateStatus(@RequestBody SettlementPaidRequestDto dto) {
+    public ResponseEntity<ResponseDto<String>> updateStatus(@Valid @RequestBody SettlementPaidRequestDto dto) {
         return settlementService.updateStatus(dto);
     }
 
@@ -329,14 +309,14 @@ public class AdminController {
     /**
      * <p>회원 정보 수정(관리자)</p>
      *
-     * @param userId 사용자 ID
+     * @param userId  사용자 ID
      * @param userDto UserAdminUpdateRequestDto
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author 이동혁
      * @since 2025-10-13
      */
     @PostMapping("/user/update/{userId}")
-    public ResponseEntity<ResponseDto<String>> updateNotice(@PathVariable Long userId, @RequestBody UserAdminUpdateRequestDto userDto){
+    public ResponseEntity<ResponseDto<String>> updateNotice(@PathVariable Long userId, @RequestBody UserAdminUpdateRequestDto userDto) {
         return adminService.updateUser(userId, userDto);
     }
 
@@ -349,23 +329,21 @@ public class AdminController {
      * @since 2025-09-24
      */
     @PostMapping("/notice/add")
-    public ResponseEntity<ResponseDto<String>> addNotice(@RequestBody NoticeAddRequestDto ntcDto){
-
+    public ResponseEntity<ResponseDto<String>> addNotice(@RequestBody NoticeAddRequestDto ntcDto) {
         return adminService.addNotice(ntcDto);
     }
-
 
     /**
      * <p>공지사항 수정</p>
      *
      * @param noticeId 공지사항 ID
-     * @param ntcDto NoticeUpdateRequestDto
+     * @param ntcDto   NoticeUpdateRequestDto
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-09-24
      */
     @PostMapping("/notice/update/{noticeId}")
-    public ResponseEntity<ResponseDto<String>> updateNotice(@PathVariable Long noticeId, @RequestBody NoticeUpdateRequestDto ntcDto){
+    public ResponseEntity<ResponseDto<String>> updateNotice(@PathVariable Long noticeId, @RequestBody NoticeUpdateRequestDto ntcDto) {
         return adminService.updateNotice(noticeId, ntcDto);
     }
 

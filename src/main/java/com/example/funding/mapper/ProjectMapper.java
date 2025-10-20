@@ -10,6 +10,7 @@ import com.example.funding.dto.row.ProjectRow;
 import com.example.funding.model.Project;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -66,4 +67,12 @@ public interface ProjectMapper {
     List<Map<String, Object>> getProjectToSuccess();
 
     List<Map<String, Object>> getProjectToFailed();
+
+    void increaseProjectCurrAmount(@Param("projectId") Long projectId, @Param("amount")Long amount);
+
+    void updateProjectStatusGoal(Long projectId);
+
+    void decreaseProjectCurrAmount(@Param("projectId") Long projectId, @Param("amount")Long amount);
+
+    void updateProjectStatusBelowGoal (Long projectId);
 }

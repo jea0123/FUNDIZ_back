@@ -3,10 +3,12 @@ package com.example.funding.controller;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.PagerRequest;
 import com.example.funding.dto.request.cs.RpAddRequestDto;
 import com.example.funding.model.Notice;
 import com.example.funding.model.Report;
 import com.example.funding.service.ReportService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,40 +23,29 @@ public class ReportController {
     /**
      * <p>신고 내역 목록 조회(관리자 기준)</p>
      *
-     * @param reqPager Pager
+     * @param req Pager
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-09-23
      */
     @GetMapping("/list")
-    public ResponseEntity<ResponseDto<PageResult<Report>>> reportList(Pager reqPager) {
-        Pager pager = Pager.ofRequest(
-                reqPager != null ? reqPager.getPage() : 1,
-                reqPager != null ? reqPager.getSize() : 10,
-                reqPager != null ? reqPager.getPerGroup() : 5
-        );
-
+    public ResponseEntity<ResponseDto<PageResult<Report>>> reportList(@Valid PagerRequest req) {
+        Pager pager = Pager.ofRequest(req.getPage(), req.getSize(), req.getPerGroup());
         return reportService.reportList(pager);
     }
-
 
     /**
      * <p>내 신고 내역 목록 조회(후원자 기준)</p>
      *
      * @param userId 사용자 ID
-     * @param reqPager Pager
+     * @param req Pager
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-09-23
      */
     @GetMapping("/mylist/{userId}")
-    public ResponseEntity<ResponseDto<PageResult<Report>>> reportList(@PathVariable Long userId, Pager reqPager) {
-        Pager pager = Pager.ofRequest(
-                reqPager != null ? reqPager.getPage() : 1,
-                reqPager != null ? reqPager.getSize() : 10,
-                reqPager != null ? reqPager.getPerGroup() : 5
-        );
-
+    public ResponseEntity<ResponseDto<PageResult<Report>>> reportList(@PathVariable Long userId, @Valid PagerRequest req) {
+        Pager pager = Pager.ofRequest(req.getPage(), req.getSize(), req.getPerGroup());
         return reportService.myReportList(userId, pager);
     }
 

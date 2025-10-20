@@ -2,6 +2,7 @@ package com.example.funding.mapper;
 
 import com.example.funding.dto.response.project.CommunityDto;
 import com.example.funding.dto.response.project.ReviewDto;
+import com.example.funding.dto.row.CountsAgg;
 import com.example.funding.model.Community;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -28,4 +29,6 @@ public interface CommunityMapper {
     int existsCommunityById(@Param("cmId") Long cmId);
 
     Community getCommunityById(@Param("cmId") Long cmId);
+
+    CountsAgg countByProjectGrouped(@Param("projectId") Long projectId);
 }

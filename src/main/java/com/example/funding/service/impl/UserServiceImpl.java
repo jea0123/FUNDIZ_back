@@ -25,6 +25,7 @@ import com.example.funding.model.Qna;
 import com.example.funding.model.User;
 import com.example.funding.service.UserService;
 import com.example.funding.validator.Loaders;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -41,7 +42,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class UserServiceImpl implements UserService {
 
     private final Loaders loaders;

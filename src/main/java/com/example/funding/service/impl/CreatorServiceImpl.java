@@ -15,7 +15,11 @@ import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
 import com.example.funding.dto.response.creator.*;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
 import com.example.funding.dto.response.shipping.CreatorShippingProjectList;
+import com.example.funding.enums.ProjectStatus;
+import com.example.funding.enums.ShippingStatus;
 import com.example.funding.exception.badrequest.AlreadyCreatorException;
+import com.example.funding.exception.badrequest.InvalidParamException;
+import com.example.funding.exception.badrequest.InvalidStatusException;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
@@ -23,7 +27,8 @@ import com.example.funding.service.CreatorService;
 import com.example.funding.service.RewardService;
 import com.example.funding.service.validator.ProjectInputValidator;
 import com.example.funding.service.validator.ProjectTransitionGuard;
-import com.example.funding.service.validator.ValidationRules;
+import com.example.funding.service.validator.ShippingValidator;
+import com.example.funding.service.validator.ProjectValidationRules;
 import com.example.funding.validator.Loaders;
 import com.example.funding.validator.PermissionChecker;
 import lombok.RequiredArgsConstructor;
@@ -32,20 +37,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+
+import static com.example.funding.validator.Preconditions.requireIn;
+import static com.example.funding.validator.Preconditions.requireInEnum;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class CreatorServiceImpl implements CreatorService {
     private final CreatorMapper creatorMapper;
     private final ProjectMapper projectMapper;
@@ -62,6 +65,7 @@ public class CreatorServiceImpl implements CreatorService {
     private final FileUploader fileUploader;
     private final Loaders loaders;
     private final PermissionChecker auth;
+    private final ShippingValidator shippingValidator;
 
     private static List<String> normalizeTags(List<String> tagList) {
         //불변 빈 리스트
@@ -70,7 +74,7 @@ public class CreatorServiceImpl implements CreatorService {
         List<String> out = new ArrayList<>(tagList.size());
         for (String tag : tagList) {
             if (tag == null) continue;
-            String display = ValidationRules.normTagDisplay(tag);
+            String display = ProjectValidationRules.normTagDisplay(tag);
             if (!display.isEmpty()) out.add(display);
         }
 
@@ -91,6 +95,13 @@ public class CreatorServiceImpl implements CreatorService {
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<CreatorProjectListDto>>> getProjectList(Long creatorId, SearchCreatorProjectDto dto, Pager pager) {
         loaders.creator(creatorId);
+        requireIn(dto.getRangeType(), List.of("7d", "30d", "90d"), InvalidParamException::new);
+//        requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new, "", "all", "ALL");
+        List<ProjectStatus> st = dto.getProjectStatuses();
+        if (st != null && st.stream().anyMatch(Objects::isNull)) {
+            throw new InvalidStatusException();
+        }
+
         dto.applyRangeType();
 
         int total = creatorMapper.countProject(creatorId, dto);
@@ -382,10 +393,10 @@ public class CreatorServiceImpl implements CreatorService {
     public ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(Long creatorId) {
         loaders.creator(creatorId);
 
-        long projectTotal = projectMapper.getProjectCnt(creatorId);
-        long totalAmount = settlementMapper.getTotalAmountCreatorId(creatorId);
-        long totalBackingCnt = backingMapper.getBackerCnt(creatorId);
-        long totalVerifyingCnt = projectMapper.getVerifyingCnt(creatorId);
+        Integer projectTotal = projectMapper.getProjectCnt(creatorId);
+        Long totalAmount = settlementMapper.getTotalAmountCreatorId(creatorId);
+        Long totalBackingCnt = backingMapper.getBackerCnt(creatorId);
+        Long totalVerifyingCnt = projectMapper.getVerifyingCnt(creatorId);
 
         CreatorDashboardDto dashboardPie = creatorMapper.creatorDashboardDto(creatorId);
         double totalProjectCnt = dashboardPie.getTotalProjectCnt();
@@ -538,18 +549,21 @@ public class CreatorServiceImpl implements CreatorService {
         loaders.user(userId);
         if (userMapper.getCreatorIdByUserId(userId) != null) throw new AlreadyCreatorException();
 
-        String profileImgPath = fileUploader.upload(dto.getProfileImg());
         Creator creator = Creator.builder()
                 .userId(userId)
                 .creatorName(dto.getCreatorName())
                 .creatorType(dto.getCreatorType().name())
                 .businessNum(dto.getBusinessNumber())
-                .profileImg(profileImgPath)
                 .email(dto.getEmail())
                 .phone(dto.getPhone())
                 .account(dto.getAccount())
                 .bank(dto.getBank())
                 .build();
+        if (dto.getProfileImg() != null && !dto.getProfileImg().isEmpty()) {
+            String profileImgPath = fileUploader.upload(dto.getProfileImg());
+            creator.setProfileImg(profileImgPath);
+        }
+
         creatorMapper.insertCreator(creator);
         return ResponseEntity.ok(ResponseDto.success(200, "창작자 등록 성공", dto.getCreatorName()));
     }
@@ -565,6 +579,7 @@ public class CreatorServiceImpl implements CreatorService {
      */
     @Override
     public ResponseEntity<ResponseDto<Creator>> item(Long creatorId) {
+        loaders.creator(creatorId);
         Creator item = creatorMapper.creatorInfo(creatorId);
         if (item == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "창작자 정보 조회 불가"));
@@ -576,14 +591,14 @@ public class CreatorServiceImpl implements CreatorService {
      * <p>크리에이터 정보 수정</p>
      *
      * @param creatorId 창작자 ID
-     * @param dto CreatorUpdateRequestDto
+     * @param dto       CreatorUpdateRequestDto
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-10-15
      */
     @Override
     public ResponseEntity<ResponseDto<String>> updateCreatorInfo(Long creatorId, CreatorUpdateRequestDto dto) {
-
+        loaders.creator(creatorId);
         int result = creatorMapper.updateCreatorInfo(dto);
         if (result == 0) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "창작자 정보 수정 실패"));
@@ -593,16 +608,28 @@ public class CreatorServiceImpl implements CreatorService {
 
     @Override
     public ResponseEntity<ResponseDto<String>> setShippingStatus(Long projectId, Long creatorId, ShippingStatusDto shippingStatusDto) {
+        if ("SHIPPED".equalsIgnoreCase(shippingStatusDto.getShippingStatus())) {
+            if (shippingStatusDto.getTrackingNum() == null || !shippingStatusDto.getTrackingNum().matches("^[0-9]{10,14}$")) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "배송 시작(SHIPPED) 상태로 변경할 때는 운송장 번호를 반드시 입력해야 합니다.");
+            }
+        }
+        // 기존 상태 가져오기
+        //Shipping current = shippingMapper.findByBackingId(shippingStatusDto.getBackingId());
+        //String currentStatus = current.getShippingStatus();
+        //검증
+        //shippingValidator.validateTransition(currentStatus, shippingStatusDto);
+
         loaders.creator(creatorId);
         Project project = loaders.project(projectId);
         auth.mustBeOwner(creatorId, project.getCreatorId());
+        requireInEnum(shippingStatusDto.getShippingStatus(), ShippingStatus.class, InvalidStatusException::new);
 
         int result = shippingMapper.updateShippingStatus(projectId, creatorId, shippingStatusDto);
         if (result == 0) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "배송상태변경실패"));
         }
 
-        return ResponseEntity.ok(ResponseDto.success(200, "배송지 변경 완료", "배송지 변경"));
+        return ResponseEntity.ok(ResponseDto.success(200, "배송상태 변경 완료", "배송상태 변경"));
     }
 
     /**
@@ -614,6 +641,24 @@ public class CreatorServiceImpl implements CreatorService {
         loaders.creator(creatorId);
         Long followerCnt = followMapper.getFollowerCnt(creatorId);
         return ResponseEntity.ok(ResponseDto.success(200, "팔로워 수 조회 성공", followerCnt));
+    }
 
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<CreatorSummaryDto>> getCreatorSummary(Long creatorId, Long userId) {
+        Creator existing = loaders.creator(creatorId);
+        CreatorSummaryDto summary = CreatorSummaryDto.builder()
+                .creator(creatorMapper.getCreatorRowById(creatorId))
+                .stats(creatorMapper.getCreatorStatsById(creatorId))
+                .followerCount(followMapper.getFollowerCnt(creatorId))
+                .lastLogin(userMapper.getLastLoginTime(existing.getUserId()))
+                .build();
+        if (userId != null) {
+            int isFollowing = followMapper.isFollowingCreator(userId, creatorId);
+            summary.setIsFollowed(isFollowing > 0);
+        } else {
+            summary.setIsFollowed(false);
+        }
+        return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 요약 정보 조회 성공", summary));
     }
 }

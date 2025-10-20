@@ -12,6 +12,7 @@ import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
 import com.example.funding.service.QnaService;
 import com.example.funding.validator.Loaders;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Validated
 public class QnaServiceImpl implements QnaService {
     private final Loaders loaders;
     private final QnaMapper qnaMapper;

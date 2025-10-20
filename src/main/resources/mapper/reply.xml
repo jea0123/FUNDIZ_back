@@ -24,15 +24,15 @@
             LEFT JOIN USERS u ON u.USERID = r.USERID
             WHERE r.CMID = #{cmId}
             AND r.CODE = 'CM'
-        <if test="lastCreatedAt != null">
-            <![CDATA[
-                AND (
-                    r.CREATEDAT < #{lastCreatedAt}
-                    OR (r.CREATEDAT = #{lastCreatedAt} AND r.REPLYID < #{lastId})
-                )
-            ]]>
-        </if>
-        ORDER BY r.CREATEDAT DESC, r.REPLYID DESC
+            <if test="lastCreatedAt != null">
+                <![CDATA[
+                    AND (
+                        r.CREATEDAT < #{lastCreatedAt}
+                        OR (r.CREATEDAT = #{lastCreatedAt} AND r.REPLYID < #{lastId})
+                    )
+                ]]>
+            </if>
+            ORDER BY r.CREATEDAT DESC, r.REPLYID DESC
         )
         WHERE ROWNUM <![CDATA[ <= ]]> #{size}
     </select>

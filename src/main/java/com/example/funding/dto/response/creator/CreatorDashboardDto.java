@@ -12,7 +12,7 @@ import java.util.List;
 public class CreatorDashboardDto {
     private Long creatorId;
 
-    private Long projectTotal;
+    private Integer projectTotal;
     private Long totalAmount;
     private Long totalBackingCnt;
     private Long totalVerifyingCnt;

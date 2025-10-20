@@ -45,10 +45,10 @@
 
     <sql id="projectListWhere">
         <where>
-            p.CREATORID = #{creatorId}
-            <if test="dto.projectStatuses != null and dto.projectStatuses.size() > 0">
-                p.PROJECTSTATUS IN
-                <foreach collection="dto.projectStatuses" item="st" open="(" separator="," close=")">
+            AND p.CREATORID = #{creatorId}
+            <if test="dto.projectStatus != null and dto.projectStatus.size() > 0">
+                AND p.PROJECTSTATUS IN
+                <foreach collection="dto.projectStatus" item="st" open="(" separator="," close=")">
                     #{st}
                 </foreach>
             </if>

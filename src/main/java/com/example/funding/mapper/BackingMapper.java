@@ -30,7 +30,7 @@ public interface BackingMapper {
 
     void updateBacking(BackingRequestUpdateDto updateDto);
 
-    long getBackerCnt(Long creatorId);
+    Long getBackerCnt(Long creatorId);
 
     List<BackingCreatorBackerList> getCBackerList(Long creatorId);
 

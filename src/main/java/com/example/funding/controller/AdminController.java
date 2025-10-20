@@ -11,6 +11,7 @@ import com.example.funding.dto.request.admin.SearchAdminProjectDto;
 import com.example.funding.dto.request.admin.UserAdminUpdateRequestDto;
 import com.example.funding.dto.request.cs.NoticeAddRequestDto;
 import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
+import com.example.funding.dto.request.cs.ReportUpdateRequestDto;
 import com.example.funding.dto.request.settlement.SettlementPaidRequestDto;
 import com.example.funding.dto.request.settlement.SettlementSearchCond;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
@@ -357,6 +358,20 @@ public class AdminController {
     @DeleteMapping("/notice/delete/{noticeId}")
     public ResponseEntity<ResponseDto<String>> deleteNotice(@PathVariable Long noticeId) {
         return adminService.deleteNotice(noticeId);
+    }
+
+    /**
+     * <p>신고내역 상태 수정</p>
+     *
+     * @param reportId 신고 ID
+     * @param dto ReportUpdateRequestDto
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-10-18
+     */
+    @PostMapping("/report/update/{reportId}")
+    public ResponseEntity<ResponseDto<String>> updateReportStatus(@PathVariable Long reportId, @RequestBody ReportUpdateRequestDto dto){
+        return adminService.updateReportStatus(reportId, dto);
     }
 
 }

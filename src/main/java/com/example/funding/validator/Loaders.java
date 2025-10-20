@@ -26,6 +26,7 @@ public class Loaders {
     private final NoticeMapper noticeMapper;
     private final NotificationMapper notificationMapper;
     private final QnaMapper qnaMapper;
+    private final ReportMapper reportMapper;
     private final AdminMapper adminMapper;
     private final SettlementMapper settlementMapper;
 
@@ -182,5 +183,15 @@ public class Loaders {
     public Settlement settlement(Long id) {
         requirePositive(id, InvalidParamException::new);
         return requireNonNullOrElseThrow(settlementMapper.getByProjectId(id), SettlementNotFoundException::new);
+    }
+
+    /**
+     * 신고내역 로더
+     * @param id 신고내역 아이디
+     * @return 관리자 객체
+     * @throws ReportNotFoundException 신고내역이 존재하지 않을 경우 발생
+     */
+    public Report report(Long id) {
+        return requireNonNullOrElseThrow(reportMapper.reportDetail(id), ReportNotFoundException::new);
     }
 }

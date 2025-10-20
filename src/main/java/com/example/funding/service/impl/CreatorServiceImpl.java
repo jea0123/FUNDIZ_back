@@ -678,11 +678,13 @@ public class CreatorServiceImpl implements CreatorService {
         return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 프로젝트 조회 성공", result));
     }
 
+    /**
+     * 크리에이터 리뷰 조회
+     */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CursorPage<ReviewListDto>>> getCreatorReviews(
-            Long creatorId, LocalDateTime lastCreatedAt, Long lastId, int size,
-            Long projectId, Boolean photoOnly) {
+    public ResponseEntity<ResponseDto<CursorPage<ReviewListDto>>> getCreatorReviews(Long creatorId, LocalDateTime lastCreatedAt, Long lastId, int size,
+                                                                                    Long projectId, Boolean photoOnly) {
         loaders.creator(creatorId);
 
         final int pageSize = Math.max(1, size);
@@ -758,5 +760,15 @@ public class CreatorServiceImpl implements CreatorService {
 
         CursorPage<ReviewListDto> page = new CursorPage<>(reviews, cursor, hasNext, totalCount);
         return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 리뷰 조회 성공", page));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<PageResult<CreatorFollowerDto>>> getCreatorFollowers(Long creatorId, Long loginUserId, Pager pager) {
+        loaders.creator(creatorId);
+        List<CreatorFollowerDto> followers = followMapper.getCreatorFollowers(creatorId, loginUserId, pager);
+        int total = followMapper.countCreatorFollowers(creatorId);
+        PageResult<CreatorFollowerDto> result = PageResult.of(followers, pager, total);
+        return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 팔로워 조회 성공", result));
     }
 }

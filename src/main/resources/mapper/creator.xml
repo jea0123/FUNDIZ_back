@@ -4,10 +4,10 @@
 
     <insert id="insertCreator" parameterType="creator">
         INSERT INTO CREATOR (
-        CREATORID, USERID, CREATORNAME, CREATORTYPE, FOLLOWERCNT, BUSINESSNUM, PROFILEIMG, EMAIL, PHONE, ACCOUNT, BANK
+        CREATORID, USERID, CREATORNAME, CREATORTYPE, FOLLOWERCNT, BUSINESSNUM, PROFILEIMG, EMAIL, PHONE, ACCOUNT, BANK, BIO
         ) VALUES (
         CREATOR_SEQ.NEXTVAL, #{userId}, #{creatorName}, #{creatorType}, 0, #{businessNum}, #{profileImg}, #{email},
-        #{phone}, #{account}, #{bank}
+        #{phone}, #{account}, #{bank}, #{bio}
         )
     </insert>
 
@@ -25,7 +25,8 @@
         BANK = #{bank},
         ACCOUNT = #{account},
         BUSINESSNUM = #{businessNum},
-        PROFILEIMG = #{profileImgUrl}
+        PROFILEIMG = #{profileImgUrl},
+        BIO = #{bio}
         WHERE CREATORID=#{creatorId}
     </update>
 

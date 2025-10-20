@@ -474,4 +474,9 @@ public class CreatorController {
     public ResponseEntity<ResponseDto<CreatorBioDto>> getCreatorBio(@NotNull @Positive @PathVariable Long creatorId) {
         return creatorService.getCreatorBio(creatorId);
     }
+
+    @GetMapping("/totalCounts/{creatorId}")
+    public ResponseEntity<ResponseDto<TotalCountsDto>> getTotalCounts(@NotNull @Positive @PathVariable Long creatorId) {
+        return creatorService.getTotalCounts(creatorId);
+    }
 }

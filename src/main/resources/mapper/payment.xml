@@ -74,5 +74,22 @@
         WHERE paymentId = #{paymentId}
     </update>
 
+    <insert id = "savePaymentInfo" parameterType="com.example.funding.model.PaymentInfo">
+        <selectKey keyProperty="userPaymentId" resultType="long" order="BEFORE">
+            SELECT PAYMENTINFO_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        insert Into paymentInfo(
+            userPaymentId,
+            userId,
+            cardCompany,
+            method
+        ) VALUES (
+        #{userPaymentId},
+        #{userId},
+        #{cardCompany},
+        #{method}
+        )
+    </insert>
+
 
 </mapper>

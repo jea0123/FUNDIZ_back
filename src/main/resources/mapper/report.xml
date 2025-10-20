@@ -46,4 +46,11 @@
         VALUES (report_seq.NEXTVAL, #{userId}, #{target}, #{reason}, SYSDATE, 'RECEIVED', #{reportType})
     </insert>
 
+    <update id="updateReportStatus" parameterType="com.example.funding.dto.request.cs.ReportUpdateRequestDto">
+        UPDATE report
+        SET REPORTSTATUS=#{reportStatus},
+        REASON = #{reason}
+        WHERE REPORTID=#{reportId}
+    </update>
+
 </mapper>

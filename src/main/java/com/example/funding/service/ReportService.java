@@ -15,4 +15,5 @@ public interface ReportService {
 
     ResponseEntity<ResponseDto<String>> addReport(Long userId, RpAddRequestDto rpDto);
 
+    ResponseEntity<ResponseDto<Report>> item(Long reportId);
 }

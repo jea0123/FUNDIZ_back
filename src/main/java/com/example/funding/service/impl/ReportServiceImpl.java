@@ -7,11 +7,13 @@ import com.example.funding.dto.request.cs.RpAddRequestDto;
 import com.example.funding.enums.NotificationType;
 import com.example.funding.handler.NotificationPublisher;
 import com.example.funding.mapper.ReportMapper;
+import com.example.funding.model.Notice;
 import com.example.funding.model.Report;
 import com.example.funding.service.ReportService;
 import com.example.funding.validator.Loaders;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -93,6 +95,23 @@ public class ReportServiceImpl implements ReportService {
         reportMapper.addReport(item);
         notificationPublisher.publish(userId, NotificationType.REPORT_RECEIVED, null, item.getReportId());
         return ResponseEntity.ok(ResponseDto.success(200, "신고 등록 성공", "데이터 출력확인"));
+    }
+
+    /**
+     * <p>신고내역 상세 페이지 조회</p>
+     *
+     * @param reportId 신고내역 ID
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author 이동혁
+     * @since 2025-10-19
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<Report>> item(Long reportId) {
+        Report item = loaders.report(reportId);
+
+        //공지사항 상세페이지 조회
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "신고내역 상세 조회 성공", item));
     }
 }
 

@@ -9,6 +9,7 @@ import com.example.funding.dto.request.admin.SearchAdminProjectDto;
 import com.example.funding.dto.request.admin.UserAdminUpdateRequestDto;
 import com.example.funding.dto.request.cs.NoticeAddRequestDto;
 import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
+import com.example.funding.dto.request.cs.ReportUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
@@ -19,10 +20,7 @@ import com.example.funding.exception.badrequest.ProjectApproveException;
 import com.example.funding.exception.badrequest.ProjectRejectException;
 import com.example.funding.exception.notfound.*;
 import com.example.funding.handler.NotificationPublisher;
-import com.example.funding.mapper.AdminMapper;
-import com.example.funding.mapper.NoticeMapper;
-import com.example.funding.mapper.RewardMapper;
-import com.example.funding.mapper.TagMapper;
+import com.example.funding.mapper.*;
 import com.example.funding.model.*;
 import com.example.funding.service.AdminService;
 import com.example.funding.service.validator.ProjectTransitionGuard;
@@ -51,6 +49,7 @@ public class AdminServiceImpl implements AdminService {
     private final TagMapper tagMapper;
     private final RewardMapper rewardMapper;
     private final NoticeMapper noticeMapper;
+    private final ReportMapper reportMapper;
 
     private final NotificationPublisher notificationPublisher;
     private final ProjectTransitionGuard transitionGuard;
@@ -394,6 +393,26 @@ public class AdminServiceImpl implements AdminService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "공지사항 삭제 실패"));
         }
         return ResponseEntity.ok(ResponseDto.success(200, "공지사항 삭제 완료", "공지사항 삭제"));
+    }
+
+    /**
+     * <p>신고 내역 상태 수정</p>
+     *
+     * @param reportId 신고 ID
+     * @param dto ReportUpdateRequestDto
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author 이동혁
+     * @since 2025-10-18
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> updateReportStatus(Long reportId, ReportUpdateRequestDto dto) {
+        dto.setReportId(reportId);
+
+        int result = reportMapper.updateReportStatus(dto);
+        if (result == 0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "신고 내역 상태 수정 실패"));
+        }
+        return ResponseEntity.ok(ResponseDto.success(200, "신고 내역 상태 수정 완료", "신고 내역 상태 수정 "));
     }
 
 }

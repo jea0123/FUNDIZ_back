@@ -33,7 +33,9 @@
 
             <!-- 프로젝트 -->
             p.projectId,
-            p.title
+            p.title,
+
+            b.backingId
 
         FROM project p
         JOIN creator c ON p.creatorId = c.creatorId
@@ -71,35 +73,33 @@
     </insert>
 
 
-    <update id ="updateShippingStatus" >
+    <update id="updateShippingStatus">
         UPDATE shipping s
-        SET
-            s.shippingStatus = #{shipping.shippingStatus}
+        <set>
+            s.shippingStatus = #{shipping.shippingStatus},
             s.trackingNum = #{shipping.trackingNum}
-        <choose>
-            <when test="shipping.shippingStatus == PENDING || shipping.shippingStatus == READY">
-                s.shippedAt = NULL,
-                s.deliveredAt = NULL,
-            </when>
-
-            <when test="shipping.shippingStatus == SHIPPED">
-                s.shippedAt = SYSDATE,
-            </when>
-
-            <when test="shipping.shippingStatus == DELIVERED">
-                s.deliveredAt = SYSDATE,
-            </when>
-        </choose>
-
+            <choose>
+                <when test="shipping.shippingStatus eq 'PENDING' or shipping.shippingStatus eq 'READY'">
+                    , s.shippedAt = NULL,
+                    s.deliveredAt = NULL
+                </when>
+                <when test="shipping.shippingStatus eq 'SHIPPED'">
+                    , s.shippedAt = SYSDATE
+                </when>
+                <when test="shipping.shippingStatus eq 'DELIVERED'">
+                    , s.deliveredAt = SYSDATE
+                </when>
+            </choose>
+        </set>
         WHERE s.backingId = #{shipping.backingId}
-        AND s.backingId = IN(
-            SELECT b.backingId
-            FROM backing b
-            JOIN backingDetail bd ON b.backingId = bd.backingId
-            JOIN rewardId r ON r.rewardId = bd.rewardId
-            JOIN project p ON p.projectId = r.projectId
-            WHERE p.projectId = #{projectId}
-            AND p.creatorId = #{creatorId}
+        AND s.backingId IN (
+        SELECT b.backingId
+        FROM backing b
+        JOIN backingDetail bd ON b.backingId = bd.backingId
+        JOIN reward r ON r.rewardId = bd.rewardId
+        JOIN project p ON p.projectId = r.projectId
+        WHERE p.projectId = #{projectId}
+        AND p.creatorId = #{creatorId}
         )
     </update>
 </mapper>

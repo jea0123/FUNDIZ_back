@@ -3,6 +3,7 @@ package com.example.funding.mapper;
 import com.example.funding.dto.response.creator.ReviewListDto;
 import com.example.funding.dto.response.project.CommunityDto;
 import com.example.funding.dto.response.project.ReviewDto;
+import com.example.funding.dto.row.CountsAgg;
 import com.example.funding.model.Community;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -44,4 +45,5 @@ public interface CommunityMapper {
             @Param("projectId") Long projectId,                  // nullable
             @Param("photoOnly") Boolean photoOnly                // nullable
     );
+    CountsAgg countByProjectGrouped(@Param("projectId") Long projectId);
 }

@@ -27,13 +27,19 @@
         )
         SELECT
         b.CMID AS cmId,
-        b.PROJECTID AS projectId,
         b.CMCONTENT AS cmContent,
         b.CREATEDAT AS createdAt,
         b.CODE AS code,
         b.RATING AS rating,
         u.NICKNAME AS nickname,
-        u.PROFILEIMG AS profileImg
+        u.PROFILEIMG AS profileImg,
+
+        <!-- 댓글 총합 -->
+        (
+        SELECT COUNT(*)
+        FROM REPLY r
+        WHERE r.CMID = b.CMID
+        ) AS replyCnt
         FROM base b
         LEFT JOIN USERS u ON u.USERID = b.USERID
         ORDER BY b.CREATEDAT DESC, b.CMID DESC
@@ -142,5 +148,20 @@
             #{id}
         </foreach>
         ORDER BY a.cmId, a.attachId
+    </select>
+
+    <select id="countByProjectGrouped" resultType="countsAgg">
+        SELECT
+            NVL((
+                SELECT SUM(CASE WHEN c.CODE = 'CM' THEN 1 ELSE 0 END)
+                FROM COMMUNITY c
+                WHERE c.PROJECTID = #{projectId}
+            ), 0) AS communityTotal,
+            NVL((
+                SELECT SUM(CASE WHEN c.CODE = 'RV' THEN 1 ELSE 0 END)
+                FROM COMMUNITY c
+                WHERE c.PROJECTID = #{projectId}
+            ), 0) AS reviewTotal
+        FROM dual
     </select>
 </mapper>

@@ -74,7 +74,8 @@ public final class Preconditions {
      * @param <E>     value와 allowed의 요소 타입
      */
     public static <E> void requireIn(E value, Collection<E> allowed, Supplier<? extends RuntimeException> ex) {
-        if (value == null || !allowed.contains(value)) throw ex.get();
+        if (value == null || allowed.isEmpty()) return;
+        if (!allowed.contains(value)) throw ex.get();
     }
 
     /**

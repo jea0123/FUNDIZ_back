@@ -2,7 +2,10 @@ package com.example.funding.service.impl;
 
 import com.example.funding.common.*;
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.request.creator.*;
+import com.example.funding.dto.request.creator.CreatorRegisterRequestDto;
+import com.example.funding.dto.request.creator.CreatorUpdateRequestDto;
+import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
+import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
 import com.example.funding.dto.request.shipping.ShippingStatusDto;
 import com.example.funding.dto.response.backing.BackingCreatorBackerList;
 import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
@@ -17,22 +20,20 @@ import com.example.funding.exception.badrequest.InvalidStatusException;
 import com.example.funding.mapper.*;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
-import com.example.funding.service.CommunityService;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.RewardService;
 import com.example.funding.service.validator.ProjectInputValidator;
 import com.example.funding.service.validator.ProjectTransitionGuard;
-import com.example.funding.service.validator.ValidationRules;
+import com.example.funding.service.validator.ProjectValidationRules;
+import com.example.funding.service.validator.ShippingValidator;
 import com.example.funding.validator.Loaders;
 import com.example.funding.validator.PermissionChecker;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
@@ -42,7 +43,6 @@ import java.util.stream.Collectors;
 
 import static com.example.funding.validator.Preconditions.requireIn;
 import static com.example.funding.validator.Preconditions.requireInEnum;
-import static java.awt.SystemColor.window;
 
 @Slf4j
 @Service
@@ -65,6 +65,7 @@ public class CreatorServiceImpl implements CreatorService {
     private final FileUploader fileUploader;
     private final Loaders loaders;
     private final PermissionChecker auth;
+    private final ShippingValidator shippingValidator;
 
     private static List<String> normalizeTags(List<String> tagList) {
         //불변 빈 리스트
@@ -73,7 +74,7 @@ public class CreatorServiceImpl implements CreatorService {
         List<String> out = new ArrayList<>(tagList.size());
         for (String tag : tagList) {
             if (tag == null) continue;
-            String display = ValidationRules.normTagDisplay(tag);
+            String display = ProjectValidationRules.normTagDisplay(tag);
             if (!display.isEmpty()) out.add(display);
         }
 
@@ -95,7 +96,12 @@ public class CreatorServiceImpl implements CreatorService {
     public ResponseEntity<ResponseDto<PageResult<CreatorProjectListDto>>> getProjectList(Long creatorId, SearchCreatorProjectDto dto, Pager pager) {
         loaders.creator(creatorId);
         requireIn(dto.getRangeType(), List.of("7d", "30d", "90d"), InvalidParamException::new);
-        requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new, "", "all", "ALL");
+//        requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new, "", "all", "ALL");
+        List<ProjectStatus> st = dto.getProjectStatuses();
+        if (st != null && st.stream().anyMatch(Objects::isNull)) {
+            throw new InvalidStatusException();
+        }
+
         dto.applyRangeType();
 
         int total = creatorMapper.countProject(creatorId, dto);
@@ -602,6 +608,17 @@ public class CreatorServiceImpl implements CreatorService {
 
     @Override
     public ResponseEntity<ResponseDto<String>> setShippingStatus(Long projectId, Long creatorId, ShippingStatusDto shippingStatusDto) {
+        if ("SHIPPED".equalsIgnoreCase(shippingStatusDto.getShippingStatus())) {
+            if (shippingStatusDto.getTrackingNum() == null || !shippingStatusDto.getTrackingNum().matches("^[0-9]{10,14}$")) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "배송 시작(SHIPPED) 상태로 변경할 때는 운송장 번호를 반드시 입력해야 합니다.");
+            }
+        }
+        // 기존 상태 가져오기
+        //Shipping current = shippingMapper.findByBackingId(shippingStatusDto.getBackingId());
+        //String currentStatus = current.getShippingStatus();
+        //검증
+        //shippingValidator.validateTransition(currentStatus, shippingStatusDto);
+
         loaders.creator(creatorId);
         Project project = loaders.project(projectId);
         auth.mustBeOwner(creatorId, project.getCreatorId());
@@ -612,7 +629,7 @@ public class CreatorServiceImpl implements CreatorService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "배송상태변경실패"));
         }
 
-        return ResponseEntity.ok(ResponseDto.success(200, "배송지 변경 완료", "배송지 변경"));
+        return ResponseEntity.ok(ResponseDto.success(200, "배송상태 변경 완료", "배송상태 변경"));
     }
 
     /**

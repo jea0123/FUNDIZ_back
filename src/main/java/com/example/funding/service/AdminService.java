@@ -8,6 +8,7 @@ import com.example.funding.dto.request.admin.SearchAdminProjectDto;
 import com.example.funding.dto.request.admin.UserAdminUpdateRequestDto;
 import com.example.funding.dto.request.cs.NoticeAddRequestDto;
 import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
+import com.example.funding.dto.request.cs.ReportUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
@@ -113,4 +114,6 @@ public interface AdminService {
     ResponseEntity<ResponseDto<String>> updateNotice(Long noticeId, NoticeUpdateRequestDto ntcDto);
 
     ResponseEntity<ResponseDto<String>> deleteNotice(Long noticeId);
+
+    ResponseEntity<ResponseDto<String>> updateReportStatus(Long reportId, ReportUpdateRequestDto dto);
 }

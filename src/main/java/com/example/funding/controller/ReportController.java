@@ -5,6 +5,7 @@ import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.PagerRequest;
 import com.example.funding.dto.request.cs.RpAddRequestDto;
+import com.example.funding.model.Notice;
 import com.example.funding.model.Report;
 import com.example.funding.service.ReportService;
 import jakarta.validation.Valid;
@@ -60,6 +61,19 @@ public class ReportController {
     @PostMapping("/{userId}/add")
     public ResponseEntity<ResponseDto<String>> addReport(@PathVariable Long userId, @RequestBody RpAddRequestDto rpDto){
         return reportService.addReport(userId, rpDto);
+    }
+
+    /**
+     * <p>신고내역 상세 페이지 조회</p>
+     *
+     * @param reportId 프로젝트 ID
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author 이동혁
+     * @since 2025-10-19
+     */
+    @GetMapping("/{reportId}")
+    public ResponseEntity<ResponseDto<Report>> item(@PathVariable Long reportId) {
+        return reportService.item(reportId);
     }
 
 }

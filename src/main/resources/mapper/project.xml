@@ -10,9 +10,9 @@
 
     <select id="findById" resultType="project">
         SELECT
-        projectId, creatorId, subctgrId, title, goalAmount, currAmount, startDate, endDate, content, contentBlocks,
-        thumbnail, businessDoc, TRUNC(createdAt), TRUNC(updatedat), projectStatus, backerCnt, likeCnt, viewCnt,
-        isVerified, requestedAt, rejectedReason
+            projectId, creatorId, subctgrId, title, goalAmount, currAmount, startDate, endDate, content, contentBlocks,
+            thumbnail, businessDoc, TRUNC(createdAt), TRUNC(updatedat), projectStatus, backerCnt, likeCnt, viewCnt,
+            isVerified, requestedAt, rejectedReason
         FROM PROJECT
         WHERE PROJECTID = #{projectId}
     </select>
@@ -37,6 +37,7 @@
         p.STARTDATE AS startDate,
         p.ENDDATE AS endDate,
         p.CONTENT AS content,
+        p.CONTENTBLOCKS AS contentBlocks,
         p.THUMBNAIL AS thumbnail,
         p.PROJECTSTATUS AS projectStatus,
         p.BACKERCNT AS backerCnt,
@@ -218,15 +219,15 @@
         <where>
             <if test="dto.keyword != null and dto.keyword != ''">
                 (
-                LOWER(p.TITLE) LIKE '%' || LOWER(#{dto.keyword}) || '%'
-                OR LOWER(p.CONTENT) LIKE '%' || LOWER(#{dto.keyword}) || '%'
-                OR LOWER(c.CREATORNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
-                OR EXISTS (
-                SELECT 1
-                FROM TAG t
-                WHERE t.PROJECTID = p.PROJECTID
-                AND LOWER(t.TAGNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
-                )
+                    LOWER(p.TITLE) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                    OR LOWER(p.CONTENT) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                    OR LOWER(c.CREATORNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                    OR EXISTS (
+                        SELECT 1
+                        FROM TAG t
+                        WHERE t.PROJECTID = p.PROJECTID
+                        AND LOWER(t.TAGNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                    )
                 )
             </if>
             <if test="dto.ctgrId != null">
@@ -244,51 +245,51 @@
     <select id="searchProjects" resultType="featuredProjectDto">
         SELECT *
         FROM (
-        SELECT T.*, ROWNUM rnum
-        FROM (
-        SELECT
-        p.PROJECTID AS projectId,
-        p.TITLE AS title,
-        c.CREATORNAME AS creatorName,
-        p.THUMBNAIL AS thumbnail,
-        p.ENDDATE AS endDate,
-        p.CURRAMOUNT AS currAmount,
+            SELECT T.*, ROWNUM rnum
+            FROM (
+                SELECT
+                    p.PROJECTID AS projectId,
+                    p.TITLE AS title,
+                    c.CREATORNAME AS creatorName,
+                    p.THUMBNAIL AS thumbnail,
+                    p.ENDDATE AS endDate,
+                    p.CURRAMOUNT AS currAmount,
 
-        /* 진행률(%) */
-        CASE WHEN NVL(p.GOALAMOUNT,0) > 0
-        THEN ROUND(NVL(p.CURRAMOUNT,0) / NULLIF(p.GOALAMOUNT,0) * 100)
-        ELSE 0
-        END AS percentNow,
+                    /* 진행률(%) */
+                    CASE WHEN NVL(p.GOALAMOUNT,0) > 0
+                    THEN ROUND(NVL(p.CURRAMOUNT,0) / NULLIF(p.GOALAMOUNT,0) * 100)
+                    ELSE 0
+                    END AS percentNow,
 
-        NVL(p.GOALAMOUNT,0) AS goalAmount
-        FROM PROJECT p
-        JOIN CREATOR c ON c.CREATORID = p.CREATORID
-        JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
-        JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
-        <include refid="searchFilterWhere"/>
+                    NVL(p.GOALAMOUNT,0) AS goalAmount
+                FROM PROJECT p
+                JOIN CREATOR c ON c.CREATORID = p.CREATORID
+                JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
+                JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
+                <include refid="searchFilterWhere"/>
 
-        <choose>
-            <when test="dto.sort == 'liked'">
-                ORDER BY p.LIKECNT DESC, P.PROJECTID DESC
-            </when>
-            <when test="dto.sort == 'recent'">
-                ORDER BY p.PROJECTID DESC
-            </when>
-            <when test="dto.sort == 'amount'">
-                ORDER BY p.CURRAMOUNT DESC, P.PROJECTID DESC
-            </when>
-            <when test="dto.sort == 'deadline'">
-                ORDER BY p.ENDDATE ASC, P.PROJECTID DESC
-            </when>
-            <when test="dto.sort == 'percent'">
-                ORDER BY percentNow DESC, P.PROJECTID DESC
-            </when>
-            <when test="dto.sort == 'view'">
-                ORDER BY p.VIEWCNT DESC, p.PROJECTID DESC
-            </when>
-        </choose>
-        ) T
-        WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
+                <choose>
+                    <when test="dto.sort == 'liked'">
+                        ORDER BY p.LIKECNT DESC, P.PROJECTID DESC
+                    </when>
+                    <when test="dto.sort == 'recent'">
+                        ORDER BY p.PROJECTID DESC
+                    </when>
+                    <when test="dto.sort == 'amount'">
+                        ORDER BY p.CURRAMOUNT DESC, P.PROJECTID DESC
+                    </when>
+                    <when test="dto.sort == 'deadline'">
+                        ORDER BY p.ENDDATE ASC, P.PROJECTID DESC
+                    </when>
+                    <when test="dto.sort == 'percent'">
+                        ORDER BY percentNow DESC, P.PROJECTID DESC
+                    </when>
+                    <when test="dto.sort == 'view'">
+                        ORDER BY p.VIEWCNT DESC, p.PROJECTID DESC
+                    </when>
+                </choose>
+            ) T
+            WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
         )
         WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
@@ -312,7 +313,7 @@
     <update id="updateProjectsToOpen">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'OPEN',
-        UPDATEDAT = SYSDATE
+            UPDATEDAT = SYSDATE
         WHERE PROJECTSTATUS = 'UPCOMING'
         AND STARTDATE <![CDATA[ <= ]]> TRUNC(SYSDATE)
     </update>
@@ -328,7 +329,7 @@
     <update id="updateProjectsToSuccess">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'SUCCESS',
-        UPDATEDAT = SYSDATE
+            UPDATEDAT = SYSDATE
         WHERE PROJECTSTATUS = 'OPEN'
         AND (ENDDATE + 1) <![CDATA[ < ]]> TRUNC(SYSDATE)
         AND CURRAMOUNT <![CDATA[ >= ]]> GOALAMOUNT
@@ -345,7 +346,7 @@
     <update id="updateProjectsToFailed">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'FAILED',
-        UPDATEDAT = SYSDATE
+            UPDATEDAT = SYSDATE
         WHERE PROJECTSTATUS = 'OPEN'
         AND (ENDDATE + 1) <![CDATA[ < ]]> TRUNC(SYSDATE)
         AND CURRAMOUNT <![CDATA[ < ]]> GOALAMOUNT
@@ -358,10 +359,8 @@
     </select>
 
     <select id="getVerifyingCnt" parameterType="long" resultType="long">
-        SELECT
-        count(*)
-        FROM
-        project
+        SELECT count(*)
+        FROM project
         WHERE CREATORID = #{creatorId}
         AND PROJECTSTATUS = 'VERIFYING'
     </select>
@@ -436,14 +435,14 @@
         WHERE projectId = #{projectId}
     </update>
 
-    <update id="decreaseProjectCurrAmount" parameterType="map">
-        update project
-        set currAmount = case
-        when currAmount >= #{amount} then NVL currAmount - #{amount}
+    <update id="decreaseProjectCurrAmount">
+        UPDATE project
+        SET currAmount = CASE
+        WHEN currAmount >= #{amount} THEN NVL(currAmount, 0) - #{amount}
         ELSE 0
         END,
-        backerCnt = case
-        when backerCnt > 0 THEN backerCnt - 1
+        backerCnt = CASE
+        WHEN backerCnt > 0 THEN backerCnt - 1
         ELSE 0
         END
         WHERE projectId = #{projectId}

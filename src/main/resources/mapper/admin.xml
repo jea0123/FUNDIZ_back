@@ -121,8 +121,11 @@
 
     <sql id="projectListWhere">
         <where>
-            <if test="dto.projectStatus != null and dto.projectStatus != ''">
-                p.PROJECTSTATUS = #{dto.projectStatus}
+            <if test="dto.projectStatuses != null and dto.projectStatuses.size() > 0">
+                p.PROJECTSTATUS IN
+                <foreach collection="dto.projectStatuses" item="st" open="(" separator="," close=")">
+                    #{st}
+                </foreach>
             </if>
             <if test="dto.fromDate != null">
                 AND p.UPDATEDAT <![CDATA[ >= ]]> #{dto.fromDate}
@@ -136,9 +139,6 @@
     <select id="countProject" resultType="Integer">
         SELECT COUNT(*)
         FROM PROJECT p
-        JOIN CREATOR c ON c.CREATORID = p.CREATORID
-        JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
-        JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
         <include refid="projectListWhere" />
     </select>
 
@@ -148,18 +148,21 @@
             SELECT T.*, ROWNUM rnum
             FROM (
                 SELECT
-                    p.PROJECTID AS projectId,
-                    p.TITLE AS title,
-                    c.CREATORNAME AS creatorName,
-                    p.PROJECTSTATUS AS projectStatus,
-                    p.STARTDATE AS startDate,
-                    p.ENDDATE AS endDate,
-                    p.GOALAMOUNT AS goalAmount,
-                    p.CURRAMOUNT AS currAmount,
-                    p.BACKERCNT AS backerCnt,
-                    p.UPDATEDAT AS updatedAt,
-                    cg.CTGRNAME AS ctgrName,
-                    sc.SUBCTGRNAME AS subctgrName
+                    p.PROJECTID,
+                    p.TITLE,
+                    p.GOALAMOUNT,
+                    p.CURRAMOUNT,
+                    p.STARTDATE,
+                    p.ENDDATE,
+                    p.CREATEDAT,
+                    p.UPDATEDAT,
+                    p.PROJECTSTATUS,
+                    p.BACKERCNT,
+                    p.LIKECNT,
+                    p.VIEWCNT,
+                    sc.SUBCTGRNAME,
+                    cg.CTGRNAME,
+                    c.CREATORNAME
                 FROM PROJECT p
                 JOIN CREATOR c ON c.CREATORID = p.CREATORID
                 JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
@@ -192,8 +195,12 @@
     
     <sql id="verifyFilterWhere">
         <where>
-            p.PROJECTSTATUS = 'VERIFYING'
-            AND p.ISVERIFIED = 'Y'
+            <if test="dto.projectStatuses != null and dto.projectStatuses.size() > 0">
+                p.PROJECTSTATUS IN
+                <foreach collection="dto.projectStatuses" item="st" open="(" separator="," close=")">
+                    #{st}
+                </foreach>
+            </if>
             <if test="dto.fromDate != null">
                 AND p.REQUESTEDAT <![CDATA[ >= ]]> #{dto.fromDate}
             </if>
@@ -206,9 +213,6 @@
     <select id="countProjectVerify" resultType="Integer">
         SELECT COUNT(*)
         FROM PROJECT p
-        JOIN CREATOR c ON c.CREATORID = p.CREATORID
-        JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
-        JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
         <include refid="verifyFilterWhere" />
     </select>
 
@@ -235,7 +239,7 @@
                 JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
                 JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
                 <include refid="verifyFilterWhere" />
-                ORDER BY p.REQUESTEDAT
+                ORDER BY p.REQUESTEDAT DESC, p.PROJECTID DESC
                 ) T
             WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
             )
@@ -243,7 +247,24 @@
     </select>
 
     <select id="getProjectVerifyDetail" resultType="projectVerifyDetailDto">
-        SELECT *
+        SELECT
+            p.PROJECTID,
+            p.TITLE,
+            p.GOALAMOUNT,
+            p.STARTDATE,
+            p.ENDDATE,
+            p.CONTENT,
+            p.CONTENTBLOCKS,
+            p.THUMBNAIL,
+            p.BUSINESSDOC,
+            p.PROJECTSTATUS,
+            p.REQUESTEDAT,
+            sc.SUBCTGRNAME,
+            cg.CTGRNAME,
+            c.CREATORNAME,
+            c.BUSINESSNUM,
+            c.EMAIL,
+            c.PHONE
         FROM PROJECT p
         JOIN CREATOR c ON c.CREATORID = p.CREATORID
         JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
@@ -254,7 +275,6 @@
     <update id="approveProject">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'UPCOMING',
-            ISVERIFIED = 'N'
         WHERE PROJECTID = #{projectId}
           AND PROJECTSTATUS = 'VERIFYING'
           AND ISVERIFIED = 'Y'
@@ -271,7 +291,6 @@
     <update id="rejectProject">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'REJECTED',
-            ISVERIFIED = 'N',
             REJECTEDREASON = #{rejectedReason}
         WHERE PROJECTID = #{projectId}
           AND PROJECTSTATUS = 'VERIFYING'

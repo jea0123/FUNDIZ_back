@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
-import static com.example.funding.service.validator.ValidationRules.*;
+import static com.example.funding.service.validator.ProjectValidationRules.*;
 
 @Component
 @RequiredArgsConstructor

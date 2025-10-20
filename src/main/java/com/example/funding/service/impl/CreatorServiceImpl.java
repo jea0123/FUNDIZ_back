@@ -786,4 +786,19 @@ public class CreatorServiceImpl implements CreatorService {
         CreatorBioDto bio = creatorMapper.getCreatorBio(creatorId);
         return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 소개 조회 성공", bio));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<TotalCountsDto>> getTotalCounts(Long creatorId) {
+        loaders.creator(creatorId);
+        Integer totalProjects = projectMapper.getProjectCnt(creatorId);
+        Integer totalFollowers = followMapper.countCreatorFollowers(creatorId);
+        Long totalReviews = communityMapper.countCreatorCommunity(creatorId, null, null);
+        TotalCountsDto dto = TotalCountsDto.builder()
+                .totalProjects(totalProjects)
+                .totalFollowers(totalFollowers)
+                .totalReviews(totalReviews)
+                .build();
+        return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 총 개수 조회 성공", dto));
+    }
 }

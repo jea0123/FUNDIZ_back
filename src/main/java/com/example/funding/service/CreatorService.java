@@ -161,4 +161,8 @@ public interface CreatorService {
     ResponseEntity<ResponseDto<CreatorBioDto>> getCreatorBio(@NotNull(message = "크리에이터 ID는 필수입니다.")
                                                              @Positive(message = "크리에이터 ID는 양수여야 합니다.")
                                                              Long creatorId);
+
+    ResponseEntity<ResponseDto<TotalCountsDto>> getTotalCounts(@NotNull(message = "크리에이터 ID는 필수입니다.")
+                                                                @Positive(message = "크리에이터 ID는 양수여야 합니다.")
+                                                                Long creatorId);
 }

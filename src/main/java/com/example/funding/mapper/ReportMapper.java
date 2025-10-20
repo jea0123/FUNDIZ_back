@@ -2,6 +2,7 @@ package com.example.funding.mapper;
 
 
 import com.example.funding.common.Pager;
+import com.example.funding.dto.request.cs.ReportUpdateRequestDto;
 import com.example.funding.model.Report;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -19,4 +20,8 @@ public interface ReportMapper {
     int myReportTotal(Long userId);
 
     Long addReport(Report item);
+
+    int updateReportStatus(ReportUpdateRequestDto dto);
+
+    Report reportDetail(@Param("reportId") Long reportId);
 }

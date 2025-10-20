@@ -558,6 +558,7 @@ public class CreatorServiceImpl implements CreatorService {
                 .phone(dto.getPhone())
                 .account(dto.getAccount())
                 .bank(dto.getBank())
+                .bio(dto.getBio())
                 .build();
         if (dto.getProfileImg() != null && !dto.getProfileImg().isEmpty()) {
             String profileImgPath = fileUploader.upload(dto.getProfileImg());
@@ -762,6 +763,9 @@ public class CreatorServiceImpl implements CreatorService {
         return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 리뷰 조회 성공", page));
     }
 
+    /**
+     * 크리에이터 팔로워 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<CreatorFollowerDto>>> getCreatorFollowers(Long creatorId, Long loginUserId, Pager pager) {
@@ -770,5 +774,31 @@ public class CreatorServiceImpl implements CreatorService {
         int total = followMapper.countCreatorFollowers(creatorId);
         PageResult<CreatorFollowerDto> result = PageResult.of(followers, pager, total);
         return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 팔로워 조회 성공", result));
+    }
+
+    /**
+     * 크리에이터 소개 조회
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<CreatorBioDto>> getCreatorBio(Long creatorId) {
+        loaders.creator(creatorId);
+        CreatorBioDto bio = creatorMapper.getCreatorBio(creatorId);
+        return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 소개 조회 성공", bio));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<TotalCountsDto>> getTotalCounts(Long creatorId) {
+        loaders.creator(creatorId);
+        Integer totalProjects = projectMapper.getProjectCnt(creatorId);
+        Integer totalFollowers = followMapper.countCreatorFollowers(creatorId);
+        Long totalReviews = communityMapper.countCreatorCommunity(creatorId, null, null);
+        TotalCountsDto dto = TotalCountsDto.builder()
+                .totalProjects(totalProjects)
+                .totalFollowers(totalFollowers)
+                .totalReviews(totalReviews)
+                .build();
+        return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 총 개수 조회 성공", dto));
     }
 }

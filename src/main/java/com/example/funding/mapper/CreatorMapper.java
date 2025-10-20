@@ -56,4 +56,6 @@ public interface CreatorMapper {
     CreatorSummaryDto.Stats getCreatorStatsById(@Param("creatorId") Long creatorId);
 
     List<CreatorProjectDto> findCreatorProjects(@Param("creatorId") Long creatorId, @Param("sort") String sort, @Param("pager") Pager pager);
+
+    CreatorBioDto getCreatorBio(@Param("creatorId") Long creatorId);
 }

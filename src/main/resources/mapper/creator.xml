@@ -4,9 +4,10 @@
 
     <insert id="insertCreator" parameterType="creator">
         INSERT INTO CREATOR (
-            CREATORID, USERID, CREATORNAME, CREATORTYPE, FOLLOWERCNT, BUSINESSNUM, PROFILEIMG, EMAIL, PHONE, ACCOUNT, BANK
+        CREATORID, USERID, CREATORNAME, CREATORTYPE, FOLLOWERCNT, BUSINESSNUM, PROFILEIMG, EMAIL, PHONE, ACCOUNT, BANK, BIO
         ) VALUES (
-            CREATOR_SEQ.NEXTVAL, #{userId}, #{creatorName}, #{creatorType}, 0, #{businessNum}, #{profileImg}, #{email}, #{phone}, #{account}, #{bank}
+        CREATOR_SEQ.NEXTVAL, #{userId}, #{creatorName}, #{creatorType}, 0, #{businessNum}, #{profileImg}, #{email},
+        #{phone}, #{account}, #{bank}, #{bio}
         )
     </insert>
 
@@ -24,7 +25,8 @@
         BANK = #{bank},
         ACCOUNT = #{account},
         BUSINESSNUM = #{businessNum},
-        PROFILEIMG = #{profileImgUrl}
+        PROFILEIMG = #{profileImgUrl},
+        BIO = #{bio}
         WHERE CREATORID=#{creatorId}
     </update>
 
@@ -64,118 +66,118 @@
     <select id="countProject" resultType="Integer">
         SELECT COUNT(*)
         FROM PROJECT p
-        <include refid="projectListWhere" />
+        <include refid="projectListWhere"/>
     </select>
 
     <select id="getProjectList" resultType="creatorProjectListDto">
         SELECT *
         FROM (
-            SELECT T.*, ROWNUM rnum
-            FROM (
-                SELECT
-                    p.PROJECTID,
-                    p.TITLE,
-                    p.GOALAMOUNT,
-                    p.CURRAMOUNT,
-                    p.STARTDATE,
-                    p.ENDDATE,
-                    p.CREATEDAT,
-                    p.UPDATEDAT,
-                    p.PROJECTSTATUS,
-                    p.BACKERCNT,
-                    p.LIKECNT,
-                    p.VIEWCNT,
+        SELECT T.*, ROWNUM rnum
+        FROM (
+        SELECT
+        p.PROJECTID,
+        p.TITLE,
+        p.GOALAMOUNT,
+        p.CURRAMOUNT,
+        p.STARTDATE,
+        p.ENDDATE,
+        p.CREATEDAT,
+        p.UPDATEDAT,
+        p.PROJECTSTATUS,
+        p.BACKERCNT,
+        p.LIKECNT,
+        p.VIEWCNT,
 
-                    <!-- 심사요청일 -->
-                    CASE
-                        WHEN p.PROJECTSTATUS = 'VERIFYING' THEN p.REQUESTEDAT
-                        ELSE NULL
-                    END AS requestedAt,
+        <!-- 심사요청일 -->
+        CASE
+        WHEN p.PROJECTSTATUS = 'VERIFYING' THEN p.REQUESTEDAT
+        ELSE NULL
+        END AS requestedAt,
 
-                    <!-- 반려사유 -->
-                    CASE
-                        WHEN p.PROJECTSTATUS = 'REJECTED' THEN p.REJECTEDREASON
-                        ELSE NULL
-                    END AS rejectedReason,
+        <!-- 반려사유 -->
+        CASE
+        WHEN p.PROJECTSTATUS = 'REJECTED' THEN p.REJECTEDREASON
+        ELSE NULL
+        END AS rejectedReason,
 
-                    sc.SUBCTGRNAME,
-                    cg.CTGRNAME,
+        sc.SUBCTGRNAME,
+        cg.CTGRNAME,
 
-                    <!-- 새소식 집계: 개수, 최근 작성일 -->
-                    NVL(n.newsCount, 0) AS newsCount,
-                    n.lastNewsAt,
+        <!-- 새소식 집계: 개수, 최근 작성일 -->
+        NVL(n.newsCount, 0) AS newsCount,
+        n.lastNewsAt,
 
-                    <!-- 후기 집계: 총 후기 수, 미답글 수, 최근 작성일 -->
-                    NVL(rv.reviewNewCount, 0) AS reviewNewCount,
-                    NVL(rv.reviewPendingCount, 0) AS reviewPendingCount,
-                    rv.lastReviewAt
+        <!-- 후기 집계: 총 후기 수, 미답글 수, 최근 작성일 -->
+        NVL(rv.reviewNewCount, 0) AS reviewNewCount,
+        NVL(rv.reviewPendingCount, 0) AS reviewPendingCount,
+        rv.lastReviewAt
 
-                FROM PROJECT p
-                JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
-                JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
+        FROM PROJECT p
+        JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
+        JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
 
-                <!-- 새소식 집계 -->
-                LEFT JOIN (
-                    SELECT
-                        PROJECTID,
-                        COUNT(*) AS newsCount,
-                        MAX(TRUNC(CREATEDAT)) AS lastNewsAt
-                    FROM NEWS
-                    GROUP BY PROJECTID
-                ) n ON n.PROJECTID = p.PROJECTID
+        <!-- 새소식 집계 -->
+        LEFT JOIN (
+        SELECT
+        PROJECTID,
+        COUNT(*) AS newsCount,
+        MAX(TRUNC(CREATEDAT)) AS lastNewsAt
+        FROM NEWS
+        GROUP BY PROJECTID
+        ) n ON n.PROJECTID = p.PROJECTID
 
-                <!-- 후기 집계: COMMUNITY(code='RV') + REPLY(code='RV') -->
-                LEFT JOIN (
-                    SELECT
-                        r.PROJECTID,
-                        COUNT(*) AS reviewNewCount,
+        <!-- 후기 집계: COMMUNITY(code='RV') + REPLY(code='RV') -->
+        LEFT JOIN (
+        SELECT
+        r.PROJECTID,
+        COUNT(*) AS reviewNewCount,
 
-                        <!-- reply가 전혀 없는 후기만 1로 집계 -->
-                        SUM(CASE WHEN rp.CMID IS NULL THEN 1 ELSE 0 END) AS reviewPendingCount,
+        <!-- reply가 전혀 없는 후기만 1로 집계 -->
+        SUM(CASE WHEN rp.CMID IS NULL THEN 1 ELSE 0 END) AS reviewPendingCount,
 
-                        MAX(TRUNC(r.CREATEDAT)) AS lastReviewAt
-                    FROM COMMUNITY r
+        MAX(TRUNC(r.CREATEDAT)) AS lastReviewAt
+        FROM COMMUNITY r
 
-                    <!-- 후기 글만 -->
-                    LEFT JOIN (
-                        SELECT CMID
-                        FROM REPLY
-                        WHERE CODE = 'RV'
-                        GROUP BY CMID
-                    ) rp ON rp.CMID = r.CMID
-                    WHERE r.CODE = 'RV'
-                    GROUP BY r.PROJECTID
-                ) rv ON rv.PROJECTID = p.PROJECTID
-                <include refid="projectListWhere" />
-                ORDER BY p.UPDATEDAT DESC
-            ) T
-            WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
+        <!-- 후기 글만 -->
+        LEFT JOIN (
+        SELECT CMID
+        FROM REPLY
+        WHERE CODE = 'RV'
+        GROUP BY CMID
+        ) rp ON rp.CMID = r.CMID
+        WHERE r.CODE = 'RV'
+        GROUP BY r.PROJECTID
+        ) rv ON rv.PROJECTID = p.PROJECTID
+        <include refid="projectListWhere"/>
+        ORDER BY p.UPDATEDAT DESC
+        ) T
+        WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
         )
         WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
 
     <select id="getProjectDetail" resultType="creatorProjectDetailDto">
         SELECT
-            p.PROJECTID,
-            p.CREATORID,
-            p.TITLE,
-            p.GOALAMOUNT,
-            p.CURRAMOUNT,
-            p.STARTDATE,
-            p.ENDDATE,
-            p.CREATEDAT,
-            p.UPDATEDAT,
-            p.PROJECTSTATUS,
-            p.CONTENT,
-            p.CONTENTBLOCKS,
-            p.THUMBNAIL,
-            p.BUSINESSDOC,
-            sc.SUBCTGRNAME,
-            cg.CTGRNAME,
-            c.CREATORNAME,
-            c.BUSINESSNUM,
-            c.EMAIL,
-            c.PHONE
+        p.PROJECTID,
+        p.CREATORID,
+        p.TITLE,
+        p.GOALAMOUNT,
+        p.CURRAMOUNT,
+        p.STARTDATE,
+        p.ENDDATE,
+        p.CREATEDAT,
+        p.UPDATEDAT,
+        p.PROJECTSTATUS,
+        p.CONTENT,
+        p.CONTENTBLOCKS,
+        p.THUMBNAIL,
+        p.BUSINESSDOC,
+        sc.SUBCTGRNAME,
+        cg.CTGRNAME,
+        c.CREATORNAME,
+        c.BUSINESSNUM,
+        c.EMAIL,
+        c.PHONE
         FROM PROJECT p
         JOIN CREATOR c ON c.CREATORID = p.CREATORID
         JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
@@ -190,28 +192,28 @@
         </selectKey>
 
         INSERT INTO PROJECT (
-            PROJECTID, CREATORID, SUBCTGRID, TITLE, GOALAMOUNT, STARTDATE, ENDDATE,
-            CONTENT, CONTENTBLOCKS, THUMBNAIL, BUSINESSDOC
+        PROJECTID, CREATORID, SUBCTGRID, TITLE, GOALAMOUNT, STARTDATE, ENDDATE,
+        CONTENT, CONTENTBLOCKS, THUMBNAIL, BUSINESSDOC
         ) VALUES (
-            #{projectId}, #{creatorId}, #{subctgrId}, #{title}, #{goalAmount}, #{startDate}, #{endDate},
-            #{content}, #{contentBlocks}, #{thumbnail}, #{businessDoc}
+        #{projectId}, #{creatorId}, #{subctgrId}, #{title}, #{goalAmount}, #{startDate}, #{endDate},
+        #{content}, #{contentBlocks}, #{thumbnail}, #{businessDoc}
         )
     </insert>
 
     <update id="updateProject">
         UPDATE PROJECT
         <set>
-            <if test="subctgrId != null"> SUBCTGRID = #{subctgrId}, </if>
-            <if test="title != null"> TITLE = #{title}, </if>
-            <if test="goalAmount != null"> GOALAMOUNT = #{goalAmount}, </if>
-            <if test="startDate != null"> STARTDATE = #{startDate}, </if>
-            <if test="endDate != null"> ENDDATE = #{endDate}, </if>
-            <if test="content != null"> CONTENT = #{content}, </if>
+            <if test="subctgrId != null">SUBCTGRID = #{subctgrId},</if>
+            <if test="title != null">TITLE = #{title},</if>
+            <if test="goalAmount != null">GOALAMOUNT = #{goalAmount},</if>
+            <if test="startDate != null">STARTDATE = #{startDate},</if>
+            <if test="endDate != null">ENDDATE = #{endDate},</if>
+            <if test="content != null">CONTENT = #{content},</if>
             <if test="contentBlocks != null and contentBlocks != ''">
                 CONTENTBLOCKS = #{contentBlocks},
             </if>
-            <if test="thumbnail != null"> THUMBNAIL = #{thumbnail}, </if>
-            <if test="businessDoc != null"> BUSINESSDOC = #{businessDoc}, </if>
+            <if test="thumbnail != null">THUMBNAIL = #{thumbnail},</if>
+            <if test="businessDoc != null">BUSINESSDOC = #{businessDoc},</if>
             UPDATEDAT = SYSDATE
         </set>
         WHERE PROJECTID = #{projectId}
@@ -227,9 +229,9 @@
     <update id="markVerifyProject">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'VERIFYING',
-            ISVERIFIED = 'Y',
-            REQUESTEDAT = SYSDATE,
-            UPDATEDAT = SYSDATE
+        ISVERIFIED = 'Y',
+        REQUESTEDAT = SYSDATE,
+        UPDATEDAT = SYSDATE
         WHERE PROJECTID = #{projectId}
         AND PROJECTSTATUS = 'DRAFT'
         AND ISVERIFIED = 'N'
@@ -261,7 +263,7 @@
         from qna q
         join project p on q.projectid = p.projectid
         WHERE q.CREATORID = #{creatorId} order by q.QNAID desc
-        ) sub  WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow})
+        ) sub WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow})
         WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
 
@@ -270,25 +272,27 @@
         WHERE CREATORID = #{creatorId}
     </select>
 
-    <select id="getProjectRankDate" parameterType="long" resultType="com.example.funding.dto.response.creator.CreatorDashboardRankDto">
+    <select id="getProjectRankDate" parameterType="long"
+            resultType="com.example.funding.dto.response.creator.CreatorDashboardRankDto">
         SELECT
-            creatorId,
-            title,
-            backerCnt,
-            likeCnt,
-            viewCnt
+        creatorId,
+        title,
+        backerCnt,
+        likeCnt,
+        viewCnt
         FROM PROJECT
         WHERE CREATORID = #{creatorId}
     </select>
 
-    <select id="creatorDashboardDto" parameterType="long" resultType="com.example.funding.dto.response.creator.CreatorDashboardDto">
+    <select id="creatorDashboardDto" parameterType="long"
+            resultType="com.example.funding.dto.response.creator.CreatorDashboardDto">
         SELECT
-            NVL(count(*),0) AS totalProjectCnt,
-            NVL(count(CASE WHEN projectStatus = 'FAILED' THEN creatorId END),0) AS projectFailedCnt
+        NVL(count(*),0) AS totalProjectCnt,
+        NVL(count(CASE WHEN projectStatus = 'FAILED' THEN creatorId END),0) AS projectFailedCnt
         FROM
-            project
+        project
         WHERE CREATORID = #{creatorId}
-<!--        GROUP BY creatorId-->
+        <!--        GROUP BY creatorId-->
     </select>
 
     <update id="increaseFollowersCount" parameterType="long">
@@ -303,19 +307,19 @@
         WHERE CREATORID = #{creatorId} AND FOLLOWERCNT > 0
     </update>
 
-    <select id="getCreatorRowById" resultType="com.example.funding.dto.response.creator.CreatorSummaryDto$CreatorRow" parameterType="long">
+    <select id="getCreatorRowById" resultType="com.example.funding.dto.response.creator.CreatorSummaryDto$CreatorRow"
+            parameterType="long">
         SELECT
-            CREATORID AS creatorId,
-            CREATORNAME AS creatorName,
-            PROFILEIMG AS profileImg,
-            BIO AS bio
+        CREATORID AS creatorId,
+        CREATORNAME AS creatorName,
+        PROFILEIMG AS profileImg
         FROM CREATOR
         WHERE CREATORID = #{creatorId}
     </select>
 
-    <select id="getCreatorStatsById" resultType="com.example.funding.dto.response.creator.CreatorSummaryDto$Stats" parameterType="long">
+    <select id="getCreatorStatsById" resultType="com.example.funding.dto.response.creator.CreatorSummaryDto$Stats"
+            parameterType="long">
         SELECT
-        /* 창작자가 올린 프로젝트 개수 */
         NVL((
         SELECT COUNT(*)
         FROM project p
@@ -324,13 +328,13 @@
 
         NVL((
         SELECT COUNT(DISTINCT b.userId)
-        FROM project        p
-        JOIN reward         r   ON r.projectId    = p.projectId
-        JOIN backingDetail  bd  ON bd.rewardId    = r.rewardId
-        JOIN backing        b   ON b.backingId    = bd.backingId
-        JOIN payment        pay ON pay.backingId  = b.backingId
+        FROM project p
+        JOIN reward r ON r.projectId = p.projectId
+        JOIN backingDetail bd ON bd.rewardId = r.rewardId
+        JOIN backing b ON b.backingId = bd.backingId
+        JOIN payment pay ON pay.backingId = b.backingId
         WHERE p.creatorId = #{creatorId}
-        AND pay.status  = 'PAID'
+        AND pay.status = 'PAID'
         ), 0) AS totalBackers,
 
         COALESCE((
@@ -341,7 +345,7 @@
         JOIN backing b ON b.backingId = bd.backingId
         JOIN payment pay ON pay.backingId = b.backingId
         WHERE p.creatorId = #{creatorId}
-        AND pay.status  = 'PAID'
+        AND pay.status = 'PAID'
         ), 0) AS totalAmount
         FROM dual
     </select>
@@ -356,10 +360,10 @@
         SELECT
         r.projectId,
         COUNT(DISTINCT CASE WHEN pay.status = 'PAID' THEN b.userId END) AS backerCnt,
-        SUM(CASE WHEN pay.status = 'PAID' THEN pay.amount ELSE 0 END)   AS currAmount
+        SUM(CASE WHEN pay.status = 'PAID' THEN pay.amount ELSE 0 END) AS currAmount
         FROM reward r
-        JOIN backingDetail bd ON bd.rewardId  = r.rewardId
-        JOIN backing b  ON b.backingId  = bd.backingId
+        JOIN backingDetail bd ON bd.rewardId = r.rewardId
+        JOIN backing b ON b.backingId = bd.backingId
         LEFT JOIN payment pay ON pay.backingId = b.backingId
         GROUP BY r.projectId
         )
@@ -369,7 +373,7 @@
         p.thumbnail,
         NVL(a.currAmount, 0) AS currAmount,
         p.goalAmount,
-        NVL(a.backerCnt, 0)  AS backerCnt,
+        NVL(a.backerCnt, 0) AS backerCnt,
         p.projectStatus,
         p.endDate,
         CASE
@@ -406,6 +410,15 @@
         WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
         )
         WHERE rn >= #{pager.startRow}
+    </select>
+
+    <select id="getCreatorBio" resultType="CreatorBioDto" parameterType="long">
+        SELECT
+        CREATORID AS creatorId,
+        CREATORNAME AS creatorName,
+        BIO AS bio
+        FROM CREATOR
+        WHERE CREATORID = #{creatorId}
     </select>
 
 </mapper>

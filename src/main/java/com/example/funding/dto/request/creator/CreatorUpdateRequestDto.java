@@ -18,4 +18,5 @@ public class CreatorUpdateRequestDto {
     private String businessNum;
     private MultipartFile profileImg;
     private String profileImgUrl;
+    private String bio;
 }

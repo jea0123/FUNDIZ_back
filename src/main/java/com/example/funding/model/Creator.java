@@ -19,4 +19,5 @@ public class Creator {
     private String phone;
     private String account;
     private String bank;
+    private String bio;
 }

@@ -3,56 +3,129 @@
 <mapper namespace="com.example.funding.mapper.CommunityMapper">
 
     <!-- START 커뮤니티/후기 목록 -->
-    <sql id="foldedQuery">
-        WITH base AS (
-        SELECT /*+ MATERIALIZE */
-        CMID, USERID, PROJECTID, CMCONTENT, NVL(RATING, 0) AS RATING, CREATEDAT, CODE
-        FROM (
+<!--    <sql id="foldedQuery">-->
+<!--        WITH base AS (-->
+<!--            SELECT /*+ MATERIALIZE */-->
+<!--                CMID, USERID, PROJECTID, CMCONTENT, NVL(RATING, 0) AS RATING, CREATEDAT, CODE-->
+<!--            FROM (-->
+<!--                SELECT-->
+<!--                    CMID, USERID, PROJECTID, CMCONTENT, NVL(RATING, 0) AS RATING, CREATEDAT, CODE-->
+<!--                FROM COMMUNITY-->
+<!--                WHERE PROJECTID = #{projectId}-->
+<!--                  AND TRIM(CODE) = #{code}-->
+<!--                <if test="lastCreatedAt != null">-->
+<!--                <![CDATA[-->
+<!--                    AND (-->
+<!--                        CREATEDAT < #{lastCreatedAt}-->
+<!--                        OR (CREATEDAT = #{lastCreatedAt} AND CMID < #{lastId})-->
+<!--                    )-->
+<!--                ]]>-->
+<!--                </if>-->
+<!--                ORDER BY CREATEDAT DESC, CMID DESC-->
+<!--            )-->
+<!--            WHERE ROWNUM <![CDATA[ <= ]]> #{size}-->
+<!--        )-->
+<!--        SELECT-->
+<!--            b.CMID AS cmId,-->
+<!--            b.CMCONTENT AS cmContent,-->
+<!--            b.CREATEDAT AS createdAt,-->
+<!--            b.CODE AS code,-->
+<!--            b.RATING AS rating,-->
+<!--            u.NICKNAME AS nickname,-->
+<!--            u.PROFILEIMG AS profileImg,-->
+
+<!--            &lt;!&ndash; 댓글 총합 &ndash;&gt;-->
+<!--            (-->
+<!--                SELECT COUNT(*)-->
+<!--                FROM REPLY r-->
+<!--                WHERE r.CMID = b.CMID-->
+<!--            ) AS replyCnt-->
+<!--        FROM base b-->
+<!--        LEFT JOIN USERS u ON u.USERID = b.USERID-->
+<!--        ORDER BY b.CREATEDAT DESC, b.CMID DESC-->
+<!--    </sql>-->
+
+<!--    <select id="getCommunityList" resultType="communityDto">-->
+<!--        <include refid="foldedQuery" />-->
+<!--    </select>-->
+
+<!--    <select id="getReviewList" resultType="reviewDto">-->
+<!--        <include refid="foldedQuery" />-->
+<!--    </select>-->
+    <!-- END 커뮤니티/후기 목록 -->
+
+    <!-- 커뮤니티 목록 -->
+    <select id="getCommunityList" resultType="communityDto">
         SELECT
-        CMID, USERID, PROJECTID, CMCONTENT, NVL(RATING, 0) AS RATING, CREATEDAT, CODE
-        FROM COMMUNITY
-        WHERE PROJECTID = #{projectId}
-        AND TRIM(CODE) = #{code}
-        <if test="lastCreatedAt != null">
-            <![CDATA[
+            c.CMID AS cmId,
+            c.CMCONTENT AS cmContent,
+            c.CREATEDAT AS createdAt,
+            c.CODE AS code,
+            u.NICKNAME AS nickname,
+            u.PROFILEIMG AS profileImg,
+
+            <!-- 댓글 총합 -->
+            (
+                SELECT COUNT(*)
+                FROM REPLY r
+                WHERE r.CMID = c.CMID
+            ) AS replyCnt
+        FROM (
+            SELECT
+                CMID, USERID, CMCONTENT, CREATEDAT, CODE
+            FROM COMMUNITY
+            WHERE PROJECTID = #{projectId}
+            AND TRIM(CODE) = #{code}
+            <if test="lastCreatedAt != null">
+                <![CDATA[
                     AND (
                         CREATEDAT < #{lastCreatedAt}
                         OR (CREATEDAT = #{lastCreatedAt} AND CMID < #{lastId})
                     )
                 ]]>
-        </if>
-        ORDER BY CREATEDAT DESC, CMID DESC
-        )
+            </if>
+            ORDER BY CREATEDAT DESC, CMID DESC
+        ) c
+        LEFT JOIN USERS u ON u.USERID = c.USERID
         WHERE ROWNUM <![CDATA[ <= ]]> #{size}
-        )
-        SELECT
-        b.CMID AS cmId,
-        b.CMCONTENT AS cmContent,
-        b.CREATEDAT AS createdAt,
-        b.CODE AS code,
-        b.RATING AS rating,
-        u.NICKNAME AS nickname,
-        u.PROFILEIMG AS profileImg,
-
-        <!-- 댓글 총합 -->
-        (
-        SELECT COUNT(*)
-        FROM REPLY r
-        WHERE r.CMID = b.CMID
-        ) AS replyCnt
-        FROM base b
-        LEFT JOIN USERS u ON u.USERID = b.USERID
-        ORDER BY b.CREATEDAT DESC, b.CMID DESC
-    </sql>
-
-    <select id="getCommunityList" resultType="communityDto">
-        <include refid="foldedQuery"/>
     </select>
 
+    <!-- 후기 목록 -->
     <select id="getReviewList" resultType="reviewDto">
-        <include refid="foldedQuery"/>
+        SELECT
+            c.CMID AS cmId,
+            c.CMCONTENT AS cmContent,
+            c.CREATEDAT AS createdAt,
+            c.CODE AS code,
+            NVL(c.RATING, 0) AS rating,
+            u.NICKNAME AS nickname,
+            u.PROFILEIMG AS profileImg,
+
+            <!-- 댓글 총합 -->
+            (
+                SELECT COUNT(*)
+                FROM REPLY r
+                WHERE r.CMID = c.CMID
+            ) AS replyCnt
+        FROM (
+            SELECT
+                CMID, USERID, CMCONTENT, NVL(RATING, 0) AS rating, CREATEDAT, CODE
+            FROM COMMUNITY
+            WHERE PROJECTID = #{projectId}
+            AND TRIM(CODE) = #{code}
+            <if test="lastCreatedAt != null">
+                <![CDATA[
+                    AND (
+                        CREATEDAT < #{lastCreatedAt}
+                        OR (CREATEDAT = #{lastCreatedAt} AND CMID < #{lastId})
+                    )
+                ]]>
+            </if>
+            ORDER BY CREATEDAT DESC, CMID DESC
+        ) c
+        LEFT JOIN USERS u ON u.USERID = c.USERID
+        WHERE ROWNUM <![CDATA[ <= ]]> #{size}
     </select>
-    <!-- END 커뮤니티/후기 목록 -->
 
     <insert id="createCommunity">
         <selectKey keyProperty="cmId" resultType="Long" order="BEFORE">

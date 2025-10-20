@@ -431,10 +431,10 @@ public class CreatorController {
      * @param photoOnly     (선택 사항) 사진이 포함된 리뷰만 조회 여부
      * @return 커서 기반 페이징된 크리에이터 리뷰 목록
      * @author 장민규
-     * @since 2025-10-19
+     * @since 2025-10-20
      */
     @GetMapping("/reviews/{creatorId}")
-    public ResponseEntity<ResponseDto<CursorPage<ReviewListDto>>> getCreatorReviews(@PathVariable Long creatorId,
+    public ResponseEntity<ResponseDto<CursorPage<ReviewListDto>>> getCreatorReviews(@NotNull @Positive @PathVariable Long creatorId,
                                                                                     @Positive @RequestParam(required = false) Long lastId,
                                                                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastCreatedAt,
                                                                                     @Positive @RequestParam(required = false) Long projectId,
@@ -443,12 +443,35 @@ public class CreatorController {
         return creatorService.getCreatorReviews(creatorId, lastCreatedAt, lastId, size, projectId, photoOnly);
     }
 
+    /**
+     * <p>크리에이터 팔로워 목록 조회</p>
+     *
+     * @param creatorId 크리에이터 ID
+     * @param principal 인증된 사용자 정보
+     * @param req       페이저 정보 (페이지 번호, 페이지 크기 등)
+     * @return 페이징된 크리에이터 팔로워 목록
+     * @author 장민규
+     * @since 2025-10-20
+     */
     @GetMapping("/followers/{creatorId}")
-    public ResponseEntity<ResponseDto<PageResult<CreatorFollowerDto>>> getCreatorFollowers(@PathVariable Long creatorId,
+    public ResponseEntity<ResponseDto<PageResult<CreatorFollowerDto>>> getCreatorFollowers(@NotNull @Positive @PathVariable Long creatorId,
                                                                                            @AuthenticationPrincipal CustomUserPrincipal principal,
                                                                                            @Valid PagerRequest req) {
         Pager pager = Pager.ofRequest(req.getPage(), req.getSize(), req.getPerGroup());
         Long loginUserId = principal != null ? principal.userId() : null;
         return creatorService.getCreatorFollowers(creatorId, loginUserId, pager);
+    }
+
+    /**
+     * <p>크리에이터 소개 정보 조회</p>
+     *
+     * @param creatorId 크리에이터 ID
+     * @return 크리에이터 소개 정보
+     * @author 장민규
+     * @since 2025-10-20
+     */
+    @GetMapping("/bio/{creatorId}")
+    public ResponseEntity<ResponseDto<CreatorBioDto>> getCreatorBio(@NotNull @Positive @PathVariable Long creatorId) {
+        return creatorService.getCreatorBio(creatorId);
     }
 }

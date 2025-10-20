@@ -762,6 +762,9 @@ public class CreatorServiceImpl implements CreatorService {
         return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 리뷰 조회 성공", page));
     }
 
+    /**
+     * 크리에이터 팔로워 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<CreatorFollowerDto>>> getCreatorFollowers(Long creatorId, Long loginUserId, Pager pager) {
@@ -770,5 +773,16 @@ public class CreatorServiceImpl implements CreatorService {
         int total = followMapper.countCreatorFollowers(creatorId);
         PageResult<CreatorFollowerDto> result = PageResult.of(followers, pager, total);
         return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 팔로워 조회 성공", result));
+    }
+
+    /**
+     * 크리에이터 소개 조회
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<CreatorBioDto>> getCreatorBio(Long creatorId) {
+        loaders.creator(creatorId);
+        CreatorBioDto bio = creatorMapper.getCreatorBio(creatorId);
+        return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 소개 조회 성공", bio));
     }
 }

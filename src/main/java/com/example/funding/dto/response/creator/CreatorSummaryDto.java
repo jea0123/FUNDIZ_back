@@ -24,7 +24,6 @@ public class CreatorSummaryDto {
         private Long creatorId;
         private String creatorName;
         private String profileImg;
-        private String bio;
     }
 
     @Getter

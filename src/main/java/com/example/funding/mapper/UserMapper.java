@@ -1,5 +1,6 @@
 package com.example.funding.mapper;
 
+import com.example.funding.dto.response.creator.ReviewListDto;
 import com.example.funding.dto.response.user.MyPageLikedDto;
 import com.example.funding.dto.response.user.RecentViewProject;
 import com.example.funding.model.User;
@@ -44,4 +45,6 @@ public interface UserMapper {
     void dislikeProject(@Param("userId") Long userId, @Param("projectId") Long projectId);
 
     LocalDateTime getLastLoginTime(@Param("userId") Long userId);
+
+    List<ReviewListDto.UserInfo> selectUsersByIds(@Param("list") List<Long> userIds);
 }

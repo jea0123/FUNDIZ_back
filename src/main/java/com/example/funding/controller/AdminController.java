@@ -32,6 +32,9 @@ import com.example.funding.service.AdminService;
 import com.example.funding.service.CategoryService;
 import com.example.funding.service.SettlementService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -69,8 +72,11 @@ public class AdminController {
      * @since 2025-09-11
      */
     @GetMapping("/analytics")
-    public ResponseEntity<ResponseDto<AdminAnalyticsDto>> getAdminAnalytics(@RequestParam(defaultValue = "6m") String period, @RequestParam(defaultValue = "qty") String metric,
-                                                                            @RequestParam(defaultValue = "5") int limit, @RequestParam(defaultValue = "1") Long ctgrId
+    public ResponseEntity<ResponseDto<AdminAnalyticsDto>> getAdminAnalytics(
+            @RequestParam(defaultValue = "6m") @NotNull String period,
+            @RequestParam(defaultValue = "qty") @NotBlank String metric,
+            @RequestParam(defaultValue = "5") @NotNull @Positive Integer limit,
+            @RequestParam(defaultValue = "1") @NotNull @Positive Long ctgrId
     ) {
         Utils.AnalyticsWindow w = resolveWindow(period, metric, KST);
         return adminService.getAdminAnalytics(w.getFrom(), w.getTo(), limit, metric, w.getMonths(), ctgrId);
@@ -169,7 +175,7 @@ public class AdminController {
     /**
      * <p>프로젝트 심사 목록 조회</p>
      *
-     * @param dto      SearchProjectVerifyDto
+     * @param dto SearchProjectVerifyDto
      * @param req 요청 pager
      * @return 성공 시 200 OK
      * @author 조은애

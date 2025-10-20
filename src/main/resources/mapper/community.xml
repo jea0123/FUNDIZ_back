@@ -5,52 +5,52 @@
     <!-- START 커뮤니티/후기 목록 -->
     <sql id="foldedQuery">
         WITH base AS (
-            SELECT /*+ MATERIALIZE */
-                CMID, USERID, PROJECTID, CMCONTENT, NVL(RATING, 0) AS RATING, CREATEDAT, CODE
-            FROM (
-                SELECT
-                    CMID, USERID, PROJECTID, CMCONTENT, NVL(RATING, 0) AS RATING, CREATEDAT, CODE
-                FROM COMMUNITY
-                WHERE PROJECTID = #{projectId}
-                  AND TRIM(CODE) = #{code}
-                <if test="lastCreatedAt != null">
-                <![CDATA[
+        SELECT /*+ MATERIALIZE */
+        CMID, USERID, PROJECTID, CMCONTENT, NVL(RATING, 0) AS RATING, CREATEDAT, CODE
+        FROM (
+        SELECT
+        CMID, USERID, PROJECTID, CMCONTENT, NVL(RATING, 0) AS RATING, CREATEDAT, CODE
+        FROM COMMUNITY
+        WHERE PROJECTID = #{projectId}
+        AND TRIM(CODE) = #{code}
+        <if test="lastCreatedAt != null">
+            <![CDATA[
                     AND (
                         CREATEDAT < #{lastCreatedAt}
                         OR (CREATEDAT = #{lastCreatedAt} AND CMID < #{lastId})
                     )
                 ]]>
-                </if>
-                ORDER BY CREATEDAT DESC, CMID DESC
-            )
-            WHERE ROWNUM <![CDATA[ <= ]]> #{size}
+        </if>
+        ORDER BY CREATEDAT DESC, CMID DESC
+        )
+        WHERE ROWNUM <![CDATA[ <= ]]> #{size}
         )
         SELECT
-            b.CMID AS cmId,
-            b.CMCONTENT AS cmContent,
-            b.CREATEDAT AS createdAt,
-            b.CODE AS code,
-            b.RATING AS rating,
-            u.NICKNAME AS nickname,
-            u.PROFILEIMG AS profileImg,
+        b.CMID AS cmId,
+        b.CMCONTENT AS cmContent,
+        b.CREATEDAT AS createdAt,
+        b.CODE AS code,
+        b.RATING AS rating,
+        u.NICKNAME AS nickname,
+        u.PROFILEIMG AS profileImg,
 
-            <!-- 댓글 총합 -->
-            (
-                SELECT COUNT(*)
-                FROM REPLY r
-                WHERE r.CMID = b.CMID
-            ) AS replyCnt
+        <!-- 댓글 총합 -->
+        (
+        SELECT COUNT(*)
+        FROM REPLY r
+        WHERE r.CMID = b.CMID
+        ) AS replyCnt
         FROM base b
         LEFT JOIN USERS u ON u.USERID = b.USERID
         ORDER BY b.CREATEDAT DESC, b.CMID DESC
     </sql>
 
     <select id="getCommunityList" resultType="communityDto">
-        <include refid="foldedQuery" />
+        <include refid="foldedQuery"/>
     </select>
 
     <select id="getReviewList" resultType="reviewDto">
-        <include refid="foldedQuery" />
+        <include refid="foldedQuery"/>
     </select>
     <!-- END 커뮤니티/후기 목록 -->
 
@@ -74,18 +74,113 @@
         WHERE CMID = #{cmId}
     </select>
 
+    <select id="findCreatorCommunityIds" resultType="long" parameterType="map">
+        SELECT cm.cmId
+        FROM community cm
+        JOIN project p ON p.projectId = cm.projectId
+        WHERE p.creatorId = #{creatorId}
+        <if test="projectId != null">
+            AND p.projectId = #{projectId}
+        </if>
+        <if test="lastCreatedAt != null and lastId != null">
+            AND (
+            cm.createdAt &lt; #{lastCreatedAt, jdbcType=TIMESTAMP}
+            OR (cm.createdAt = #{lastCreatedAt, jdbcType=TIMESTAMP} AND cm.cmId &lt; #{lastId})
+            )
+        </if>
+        <if test="photoOnly != null and photoOnly">
+            AND EXISTS (
+            SELECT 1 FROM attach a
+            WHERE a.cmId = cm.cmId
+            AND a.code = 'CM'
+            )
+        </if>
+        ORDER BY cm.createdAt DESC, cm.cmId DESC
+        FETCH FIRST #{limit} ROWS ONLY
+    </select>
+
+    <select id="findCreatorCommunityWindow" parameterType="map"
+            resultType="com.example.funding.dto.response.creator.ReviewListDto$Review">
+        SELECT *
+        FROM (
+        SELECT
+        cm.cmId AS cmId,
+        cm.userId AS userId,
+        cm.projectId AS projectId,
+        cm.cmContent AS cmContent,
+        cm.createdAt AS createdAt
+        FROM community cm
+        JOIN project p ON p.projectId = cm.projectId
+        WHERE p.creatorId = #{creatorId}
+
+        <if test="projectId != null">
+            AND p.projectId = #{projectId}
+        </if>
+
+        <if test="lastCreatedAt != null and lastId != null">
+            AND (
+            cm.createdAt &lt; #{lastCreatedAt, jdbcType=TIMESTAMP}
+            OR (cm.createdAt = #{lastCreatedAt, jdbcType=TIMESTAMP}
+            AND cm.cmId &lt; #{lastId})
+            )
+        </if>
+
+        <if test="photoOnly != null and photoOnly">
+            AND EXISTS (
+            SELECT 1 FROM attach a
+            WHERE a.cmId = cm.cmId
+            AND a.code = 'CM'
+            )
+        </if>
+
+        ORDER BY cm.createdAt DESC, cm.cmId DESC
+        )
+        WHERE ROWNUM &lt;= #{limit}
+    </select>
+
+    <select id="selectReviewImagesByCmIds" parameterType="list"
+            resultType="com.example.funding.dto.response.creator.ReviewListDto$Image">
+        SELECT
+        a.cmId AS cmId,
+        a.filePath AS url
+        FROM attach a
+        WHERE a.code = 'CM'
+        AND a.cmId IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY a.cmId, a.attachId
+    </select>
+
     <select id="countByProjectGrouped" resultType="countsAgg">
         SELECT
-            NVL((
-                SELECT SUM(CASE WHEN c.CODE = 'CM' THEN 1 ELSE 0 END)
-                FROM COMMUNITY c
-                WHERE c.PROJECTID = #{projectId}
-            ), 0) AS communityTotal,
-            NVL((
-                SELECT SUM(CASE WHEN c.CODE = 'RV' THEN 1 ELSE 0 END)
-                FROM COMMUNITY c
-                WHERE c.PROJECTID = #{projectId}
-            ), 0) AS reviewTotal
+        NVL((
+        SELECT SUM(CASE WHEN c.CODE = 'CM' THEN 1 ELSE 0 END)
+        FROM COMMUNITY c
+        WHERE c.PROJECTID = #{projectId}
+        ), 0) AS communityTotal,
+        NVL((
+        SELECT SUM(CASE WHEN c.CODE = 'RV' THEN 1 ELSE 0 END)
+        FROM COMMUNITY c
+        WHERE c.PROJECTID = #{projectId}
+        ), 0) AS reviewTotal
         FROM dual
+    </select>
+
+    <select id="countCreatorCommunity" resultType="long" parameterType="map">
+        SELECT COUNT(*)
+        FROM community cm
+        JOIN project p ON p.projectId = cm.projectId
+        WHERE p.creatorId = #{creatorId}
+        <if test="projectId != null">
+            AND p.projectId = #{projectId}
+        </if>
+        <if test="photoOnly != null and photoOnly">
+            AND EXISTS (
+            SELECT 1 FROM attach a
+            WHERE a.cmId = cm.cmId
+            AND a.code = 'CM'
+            )
+        </if>
     </select>
 </mapper>

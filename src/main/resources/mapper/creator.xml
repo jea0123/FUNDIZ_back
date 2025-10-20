@@ -270,7 +270,7 @@
         WHERE CREATORID = #{creatorId}
     </select>
 
-    <select id ="getProjectRankDate" parameterType="long" resultType="com.example.funding.dto.response.creator.CreatorDashboardRankDto">
+    <select id="getProjectRankDate" parameterType="long" resultType="com.example.funding.dto.response.creator.CreatorDashboardRankDto">
         SELECT
             creatorId,
             title,
@@ -345,4 +345,67 @@
         ), 0) AS totalAmount
         FROM dual
     </select>
+
+    <select id="findCreatorProjects"
+            parameterType="map"
+            resultType="com.example.funding.dto.response.creator.CreatorProjectDto">
+        SELECT * FROM (
+        SELECT inner_table.*, ROWNUM rn
+        FROM (
+        WITH agg AS (
+        SELECT
+        r.projectId,
+        COUNT(DISTINCT CASE WHEN pay.status = 'PAID' THEN b.userId END) AS backerCnt,
+        SUM(CASE WHEN pay.status = 'PAID' THEN pay.amount ELSE 0 END)   AS currAmount
+        FROM reward r
+        JOIN backingDetail bd ON bd.rewardId  = r.rewardId
+        JOIN backing b  ON b.backingId  = bd.backingId
+        LEFT JOIN payment pay ON pay.backingId = b.backingId
+        GROUP BY r.projectId
+        )
+        SELECT
+        p.projectId,
+        p.title,
+        p.thumbnail,
+        NVL(a.currAmount, 0) AS currAmount,
+        p.goalAmount,
+        NVL(a.backerCnt, 0)  AS backerCnt,
+        p.projectStatus,
+        p.endDate,
+        CASE
+        WHEN p.projectStatus IN ('SUCCESS','SETTLED')
+        OR NVL(a.currAmount,0) >= NVL(p.goalAmount,0)
+        THEN 1 ELSE 0
+        END AS isSuccess,
+        CASE
+        WHEN NVL(p.goalAmount,0) = 0 THEN 0
+        ELSE ROUND((NVL(a.currAmount,0) / p.goalAmount) * 100)
+        END AS achievePercent
+        FROM project p
+        LEFT JOIN agg a ON a.projectId = p.projectId
+        WHERE p.creatorId = #{creatorId}
+        <choose>
+            <when test="sort == null or sort == '' or sort == 'recent'">
+                ORDER BY p.createdAt DESC, p.projectId DESC
+            </when>
+            <when test="sort == 'popular'">
+                ORDER BY NVL(a.backerCnt,0) DESC, NVL(a.currAmount,0) DESC, NVL(p.viewCnt,0) DESC
+            </when>
+            <when test="sort == 'percent'">
+                ORDER BY
+                CASE WHEN NVL(p.goalAmount,0)=0 THEN 0 ELSE NVL(a.currAmount,0)/p.goalAmount END DESC,
+                NVL(a.currAmount,0) DESC
+            </when>
+            <when test="sort == 'closing'">
+                ORDER BY
+                CASE WHEN p.projectStatus IN ('OPEN','UPCOMING','VERIFYING') THEN 0 ELSE 1 END,
+                p.endDate ASC NULLS LAST
+            </when>
+        </choose>
+        ) inner_table
+        WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
+        )
+        WHERE rn >= #{pager.startRow}
+    </select>
+
 </mapper>

@@ -1,12 +1,11 @@
 package com.example.funding.service;
 
+import com.example.funding.common.Cursor;
+import com.example.funding.common.CursorPage;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.request.creator.CreatorRegisterRequestDto;
-import com.example.funding.dto.request.creator.CreatorUpdateRequestDto;
-import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
-import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
+import com.example.funding.dto.request.creator.*;
 import com.example.funding.dto.request.shipping.ShippingStatusDto;
 import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
 import com.example.funding.dto.response.creator.*;
@@ -16,12 +15,18 @@ import com.example.funding.exception.badrequest.AlreadyCreatorException;
 import com.example.funding.exception.notfound.CreatorNotFoundException;
 import com.example.funding.exception.notfound.UserNotFoundException;
 import com.example.funding.model.Creator;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
+@Validated
 public interface CreatorService {
 
     ResponseEntity<ResponseDto<PageResult<CreatorProjectListDto>>> getProjectList(Long creatorId, SearchCreatorProjectDto dto, Pager pager);
@@ -76,5 +81,33 @@ public interface CreatorService {
      */
     ResponseEntity<ResponseDto<Long>> getFollowerCnt(Long creatorId);
 
-    ResponseEntity<ResponseDto<CreatorSummaryDto>> getCreatorSummary(Long creatorId, Long userId);
+    /**
+     * 크리에이터 요약 정보 조회
+     * @param creatorId 크리에이터 ID
+     * @param userId 유저 ID (팔로우 여부 확인용)
+     * @return 크리에이터 요약 정보
+     * @since 2025-10-19
+     * @author 장민규
+     */
+    ResponseEntity<ResponseDto<CreatorSummaryDto>> getCreatorSummary(@NotNull(message = "크리에이터 ID는 필수입니다.")
+                                                                     @Positive(message = "크리에이터 ID는 양수여야 합니다.")
+                                                                     Long creatorId, Long userId);
+
+    /**
+     * 크리에이터의 프로젝트 목록 조회 (페이징 및 정렬)
+     * @param creatorId 크리에이터 ID
+     * @param sort 정렬 기준
+     * @param pager 페이저 정보 (페이지 번호, 페이지 크기 등)
+     * @return 페이징된 크리에이터 프로젝트 목록
+     * @since 2025-10-19
+     * @author 장민규
+     */
+    ResponseEntity<ResponseDto<PageResult<CreatorProjectDto>>> getCreatorProject(@NotNull(message = "크리에이터 ID는 필수입니다.")
+                                                                                 @Positive(message = "크리에이터 ID는 양수여야 합니다.")
+                                                                                 Long creatorId,
+                                                                                 @NotBlank(message = "정렬 기준은 필수입니다.")
+                                                                                 String sort, Pager pager);
+
+    ResponseEntity<ResponseDto<CursorPage<ReviewListDto>>> getCreatorReviews(Long creatorId, LocalDateTime lastCreatedAt, Long lastId, int size,
+                                                                             Long projectId, Boolean photoOnly);
 }

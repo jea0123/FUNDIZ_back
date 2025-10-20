@@ -1,9 +1,6 @@
 package com.example.funding.controller;
 
-import com.example.funding.common.CustomUserPrincipal;
-import com.example.funding.common.FileUploader;
-import com.example.funding.common.PageResult;
-import com.example.funding.common.Pager;
+import com.example.funding.common.*;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.PagerRequest;
 import com.example.funding.dto.request.creator.*;
@@ -23,8 +20,11 @@ import com.example.funding.service.CreatorService;
 import com.example.funding.service.NewsService;
 import com.example.funding.service.RewardService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -53,7 +54,7 @@ public class CreatorController {
      * @param dto       크리에이터 등록 요청 DTO
      * @param principal 인증된 사용자 정보
      * @return 크리에이터 이름
-     * @throws UserNotFoundException 유저를 찾을 수 없는 경우(404)
+     * @throws UserNotFoundException   유저를 찾을 수 없는 경우(404)
      * @throws AlreadyCreatorException 이미 크리에이터로 등록된 유저인 경우(400)
      * @author 장민규
      * @since 2025-10-12
@@ -91,8 +92,8 @@ public class CreatorController {
     /**
      * <p>크리에이터 정보 수정</p>
      *
-     * @param creatorId 창작자 ID
-     * @param dto CreatorUpdateRequestDto
+     * @param creatorId  창작자 ID
+     * @param dto        CreatorUpdateRequestDto
      * @param profileImg 프로필 이미지
      * @return 성공 시 200 OK
      * @author 이동혁
@@ -110,13 +111,13 @@ public class CreatorController {
             String profileImgUrl = fileUploader.upload(dto.getProfileImg());
 
             if (profileImgUrl != null && !profileImgUrl.isEmpty()) {
-                    dto.setProfileImgUrl(profileImgUrl);
-                } else {
-                    dto.setProfileImgUrl(dto.getProfileImgUrl());
-                }
+                dto.setProfileImgUrl(profileImgUrl);
             } else {
                 dto.setProfileImgUrl(dto.getProfileImgUrl());
             }
+        } else {
+            dto.setProfileImgUrl(dto.getProfileImgUrl());
+        }
 
         return creatorService.updateCreatorInfo(creatorId, dto);
     }
@@ -126,7 +127,7 @@ public class CreatorController {
      *
      * @param creatorId 창작자 ID
      * @param dto       SearchCreatorProjectDto
-     * @param req  요청 pager
+     * @param req       요청 pager
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-10-05
@@ -164,7 +165,7 @@ public class CreatorController {
      */
     @PostMapping("/project/new")
     public ResponseEntity<ResponseDto<Long>> createProject(ProjectCreateRequestDto dto,
-                                                             @RequestAttribute Long creatorId) throws IOException {
+                                                           @RequestAttribute Long creatorId) throws IOException {
 
         String thumbnailUrl = null;
         if (dto.getThumbnail() != null && !dto.getThumbnail().isEmpty()) {
@@ -266,7 +267,7 @@ public class CreatorController {
      */
     @GetMapping("/projects/{projectId}/reward")
     public ResponseEntity<ResponseDto<List<Reward>>> getRewardListManage(@PathVariable Long projectId,
-                                                                          @RequestAttribute Long creatorId) {
+                                                                         @RequestAttribute Long creatorId) {
         return rewardService.getRewardListManage(projectId, creatorId);
     }
 
@@ -309,7 +310,7 @@ public class CreatorController {
      * <p>QnA 내역 목록 조회(창작자 기준)</p>
      *
      * @param creatorId 창작자 ID
-     * @param req  Pager
+     * @param req       Pager
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-10-08
@@ -349,10 +350,10 @@ public class CreatorController {
     }
 
     @PostMapping("/shippingBackerList/{projectId}")
-    public ResponseEntity<ResponseDto<String>> setShippingStatus (@PathVariable Long projectId,
-                                                                  @RequestAttribute Long creatorId,
-                                                                  @Valid @RequestBody ShippingStatusDto status) {
-        return creatorService.setShippingStatus(projectId ,creatorId, status);
+    public ResponseEntity<ResponseDto<String>> setShippingStatus(@PathVariable Long projectId,
+                                                                 @RequestAttribute Long creatorId,
+                                                                 @Valid @RequestBody ShippingStatusDto status) {
+        return creatorService.setShippingStatus(projectId, creatorId, status);
     }
 
     /**
@@ -386,9 +387,46 @@ public class CreatorController {
         return creatorService.getFollowerCnt(creatorId);
     }
 
+    /**
+     * <p>크리에이터 요약 정보 조회</p>
+     *
+     * @param creatorId 크리에이터 ID
+     * @param principal 인증된 사용자 정보
+     * @return 크리에이터 요약 정보
+     * @author 장민규
+     * @since 2025-10-19
+     */
     @GetMapping("/summary/{creatorId}")
     public ResponseEntity<ResponseDto<CreatorSummaryDto>> getCreatorSummary(@PathVariable Long creatorId,
                                                                             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        return creatorService.getCreatorSummary(creatorId, principal != null ? principal.userId() : null);
+        return creatorService.getCreatorSummary(creatorId, 10L);
+    }
+
+    /**
+     * <p>크리에이터의 프로젝트 목록 조회 (페이징 및 정렬)</p>
+     *
+     * @param creatorId 크리에이터 ID
+     * @param sort      정렬 기준 (recent, popular, endingSoon 등)
+     * @param req       페이저 정보 (페이지 번호, 페이지 크기 등)
+     * @return 페이징된 크리에이터 프로젝트 목록
+     * @author 장민규
+     * @since 2025-10-19
+     */
+    @GetMapping("/projectsList/{creatorId}")
+    public ResponseEntity<ResponseDto<PageResult<CreatorProjectDto>>> getCreatorProject(@NotNull @Positive @PathVariable Long creatorId,
+                                                                                        @NotNull @RequestParam(required = false, defaultValue = "recent") String sort,
+                                                                                        @Valid PagerRequest req) {
+        Pager pager = Pager.ofRequest(req.getPage(), req.getSize(), 5);
+        return creatorService.getCreatorProject(creatorId, sort, pager);
+    }
+
+    @GetMapping("/reviews/{creatorId}")
+    public ResponseEntity<ResponseDto<CursorPage<ReviewListDto>>> getCreatorReviews(@PathVariable Long creatorId,
+                                                                                    @RequestParam(required = false) Long lastId,
+                                                                                    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastCreatedAt,
+                                                                                    @RequestParam(required = false) Long projectId,
+                                                                                    @RequestParam(required = false, defaultValue = "false") Boolean photoOnly,
+                                                                                    @RequestParam(required = false, defaultValue = "10") int size) {
+        return creatorService.getCreatorReviews(creatorId, lastCreatedAt, lastId, size, projectId, photoOnly);
     }
 }

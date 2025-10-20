@@ -31,9 +31,6 @@ public interface CommunityMapper {
 
     Community getCommunityById(@Param("cmId") Long cmId);
 
-    List<Long> findCreatorCommunityIds(@Param("creatorId") Long creatorId, @Param("lastCreatedAt") LocalDateTime lastCreatedAt, @Param("lastId") Long lastId, @Param("limit") int limit,
-                                       @Param("projectId") Long projectId, @Param("photoOnly") Boolean photoOnly);
-
     List<ReviewListDto.Image> selectReviewImagesByCmIds(@Param("list") List<Long> cmIds);
 
     List<ReviewListDto.Review> findCreatorCommunityWindow(

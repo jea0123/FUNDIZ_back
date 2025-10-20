@@ -397,7 +397,7 @@ public class CreatorController {
      * @since 2025-10-19
      */
     @GetMapping("/summary/{creatorId}")
-    public ResponseEntity<ResponseDto<CreatorSummaryDto>> getCreatorSummary(@PathVariable Long creatorId,
+    public ResponseEntity<ResponseDto<CreatorSummaryDto>> getCreatorSummary(@NotNull @Positive @PathVariable Long creatorId,
                                                                             @AuthenticationPrincipal CustomUserPrincipal principal) {
         return creatorService.getCreatorSummary(creatorId, 10L);
     }
@@ -420,13 +420,26 @@ public class CreatorController {
         return creatorService.getCreatorProject(creatorId, sort, pager);
     }
 
+    /**
+     * <p>크리에이터 리뷰 목록 조회 (커서 기반 페이징)</p>
+     *
+     * @param creatorId    크리에이터 ID
+     * @param lastCreatedAt 마지막으로 조회된 리뷰의 생성일시 (커서)
+     * @param lastId       마지막으로 조회된 리뷰의 ID (커서)
+     * @param size         조회할 리뷰 개수
+     * @param projectId    (선택 사항) 특정 프로젝트에 대한 리뷰만 조회
+     * @param photoOnly    (선택 사항) 사진이 포함된 리뷰만 조회 여부
+     * @return 커서 기반 페이징된 크리에이터 리뷰 목록
+     * @author 장민규
+     * @since 2025-10-19
+     */
     @GetMapping("/reviews/{creatorId}")
     public ResponseEntity<ResponseDto<CursorPage<ReviewListDto>>> getCreatorReviews(@PathVariable Long creatorId,
-                                                                                    @RequestParam(required = false) Long lastId,
+                                                                                    @Positive @RequestParam(required = false) Long lastId,
                                                                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastCreatedAt,
-                                                                                    @RequestParam(required = false) Long projectId,
+                                                                                    @Positive @RequestParam(required = false) Long projectId,
                                                                                     @RequestParam(required = false, defaultValue = "false") Boolean photoOnly,
-                                                                                    @RequestParam(required = false, defaultValue = "10") int size) {
+                                                                                    @NotNull @Positive @RequestParam(required = false, defaultValue = "10") int size) {
         return creatorService.getCreatorReviews(creatorId, lastCreatedAt, lastId, size, projectId, photoOnly);
     }
 }

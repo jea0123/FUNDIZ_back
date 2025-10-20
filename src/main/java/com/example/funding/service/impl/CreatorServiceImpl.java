@@ -678,11 +678,13 @@ public class CreatorServiceImpl implements CreatorService {
         return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 프로젝트 조회 성공", result));
     }
 
+    /**
+     * 크리에이터 리뷰 조회
+     */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CursorPage<ReviewListDto>>> getCreatorReviews(
-            Long creatorId, LocalDateTime lastCreatedAt, Long lastId, int size,
-            Long projectId, Boolean photoOnly) {
+    public ResponseEntity<ResponseDto<CursorPage<ReviewListDto>>> getCreatorReviews(Long creatorId, LocalDateTime lastCreatedAt, Long lastId, int size,
+                                                                                    Long projectId, Boolean photoOnly) {
         loaders.creator(creatorId);
 
         final int pageSize = Math.max(1, size);

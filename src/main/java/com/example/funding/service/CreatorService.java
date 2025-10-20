@@ -1,11 +1,13 @@
 package com.example.funding.service;
 
-import com.example.funding.common.Cursor;
 import com.example.funding.common.CursorPage;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.request.creator.*;
+import com.example.funding.dto.request.creator.CreatorRegisterRequestDto;
+import com.example.funding.dto.request.creator.CreatorUpdateRequestDto;
+import com.example.funding.dto.request.creator.ProjectCreateRequestDto;
+import com.example.funding.dto.request.creator.SearchCreatorProjectDto;
 import com.example.funding.dto.request.shipping.ShippingStatusDto;
 import com.example.funding.dto.response.backing.BackingCreatorProjectListDto;
 import com.example.funding.dto.response.creator.*;
@@ -20,7 +22,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -108,6 +109,23 @@ public interface CreatorService {
                                                                                  @NotBlank(message = "정렬 기준은 필수입니다.")
                                                                                  String sort, Pager pager);
 
-    ResponseEntity<ResponseDto<CursorPage<ReviewListDto>>> getCreatorReviews(Long creatorId, LocalDateTime lastCreatedAt, Long lastId, int size,
+    /**
+     * 크리에이터 리뷰 목록 조회 (커서 기반 페이징)
+     * @param creatorId 크리에이터 ID
+     * @param lastCreatedAt 마지막으로 조회된 리뷰의 생성일시 (커서)
+     * @param lastId 마지막으로 조회된 리뷰의 ID (커서)
+     * @param size 조회할 리뷰 개수
+     * @param projectId (선택 사항) 특정 프로젝트에 대한 리뷰만 조회
+     * @param photoOnly (선택 사항) 사진이 포함된 리뷰만 조회 여부
+     * @return 커서 기반 페이징된 크리에이터 리뷰 목록
+     * @since 2025-10-19
+     * @author 장민규
+     */
+    ResponseEntity<ResponseDto<CursorPage<ReviewListDto>>> getCreatorReviews(@NotNull(message = "크리에이터 ID는 필수입니다.")
+                                                                             @Positive(message = "크리에이터 ID는 양수여야 합니다.")
+                                                                             Long creatorId, LocalDateTime lastCreatedAt,
+                                                                             @Positive(message = "마지막 ID는 양수여야 합니다.") Long lastId,
+                                                                             @Positive(message = "조회 개수는 양수여야 합니다.") int size,
+                                                                             @Positive(message = "프로젝트 ID는 양수여야 합니다.")
                                                                              Long projectId, Boolean photoOnly);
 }

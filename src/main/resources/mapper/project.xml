@@ -10,9 +10,9 @@
 
     <select id="findById" resultType="project">
         SELECT
-            projectId, creatorId, subctgrId, title, goalAmount, currAmount, startDate, endDate, content, contentBlocks,
-            thumbnail, businessDoc, TRUNC(createdAt), TRUNC(updatedat), projectStatus, backerCnt, likeCnt, viewCnt,
-            isVerified, requestedAt, rejectedReason
+        projectId, creatorId, subctgrId, title, goalAmount, currAmount, startDate, endDate, content, contentBlocks,
+        thumbnail, businessDoc, TRUNC(createdAt), TRUNC(updatedat), projectStatus, backerCnt, likeCnt, viewCnt,
+        isVerified, requestedAt, rejectedReason
         FROM PROJECT
         WHERE PROJECTID = #{projectId}
     </select>
@@ -66,15 +66,15 @@
     </select>
 
     <select id="findFeaturedJoinedWithRecent" parameterType="map" resultType="featuredProjectDto">
-        SELECT projectId, title, creatorName, thumbnail, endDate, percentNow, goalAmount, score
+        SELECT projectId, title, creatorId, creatorName, thumbnail, endDate, percentNow, goalAmount, score
         FROM (
         SELECT
         pr.PROJECTID AS projectId,
+        pr.CREATORID AS creatorId,
         pr.Title AS title,
         NVL2(TRIM(c.CREATORNAME), c.CREATORNAME, 'Unknown Creator') AS creatorName,
         pr.Thumbnail AS thumbnail,
         pr.ENDDATE AS endDate,
-        /* 진행률(%) */
 
         CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
         THEN ROUND(NVL(pr.CURRAMOUNT,0) / NULLIF(pr.GOALAMOUNT,0) * 100)
@@ -82,7 +82,6 @@
         END AS percentNow,
         NVL(pr.GOALAMOUNT,0) AS goalAmount,
 
-        /* 점수: 진행률 35% + 최근결제/목표 15% + 백커/좋아요/조회 */
         (
         (CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
         THEN ROUND(NVL(pr.CURRAMOUNT,0) / NULLIF(pr.GOALAMOUNT,0) * 100)
@@ -116,7 +115,6 @@
         FROM PROJECT pr
         JOIN CREATOR c ON c.CREATORID = pr.CREATORID
 
-        /* 최근 결제액 집계: 프로젝트별 recentPaidAmount */
         LEFT JOIN (
         SELECT bp.PROJECTID,
         SUM(p.AMOUNT) AS recentPaidAmount
@@ -142,59 +140,54 @@
             SELECT *
             FROM (
               SELECT
-                pr.PROJECTID                                   AS projectId,
-                pr.TITLE                                       AS title,
-                pr.THUMBNAIL                                   AS thumbnail,
-                pr.CREATORID                                   AS creatorId,
+                pr.PROJECTID AS projectId,
+                pr.TITLE AS title,
+                pr.THUMBNAIL AS thumbnail,
+                pr.CREATORID AS creatorId,
                 NVL2(TRIM(c.CREATORNAME), c.CREATORNAME, 'Unknown Creator') AS creatorName,
-                NVL(pr.CURRAMOUNT,0)                           AS currAmount,
-                NVL(pr.GOALAMOUNT,0)                           AS goalAmount,
-                pr.ENDDATE                                     AS endDate,
-                NVL(pr.LIKECNT,0)                              AS likeCnt,
-                NVL(pr.VIEWCNT,0)                              AS viewCnt,
+                NVL(pr.CURRAMOUNT,0) AS currAmount,
+                NVL(pr.GOALAMOUNT,0) AS goalAmount,
+                pr.ENDDATE AS endDate,
+                NVL(pr.LIKECNT,0) AS likeCnt,
+                NVL(pr.VIEWCNT,0) AS viewCnt,
 
-                /* 결제 집계 (없으면 0) */
-                NVL(paid.totalPaidAmount, 0)                   AS totalPaidAmount,
-                NVL(paid.backerCnt, 0)                         AS backerCnt,
-                paid.lastPaidAt                                AS lastPaidAt,
+                NVL(paid.totalPaidAmount, 0) AS totalPaidAmount,
+                NVL(paid.backerCnt, 0) AS backerCnt,
+                paid.lastPaidAt AS lastPaidAt,
 
-                /* 진행률(%) */
                 CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
                      THEN ROUND(NVL(pr.CURRAMOUNT,0) / NULLIF(pr.GOALAMOUNT,0) * 100)
-                     ELSE 0 END                                AS percentNow,
+                     ELSE 0 END AS percentNow,
 
-                /* 트렌드 점수: 결제비중 70% + 좋아요 20% + 조회수 10% */
                 ( (CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
                         THEN (NVL(paid.totalPaidAmount,0) / NULLIF(pr.GOALAMOUNT,0)) * 100
                         ELSE 0 END) * 0.7
                   + (NVL(pr.LIKECNT,0)  / 50.0)  * 0.2
                   + (NVL(pr.VIEWCNT,0)  / 500.0) * 0.1
-                )                                              AS trendScore
+                ) AS trendScore
               FROM PROJECT pr
               JOIN CREATOR c ON c.CREATORID = pr.CREATORID
 
-              /* 최근 결제 집계: PAYMENT → BACKING → BACKINGDETAIL → REWARD */
               LEFT JOIN (
                 SELECT
                   r.PROJECTID,
-                  SUM(p.AMOUNT)                 AS totalPaidAmount,
-                  COUNT(DISTINCT b.USERID)      AS backerCnt,
-                  MAX(p.CREATEDAT)              AS lastPaidAt
+                  SUM(p.AMOUNT) AS totalPaidAmount,
+                  COUNT(DISTINCT b.USERID) AS backerCnt,
+                  MAX(p.CREATEDAT) AS lastPaidAt
                 FROM PAYMENT p
-                JOIN BACKING b        ON b.BACKINGID  = p.BACKINGID
+                JOIN BACKING b ON b.BACKINGID = p.BACKINGID
                 JOIN BACKINGDETAIL bd ON bd.BACKINGID = b.BACKINGID
-                JOIN REWARD r         ON r.REWARDID   = bd.REWARDID
-                WHERE p.STATUS     = 'PAID'
-                  AND p.CREATEDAT >= #{since}   -- 예: SYSDATE-1(최근 24시간)
+                JOIN REWARD r ON r.REWARDID = bd.REWARDID
+                WHERE p.STATUS = 'PAID'
+                  AND p.CREATEDAT >= #{since}
                 GROUP BY r.PROJECTID
               ) paid ON paid.PROJECTID = pr.PROJECTID
 
-              /* 프로젝트 조건 */
               WHERE pr.PROJECTSTATUS = 'OPEN'
                 AND (
                   #{startDays,jdbcType=NUMERIC} IS NULL
                   OR pr.STARTDATE IS NULL
-                  OR pr.STARTDATE >= TRUNC(SYSDATE) - #{startDays,jdbcType=NUMERIC}  -- 예: 30
+                  OR pr.STARTDATE >= TRUNC(SYSDATE) - #{startDays,jdbcType=NUMERIC}
                 )
 
               ORDER BY trendScore DESC
@@ -219,15 +212,15 @@
         <where>
             <if test="dto.keyword != null and dto.keyword != ''">
                 (
-                    LOWER(p.TITLE) LIKE '%' || LOWER(#{dto.keyword}) || '%'
-                    OR LOWER(p.CONTENT) LIKE '%' || LOWER(#{dto.keyword}) || '%'
-                    OR LOWER(c.CREATORNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
-                    OR EXISTS (
-                        SELECT 1
-                        FROM TAG t
-                        WHERE t.PROJECTID = p.PROJECTID
-                        AND LOWER(t.TAGNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
-                    )
+                LOWER(p.TITLE) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                OR LOWER(p.CONTENT) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                OR LOWER(c.CREATORNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                OR EXISTS (
+                SELECT 1
+                FROM TAG t
+                WHERE t.PROJECTID = p.PROJECTID
+                AND LOWER(t.TAGNAME) LIKE '%' || LOWER(#{dto.keyword}) || '%'
+                )
                 )
             </if>
             <if test="dto.ctgrId != null">
@@ -245,51 +238,51 @@
     <select id="searchProjects" resultType="featuredProjectDto">
         SELECT *
         FROM (
-            SELECT T.*, ROWNUM rnum
-            FROM (
-                SELECT
-                    p.PROJECTID AS projectId,
-                    p.TITLE AS title,
-                    c.CREATORNAME AS creatorName,
-                    p.THUMBNAIL AS thumbnail,
-                    p.ENDDATE AS endDate,
-                    p.CURRAMOUNT AS currAmount,
+        SELECT T.*, ROWNUM rnum
+        FROM (
+        SELECT
+        p.PROJECTID AS projectId,
+        p.TITLE AS title,
+        c.CREATORNAME AS creatorName,
+        p.THUMBNAIL AS thumbnail,
+        p.ENDDATE AS endDate,
+        p.CURRAMOUNT AS currAmount,
 
-                    /* 진행률(%) */
-                    CASE WHEN NVL(p.GOALAMOUNT,0) > 0
-                    THEN ROUND(NVL(p.CURRAMOUNT,0) / NULLIF(p.GOALAMOUNT,0) * 100)
-                    ELSE 0
-                    END AS percentNow,
+        /* 진행률(%) */
+        CASE WHEN NVL(p.GOALAMOUNT,0) > 0
+        THEN ROUND(NVL(p.CURRAMOUNT,0) / NULLIF(p.GOALAMOUNT,0) * 100)
+        ELSE 0
+        END AS percentNow,
 
-                    NVL(p.GOALAMOUNT,0) AS goalAmount
-                FROM PROJECT p
-                JOIN CREATOR c ON c.CREATORID = p.CREATORID
-                JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
-                JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
-                <include refid="searchFilterWhere"/>
+        NVL(p.GOALAMOUNT,0) AS goalAmount
+        FROM PROJECT p
+        JOIN CREATOR c ON c.CREATORID = p.CREATORID
+        JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
+        JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
+        <include refid="searchFilterWhere"/>
 
-                <choose>
-                    <when test="dto.sort == 'liked'">
-                        ORDER BY p.LIKECNT DESC, P.PROJECTID DESC
-                    </when>
-                    <when test="dto.sort == 'recent'">
-                        ORDER BY p.PROJECTID DESC
-                    </when>
-                    <when test="dto.sort == 'amount'">
-                        ORDER BY p.CURRAMOUNT DESC, P.PROJECTID DESC
-                    </when>
-                    <when test="dto.sort == 'deadline'">
-                        ORDER BY p.ENDDATE ASC, P.PROJECTID DESC
-                    </when>
-                    <when test="dto.sort == 'percent'">
-                        ORDER BY percentNow DESC, P.PROJECTID DESC
-                    </when>
-                    <when test="dto.sort == 'view'">
-                        ORDER BY p.VIEWCNT DESC, p.PROJECTID DESC
-                    </when>
-                </choose>
-            ) T
-            WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
+        <choose>
+            <when test="dto.sort == 'liked'">
+                ORDER BY p.LIKECNT DESC, P.PROJECTID DESC
+            </when>
+            <when test="dto.sort == 'recent'">
+                ORDER BY p.PROJECTID DESC
+            </when>
+            <when test="dto.sort == 'amount'">
+                ORDER BY p.CURRAMOUNT DESC, P.PROJECTID DESC
+            </when>
+            <when test="dto.sort == 'deadline'">
+                ORDER BY p.ENDDATE ASC, P.PROJECTID DESC
+            </when>
+            <when test="dto.sort == 'percent'">
+                ORDER BY percentNow DESC, P.PROJECTID DESC
+            </when>
+            <when test="dto.sort == 'view'">
+                ORDER BY p.VIEWCNT DESC, p.PROJECTID DESC
+            </when>
+        </choose>
+        ) T
+        WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
         )
         WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
@@ -313,7 +306,7 @@
     <update id="updateProjectsToOpen">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'OPEN',
-            UPDATEDAT = SYSDATE
+        UPDATEDAT = SYSDATE
         WHERE PROJECTSTATUS = 'UPCOMING'
         AND STARTDATE <![CDATA[ <= ]]> TRUNC(SYSDATE)
     </update>
@@ -329,7 +322,7 @@
     <update id="updateProjectsToSuccess">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'SUCCESS',
-            UPDATEDAT = SYSDATE
+        UPDATEDAT = SYSDATE
         WHERE PROJECTSTATUS = 'OPEN'
         AND (ENDDATE + 1) <![CDATA[ < ]]> TRUNC(SYSDATE)
         AND CURRAMOUNT <![CDATA[ >= ]]> GOALAMOUNT
@@ -346,7 +339,7 @@
     <update id="updateProjectsToFailed">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'FAILED',
-            UPDATEDAT = SYSDATE
+        UPDATEDAT = SYSDATE
         WHERE PROJECTSTATUS = 'OPEN'
         AND (ENDDATE + 1) <![CDATA[ < ]]> TRUNC(SYSDATE)
         AND CURRAMOUNT <![CDATA[ < ]]> GOALAMOUNT
@@ -467,4 +460,16 @@
         AND projectStatus = 'SUCCESS'
     </update>
 
+    <select id="selectProjectsByIds" parameterType="list"
+            resultType="com.example.funding.dto.response.creator.ReviewListDto$ProjectInfo">
+        SELECT
+        p.projectId AS projectId,
+        p.title AS title,
+        p.thumbnail AS thumbnail
+        FROM project p
+        WHERE p.projectId IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

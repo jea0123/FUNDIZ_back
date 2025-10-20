@@ -49,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
 
         String encodedPassword = passwordEncoder.encode(dto.getPassword());
         dto.setPassword(encodedPassword);
-        User user = User.builder().email(dto.getEmail()).password(dto.getPassword()).nickname(dto.getNickname())
+        User user = User.builder().email(dto.getEmail()).pwd(dto.getPassword()).nickname(dto.getNickname())
                 .build();
         userMapper.signUp(user);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "회원가입 성공", dto.getEmail()));
@@ -64,7 +64,7 @@ public class AuthServiceImpl implements AuthService {
         String encodedPassword = passwordEncoder.encode(dto.getPassword());
 
       //임시로그인 암호화
-        if (user == null || passwordEncoder.matches(user.getPassword(), encodedPassword))
+        if (user == null || passwordEncoder.matches(user.getPwd(), encodedPassword))
             throw new InvalidCredentialsException();
 
 //        //임시 로그인 암호화 해제

@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
-import static com.example.funding.service.validator.ValidationRules.normRewardName;
-import static com.example.funding.service.validator.ValidationRules.nvl;
+import static com.example.funding.service.validator.ProjectValidationRules.normRewardName;
+import static com.example.funding.service.validator.ProjectValidationRules.nvl;
 
 @Component
 @RequiredArgsConstructor

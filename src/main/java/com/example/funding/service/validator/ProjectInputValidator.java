@@ -5,13 +5,15 @@ import com.example.funding.dto.request.reward.RewardCreateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
-import static com.example.funding.service.validator.ValidationRules.*;
+import static com.example.funding.service.validator.ProjectValidationRules.*;
 
 @Component
 @RequiredArgsConstructor
@@ -27,7 +29,9 @@ public class ProjectInputValidator {
         validateBasics(dto.getTitle(), dto.getContent(), dto.getGoalAmount(),
                 dto.getStartDate(), dto.getEndDate(), true, errors);
 
-        //TODO: 대표이미지 검증 추가
+        validateThumbnail(dto.getThumbnail(), true, errors);
+        validateThumbnailUrl(dto.getThumbnailUrl(), false, errors);
+        validateBusinessDoc(dto.getBusinessDoc(), false, errors);
 
         validateTags(dto.getTagList(), errors);
         if (dto.getRewardList() != null && !dto.getRewardList().isEmpty()) {
@@ -47,7 +51,9 @@ public class ProjectInputValidator {
         validateBasics(dto.getTitle(), dto.getContent(), dto.getGoalAmount(),
             dto.getStartDate(), dto.getEndDate(), false, errors);
 
-        //TODO: 대표이미지 검증 추가
+        validateThumbnail(dto.getThumbnail(), false, errors);
+        validateThumbnailUrl(dto.getThumbnailUrl(), false, errors);
+        validateBusinessDoc(dto.getBusinessDoc(), false, errors);
 
         validateTags(dto.getTagList(), errors);
         if (dto.getRewardList() != null && !dto.getRewardList().isEmpty()) {
@@ -55,6 +61,75 @@ public class ProjectInputValidator {
         }
 
         return errors;
+    }
+
+    private void validateThumbnail(MultipartFile file, boolean required, List<String> errors) {
+        boolean hasFile = file != null && !file.isEmpty();
+
+        if (required && !hasFile) {
+            errors.add("대표이미지 파일은 필수입니다.");
+            return;
+        }
+        if (!hasFile) return;
+
+        String ct = Optional.ofNullable(file.getContentType()).orElse("");
+        if (!ALLOWED_IMAGE_TYPES.contains(ct)) {
+            errors.add("대표이미지 형식은 JPEG 또는 PNG만 허용됩니다.");
+            return;
+        }
+
+        try (InputStream is = file.getInputStream()) {
+            if (!isImageBySignature(is)) {
+                errors.add("대표이미지 파일이 손상되었거나 이미지가 아닙니다.");
+                return;
+            }
+        } catch (Exception e) {
+            errors.add("대표이미지 파일을 읽는 중 오류가 발생했습니다.");
+            return;
+        }
+    }
+
+    private void validateThumbnailUrl(String url, boolean required, List<String> errors) {
+        String u = nvl(url).trim();
+        if (required && u.isEmpty()) {
+            errors.add("대표이미지 업로드에 실패했습니다. 다시 시도해주세요.");
+            return;
+        }
+        if (!u.isEmpty() && u.length() > MAX_THUMBNAIL_LEN) {
+            errors.add("대표이미지 URL 길이는 최대 " + MAX_THUMBNAIL_LEN + "자 이하여야 합니다.");
+        }
+    }
+
+    public void validateBusinessDoc(@Nullable MultipartFile file, boolean required, List<String> errors) {
+        boolean hasFile = file != null && !file.isEmpty();
+
+        if (required && !hasFile) {
+            errors.add("사업자등록증 파일은 필수입니다.");
+            return;
+        }
+        if (!hasFile) return;
+
+        String ct = Optional.ofNullable(file.getContentType()).orElse("");
+        boolean isPdf = "application/pdf".equals(ct);
+        boolean isImg = ALLOWED_IMAGE_TYPES.contains(ct);
+        if (!isPdf && !isImg) {
+            errors.add("사업자등록증은 PDF 또는 JPEG/PNG 형식만 허용됩니다.");
+            return;
+        }
+
+        try (InputStream is = file.getInputStream()) {
+            if (isPdf) {
+                if (!isPdfBySignature(is)) {
+                    errors.add("PDF 파일이 손상되었거나 확장자/형식이 일치하지 않습니다.");
+                }
+            } else {
+                if (!isImageBySignature(is)) {
+                    errors.add("이미지 파일이 손상되었거나 지원되지 않습니다.");
+                }
+            }
+        } catch (Exception e) {
+            errors.add("사업자등록증 파일을 확인하는 중 오류가 발생했습니다.");
+        }
     }
 
     /**
@@ -83,13 +158,15 @@ public class ProjectInputValidator {
         }
 
         if (forCreate) {
-            if (goalAmount == null || goalAmount < MIN_GOAL_AMOUNT) {
-                errors.add("목표 금액은 최소 " + MIN_GOAL_AMOUNT + "원 이상이어야 합니다.");
+            if (goalAmount == null) {
+                errors.add("목표 금액은 필수입니다.");
+            } else if (goalAmount < MIN_GOAL_AMOUNT || goalAmount > MAX_GOAL_AMOUNT) {
+                errors.add("목표 금액은 최소 " + MIN_GOAL_AMOUNT + "원, 최대 " + MAX_GOAL_AMOUNT + "원 이하여야 합니다.");
             }
         } else {
             // 프로젝트 수정인 경우
-            if (goalAmount != null && goalAmount < MIN_GOAL_AMOUNT) {
-                errors.add("목표 금액은 최소 " + MIN_GOAL_AMOUNT + "원 이상이어야 합니다.");
+            if (goalAmount != null && (goalAmount < MIN_GOAL_AMOUNT || goalAmount > MAX_GOAL_AMOUNT)) {
+                errors.add("목표 금액은 최소 " + MIN_GOAL_AMOUNT + "원, 최대 " + MAX_GOAL_AMOUNT + "원 이하여야 합니다.");
             }
         }
 
@@ -244,5 +321,25 @@ public class ProjectInputValidator {
         if (!dup.isEmpty()) errors.add("중복된 리워드명이 있습니다.");
 
         return errors;
+    }
+
+    private boolean isImageBySignature(InputStream is) throws Exception {
+        is.mark(16);
+        byte[] head = is.readNBytes(12);
+        is.reset();
+        // JPEG: FF D8 FF
+        if (head.length >= 3 && (head[0] & 0xFF) == 0xFF && (head[1] & 0xFF) == 0xD8 && (head[2] & 0xFF) == 0xFF) return true;
+        // PNG: 89 50 4E 47 0D 0A 1A 0A
+        if (head.length >= 8 && (head[0] & 0xFF) == 0x89 && head[1]=='P' && head[2]=='N' && head[3]=='G') return true;
+        // (WebP 필요 시 추가: "RIFF....WEBP")
+        return false;
+    }
+
+    private boolean isPdfBySignature(InputStream is) throws Exception {
+        is.mark(8);
+        byte[] head = is.readNBytes(5);
+        is.reset();
+        // "%PDF-"
+        return head.length >= 5 && head[0]=='%' && head[1]=='P' && head[2]=='D' && head[3]=='F' && head[4]=='-';
     }
 }

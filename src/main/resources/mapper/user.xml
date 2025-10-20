@@ -15,14 +15,16 @@
     </update>
 
     <select id="getUserById" parameterType="long" resultType="com.example.funding.model.User">
-        SELECT *
+        SELECT userId, email, pwd, nickname, profileImg, isSuspended, joinedAt, lastLoginAt, followCnt, reason,
+        suspendedAt, releasedAt, isCreator, role
         FROM users
         WHERE userId=#{userId, jdbcType=NUMERIC}
-
     </select>
 
     <select id="findByEmail" parameterType="String" resultType="user">
-        SELECT * FROM USERS WHERE EMAIL = #{email}
+        SELECT userId, email, pwd, nickname, profileImg, isSuspended, joinedAt, lastLoginAt, followCnt, reason,
+        suspendedAt, releasedAt, isCreator, role
+        FROM USERS WHERE EMAIL = #{email}
     </select>
 
     <select id="findByNickname" parameterType="String" resultType="user">
@@ -33,7 +35,7 @@
         MERGE INTO recentview rv
         USING (
         SELECT
-        #{userId, jdbcType=NUMERIC}    AS userId,
+        #{userId, jdbcType=NUMERIC} AS userId,
         #{projectId, jdbcType=NUMERIC} AS projectId
         FROM dual
         ) src
@@ -93,7 +95,7 @@
         SET profileImg = #{profileImg}
         WHERE userId = #{userId}
     </update>
-    
+
     <delete id="withdrawUser" parameterType="long">
         DELETE FROM USERS
         WHERE USERID = #{userId}
@@ -103,5 +105,17 @@
         SELECT LASTLOGINAT
         FROM USERS
         WHERE USERID = #{userId}
+    </select>
+
+    <select id="selectUsersByIds" parameterType="list" resultType="com.example.funding.dto.response.creator.ReviewListDto$UserInfo">
+        SELECT
+        u.userId AS userId,
+        u.nickname AS nickname,
+        u.profileImg AS profileImg
+        FROM users u
+        WHERE u.userId IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
     </select>
 </mapper>

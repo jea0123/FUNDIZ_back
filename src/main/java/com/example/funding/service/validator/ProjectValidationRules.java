@@ -5,14 +5,11 @@ import lombok.experimental.UtilityClass;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @UtilityClass
-public class ValidationRules {
+public class ProjectValidationRules {
     // 기본 필드
     public static final int MIN_TITLE_LEN = 2;
     public static final int MAX_TITLE_LEN = 255;
@@ -25,12 +22,13 @@ public class ValidationRules {
     public static final int MIN_START_LEAD_DAYS = 7; // 리드타임: 오늘+최소 n일 이후 시작
 
     // 대표이미지
+    public static final Set<String> ALLOWED_IMAGE_TYPES = Set.of("image/jpeg", "image/png");
     public static final int MAX_THUMBNAIL_LEN = 500;
 
     // 태그
-    public static final int MAX_TAGS = 10;
+    public static final int MAX_TAGS = 3;
     public static final int MIN_TAG_LEN = 2;
-    public static final int MAX_TAG_LEN = 20;
+    public static final int MAX_TAG_LEN = 15;
     public static final Pattern TAG_PATTERN = Pattern.compile("^[0-9A-Za-z가-힣 _-]+$");
 
     // 리워드
@@ -38,41 +36,6 @@ public class ValidationRules {
     public static final int MAX_REWARD_CONTENT_LEN = 255;
     public static final int MIN_REWARD_PRICE = 1_000;
     public static final int MAX_REWARD_PRICE = 30_000_000;
-
-    //주소
-    public static final int MAX_ADDR_NAME_LEN = 30;
-    public static final int MAX_ROAD_ADDR_LEN = 100;
-    public static final int MAX_DETAIL_ADDR_LEN = 100;
-    public static final Pattern POSTAL_PATTERN = Pattern.compile("^[0-9]{5}$");
-    public static final Pattern PHONE_PATTERN = Pattern.compile("^(?:01[0-9]|02|0[3-6][1-5]|070)-?[0-9]{3,4}-?[0-9]{4}$");
-
-    // 배송
-    public static final Pattern TRACKING_NUM_PATTERN = Pattern.compile("^[0-9]{10,14}$");
-
-    // 배송상태 전환 규칙
-    public static final Map<String, List<String>> SHIPPING_ALLOWED_TRANSITIONS = Map.of(
-            "PENDING", List.of("READY"),
-            "READY", List.of("SHIPPED"),
-            "SHIPPED", List.of("DELIVERED", "FAILED"),
-            "DELIVERED", List.of("CANCELED"),
-            "CANCELED", List.of(),
-            "FAILED", List.of()
-    );
-
-    // 배송 상태 라벨
-    public static final Map<String, String> SHIPPING_STATUS_LABEL = Map.of(
-            "PENDING", "후원 완료",
-            "READY", "상품 준비 중",
-            "SHIPPED", "배송 시작",
-            "DELIVERED", "배송 완료",
-            "CANCELED", "취소",
-            "FAILED", "배송 실패"
-    );
-
-    // 공백 검사
-    public static boolean isBlank(String s) {
-        return s == null || s.trim().isEmpty();
-    }
 
     // helpers
     /** 두 날짜 사이의 포함 일수(끝 미포함) */

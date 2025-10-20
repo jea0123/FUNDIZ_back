@@ -5,9 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 
-import static com.example.funding.service.validator.ValidationRules.*;
+import static com.example.funding.service.validator.AddressValidationRules.*;
 
 @Component
 @RequiredArgsConstructor

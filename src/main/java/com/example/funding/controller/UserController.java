@@ -1,5 +1,6 @@
 package com.example.funding.controller;
 
+import com.example.funding.common.CustomUserPrincipal;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
@@ -18,6 +19,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -41,21 +43,15 @@ public class UserController {
      * @author by: 장민규
      */
     @GetMapping("/loginUser")
-    public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(
-//            @AuthenticationPrincipal CustomUserPrincipal principal
-    ) {
-//        Long userId = principal.userId();
-        Long userId = 501L; // TODO: 임시
-        return userService.getLoginUser(userId);
+    public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(@AuthenticationPrincipal CustomUserPrincipal principal) {
+        return userService.getLoginUser(principal.userId());
     }
 
     @PostMapping("/recentView/{projectId}")
-    public ResponseEntity<ResponseDto<?>> addRecentViewProject(@PathVariable Long projectId
-//                                                                   @AuthenticationPrincipal CustomUserPrincipal principal
+    public ResponseEntity<ResponseDto<?>> addRecentViewProject(@PathVariable Long projectId,
+                                                               @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
-//        Long userId = principal.userId();
-        Long userId = 501L; // TODO: 임시
-        return userService.addRecentViewProject(userId, projectId);
+        return userService.addRecentViewProject(principal.userId(), projectId);
     }
 
     /**
@@ -68,12 +64,8 @@ public class UserController {
      * @since 2025-09-05
      */
     @GetMapping("/recentViewProjects")
-    public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(
-//            @AuthenticationPrincipal CustomUserPrincipal principal
-    ) {
-//        Long userId = principal.userId();
-        Long userId = 501L; // TODO: 임시
-        return userService.getRecentViewProjects(userId);
+    public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(@AuthenticationPrincipal CustomUserPrincipal principal) {
+        return userService.getRecentViewProjects(principal.userId());
     }
 
     /**
@@ -90,30 +82,24 @@ public class UserController {
     }
 
     @PostMapping("/nickname")
-    public ResponseEntity<ResponseDto<String>> updateNickname(@Valid @RequestBody UserNicknameDto dto
-//                                                              @AuthenticationPrincipal CustomUserPrincipal principal
+    public ResponseEntity<ResponseDto<String>> updateNickname(@Valid @RequestBody UserNicknameDto dto,
+                                                              @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
-//        Long userId = principal.userId();
-        Long userId = 501L; // TODO: 임시
-        return userService.userNickname(userId, dto);
+        return userService.userNickname(principal.userId(), dto);
     }
 
     @PostMapping("/profileImg")
-    public ResponseEntity<ResponseDto<String>> updateProfileImg(@Valid @ModelAttribute UserProfileImgDto dto
-//                                                                @AuthenticationPrincipal CustomUserPrincipal principal
+    public ResponseEntity<ResponseDto<String>> updateProfileImg(@Valid @ModelAttribute UserProfileImgDto dto,
+                                                                @AuthenticationPrincipal CustomUserPrincipal principal
     ) throws IOException {
-//        Long userId = principal.userId();
-        Long userId = 501L; // TODO: 임시
-        return userService.userProfileImg(userId, dto);
+        return userService.userProfileImg(principal.userId(), dto);
     }
 
     @PostMapping("/password")
-    public ResponseEntity<ResponseDto<String>> updatePassword(@Valid @RequestBody UserPasswordDto dto
-//                                                              @AuthenticationPrincipal CustomUserPrincipal principal
+    public ResponseEntity<ResponseDto<String>> updatePassword(@Valid @RequestBody UserPasswordDto dto,
+                                                              @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
-//        Long userId = principal.userId();
-        Long userId = 501L; // TODO: 임시
-        return userService.userPassword(userId, dto);
+        return userService.userPassword(principal.userId(), dto);
     }
 
     /**
@@ -162,12 +148,10 @@ public class UserController {
      * @since 2025-10-15
      */
     @PostMapping("/like/{projectId}")
-    public ResponseEntity<ResponseDto<Long>> likeProject(@PathVariable Long projectId
-//                                                      @AuthenticationPrincipal CustomUserPrincipal principal
+    public ResponseEntity<ResponseDto<Long>> likeProject(@PathVariable Long projectId,
+                                                      @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
-//        Long userId = principal.userId();
-        Long userId = 501L; // TODO: 임시
-        return userService.likeProject(userId, projectId);
+        return userService.likeProject(principal.userId(), projectId);
     }
 
     /**
@@ -183,12 +167,10 @@ public class UserController {
      * @since 2025-10-15
      */
     @DeleteMapping("/dislike/{projectId}")
-    public ResponseEntity<ResponseDto<Long>> dislikeProject(@PathVariable Long projectId
-//                                                         @AuthenticationPrincipal CustomUserPrincipal principal
+    public ResponseEntity<ResponseDto<Long>> dislikeProject(@PathVariable Long projectId,
+                                                         @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
-//        Long userId = principal.userId();
-        Long userId = 501L; // TODO: 임시
-        return userService.dislikeProject(userId, projectId);
+        return userService.dislikeProject(principal.userId(), projectId);
     }
 
     /**
@@ -203,12 +185,10 @@ public class UserController {
      * @since 2025-10-15
      */
     @GetMapping("/checkLike/{projectId}")
-    public ResponseEntity<ResponseDto<Boolean>> isProjectLiked(@PathVariable Long projectId
-//                                                              @AuthenticationPrincipal CustomUserPrincipal principal
+    public ResponseEntity<ResponseDto<Boolean>> isProjectLiked(@PathVariable Long projectId,
+                                                              @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
-//        Long userId = principal.userId();
-        Long userId = 501L; // TODO: 임시
-        return userService.checkLikedProject(userId, projectId);
+        return userService.checkLikedProject(principal.userId(), projectId);
     }
 
     /**
@@ -224,12 +204,10 @@ public class UserController {
      * @since 2025-10-15
      */
     @PostMapping("/follow/{creatorId}")
-    public ResponseEntity<ResponseDto<String>> followCreator(@PathVariable Long creatorId
-//                                                            @AuthenticationPrincipal CustomUserPrincipal principal
+    public ResponseEntity<ResponseDto<String>> followCreator(@PathVariable Long creatorId,
+                                                            @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
-//        Long userId = principal.userId();
-        Long userId = 501L; // TODO: 임시
-        return userService.followCreator(userId, creatorId);
+        return userService.followCreator(principal.userId(), creatorId);
     }
 
     /**
@@ -245,12 +223,10 @@ public class UserController {
      * @since 2025-10-15
      */
     @DeleteMapping("/unfollow/{creatorId}")
-    public ResponseEntity<ResponseDto<String>> unfollowCreator(@PathVariable Long creatorId
-//                                                              @AuthenticationPrincipal CustomUserPrincipal principal
+    public ResponseEntity<ResponseDto<String>> unfollowCreator(@PathVariable Long creatorId,
+                                                              @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
-//        Long userId = principal.userId();
-        Long userId = 501L; // TODO: 임시
-        return userService.unfollowCreator(userId, creatorId);
+        return userService.unfollowCreator(principal.userId(), creatorId);
     }
 
     /**
@@ -265,11 +241,9 @@ public class UserController {
      * @since 2025-10-15
      */
     @GetMapping("/checkFollow/{creatorId}")
-    public ResponseEntity<ResponseDto<Boolean>> isFollowingCreator(@PathVariable Long creatorId
-//                                                                 @AuthenticationPrincipal CustomUserPrincipal principal
+    public ResponseEntity<ResponseDto<Boolean>> isFollowingCreator(@PathVariable Long creatorId,
+                                                                 @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
-//        Long userId = principal.userId();
-        Long userId = 501L; // TODO: 임시
-        return userService.isFollowingCreator(userId, creatorId);
+        return userService.isFollowingCreator(principal.userId(), creatorId);
     }
 }

@@ -9,6 +9,7 @@ import com.example.funding.dto.request.admin.SearchAdminProjectDto;
 import com.example.funding.dto.request.admin.UserAdminUpdateRequestDto;
 import com.example.funding.dto.request.cs.NoticeAddRequestDto;
 import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
+import com.example.funding.dto.request.cs.ReportUpdateRequestDto;
 import com.example.funding.dto.response.admin.AdminAnalyticsDto;
 import com.example.funding.dto.response.admin.AdminProjectListDto;
 import com.example.funding.dto.response.admin.ProjectVerifyDetailDto;
@@ -53,6 +54,7 @@ public class AdminServiceImpl implements AdminService {
     private final RewardMapper rewardMapper;
     private final NoticeMapper noticeMapper;
     private final CategoryMapper categoryMapper;
+    private final ReportMapper reportMapper;
 
     private final NotificationPublisher notificationPublisher;
     private final ProjectTransitionGuard transitionGuard;
@@ -62,7 +64,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<AdminAnalyticsDto>> getAdminAnalytics(LocalDate from, LocalDate to, int limit, String metric, int months, Long ctgrId) {
+    public ResponseEntity<ResponseDto<AdminAnalyticsDto>> getAdminAnalytics(LocalDate from, LocalDate to, Integer limit, String metric, Integer months, Long ctgrId) {
         requireIn(metric, List.of("qty", "revenue"), InvalidParamException::new);
         Kpi kpi = adminMapper.getKpiByMonths(months);
         List<RevenueTrend> revenueTrends = adminMapper.getMonthlyTrends(months);
@@ -122,7 +124,7 @@ public class AdminServiceImpl implements AdminService {
     public ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchAdminProjectDto dto, Pager pager) {
         // TODO: 검증 변경 (단일 -> 리스트 검증)
 //        requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new);
-        List<ProjectStatus> st = dto.getProjectStatuses();
+        List<ProjectStatus> st = dto.getProjectStatus();
         if (st != null && st.stream().anyMatch(Objects::isNull)) {
             throw new InvalidStatusException();
         }
@@ -196,7 +198,7 @@ public class AdminServiceImpl implements AdminService {
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<ProjectVerifyListDto>>> getProjectVerifyList(SearchAdminProjectDto dto, Pager pager) {
 //        requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new);
-        List<ProjectStatus> st = dto.getProjectStatuses();
+        List<ProjectStatus> st = dto.getProjectStatus();
         if (st != null && st.stream().anyMatch(Objects::isNull)) {
             throw new InvalidStatusException();
         }
@@ -400,5 +402,26 @@ public class AdminServiceImpl implements AdminService {
         }
         return ResponseEntity.ok(ResponseDto.success(200, "공지사항 삭제 완료", "공지사항 삭제"));
     }
+
+    /**
+     * <p>신고 내역 상태 수정</p>
+     *
+     * @param reportId 신고 ID
+     * @param dto ReportUpdateRequestDto
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author 이동혁
+     * @since 2025-10-18
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> updateReportStatus(Long reportId, ReportUpdateRequestDto dto) {
+        dto.setReportId(reportId);
+
+        int result = reportMapper.updateReportStatus(dto);
+        if (result == 0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "신고 내역 상태 수정 실패"));
+        }
+        return ResponseEntity.ok(ResponseDto.success(200, "신고 내역 상태 수정 완료", "신고 내역 상태 수정 "));
+    }
+
 
 }

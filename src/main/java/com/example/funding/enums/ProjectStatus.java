@@ -9,6 +9,5 @@ public enum ProjectStatus {
     SUCCESS,
     FAILED,
     CANCELED,
-    SETTLED,
-    CLOSED
+    SETTLED
 }

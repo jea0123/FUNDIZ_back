@@ -23,4 +23,73 @@
         FROM follow
         WHERE creatorId = #{creatorId}
     </select>
+
+    <select id="getCreatorFollowers" resultType="CreatorFollowerDto">
+        WITH c1 AS (
+        SELECT
+        c.creatorId,
+        c.userId,
+        c.creatorName,
+        c.profileImg,
+        ROW_NUMBER() OVER (PARTITION BY c.userId ORDER BY c.creatorId DESC) AS rn
+        FROM creator c
+        )
+        , base AS (
+        SELECT
+        u.userId,
+        u.nickname,
+        u.profileImg AS userProfileImg,
+        CASE WHEN u.isCreator = 'Y' THEN 1 ELSE 0 END AS isCreator,
+        c1.creatorId,
+        c1.creatorName,
+        c1.profileImg AS creatorProfileImg,
+        f.followDate,
+        CASE WHEN u.isCreator = 'Y' THEN 1 ELSE 0 END AS canFollow,
+        CASE
+        WHEN u.isCreator = 'Y'
+        AND #{loginUserId} IS NOT NULL
+        AND EXISTS (
+        SELECT 1
+        FROM follow f2
+        WHERE f2.creatorId = c1.creatorId
+        AND f2.userId = #{loginUserId}
+        )
+        THEN 1 ELSE 0
+        END AS isFollowing,
+        ROW_NUMBER() OVER (
+        PARTITION BY u.userId
+        ORDER BY f.followDate DESC, u.userId DESC
+        ) AS rn2
+        FROM follow f
+        JOIN users u
+        ON u.userId = f.userId
+        LEFT JOIN c1
+        ON c1.userId = u.userId
+        AND c1.rn = 1
+        WHERE f.creatorId = #{creatorId}
+        )
+        SELECT *
+        FROM (
+        SELECT inner_q.*, ROWNUM AS rn
+        FROM (
+        SELECT
+        userId, nickname, userProfileImg, isCreator,
+        creatorId, creatorName, creatorProfileImg,
+        followDate, canFollow, isFollowing
+        FROM base
+        WHERE rn2 = 1
+        ORDER BY followDate DESC, userId DESC
+        ) inner_q
+        WHERE ROWNUM &lt;= #{pager.endRow}
+        )
+        WHERE rn &gt;= #{pager.startRow}
+        ORDER BY rn
+    </select>
+
+    <select id="countCreatorFollowers" resultType="int">
+        SELECT COUNT(DISTINCT userId)
+        FROM follow
+        WHERE creatorId = #{creatorId}
+    </select>
+
 </mapper>

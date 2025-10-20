@@ -18,4 +18,6 @@ public interface ShippingMapper {
     int updateShippingStatus(@Param("projectId") Long projectId,
                              @Param("creatorId") Long creatorId,
                              @Param("shipping")ShippingStatusDto shippingStatusDto);
+
+    void updateBackingToShippingStatus(Long backingId);
 }

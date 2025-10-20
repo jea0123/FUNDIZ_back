@@ -102,4 +102,10 @@
         AND p.creatorId = #{creatorId}
         )
     </update>
+
+    <update id = "updateBackingToShippingStatus" >
+        update shipping
+        set shippingStatus = 'CANCELED'
+        where backingId = #{backingId}
+    </update>
 </mapper>

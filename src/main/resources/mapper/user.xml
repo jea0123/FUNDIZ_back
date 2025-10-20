@@ -15,14 +15,16 @@
     </update>
 
     <select id="getUserById" parameterType="long" resultType="com.example.funding.model.User">
-        SELECT *
+        SELECT userId, email, pwd, nickname, profileImg, isSuspended, joinedAt, lastLoginAt, followCnt, reason,
+        suspendedAt, releasedAt, isCreator, role
         FROM users
         WHERE userId=#{userId, jdbcType=NUMERIC}
-
     </select>
 
     <select id="findByEmail" parameterType="String" resultType="user">
-        SELECT * FROM USERS WHERE EMAIL = #{email}
+        SELECT userId, email, pwd, nickname, profileImg, isSuspended, joinedAt, lastLoginAt, followCnt, reason,
+        suspendedAt, releasedAt, isCreator, role
+        FROM USERS WHERE EMAIL = #{email}
     </select>
 
     <select id="findByNickname" parameterType="String" resultType="user">

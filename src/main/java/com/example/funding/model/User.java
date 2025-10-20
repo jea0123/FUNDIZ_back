@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class User {
     private Long userId;
     private String email;
-    private String password;
+    private String pwd;
     private String nickname;
     private String profileImg;
     private Character isSuspended;

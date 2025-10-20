@@ -119,7 +119,7 @@ public class ProjectServiceImpl implements ProjectService {
         List<RecentTop10ProjectDto> ranked = projectMapper.findRecentTopProjectsJoined(since, startDays, limit);
 
         if (ranked == null || ranked.isEmpty()) {
-            throw new RecentPaidProjectNotFoundException();
+            return ResponseEntity.ok(ResponseDto.success(200, "최근 24시간 내 결제된 프로젝트 TOP10 조회 성공", Collections.emptyList()));
         }
         return ResponseEntity.ok(ResponseDto.success(200, "최근 24시간 내 결제된 프로젝트 TOP10 조회 성공", ranked));
     }
@@ -131,8 +131,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<FeaturedProjectDto>>> getFeatured(int days, int limit) {
         List<FeaturedProjectDto> result = projectMapper.findFeaturedJoinedWithRecent(days, limit);
-        if (result == null || result.isEmpty()) throw new FeaturedProjectNotFoundException();
-
+        if (result == null || result.isEmpty()) {
+            return ResponseEntity.ok(ResponseDto.success(200, "추천 프로젝트 조회 성공", Collections.emptyList()));
+        }
         return ResponseEntity.ok(ResponseDto.success(200, "추천 프로젝트 조회 성공", result));
     }
 

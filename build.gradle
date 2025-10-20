@@ -45,6 +45,13 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.13.0'
     // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.13.0'
+
+//    implementation "com.oracle.database.jdbc:ojdbc11-production:23.7.0.25.01"
+    implementation("com.oracle.database.jdbc:ojdbc11-production:23.7.0.25.01") {
+        exclude group: "com.oracle.database.xml", module: "xmlparserv2"
+        exclude group: "com.oracle.database.xml", module: "xdb"
+        exclude group: "com.oracle.database.nls", module: "orai18n"
+    }
 }
 
 tasks.named('test') {

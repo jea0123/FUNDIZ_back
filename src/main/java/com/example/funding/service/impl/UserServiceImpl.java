@@ -213,8 +213,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<ResponseDto<String>> userPassword(Long userId, UserPasswordDto dto) {
         User user = loaders.user(userId);
-        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) throw new InCorrectPasswordException();
-        if (passwordEncoder.matches(dto.getNewPassword(), user.getPassword())) throw new DuplicatedPasswordException();
+        if (!passwordEncoder.matches(dto.getPassword(), user.getPwd())) throw new InCorrectPasswordException();
+        if (passwordEncoder.matches(dto.getNewPassword(), user.getPwd())) throw new DuplicatedPasswordException();
 
         String encodedNewPassword = passwordEncoder.encode(dto.getNewPassword());
         userMapper.updatePwd(userId, encodedNewPassword);

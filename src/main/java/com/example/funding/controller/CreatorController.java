@@ -423,12 +423,12 @@ public class CreatorController {
     /**
      * <p>크리에이터 리뷰 목록 조회 (커서 기반 페이징)</p>
      *
-     * @param creatorId    크리에이터 ID
+     * @param creatorId     크리에이터 ID
      * @param lastCreatedAt 마지막으로 조회된 리뷰의 생성일시 (커서)
-     * @param lastId       마지막으로 조회된 리뷰의 ID (커서)
-     * @param size         조회할 리뷰 개수
-     * @param projectId    (선택 사항) 특정 프로젝트에 대한 리뷰만 조회
-     * @param photoOnly    (선택 사항) 사진이 포함된 리뷰만 조회 여부
+     * @param lastId        마지막으로 조회된 리뷰의 ID (커서)
+     * @param size          조회할 리뷰 개수
+     * @param projectId     (선택 사항) 특정 프로젝트에 대한 리뷰만 조회
+     * @param photoOnly     (선택 사항) 사진이 포함된 리뷰만 조회 여부
      * @return 커서 기반 페이징된 크리에이터 리뷰 목록
      * @author 장민규
      * @since 2025-10-19
@@ -441,5 +441,14 @@ public class CreatorController {
                                                                                     @RequestParam(required = false, defaultValue = "false") Boolean photoOnly,
                                                                                     @NotNull @Positive @RequestParam(required = false, defaultValue = "10") int size) {
         return creatorService.getCreatorReviews(creatorId, lastCreatedAt, lastId, size, projectId, photoOnly);
+    }
+
+    @GetMapping("/followers/{creatorId}")
+    public ResponseEntity<ResponseDto<PageResult<CreatorFollowerDto>>> getCreatorFollowers(@PathVariable Long creatorId,
+                                                                                           @AuthenticationPrincipal CustomUserPrincipal principal,
+                                                                                           @Valid PagerRequest req) {
+        Pager pager = Pager.ofRequest(req.getPage(), req.getSize(), req.getPerGroup());
+        Long loginUserId = principal != null ? principal.userId() : null;
+        return creatorService.getCreatorFollowers(creatorId, loginUserId, pager);
     }
 }

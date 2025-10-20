@@ -761,4 +761,14 @@ public class CreatorServiceImpl implements CreatorService {
         CursorPage<ReviewListDto> page = new CursorPage<>(reviews, cursor, hasNext, totalCount);
         return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 리뷰 조회 성공", page));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<PageResult<CreatorFollowerDto>>> getCreatorFollowers(Long creatorId, Long loginUserId, Pager pager) {
+        loaders.creator(creatorId);
+        List<CreatorFollowerDto> followers = followMapper.getCreatorFollowers(creatorId, loginUserId, pager);
+        int total = followMapper.countCreatorFollowers(creatorId);
+        PageResult<CreatorFollowerDto> result = PageResult.of(followers, pager, total);
+        return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 팔로워 조회 성공", result));
+    }
 }

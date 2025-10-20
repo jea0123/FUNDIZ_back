@@ -22,8 +22,8 @@ public class ProjectValidationRules {
     public static final int MIN_START_LEAD_DAYS = 7; // 리드타임: 오늘+최소 n일 이후 시작
 
     // 대표이미지
-    public static final long MAX_THUMBNAIL = 4L * 1024 * 1024 * 1024;
-    private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of("image/jpeg", "image/png");
+    public static final Set<String> ALLOWED_IMAGE_TYPES = Set.of("image/jpeg", "image/png");
+    public static final int MAX_THUMBNAIL_LEN = 500;
 
     // 태그
     public static final int MAX_TAGS = 3;

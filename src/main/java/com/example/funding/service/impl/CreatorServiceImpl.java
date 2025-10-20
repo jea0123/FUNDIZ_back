@@ -558,6 +558,7 @@ public class CreatorServiceImpl implements CreatorService {
                 .phone(dto.getPhone())
                 .account(dto.getAccount())
                 .bank(dto.getBank())
+                .bio(dto.getBio())
                 .build();
         if (dto.getProfileImg() != null && !dto.getProfileImg().isEmpty()) {
             String profileImgPath = fileUploader.upload(dto.getProfileImg());

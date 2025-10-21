@@ -50,8 +50,7 @@ public class UserController {
 
     @PostMapping("/recentView/{projectId}")
     public ResponseEntity<ResponseDto<?>> addRecentViewProject(@PathVariable Long projectId,
-                                                               @AuthenticationPrincipal CustomUserPrincipal principal
-    ) {
+                                                               @AuthenticationPrincipal CustomUserPrincipal principal) {
         return userService.addRecentViewProject(principal.userId(), projectId);
     }
 

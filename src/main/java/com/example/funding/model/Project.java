@@ -28,7 +28,6 @@ public class Project {
     private Integer backerCnt;
     private Integer likeCnt;
     private Integer viewCnt;
-    private Character isVerified;
     private LocalDateTime requestedAt;
     private String rejectedReason;
 }

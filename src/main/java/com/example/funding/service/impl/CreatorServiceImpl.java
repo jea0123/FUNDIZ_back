@@ -36,7 +36,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -545,7 +544,7 @@ public class CreatorServiceImpl implements CreatorService {
      * 크리에이터 등록
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> registerCreator(CreatorRegisterRequestDto dto, Long userId) throws IOException {
+    public ResponseEntity<ResponseDto<String>> registerCreator(CreatorRegisterRequestDto dto, Long userId) throws Exception {
         loaders.user(userId);
         if (userMapper.getCreatorIdByUserId(userId) != null) throw new AlreadyCreatorException();
 

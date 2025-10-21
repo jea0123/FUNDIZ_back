@@ -9,6 +9,8 @@ import com.example.funding.dto.request.admin.AdminProjectUpdateDto;
 import com.example.funding.dto.request.admin.RejectProjectDto;
 import com.example.funding.dto.request.admin.SearchAdminProjectDto;
 import com.example.funding.dto.request.admin.UserAdminUpdateRequestDto;
+import com.example.funding.dto.request.category.CreateCategoryDto;
+import com.example.funding.dto.request.category.CreateSubCategoryDto;
 import com.example.funding.dto.request.cs.NoticeAddRequestDto;
 import com.example.funding.dto.request.cs.NoticeUpdateRequestDto;
 import com.example.funding.dto.request.cs.ReportUpdateRequestDto;
@@ -378,6 +380,22 @@ public class AdminController {
     @PostMapping("/report/update/{reportId}")
     public ResponseEntity<ResponseDto<String>> updateReportStatus(@PathVariable Long reportId, @RequestBody ReportUpdateRequestDto dto){
         return adminService.updateReportStatus(reportId, dto);
+    }
+
+    /**
+     * 카테고리 생성
+     */
+    @PostMapping("/categories/create")
+    public ResponseEntity<ResponseDto<String>> createCategory(@RequestBody CreateCategoryDto dto) {
+        return categoryService.createCategory(dto);
+    }
+
+    /**
+     * 세부카테고리 생성
+     */
+    @PostMapping("/subcategories/create")
+    public ResponseEntity<ResponseDto<String>> createSubCategory(@RequestBody CreateSubCategoryDto dto) {
+        return categoryService.createSubCategory(dto);
     }
 
 }

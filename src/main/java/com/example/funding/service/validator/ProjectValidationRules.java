@@ -16,7 +16,7 @@ public class ProjectValidationRules {
     public static final int MIN_CONTENT_LEN = 30;
     public static final int MAX_CONTENT_LEN = 3000;
     public static final int MIN_GOAL_AMOUNT = 10_000;
-    public static final int MAX_GOAL_AMOUNT = Integer.MAX_VALUE;
+    public static final int MAX_GOAL_AMOUNT = 2_000_000_000;
     public static final int MIN_DAYS = 7;
     public static final int MAX_DAYS = 60;
     public static final int MIN_START_LEAD_DAYS = 7; // 리드타임: 오늘+최소 n일 이후 시작
@@ -29,7 +29,6 @@ public class ProjectValidationRules {
     public static final int MAX_TAGS = 3;
     public static final int MIN_TAG_LEN = 2;
     public static final int MAX_TAG_LEN = 15;
-    public static final Pattern TAG_PATTERN = Pattern.compile("^[0-9A-Za-z가-힣 _-]+$");
 
     // 리워드
     public static final int MAX_REWARD_NAME_LEN = 255;

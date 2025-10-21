@@ -25,8 +25,8 @@ public class BackingController {
     private final BackingService backingService;
 
     @GetMapping("/prepare/{projectId}")
-    public ResponseEntity<ResponseDto<BackingResponseDto>>prepareBacking(@PathVariable Long projectId,
-                                                                         @AuthenticationPrincipal CustomUserPrincipal principal) {
+    public ResponseEntity<ResponseDto<BackingResponseDto>> prepareBacking(@PathVariable Long projectId,
+                                                                          @AuthenticationPrincipal CustomUserPrincipal principal) {
         return backingService.prepareBacking(principal.userId(), projectId);
     }
 
@@ -49,8 +49,13 @@ public class BackingController {
         return backingService.updateBacking(requestDto, backingId, principal.userId());
     }
 
+    @GetMapping("/myPageBackingList/{userId}")
+    public ResponseEntity<ResponseDto<List<MyPageBackingListDto>>> geMyPageBackingList(@PathVariable Long userId) {
+        return backingService.getMyPageBackingList(userId);
+    }
+
     @GetMapping("/page")
-    public ResponseEntity<ResponseDto<List<BackingDto>>>getBackingList(@AuthenticationPrincipal CustomUserPrincipal principal) {
+    public ResponseEntity<ResponseDto<List<BackingDto>>> getBackingList(@AuthenticationPrincipal CustomUserPrincipal principal) {
         return backingService.getBackingList(principal.userId());
     }
 
@@ -58,17 +63,17 @@ public class BackingController {
     public ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(@AuthenticationPrincipal CustomUserPrincipal principal,
                                                                     @PathVariable Long projectId,
                                                                     @PathVariable Long rewardId,
-                                                                    @PathVariable Long backingId){
+                                                                    @PathVariable Long backingId) {
         return backingService.getBackingDetail(principal.userId(), projectId, rewardId, backingId);
     }
 
     @GetMapping("/myPageBackingList")
-    public ResponseEntity<ResponseDto<List<MyPageBackingListDto>>>geMyPageBackingList(@AuthenticationPrincipal CustomUserPrincipal principal) {
+    public ResponseEntity<ResponseDto<List<MyPageBackingListDto>>> geMyPageBackingList(@AuthenticationPrincipal CustomUserPrincipal principal) {
         return backingService.getMyPageBackingList(principal.userId());
     }
 
     @GetMapping("/myPageBackingDetail/{backingId}")
-    public ResponseEntity<ResponseDto<MyPageBackingDetailDto>>geMyPageBackingDetail(@AuthenticationPrincipal CustomUserPrincipal principal) {
+    public ResponseEntity<ResponseDto<MyPageBackingDetailDto>> geMyPageBackingDetail(@AuthenticationPrincipal CustomUserPrincipal principal) {
         return backingService.getMyPageBackingDetail(principal.userId());
     }
 

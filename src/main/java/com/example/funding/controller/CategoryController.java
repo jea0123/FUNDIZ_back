@@ -1,14 +1,14 @@
 package com.example.funding.controller;
 
 import com.example.funding.dto.ResponseDto;
-import com.example.funding.dto.request.category.CreateCategoryDto;
-import com.example.funding.dto.request.category.CreateSubCategoryDto;
 import com.example.funding.model.Category;
 import com.example.funding.model.Subcategory;
 import com.example.funding.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -41,15 +41,5 @@ public class CategoryController {
     @GetMapping("/subcategories")
     public ResponseEntity<ResponseDto<List<Subcategory>>> getAllSubcategories() {
         return categoryService.getAllSubcategories();
-    }
-
-    @PostMapping("/create")
-    public ResponseEntity<ResponseDto<String>> createCategory(@RequestBody CreateCategoryDto dto) {
-        return categoryService.createCategory(dto);
-    }
-
-    @PostMapping("/subcategories/create")
-    public ResponseEntity<ResponseDto<String>> createSubCategory(@RequestBody CreateSubCategoryDto dto) {
-        return categoryService.createSubCategory(dto);
     }
 }

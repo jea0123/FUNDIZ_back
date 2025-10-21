@@ -25,7 +25,6 @@ import com.example.funding.model.Qna;
 import com.example.funding.model.User;
 import com.example.funding.service.UserService;
 import com.example.funding.validator.Loaders;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -33,9 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
-import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -203,7 +200,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<ResponseDto<String>> userProfileImg(Long userId, UserProfileImgDto dto) throws IOException {
+    public ResponseEntity<ResponseDto<String>> userProfileImg(Long userId, UserProfileImgDto dto) throws Exception {
         loaders.user(userId);
         String profileImgUrl = fileUploader.upload(dto.getProfileImg());
         userMapper.updateProfile(userId, profileImgUrl);

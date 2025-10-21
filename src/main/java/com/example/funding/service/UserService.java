@@ -52,7 +52,7 @@ public interface UserService {
 
     ResponseEntity<ResponseDto<String>> userNickname(Long userId, UserNicknameDto dto);
 
-    ResponseEntity<ResponseDto<String>> userProfileImg(Long userId, UserProfileImgDto dto) throws IOException;
+    ResponseEntity<ResponseDto<String>> userProfileImg(Long userId, UserProfileImgDto dto) throws Exception;
 
     ResponseEntity<ResponseDto<String>> userPassword(Long userId, UserPasswordDto dto);
 

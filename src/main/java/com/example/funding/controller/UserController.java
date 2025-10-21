@@ -70,19 +70,6 @@ public class UserController {
         return userService.getRecentViewProjects(principal.userId(), limit != null ? limit : 10);
     }
 
-    /**
-     * <p>마이페이지 구현</p>
-     *
-     * @param userId 에 따른 MyPage 프로필 조회
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-     * @author by: 이윤기
-     * @since 2025-09-02
-     */
-    @GetMapping("/userPage/{userId}")
-    public ResponseEntity<ResponseDto<MyPageUserDto>> getMyPageUser(@PathVariable Long userId) {
-        return userService.getMyPageUser(userId);
-    }
-
     @PostMapping("/nickname")
     public ResponseEntity<ResponseDto<String>> updateNickname(@Valid @RequestBody UserNicknameDto dto,
                                                               @AuthenticationPrincipal CustomUserPrincipal principal
@@ -130,11 +117,6 @@ public class UserController {
     public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfUser(@PathVariable Long userId, @Valid PagerRequest req) {
         Pager pager = Pager.ofRequest(req.getPage(), req.getSize(), req.getPerGroup());
         return userService.getQnaListOfUser(userId, pager);
-    }
-
-    @GetMapping("/QnAListDetail/{userId}/project/{projectId}")
-    public ResponseEntity<ResponseDto<MyPageQnADetailDto>> getQnADetail(@PathVariable Long userId, @PathVariable Long projectId) {
-        return userService.getQnADetail(userId, projectId);
     }
 
     /**

@@ -7,7 +7,6 @@ import com.example.funding.dto.request.backing.BackingRequestUpdateDto;
 import com.example.funding.dto.response.backing.BackingResponseDto;
 import com.example.funding.dto.response.backing.userList_detail.MyPageBackingDetailDto;
 import com.example.funding.dto.response.backing.userList_detail.MyPageBackingListDto;
-import com.example.funding.dto.response.user.BackingDto;
 import com.example.funding.service.BackingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,16 +44,6 @@ public class BackingController {
                                                              @PathVariable Long backingId,
                                                              @PathVariable Long userId) {
         return backingService.updateBacking(requestDto, backingId, userId);
-    }
-
-    @GetMapping("/page/{userId}")
-    public ResponseEntity<ResponseDto<List<BackingDto>>>getBackingList(@PathVariable Long userId) {
-        return backingService.getBackingList(userId);
-    }
-
-    @GetMapping("/page/{userId}/project/{projectId}/reward/{rewardId}/backing/{backingId}")
-    public ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(@PathVariable Long userId, @PathVariable Long projectId, @PathVariable Long rewardId, @PathVariable Long backingId){
-        return backingService.getBackingDetail(userId,projectId, rewardId, backingId);
     }
 
     @GetMapping("/myPageBackingList/{userId}")

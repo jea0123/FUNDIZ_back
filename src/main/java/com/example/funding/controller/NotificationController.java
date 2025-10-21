@@ -56,9 +56,7 @@ public class NotificationController {
      */
     @GetMapping("/list")
     public ResponseEntity<ResponseDto<List<Notification>>> getAllNotifications(@AuthenticationPrincipal CustomUserPrincipal principal) {
-        Long userId = principal.userId();
-        userId = 501L;
-        return notificationService.getNotificationsByUserId(userId);
+        return notificationService.getNotificationsByUserId(principal.userId());
     }
 
     /**
@@ -76,9 +74,7 @@ public class NotificationController {
     @GetMapping("/{notificationId}")
     public ResponseEntity<ResponseDto<Notification>> getNotificationById(@PathVariable Long notificationId,
                                                                          @AuthenticationPrincipal CustomUserPrincipal principal) {
-        Long userId = principal.userId();
-        userId = 501L;
-        return notificationService.getNotificationById(notificationId, userId);
+        return notificationService.getNotificationById(notificationId, principal.userId());
     }
 
     /**
@@ -96,9 +92,7 @@ public class NotificationController {
     @PutMapping("/read/{notificationId}")
     public ResponseEntity<ResponseDto<String>> markAsRead(@PathVariable Long notificationId,
                                                           @AuthenticationPrincipal CustomUserPrincipal principal) {
-        Long userId = principal.userId();
-        userId = 501L;
-        return notificationService.markAsRead(notificationId, userId);
+        return notificationService.markAsRead(notificationId, principal.userId());
     }
 
     /**
@@ -112,9 +106,7 @@ public class NotificationController {
      */
     @PutMapping("/readAll")
     public ResponseEntity<ResponseDto<String>> markAllAsRead(@AuthenticationPrincipal CustomUserPrincipal principal) {
-        Long userId = principal.userId();
-        userId = 501L;
-        return notificationService.markAllAsRead(userId);
+        return notificationService.markAllAsRead(principal.userId());
     }
 
     /**
@@ -132,9 +124,7 @@ public class NotificationController {
     @DeleteMapping("/delete/{notificationId}")
     public ResponseEntity<ResponseDto<String>> deleteNotification(@PathVariable Long notificationId,
                                                                   @AuthenticationPrincipal CustomUserPrincipal principal) {
-        Long userId = principal.userId();
-        userId = 501L;
-        return notificationService.deleteNotification(notificationId, userId);
+        return notificationService.deleteNotification(notificationId, principal.userId());
     }
 
     /**
@@ -149,9 +139,7 @@ public class NotificationController {
      */
     @DeleteMapping("/deleteAll")
     public ResponseEntity<ResponseDto<String>> deleteAllNotifications(@AuthenticationPrincipal CustomUserPrincipal principal) {
-        Long userId = principal.userId();
-        userId = 501L;
-        return notificationService.deleteAllNotificationsByUserId(userId);
+        return notificationService.deleteAllNotificationsByUserId(principal.userId());
     }
 
     @ExceptionHandler({AsyncRequestNotUsableException.class, ClientAbortException.class, IOException.class})

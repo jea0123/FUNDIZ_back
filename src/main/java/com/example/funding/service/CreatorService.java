@@ -23,7 +23,6 @@ import jakarta.validation.constraints.Positive;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -83,7 +82,9 @@ public interface CreatorService {
      * @author 장민규
      * @since 2025-10-15
      */
-    ResponseEntity<ResponseDto<Long>> getFollowerCnt(Long creatorId);
+    ResponseEntity<ResponseDto<Long>> getFollowerCnt(@NotNull(message = "크리에이터 ID는 필수입니다.")
+                                                     @Positive(message = "크리에이터 ID는 양수여야 합니다.")
+                                                     Long creatorId);
 
     /**
      * 크리에이터 요약 정보 조회
@@ -138,9 +139,9 @@ public interface CreatorService {
     /**
      * 크리에이터 팔로워 목록 조회 (페이징)
      *
-     * @param creatorId 크리에이터 ID
+     * @param creatorId   크리에이터 ID
      * @param loginUserId 로그인한 유저 ID (팔로우 여부 확인용)
-     * @param pager     페이저 정보 (페이지 번호, 페이지 크기 등)
+     * @param pager       페이저 정보 (페이지 번호, 페이지 크기 등)
      * @return 페이징된 크리에이터 팔로워 목록
      * @author 장민규
      * @since 2025-10-20
@@ -153,6 +154,7 @@ public interface CreatorService {
 
     /**
      * 크리에이터 소개 정보 조회
+     *
      * @param creatorId 크리에이터 ID
      * @return 크리에이터 소개 정보
      * @author 장민규
@@ -162,7 +164,15 @@ public interface CreatorService {
                                                              @Positive(message = "크리에이터 ID는 양수여야 합니다.")
                                                              Long creatorId);
 
+    /**
+     * 크리에이터 총 카운트 조회 (프로젝트 수, 팔로워 수, 리뷰 수)
+     *
+     * @param creatorId 크리에이터 ID
+     * @return 크리에이터 총 카운트 정보
+     * @author 장민규
+     * @since 2025-10-20
+     */
     ResponseEntity<ResponseDto<TotalCountsDto>> getTotalCounts(@NotNull(message = "크리에이터 ID는 필수입니다.")
-                                                                @Positive(message = "크리에이터 ID는 양수여야 합니다.")
-                                                                Long creatorId);
+                                                               @Positive(message = "크리에이터 ID는 양수여야 합니다.")
+                                                               Long creatorId);
 }

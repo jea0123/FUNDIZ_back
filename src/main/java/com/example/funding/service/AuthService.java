@@ -63,6 +63,15 @@ public interface AuthService {
      */
     ResponseEntity<ResponseDto<String>> checkNickname(CheckNicknameRequestDto dto);
 
+    /**
+     * <p>회원 탈퇴</p>
+     * <p>- 회원 정보 삭제</p>
+     *
+     * @param userId 인증된 사용자의 ID
+     * @return 탈퇴 완료 메시지
+     * @author by: 장민규
+     * @since 2025-09-10
+     */
     ResponseEntity<ResponseDto<String>> withdrawUser(Long userId);
 
     /**

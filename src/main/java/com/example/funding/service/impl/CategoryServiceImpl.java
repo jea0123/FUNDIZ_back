@@ -44,6 +44,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @since 2025-09-12
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<List<Subcategory>>> getAllSubcategories() {
         List<Subcategory> subcategories = categoryMapper.getAllSubcategories();
         return ResponseEntity.ok(ResponseDto.success(200, "서브카테고리 조회 성공", subcategories));

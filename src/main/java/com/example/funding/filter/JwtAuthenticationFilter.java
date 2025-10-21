@@ -54,8 +54,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest req) {
-        if ("OPTIONS".equalsIgnoreCase(req.getMethod()))
-            return true;
+//        if ("OPTIONS".equalsIgnoreCase(req.getMethod()))
+//            return true;
         String path = req.getRequestURI();
         for (String p : WHITELIST)
             if (pathMatcher.match(p, path))
@@ -73,10 +73,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
         //TODO: CORS 프리플라이트 무조건 통과 (임시)
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+//        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
 
         String token = resolveToken(request);
         if (token == null || token.isEmpty()) {

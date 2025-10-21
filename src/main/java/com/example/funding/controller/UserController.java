@@ -93,29 +93,27 @@ public class UserController {
     /**
      * <p>마이페이지 구현</p>
      *
-     * @param userId 에 따른 MyPage 후원한 프로젝트 목록 조회
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author by: 이윤기
      * @since 2025-09-02
      */
-    @GetMapping("/likedList/{userId}")
-    public ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(@PathVariable Long userId) {
-        return userService.getLikedList(userId);
+    @GetMapping("/likedList")
+    public ResponseEntity<ResponseDto<List<MyPageLikedDto>>> getLikedList(@AuthenticationPrincipal CustomUserPrincipal principal) {
+        return userService.getLikedList(principal.userId());
     }
 
     /**
      * <p>사용자 Q&A 목록</p>
      *
-     * @param userId 사용자 ID
      * @param req    요청 pager
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author by: 이윤기
      * @since 2025-09-05
      */
-    @GetMapping("/qna/{userId}")
-    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfUser(@PathVariable Long userId, @Valid PagerRequest req) {
+    @GetMapping("/qna")
+    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfUser(@AuthenticationPrincipal CustomUserPrincipal principal, @Valid PagerRequest req) {
         Pager pager = Pager.ofRequest(req.getPage(), req.getSize(), req.getPerGroup());
-        return userService.getQnaListOfUser(userId, pager);
+        return userService.getQnaListOfUser(principal.userId(), pager);
     }
 
     /**

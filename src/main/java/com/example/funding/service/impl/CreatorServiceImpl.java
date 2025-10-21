@@ -67,7 +67,6 @@ public class CreatorServiceImpl implements CreatorService {
     private final ShippingValidator shippingValidator;
 
     private static List<String> normalizeTags(List<String> tagList) {
-        //불변 빈 리스트
         if (tagList == null) return List.of();
 
         List<String> out = new ArrayList<>(tagList.size());
@@ -786,6 +785,9 @@ public class CreatorServiceImpl implements CreatorService {
         return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 소개 조회 성공", bio));
     }
 
+    /**
+     * 크리에이터 총 개수 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<TotalCountsDto>> getTotalCounts(Long creatorId) {

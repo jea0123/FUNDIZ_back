@@ -13,7 +13,6 @@ import com.example.funding.exception.conflict.DuplicatedLikedProjectException;
 import com.example.funding.exception.notfound.*;
 import org.springframework.http.ResponseEntity;
 
-import java.io.IOException;
 import java.util.List;
 
 public interface UserService {
@@ -45,7 +44,7 @@ public interface UserService {
      * @author by: 장민규
      * @since 2025-09-05
      */
-    ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(Long userId);
+    ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(Long userId, int limit);
 
     //서비스에서구현
     ResponseEntity<ResponseDto<MyPageQnADetailDto>> getQnADetail(Long userId, Long projectId);
@@ -131,4 +130,6 @@ public interface UserService {
      * @since 2025-10-15
      */
     ResponseEntity<ResponseDto<Boolean>> isFollowingCreator(Long userId, Long creatorId);
+
+    ResponseEntity<ResponseDto<UserSummaryDto>> getUserSummary(Long userId);
 }

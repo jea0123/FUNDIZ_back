@@ -63,8 +63,9 @@ public class UserController {
      * @since 2025-09-05
      */
     @GetMapping("/recentViewProjects")
-    public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(@AuthenticationPrincipal CustomUserPrincipal principal) {
-        return userService.getRecentViewProjects(principal.userId());
+    public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(@AuthenticationPrincipal CustomUserPrincipal principal,
+                                                                                      @RequestParam(required = false) Integer limit) {
+        return userService.getRecentViewProjects(principal.userId(), limit != null ? limit : 10);
     }
 
     /**

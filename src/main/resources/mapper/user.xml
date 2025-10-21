@@ -5,7 +5,7 @@
     <insert id="signUp" parameterType="user">
         INSERT INTO USERS (USERID, EMAIL, PWD, NICKNAME)
         VALUES
-        (USERS_SEQ.NEXTVAL, #{email}, #{password}, #{nickname})
+        (USERS_SEQ.NEXTVAL, #{email}, #{pwd}, #{nickname})
     </insert>
 
     <update id="updateLastLogin" parameterType="Long">
@@ -68,7 +68,7 @@
         ORDER BY rv.viewedAt DESC
         )
         <![CDATA[
-            WHERE ROWNUM <= 10
+            WHERE ROWNUM <= #{limit}
         ]]>
     </select>
 

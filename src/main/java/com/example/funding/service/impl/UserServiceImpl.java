@@ -146,10 +146,10 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(Long userId) {
+    public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(Long userId, int limit) {
         loaders.user(userId);
 
-        List<RecentViewProject> recentViewProjects = userMapper.getRecentViewProjects(userId);
+        List<RecentViewProject> recentViewProjects = userMapper.getRecentViewProjects(userId, limit);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "최근 본 프로젝트 조회 성공", recentViewProjects));
     }
 

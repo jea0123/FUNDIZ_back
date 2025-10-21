@@ -27,7 +27,7 @@ public interface UserMapper {
 
     void upsertRecentView(@Param("userId") Long userId, @Param("projectId") Long projectId);
 
-    List<RecentViewProject> getRecentViewProjects(@Param("userId") Long userId);
+    List<RecentViewProject> getRecentViewProjects(@Param("userId") Long userId, @Param("limit") int limit);
 
     void updateNickname(@Param("userId") Long userId, @Param("nickname") String nickname);
 

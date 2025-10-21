@@ -44,7 +44,7 @@ public interface UserService {
      * @author by: 장민규
      * @since 2025-09-05
      */
-    ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(Long userId);
+    ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(Long userId, int limit);
 
     //서비스에서구현
     ResponseEntity<ResponseDto<MyPageQnADetailDto>> getQnADetail(Long userId, Long projectId);

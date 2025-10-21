@@ -65,7 +65,10 @@ public interface CreatorService {
      * @throws AlreadyCreatorException 이미 크리에이터로 등록된 유저인 경우
      * @since 2025-10-12
      */
-    ResponseEntity<ResponseDto<String>> registerCreator(CreatorRegisterRequestDto dto, Long userId) throws Exception;
+    ResponseEntity<ResponseDto<Long>> registerCreator(CreatorRegisterRequestDto dto,
+                                                      @NotNull(message = "유저 ID는 필수입니다. 현재: ${validatedValue}")
+                                                      @Positive(message = "유저 ID는 양수여야 합니다. 현재: ${validatedValue}")
+                                                      Long userId) throws Exception;
 
     ResponseEntity<ResponseDto<String>> updateCreatorInfo(Long creatorId, CreatorUpdateRequestDto dto);
 

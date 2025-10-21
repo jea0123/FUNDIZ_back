@@ -59,7 +59,7 @@ public class CreatorController {
      * @since 2025-10-12
      */
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseDto<String>> registerCreator(@Valid @ModelAttribute CreatorRegisterRequestDto dto,
+    public ResponseEntity<ResponseDto<Long>> registerCreator(@Valid @ModelAttribute CreatorRegisterRequestDto dto,
                                                                @AuthenticationPrincipal CustomUserPrincipal principal
     ) throws Exception {
         MultipartFile file = dto.getProfileImg();

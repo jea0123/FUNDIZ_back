@@ -18,4 +18,8 @@ public interface CategoryMapper {
     SubcategoryWithParentDto getSubcategoryWithParent(@Param("subctgrId") Long subctgrId);
 
     List<CategorySuccess> getCategorySuccessByCategory(@Param("ctgrId") Long ctgrId);
+
+    void insertCategory(Category category);
+
+    void insertSubCategory(Subcategory subcategory);
 }

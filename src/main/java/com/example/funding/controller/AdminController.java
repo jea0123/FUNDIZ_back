@@ -40,6 +40,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -50,7 +51,7 @@ import static com.example.funding.common.Utils.monthsInt;
 import static com.example.funding.common.Utils.resolveWindow;
 
 @RestController
-//@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
 public class AdminController {

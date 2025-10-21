@@ -70,7 +70,6 @@ public class AttachController {
     @DeleteMapping("/delete/{attachId}")
     public ResponseEntity<ResponseDto<String>> delete(@PathVariable Long attachId) {
         attachMapper.delete(attachId);
-
         return ResponseEntity.ok(ResponseDto.success(200, "파일 삭제 성공", null));
     }
 

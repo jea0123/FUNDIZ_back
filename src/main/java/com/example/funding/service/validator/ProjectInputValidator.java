@@ -146,14 +146,14 @@ public class ProjectInputValidator {
         if (forCreate || title != null) {
             String t = nvl(title).trim();
             if (t.length() < MIN_TITLE_LEN || t.length() > MAX_TITLE_LEN) {
-                errors.add("제목 길이는 " + MIN_TITLE_LEN + "~" + MAX_TITLE_LEN + "자여야 합니다.");
+                errors.add("제목은 " + MIN_TITLE_LEN + "~" + MAX_TITLE_LEN + "자 이내로 입력해주세요.");
             }
         }
 
         if (forCreate || content != null) {
             String c = nvl(content).trim();
             if (c.length() < MIN_CONTENT_LEN || c.length() > MAX_CONTENT_LEN) {
-                errors.add("본문 길이는 " + MIN_CONTENT_LEN + "~" + MAX_CONTENT_LEN + "자여야 합니다.");
+                errors.add("본문은 최소 " + MIN_CONTENT_LEN + "자 이상, 최대 " + MAX_CONTENT_LEN + "자 이하여야 합니다.");
             }
         }
 
@@ -161,7 +161,7 @@ public class ProjectInputValidator {
             if (goalAmount == null) {
                 errors.add("목표 금액은 필수입니다.");
             } else if (goalAmount < MIN_GOAL_AMOUNT || goalAmount > MAX_GOAL_AMOUNT) {
-                errors.add("목표 금액은 최소 " + MIN_GOAL_AMOUNT + "원, 최대 " + MAX_GOAL_AMOUNT + "원 이하여야 합니다.");
+                errors.add("목표 금액은 최소 " + MIN_GOAL_AMOUNT + "원 이상, 최대 " + MAX_GOAL_AMOUNT + "원 이하여야 합니다.");
             }
         } else {
             // 프로젝트 수정인 경우

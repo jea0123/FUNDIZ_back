@@ -277,7 +277,6 @@
         SET PROJECTSTATUS = 'UPCOMING',
         WHERE PROJECTID = #{projectId}
           AND PROJECTSTATUS = 'VERIFYING'
-          AND ISVERIFIED = 'Y'
     </update>
     
     <select id="isApprovable" resultType="int">
@@ -285,7 +284,6 @@
         FROM PROJECT
         WHERE PROJECTID = #{projectId}
           AND PROJECTSTATUS = 'VERIFYING'
-          AND ISVERIFIED = 'Y'
     </select>
 
     <update id="rejectProject">
@@ -294,7 +292,6 @@
             REJECTEDREASON = #{rejectedReason}
         WHERE PROJECTID = #{projectId}
           AND PROJECTSTATUS = 'VERIFYING'
-          AND ISVERIFIED = 'Y'
     </update>
     
     <select id="isRejectable" resultType="int">
@@ -302,7 +299,6 @@
         FROM PROJECT
         WHERE PROJECTID = #{projectId}
           AND PROJECTSTATUS = 'VERIFYING'
-          AND ISVERIFIED = 'Y'
     </select>
 
     <select id="userTotal" resultType="Integer">

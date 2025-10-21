@@ -12,7 +12,7 @@
         SELECT
         projectId, creatorId, subctgrId, title, goalAmount, currAmount, startDate, endDate, content, contentBlocks,
         thumbnail, businessDoc, TRUNC(createdAt), TRUNC(updatedat), projectStatus, backerCnt, likeCnt, viewCnt,
-        isVerified, requestedAt, rejectedReason
+        requestedAt, rejectedReason
         FROM PROJECT
         WHERE PROJECTID = #{projectId}
     </select>

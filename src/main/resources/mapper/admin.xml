@@ -274,7 +274,7 @@
 
     <update id="approveProject">
         UPDATE PROJECT
-        SET PROJECTSTATUS = 'UPCOMING',
+        SET PROJECTSTATUS = 'UPCOMING'
         WHERE PROJECTID = #{projectId}
           AND PROJECTSTATUS = 'VERIFYING'
     </update>

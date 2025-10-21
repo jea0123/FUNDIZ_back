@@ -13,7 +13,7 @@ public class AddressValidationRules {
     public static final int MAX_ROAD_ADDR_LEN = 100;
     public static final int MAX_DETAIL_ADDR_LEN = 100;
     public static final Pattern POSTAL_PATTERN = Pattern.compile("^[0-9]{5}$");
-    public static final Pattern PHONE_PATTERN = Pattern.compile("^01[0-9]-?[0-9]{3,4}-?[0-9]{4}$");
+    public static final Pattern PHONE_PATTERN = Pattern.compile("^(?:(?:01[0-9])|(?:02|0[3-6][1-5]|070))[-]?[0-9]{3,4}[-]?[0-9]{4}$");
 
     // 배송
     public static final Pattern TRACKING_NUM_PATTERN = Pattern.compile("^[0-9]{10,14}$");

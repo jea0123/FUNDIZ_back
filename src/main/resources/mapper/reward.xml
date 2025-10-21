@@ -161,12 +161,14 @@
                         else remain
                     end
         where rewardId = #{rewardId}
+        AND remain is not null
     </update>
 
     <update id ="increaseRewardRemain" parameterType="map">
         UPDATE reward
         SET remain = NVL(remain, 0) + #{quantity}
         WHERE rewardId = #{rewardId}
+        AND remain is not null
     </update>
 
     <select id ="findProjectIdByRewardId" parameterType="long" resultType = "long">

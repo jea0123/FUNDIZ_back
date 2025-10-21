@@ -94,7 +94,10 @@ public class BackingServiceImpl implements BackingService {
         loaders.user(userId);
         requestDto.getRewards().forEach(reward -> {
             Reward existingReward = loaders.reward(reward.getRewardId());
-            if (existingReward.getRemain() < reward.getQuantity()) {
+            Integer remain = existingReward.getRemain();
+            System.out.println("remain 은뭘까요????????????????? " + remain);
+
+            if (remain != null && remain < reward.getQuantity()) {
                 throw new IllegalArgumentException("리워드의 남은 수량이 부족합니다. 리워드 ID: " + reward.getRewardId());
             }
         });
@@ -125,6 +128,8 @@ public class BackingServiceImpl implements BackingService {
 
         // backingDetail
         if (rewards != null && !rewards.isEmpty()) {
+            Reward existingReward = loaders.reward(rewards.get(0).getRewardId());
+            Integer remain = existingReward.getRemain();
             for (RewardBackingRequestDto reward : rewards) {
                 BackingDetail detail = new BackingDetail();
                 detail.setBackingId(backingId);
@@ -133,7 +138,13 @@ public class BackingServiceImpl implements BackingService {
                 detail.setPrice(reward.getPrice());
                 backingMapper.addBackingDetail(detail);
                 // 남은개수 빼는 로직
-                rewardMapper.decreaseRewardRemain(detail.getRewardId(), reward.getQuantity());
+                if(remain != null) {
+                    rewardMapper.decreaseRewardRemain(detail.getRewardId(), reward.getQuantity());
+                    log.info("리워드 차감 정료오오오오ㅗ오오ㅗ오ㅗㅇ {}", reward.getRewardId());
+                }
+                else{
+                    log.info("무제한이에요 {}", reward.getRewardId());
+                }
             }
             //출력용
             rewards.forEach(r -> System.out.println("  - rewardId: " + r.getRewardId() + ", qty: " + r.getQuantity()));
@@ -193,9 +204,8 @@ public class BackingServiceImpl implements BackingService {
         projectMapper.decreaseProjectCurrAmount(projectId, backing.getAmount());
 
         // 후원 취소 -> 남은개수를 개수만큼 돌리기
-        for (BackingDetail detail : rewardDetails) {
+        for (BackingDetail detail : rewardDetails)
             rewardMapper.increaseRewardRemain(detail.getBackingId(), detail.getQuantity());
-        }
 
         // 프로젝트의 상태를 확인 후 바꾸기 success -> open
         //projectMapper.updateProjectStatusBelowGoal(projectId);

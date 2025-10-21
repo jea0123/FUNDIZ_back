@@ -2,10 +2,7 @@ package com.example.funding.dto.request.creator;
 
 import com.example.funding.enums.CreatorType;
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,7 +13,7 @@ public class CreatorRegisterRequestDto {
     @NotBlank(message = "창작자 이름은 필수입니다.")
     @Size(min = 2, max = 10, message = "창작자 이름은 2자 이상 10자 이하여야 합니다.")
     private String creatorName;
-    @NotBlank(message = "창작자 타입은 필수입니다.")
+    @NotNull(message = "창작자 타입은 필수입니다.")
     private CreatorType creatorType;
     @Email(message = "유효한 이메일 형식이 아닙니다.")
     @NotBlank(message = "이메일은 필수입니다.")

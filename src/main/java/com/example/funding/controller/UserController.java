@@ -13,6 +13,7 @@ import com.example.funding.dto.response.user.*;
 import com.example.funding.exception.conflict.DuplicatedFollowCreatorException;
 import com.example.funding.exception.conflict.DuplicatedLikedProjectException;
 import com.example.funding.exception.notfound.*;
+import com.example.funding.service.AuthService;
 import com.example.funding.service.ProjectService;
 import com.example.funding.service.UserService;
 import jakarta.validation.Valid;
@@ -32,6 +33,7 @@ public class UserController {
 
     private final UserService userService;
     private final ProjectService projectService;
+    private final AuthService authService;
 
     /**
      * <p>로그인 사용자 정보 조회</p>
@@ -246,8 +248,31 @@ public class UserController {
         return userService.isFollowingCreator(principal.userId(), creatorId);
     }
 
+    /**
+     * <p>사용자 요약 정보 조회</p>
+     *
+     * @param principal 인증된 사용자의 정보
+     * @return 사용자 요약 정보
+     * @throws UserNotFoundException 사용자가 존재하지 않을 때
+     * @author by: 장민규
+     * @since 2025-10-21
+     */
     @GetMapping("/summary")
     public ResponseEntity<ResponseDto<UserSummaryDto>> getUserSummary(@AuthenticationPrincipal CustomUserPrincipal principal) {
         return userService.getUserSummary(principal.userId());
+    }
+
+    /**
+     * <p>회원 탈퇴</p>
+     *
+     * @param principal 인증된 사용자의 정보
+     * @return 탈퇴 완료 메시지
+     * @throws UserNotFoundException 사용자가 존재하지 않을 때
+     * @author by: 장민규
+     * @since 2025-10-21
+     */
+    @DeleteMapping("/withdraw")
+    public ResponseEntity<ResponseDto<String>> withdrawUser(@AuthenticationPrincipal CustomUserPrincipal principal) {
+        return authService.withdrawUser(principal.userId());
     }
 }

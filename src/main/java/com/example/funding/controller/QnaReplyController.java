@@ -1,6 +1,7 @@
 package com.example.funding.controller;
 
 import com.example.funding.common.CursorPage;
+import com.example.funding.common.CustomUserPrincipal;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.creator.QnaReplyCreateRequestDto;
 import com.example.funding.dto.response.cs.QnaReplyDto;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -52,9 +54,8 @@ public class QnaReplyController {
      */
     @PostMapping("/reply/{qnaId}")
     public ResponseEntity<ResponseDto<QnaReplyDto>> createQnaReply(@PathVariable Long qnaId,
-                                                                   Long creatorId,
+                                                                   @AuthenticationPrincipal CustomUserPrincipal principal,
                                                                    @RequestBody QnaReplyCreateRequestDto dto) {
-        creatorId = 179L;
-        return replyService.createQnaReply(qnaId, creatorId, dto);
+        return replyService.createQnaReply(qnaId, principal.creatorId(), dto);
     }
 }

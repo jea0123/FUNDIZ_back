@@ -13,7 +13,7 @@ import java.util.List;
 
 @Mapper
 public interface CreatorMapper {
-    void insertCreator(Creator creator);
+    Long insertCreator(Creator creator);
 
     Creator findById(@Param("creatorId") Long creatorId);
 

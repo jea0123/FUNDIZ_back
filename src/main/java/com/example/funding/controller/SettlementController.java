@@ -1,5 +1,6 @@
 package com.example.funding.controller;
 
+import com.example.funding.common.CustomUserPrincipal;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.response.settlement.CreatorSettlementDto;
 import com.example.funding.exception.notfound.CreatorNotFoundException;
@@ -7,6 +8,7 @@ import com.example.funding.service.SettlementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,10 +31,8 @@ public class SettlementController {
      */
     @GetMapping("/creator")
     public ResponseEntity<ResponseDto<CreatorSettlementDto>> getSettlementByCreatorId(
-//            @AuthenticationPrincipal CustomUserPrincipal principal
+            @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
-//        Long creatorId = principal.creatorId();
-        Long creatorId = 502L;
-        return settlementService.getSettlementByCreatorId(creatorId);
+        return settlementService.getSettlementByCreatorId(principal.creatorId());
     }
 }

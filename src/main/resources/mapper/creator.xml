@@ -9,6 +9,9 @@
         CREATOR_SEQ.NEXTVAL, #{userId}, #{creatorName}, #{creatorType}, 0, #{businessNum}, #{profileImg}, #{email},
         #{phone}, #{account}, #{bank}, #{bio}
         )
+        <selectKey keyProperty="creatorId" resultType="Long" order="AFTER">
+            SELECT CREATOR_SEQ.CURRVAL FROM DUAL
+        </selectKey>
     </insert>
 
     <select id="creatorInfo" parameterType="Long" resultType="creator">

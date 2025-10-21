@@ -37,4 +37,14 @@
         GROUP BY sc.subctgrName
         ORDER BY sc.subctgrName
     </select>
+
+    <insert id="insertCategory" parameterType="category">
+        INSERT INTO CATEGORY (CTGRID, CTGRNAME)
+        VALUES (CATEGORY_SEQ.NEXTVAL, #{ctgrName})
+    </insert>
+
+    <insert id="insertSubCategory" parameterType="subcategory">
+        INSERT INTO SUBCATEGORY (SUBCTGRID, CTGRID, SUBCTGRNAME)
+        VALUES (SUBCATEGORY_SEQ.NEXTVAL, #{ctgrId}, #{subctgrName})
+    </insert>
 </mapper>

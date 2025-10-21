@@ -59,7 +59,7 @@ public class CreatorController {
      * @since 2025-10-12
      */
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseDto<String>> registerCreator(@Valid @ModelAttribute CreatorRegisterRequestDto dto,
+    public ResponseEntity<ResponseDto<Long>> registerCreator(@Valid @ModelAttribute CreatorRegisterRequestDto dto,
                                                                @AuthenticationPrincipal CustomUserPrincipal principal
     ) throws Exception {
         MultipartFile file = dto.getProfileImg();
@@ -399,7 +399,7 @@ public class CreatorController {
     @GetMapping("/summary/{creatorId}")
     public ResponseEntity<ResponseDto<CreatorSummaryDto>> getCreatorSummary(@NotNull @Positive @PathVariable Long creatorId,
                                                                             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        return creatorService.getCreatorSummary(creatorId, 10L);
+        return creatorService.getCreatorSummary(creatorId, principal.userId());
     }
 
     /**
@@ -475,6 +475,14 @@ public class CreatorController {
         return creatorService.getCreatorBio(creatorId);
     }
 
+    /**
+     * <p>크리에이터 총 카운트 조회</p>
+     *
+     * @param creatorId 크리에이터 ID
+     * @return 크리에이터 총 카운트 정보
+     * @author 장민규
+     * @since 2025-10-21
+     */
     @GetMapping("/totalCounts/{creatorId}")
     public ResponseEntity<ResponseDto<TotalCountsDto>> getTotalCounts(@NotNull @Positive @PathVariable Long creatorId) {
         return creatorService.getTotalCounts(creatorId);

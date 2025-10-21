@@ -544,7 +544,7 @@ public class CreatorServiceImpl implements CreatorService {
      * 크리에이터 등록
      */
     @Override
-    public ResponseEntity<ResponseDto<String>> registerCreator(CreatorRegisterRequestDto dto, Long userId) throws Exception {
+    public ResponseEntity<ResponseDto<Long>> registerCreator(CreatorRegisterRequestDto dto, Long userId) throws Exception {
         loaders.user(userId);
         if (userMapper.getCreatorIdByUserId(userId) != null) throw new AlreadyCreatorException();
 
@@ -565,7 +565,7 @@ public class CreatorServiceImpl implements CreatorService {
         }
 
         creatorMapper.insertCreator(creator);
-        return ResponseEntity.ok(ResponseDto.success(200, "창작자 등록 성공", dto.getCreatorName()));
+        return ResponseEntity.ok(ResponseDto.success(200, "창작자 등록 성공", creator.getCreatorId()));
     }
 
 

@@ -12,8 +12,12 @@ import com.example.funding.exception.conflict.DuplicatedEmailException;
 import com.example.funding.exception.conflict.DuplicatedNicknameException;
 import com.example.funding.exception.forbidden.InvalidAdminCredentialsException;
 import com.example.funding.exception.notfound.AdminNotFoundException;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 
+@Validated
 public interface AuthService {
     /**
      * <p>회원가입</p>
@@ -63,7 +67,18 @@ public interface AuthService {
      */
     ResponseEntity<ResponseDto<String>> checkNickname(CheckNicknameRequestDto dto);
 
-    ResponseEntity<ResponseDto<String>> withdrawUser(Long userId);
+    /**
+     * <p>회원 탈퇴</p>
+     * <p>- 회원 정보 삭제</p>
+     *
+     * @param userId 인증된 사용자의 ID
+     * @return 탈퇴 완료 메시지
+     * @author by: 장민규
+     * @since 2025-09-10
+     */
+    ResponseEntity<ResponseDto<String>> withdrawUser(@NotNull(message = "사용자 ID는 필수입니다. 현재: ${validatedValue}")
+                                                     @Positive(message = "사용자 ID는 양수여야 합니다. 현재: ${validatedValue}")
+                                                     Long userId);
 
     /**
      * <p>관리자 회원가입</p>

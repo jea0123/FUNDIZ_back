@@ -8,9 +8,11 @@ import com.example.funding.dto.response.backing.userList_detail.MyPageBackingDet
 import com.example.funding.dto.response.backing.userList_detail.MyPageBackingListDto;
 import com.example.funding.dto.response.user.BackingDto;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
+@Validated
 public interface BackingService {
     ResponseEntity<ResponseDto<BackingResponseDto>> prepareBacking(Long userId, Long projectId);
 

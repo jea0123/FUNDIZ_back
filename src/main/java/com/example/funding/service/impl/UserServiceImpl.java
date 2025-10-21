@@ -270,7 +270,7 @@ public class UserServiceImpl implements UserService {
         followMapper.followCreator(userId, creatorId);
         creatorMapper.increaseFollowersCount(creatorId);
 
-        notificationPublisher.publish(userId, NotificationType.NEW_FOLLOWER, existingUser.getNickname(), null);
+        notificationPublisher.publish(creator.getUserId(), NotificationType.NEW_FOLLOWER, existingUser.getNickname(), null);
         return ResponseEntity.ok(ResponseDto.success(200, "크리에이터 팔로우 성공", creator.getCreatorName()));
     }
 
@@ -291,6 +291,7 @@ public class UserServiceImpl implements UserService {
      * 크리에이터 팔로우 여부 확인
      */
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<Boolean>> isFollowingCreator(Long userId, Long creatorId) {
         loaders.user(userId);
         loaders.creator(creatorId);
@@ -302,6 +303,9 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * 유저 요약 정보 조회
+     */
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<UserSummaryDto>> getUserSummary(Long userId) {

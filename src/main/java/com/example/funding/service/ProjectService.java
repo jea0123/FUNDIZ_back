@@ -11,10 +11,14 @@ import com.example.funding.dto.response.project.RecentTop10ProjectDto;
 import com.example.funding.exception.notfound.FeaturedProjectNotFoundException;
 import com.example.funding.exception.notfound.ProjectNotFoundException;
 import com.example.funding.exception.notfound.RecentPaidProjectNotFoundException;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
+@Validated
 public interface ProjectService {
 
     ResponseEntity<ResponseDto<ProjectDetailDto>> getProjectDetail(Long projectId);
@@ -75,7 +79,10 @@ public interface ProjectService {
      * @author 장민규
      * @since 2025-10-15
      */
-    ResponseEntity<ResponseDto<Long>> getLikeCnt(Long projectId);
+    ResponseEntity<ResponseDto<Long>> getLikeCnt(
+            @NotNull(message = "프로젝트 ID는 필수입니다. 현재: ${validatedValue}")
+            @Positive(message = "프로젝트 ID는 양수여야 합니다. 현재: ${validatedValue}")
+            Long projectId);
 
     ResponseEntity<ResponseDto<ProjectCountsDto>> getCounts(Long projectId);
 }

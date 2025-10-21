@@ -229,12 +229,10 @@
     <update id="markVerifyProject">
         UPDATE PROJECT
         SET PROJECTSTATUS = 'VERIFYING',
-        ISVERIFIED = 'Y',
         REQUESTEDAT = SYSDATE,
         UPDATEDAT = SYSDATE
         WHERE PROJECTID = #{projectId}
         AND PROJECTSTATUS = 'DRAFT'
-        AND ISVERIFIED = 'N'
     </update>
 
     <select id="existsCreator" resultType="int">

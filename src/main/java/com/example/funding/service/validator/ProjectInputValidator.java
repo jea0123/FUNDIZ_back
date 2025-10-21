@@ -81,11 +81,9 @@ public class ProjectInputValidator {
         try (InputStream is = file.getInputStream()) {
             if (!isImageBySignature(is)) {
                 errors.add("대표이미지 파일이 손상되었거나 이미지가 아닙니다.");
-                return;
             }
         } catch (Exception e) {
             errors.add("대표이미지 파일을 읽는 중 오류가 발생했습니다.");
-            return;
         }
     }
 
@@ -95,7 +93,7 @@ public class ProjectInputValidator {
             errors.add("대표이미지 업로드에 실패했습니다. 다시 시도해주세요.");
             return;
         }
-        if (!u.isEmpty() && u.length() > MAX_THUMBNAIL_LEN) {
+        if (u.length() > MAX_THUMBNAIL_LEN) {
             errors.add("대표이미지 URL 길이는 최대 " + MAX_THUMBNAIL_LEN + "자 이하여야 합니다.");
         }
     }
@@ -147,26 +145,30 @@ public class ProjectInputValidator {
             String t = nvl(title).trim();
             if (t.length() < MIN_TITLE_LEN || t.length() > MAX_TITLE_LEN) {
                 errors.add("제목은 " + MIN_TITLE_LEN + "~" + MAX_TITLE_LEN + "자 이내로 입력해주세요.");
+                return;
             }
         }
 
         if (forCreate || content != null) {
             String c = nvl(content).trim();
             if (c.length() < MIN_CONTENT_LEN || c.length() > MAX_CONTENT_LEN) {
-                errors.add("본문은 최소 " + MIN_CONTENT_LEN + "자 이상, 최대 " + MAX_CONTENT_LEN + "자 이하여야 합니다.");
+                errors.add("본문은 " + MIN_CONTENT_LEN + "~" + MAX_CONTENT_LEN + "자 이내로 입력해주세요.");
+                return;
             }
         }
 
         if (forCreate) {
             if (goalAmount == null) {
                 errors.add("목표 금액은 필수입니다.");
+                return;
             } else if (goalAmount < MIN_GOAL_AMOUNT || goalAmount > MAX_GOAL_AMOUNT) {
-                errors.add("목표 금액은 최소 " + MIN_GOAL_AMOUNT + "원 이상, 최대 " + MAX_GOAL_AMOUNT + "원 이하여야 합니다.");
+                errors.add("목표 금액은 " + MIN_GOAL_AMOUNT + "원 ~ " + MAX_GOAL_AMOUNT + "원 이내로 입력해주세요.");
+                return;
             }
         } else {
             // 프로젝트 수정인 경우
             if (goalAmount != null && (goalAmount < MIN_GOAL_AMOUNT || goalAmount > MAX_GOAL_AMOUNT)) {
-                errors.add("목표 금액은 최소 " + MIN_GOAL_AMOUNT + "원, 최대 " + MAX_GOAL_AMOUNT + "원 이하여야 합니다.");
+                errors.add("목표 금액은 " + MIN_GOAL_AMOUNT + "원 ~ " + MAX_GOAL_AMOUNT + "원 이내로 입력해주세요.");
             }
         }
 
@@ -184,6 +186,7 @@ public class ProjectInputValidator {
             long days = daysInclusive(startDate, endDate);
             if (days < MIN_DAYS || days > MAX_DAYS) {
                 errors.add("펀딩 기간은 " + MIN_DAYS + "~" + MAX_DAYS + "일이어야 합니다.");
+                return;
             }
 
             LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
@@ -227,9 +230,6 @@ public class ProjectInputValidator {
 
             if (display.length() < MIN_TAG_LEN) errors.add("태그 길이는 최소 " + MIN_TAG_LEN + "자입니다.");
             if (display.length() > MAX_TAG_LEN) errors.add("태그 길이는 최대 " + MAX_TAG_LEN + "자입니다.");
-
-            if (!TAG_PATTERN.matcher(display).matches())
-                errors.add("태그 '" + display + "'에 허용되지 않는 문자가 포함되어 있습니다.");
 
             if (seen.putIfAbsent(key, display) != null) hasDup = true;
         }

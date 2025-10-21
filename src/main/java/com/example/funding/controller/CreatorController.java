@@ -75,33 +75,30 @@ public class CreatorController {
     /**
      * <p>크리에이터 상세 정보 조회</p>
      *
-     * @param creatorId 창작자 ID
+     * @param principal 창작자 ID
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author 이동혁
      * @since 2025-10-15
      */
     @GetMapping("/info")
-    public ResponseEntity<ResponseDto<Creator>> item(@RequestAttribute Long creatorId) {
-        creatorId = 1L;
-        return creatorService.item(creatorId);
+    public ResponseEntity<ResponseDto<Creator>> item(@AuthenticationPrincipal CustomUserPrincipal principal) {
+        return creatorService.item(principal.creatorId());
     }
 
     /**
      * <p>크리에이터 정보 수정</p>
      *
-     * @param creatorId  창작자 ID
+     * @param principal  창작자 ID
      * @param dto        CreatorUpdateRequestDto
      * @param profileImg 프로필 이미지
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-10-15
      */
-    @PostMapping(value = "/update/{creatorId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseDto<String>> updateCreatorInfo(@RequestAttribute Long creatorId,
+    @PostMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseDto<String>> updateCreatorInfo(@AuthenticationPrincipal CustomUserPrincipal principal,
                                                                  @ModelAttribute CreatorUpdateRequestDto dto,
                                                                  @RequestParam(required = false) MultipartFile profileImg) throws Exception {
-        creatorId = 1L;
-
         if (profileImg != null && !profileImg.isEmpty()) {
             // 새로운 프로필 이미지가 있다면 업로드 처리
             dto.setProfileImg(profileImg);
@@ -116,13 +113,13 @@ public class CreatorController {
             dto.setProfileImgUrl(dto.getProfileImgUrl());
         }
 
-        return creatorService.updateCreatorInfo(creatorId, dto);
+        return creatorService.updateCreatorInfo(principal.creatorId(), dto);
     }
 
     /**
      * <p>프로젝트 목록 조회</p>
      *
-     * @param creatorId 창작자 ID
+     * @param principal 창작자 ID
      * @param dto       SearchCreatorProjectDto
      * @param req       요청 pager
      * @return 성공 시 200 OK
@@ -130,39 +127,40 @@ public class CreatorController {
      * @since 2025-10-05
      */
     @GetMapping("/projects")
-    public ResponseEntity<ResponseDto<PageResult<CreatorProjectListDto>>> getProjectList(@RequestAttribute Long creatorId,
+    public ResponseEntity<ResponseDto<PageResult<CreatorProjectListDto>>> getProjectList(@AuthenticationPrincipal CustomUserPrincipal principal,
                                                                                          SearchCreatorProjectDto dto,
                                                                                          @Valid PagerRequest req) {
         Pager pager = Pager.ofRequest(req.getPage(), req.getSize(), req.getPerGroup());
-        return creatorService.getProjectList(creatorId, dto, pager);
+        return creatorService.getProjectList(principal.creatorId(), dto, pager);
     }
 
     /**
      * <p>프로젝트 상세 조회</p>
      *
      * @param projectId 프로젝트 ID
-     * @param creatorId 창작자 ID
+     * @param principal 창작자 ID
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-10-05
      */
     @GetMapping("/projects/{projectId}")
     public ResponseEntity<ResponseDto<CreatorProjectDetailDto>> getProjectDetail(@PathVariable Long projectId,
-                                                                                 @RequestAttribute Long creatorId) {
-        return creatorService.getProjectDetail(projectId, creatorId);
+                                                                                 @AuthenticationPrincipal CustomUserPrincipal principal) {
+        return creatorService.getProjectDetail(projectId, principal.creatorId());
     }
 
     /**
      * <p>프로젝트 생성</p>
      *
      * @param dto ProjectCreateRequestDto
+     * @param principal 창작자 ID
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-09-09
      */
     @PostMapping("/project/new")
     public ResponseEntity<ResponseDto<Long>> createProject(ProjectCreateRequestDto dto,
-                                                           @RequestAttribute Long creatorId) throws Exception {
+                                                           @AuthenticationPrincipal CustomUserPrincipal principal) throws Exception {
 
         String thumbnailUrl = null;
         if (dto.getThumbnail() != null && !dto.getThumbnail().isEmpty()) {
@@ -175,7 +173,7 @@ public class CreatorController {
         dto.setThumbnailUrl(thumbnailUrl);
         dto.setBusinessDocUrl(businessDocUrl);
 
-        return creatorService.createProject(dto, creatorId);
+        return creatorService.createProject(dto, principal.creatorId());
     }
 
     /**
@@ -183,6 +181,7 @@ public class CreatorController {
      *
      * @param projectId 프로젝트 ID
      * @param dto       ProjectCreateRequestDto
+     * @param principal 창작자 ID
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-09-16
@@ -190,7 +189,7 @@ public class CreatorController {
     @PostMapping("/project/{projectId}")
     public ResponseEntity<ResponseDto<String>> updateProject(@PathVariable Long projectId,
                                                              ProjectCreateRequestDto dto,
-                                                             @RequestAttribute Long creatorId) throws Exception {
+                                                             @AuthenticationPrincipal CustomUserPrincipal principal) throws Exception {
         if (dto.getProjectId() != null && !dto.getProjectId().equals(projectId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 프로젝트 ID 입니다.");
         }
@@ -207,72 +206,74 @@ public class CreatorController {
         dto.setThumbnailUrl(thumbnailUrl);
         dto.setBusinessDocUrl(businessDocUrl);
 
-        return creatorService.updateProject(dto, creatorId);
+        return creatorService.updateProject(dto, principal.creatorId());
     }
 
     /**
      * <p>프로젝트 삭제</p>
      *
      * @param projectId 프로젝트 ID
+     * @param principal 창작자 ID
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-09-16
      */
     @DeleteMapping("/project/{projectId}")
     public ResponseEntity<ResponseDto<String>> deleteProject(@PathVariable Long projectId,
-                                                             @RequestAttribute Long creatorId) {
-        return creatorService.deleteProject(projectId, creatorId);
+                                                             @AuthenticationPrincipal CustomUserPrincipal principal) {
+        return creatorService.deleteProject(projectId, principal.creatorId());
     }
 
     /**
      * <p>프로젝트 심사 요청</p>
      *
      * @param projectId 프로젝트 ID
+     * @param principal 창작자 ID
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-09-18
      */
     @PostMapping("/project/{projectId}/submit")
     public ResponseEntity<ResponseDto<String>> verifyProject(@PathVariable Long projectId,
-                                                             @RequestAttribute Long creatorId) {
-        return creatorService.verifyProject(projectId, creatorId);
+                                                             @AuthenticationPrincipal CustomUserPrincipal principal) {
+        return creatorService.verifyProject(projectId, principal.creatorId());
     }
 
     /**
      * <p>프로젝트 요약</p>
      *
      * @param projectId 프로젝트 ID
-     * @param creatorId 창작자 ID
+     * @param principal 창작자 ID
      * @return 성공 시 200 Ok
      * @author 조은애
      * @since 2025-10-08
      */
     @GetMapping("/projects/{projectId}/summary")
     public ResponseEntity<ResponseDto<CreatorProjectSummaryDto>> getProjectSummary(@PathVariable Long projectId,
-                                                                                   @RequestAttribute Long creatorId) {
-        return creatorService.getProjectSummary(projectId, creatorId);
+                                                                                   @AuthenticationPrincipal CustomUserPrincipal principal) {
+        return creatorService.getProjectSummary(projectId, principal.creatorId());
     }
 
     /**
      * <p>리워드 목록 조회</p>
      *
      * @param projectId 프로젝트 Id
-     * @param creatorId 창작자 ID
+     * @param principal 창작자 ID
      * @return 성공 시 200 Ok
      * @author 조은애
      * @since 2025-10-08
      */
     @GetMapping("/projects/{projectId}/reward")
     public ResponseEntity<ResponseDto<List<Reward>>> getRewardListManage(@PathVariable Long projectId,
-                                                                         @RequestAttribute Long creatorId) {
-        return rewardService.getRewardListManage(projectId, creatorId);
+                                                                         @AuthenticationPrincipal CustomUserPrincipal principal) {
+        return rewardService.getRewardListManage(projectId, principal.creatorId());
     }
 
     /**
      * <p>리워드 단건 추가</p>
      *
      * @param projectId 프로젝트 Id
-     * @param creatorId 창작자 ID
+     * @param principal 창작자 ID
      * @param dto       RewardCreateRequestDto
      * @return 성공 시 200 Ok
      * @author 조은애
@@ -280,10 +281,10 @@ public class CreatorController {
      */
     @PostMapping("/projects/{projectId}/reward")
     public ResponseEntity<ResponseDto<String>> addReward(@PathVariable Long projectId,
-                                                         @RequestAttribute Long creatorId,
+                                                         @AuthenticationPrincipal CustomUserPrincipal principal,
                                                          @RequestBody RewardCreateRequestDto dto) {
         dto.setProjectId(projectId);
-        return rewardService.addReward(projectId, creatorId, dto);
+        return rewardService.addReward(projectId, principal.creatorId(), dto);
     }
 
     /**
@@ -294,63 +295,65 @@ public class CreatorController {
      * <li>이메일</li>
      * <li>전화번호</li>
      *
+     * @param principal 창작자 ID
      * @return 성공 시 200 Ok
      * @author 조은애
      * @since 2025-10-11
      */
     @GetMapping("/summary")
-    public ResponseEntity<ResponseDto<CreatorProfileSummaryDto>> getCreatorProfileSummary(@RequestAttribute Long creatorId) {
-        return creatorService.getCreatorProfileSummary(creatorId);
+    public ResponseEntity<ResponseDto<CreatorProfileSummaryDto>> getCreatorProfileSummary(@AuthenticationPrincipal CustomUserPrincipal principal) {
+        return creatorService.getCreatorProfileSummary(principal.creatorId());
     }
 
     /**
      * <p>QnA 내역 목록 조회(창작자 기준)</p>
      *
-     * @param creatorId 창작자 ID
+     * @param principal 창작자 ID
      * @param req       Pager
      * @return 성공 시 200 OK
      * @author 이동혁
      * @since 2025-10-08
      */
     @GetMapping("/qna")
-    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfCreator(@RequestAttribute("creatorId") Long creatorId, @Valid PagerRequest req) {
+    public ResponseEntity<ResponseDto<PageResult<CreatorQnaDto>>> getQnaListOfCreator(@AuthenticationPrincipal CustomUserPrincipal principal, @Valid PagerRequest req) {
         Pager pager = Pager.ofRequest(req.getPage(), req.getSize(), req.getPerGroup());
-        return creatorService.getQnaListOfCreator(creatorId, pager);
+        return creatorService.getQnaListOfCreator(principal.creatorId(), pager);
     }
 
     /**
      * <p>창작자의 대시보드</p>
      *
-     * @param creatorId
+     * @param principal 창작자 ID
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author by: 이윤기
      * @since 2025-10-02
      */
     @GetMapping("/dashBoard")
-    public ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(@RequestAttribute Long creatorId) {
-        return creatorService.getCreatorDashBoard(creatorId);
+    public ResponseEntity<ResponseDto<CreatorDashboardDto>> getCreatorDashBoard(@AuthenticationPrincipal CustomUserPrincipal principal) {
+        return creatorService.getCreatorDashBoard(principal.creatorId());
     }
 
     @GetMapping("/backingList")
-    public ResponseEntity<ResponseDto<List<BackingCreatorProjectListDto>>> getBackingList(@RequestAttribute Long creatorId) {
-        return creatorService.getCreatorProjectList(creatorId);
+    public ResponseEntity<ResponseDto<List<BackingCreatorProjectListDto>>> getBackingList(@AuthenticationPrincipal CustomUserPrincipal principal) {
+        return creatorService.getCreatorProjectList(principal.creatorId());
     }
 
     @GetMapping("/shippingList")
-    public ResponseEntity<ResponseDto<List<CreatorShippingProjectList>>> getShippingList(@RequestAttribute Long creatorId) {
-        return creatorService.getCreatorShippingList(creatorId);
+    public ResponseEntity<ResponseDto<List<CreatorShippingProjectList>>> getShippingList(@AuthenticationPrincipal CustomUserPrincipal principal) {
+        return creatorService.getCreatorShippingList(principal.creatorId());
     }
 
     @GetMapping("/shippingBackerList/{projectId}")
-    public ResponseEntity<ResponseDto<List<CreatorShippingBackerList>>> getShippingBackerList(@RequestAttribute Long creatorId, @PathVariable Long projectId) {
-        return creatorService.getShippingBackerList(creatorId, projectId);
+    public ResponseEntity<ResponseDto<List<CreatorShippingBackerList>>> getShippingBackerList(@AuthenticationPrincipal CustomUserPrincipal principal,
+                                                                                              @PathVariable Long projectId) {
+        return creatorService.getShippingBackerList(principal.creatorId(), projectId);
     }
 
     @PostMapping("/shippingBackerList/{projectId}")
     public ResponseEntity<ResponseDto<String>> setShippingStatus(@PathVariable Long projectId,
-                                                                 @RequestAttribute Long creatorId,
+                                                                 @AuthenticationPrincipal CustomUserPrincipal principal,
                                                                  @Valid @RequestBody ShippingStatusDto status) {
-        return creatorService.setShippingStatus(projectId, creatorId, status);
+        return creatorService.setShippingStatus(projectId, principal.creatorId(), status);
     }
 
     /**
@@ -358,7 +361,7 @@ public class CreatorController {
      *
      * @param projectId 프로젝트 ID
      * @param dto       NewsCreateRequestDto
-     * @param creatorId 창작자 ID
+     * @param principal 창작자 ID
      * @return 성공 시 200 Ok
      * @author 조은애
      * @since 2025-10-11
@@ -366,8 +369,8 @@ public class CreatorController {
     @PostMapping("/projects/{projectId}/news")
     public ResponseEntity<ResponseDto<String>> createNews(@PathVariable Long projectId,
                                                           @RequestBody NewsCreateRequestDto dto,
-                                                          @RequestAttribute Long creatorId) {
-        return newsService.createNews(projectId, creatorId, dto);
+                                                          @AuthenticationPrincipal CustomUserPrincipal principal) {
+        return newsService.createNews(projectId, principal.creatorId(), dto);
     }
 
     /**

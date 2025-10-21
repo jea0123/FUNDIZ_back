@@ -5,8 +5,7 @@
     <!-- 커뮤니티 목록 조회 -->
     <select id="getCommunityList" resultType="communityDto">
         WITH base AS (
-            SELECT
-                CMID, USERID, CMCONTENT, CREATEDAT, CODE
+            SELECT CMID, USERID, CMCONTENT, CREATEDAT, CODE
             FROM COMMUNITY
             WHERE PROJECTID = #{projectId}
             AND TRIM(CODE) = #{code}
@@ -18,17 +17,14 @@
                     )
                 ]]>
             </if>
-            ORDER BY CREATEDAT DESC, CMID DESC
         ),
         topn AS (
-            SELECT /*+ MATERIALIZE */
-                *
+            SELECT /*+ MATERIALIZE */ *
             FROM base
             WHERE ROWNUM <![CDATA[ <= ]]> #{size}
         ),
         replyCnt AS (
-            SELECT /*+ MATERIALIZE */
-                CMID, COUNT(*) AS replyCnt
+            SELECT /*+ MATERIALIZE */ CMID, COUNT(*) AS replyCnt
             FROM REPLY
             WHERE CMID IN (SELECT CMID FROM topn)
             GROUP BY CMID
@@ -44,6 +40,7 @@
         FROM topn t
         LEFT JOIN USERS u ON u.USERID = t.USERID
         LEFT JOIN REPLYCNT r ON r.CMID = t.CMID
+        ORDER BY t.CREATEDAT DESC, t.CMID DESC
     </select>
 
     <!-- 후기 목록 조회 -->
@@ -62,7 +59,6 @@
                     )
                 ]]>
             </if>
-            ORDER BY CREATEDAT DESC, CMID DESC
         ),
         topn AS (
             SELECT /*+ MATERIALIZE */
@@ -88,7 +84,8 @@
             NVL(r.REPLYCNT, 0) AS replyCnt
         FROM topn t
         LEFT JOIN USERS u     ON u.USERID = t.USERID
-        LEFT JOIN reply_cnt r ON r.CMID   = t.CMID
+        LEFT JOIN REPLYCNT r ON r.CMID   = t.CMID
+        ORDER BY t.CREATEDAT DESC, t.CMID DESC
     </select>
 
     <insert id="createCommunity">

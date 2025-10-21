@@ -1,6 +1,8 @@
 package com.example.funding.service;
 
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.category.CreateCategoryDto;
+import com.example.funding.dto.request.category.CreateSubCategoryDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.exception.notfound.CategorySuccessNotFoundException;
 import com.example.funding.model.Category;
@@ -37,4 +39,24 @@ public interface CategoryService {
     ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(@NotNull(message = "ctgrId는 필수입니다. 현재: ${validatedValue}")
                                                                                     @Positive(message = "ctgrId는 양수여야 합니다. 현재: ${validatedValue}")
                                                                                     Long ctgrId);
+
+    /**
+     * 카테고리 생성
+     *
+     * @param dto 생성할 카테고리 정보
+     * @return 생성 성공 메시지
+     * @author 장민규
+     * @since 2025-10-21
+     */
+    ResponseEntity<ResponseDto<String>> createCategory(CreateCategoryDto dto);
+
+    /**
+     * 세부카테고리 생성
+     *
+     * @param dto 생성할 세부카테고리 정보
+     * @return 생성 성공 메시지
+     * @author 장민규
+     * @since 2025-10-21
+     */
+    ResponseEntity<ResponseDto<String>> createSubCategory(CreateSubCategoryDto dto);
 }

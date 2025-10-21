@@ -1,6 +1,8 @@
 package com.example.funding.service.impl;
 
 import com.example.funding.dto.ResponseDto;
+import com.example.funding.dto.request.category.CreateCategoryDto;
+import com.example.funding.dto.request.category.CreateSubCategoryDto;
 import com.example.funding.dto.response.admin.analytic.CategorySuccess;
 import com.example.funding.exception.badrequest.InvalidParamException;
 import com.example.funding.exception.notfound.CategorySuccessNotFoundException;
@@ -8,14 +10,12 @@ import com.example.funding.mapper.CategoryMapper;
 import com.example.funding.model.Category;
 import com.example.funding.model.Subcategory;
 import com.example.funding.service.CategoryService;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
@@ -60,5 +60,30 @@ public class CategoryServiceImpl implements CategoryService {
         if (categorySuccesses.isEmpty()) throw new CategorySuccessNotFoundException();
 
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "카테고리별 성공률 조회 성공", categorySuccesses));
+    }
+
+    /**
+     * 카테고리 생성
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> createCategory(CreateCategoryDto dto) {
+        Category category = Category.builder()
+                .ctgrName(dto.getCtgrName())
+                .build();
+        categoryMapper.insertCategory(category);
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "카테고리 생성 성공", dto.getCtgrName()));
+    }
+
+    /**
+     * 세부카테고리 생성
+     */
+    @Override
+    public ResponseEntity<ResponseDto<String>> createSubCategory(CreateSubCategoryDto dto) {
+        Subcategory subcategory = Subcategory.builder()
+                .ctgrId(dto.getCtgrId())
+                .subctgrName(dto.getSubctgrName())
+                .build();
+        categoryMapper.insertSubCategory(subcategory);
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "서브카테고리 생성 성공", dto.getSubctgrName()));
     }
 }

@@ -173,7 +173,7 @@ public class CreatorController {
         dto.setThumbnailUrl(thumbnailUrl);
         dto.setBusinessDocUrl(businessDocUrl);
 
-        return creatorService.createProject(dto, principal.creatorId());
+        return creatorService.createProject(dto, 101L);
     }
 
     /**
@@ -236,7 +236,7 @@ public class CreatorController {
     @PostMapping("/project/{projectId}/submit")
     public ResponseEntity<ResponseDto<String>> verifyProject(@PathVariable Long projectId,
                                                              @AuthenticationPrincipal CustomUserPrincipal principal) {
-        return creatorService.verifyProject(projectId, principal.creatorId());
+        return creatorService.verifyProject(projectId, 101L);
     }
 
     /**

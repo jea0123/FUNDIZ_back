@@ -49,11 +49,6 @@ public class BackingController {
         return backingService.updateBacking(requestDto, backingId, principal.userId());
     }
 
-    @GetMapping("/myPageBackingList/{userId}")
-    public ResponseEntity<ResponseDto<List<MyPageBackingListDto>>> geMyPageBackingList(@PathVariable Long userId) {
-        return backingService.getMyPageBackingList(userId);
-    }
-
     @GetMapping("/page")
     public ResponseEntity<ResponseDto<List<BackingDto>>> getBackingList(@AuthenticationPrincipal CustomUserPrincipal principal) {
         return backingService.getBackingList(principal.userId());

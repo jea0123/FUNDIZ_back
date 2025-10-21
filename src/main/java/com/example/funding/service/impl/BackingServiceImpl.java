@@ -258,7 +258,7 @@ public class BackingServiceImpl implements BackingService {
     }
 
     @Override
-    public ResponseEntity<ResponseDto<String>> updateBacking(BackingRequestUpdateDto updateDto, @NotBlank Long backingId, @NotBlank Long userId) {
+    public ResponseEntity<ResponseDto<String>> updateBacking(BackingRequestUpdateDto updateDto, Long backingId, Long userId) {
         loaders.user(userId);
         loaders.backing(backingId);
         updateDto.setBackingId(backingId);

@@ -7,9 +7,11 @@ import com.example.funding.dto.response.project.CommunityDto;
 import com.example.funding.common.CursorPage;
 import com.example.funding.dto.response.project.ReviewDto;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 
+@Validated
 public interface CommunityService {
     ResponseEntity<ResponseDto<CursorPage<CommunityDto>>> getCommunityList(Long projectId, String code, LocalDateTime lastCreatedAt, Long lastId, int size);
 

@@ -8,9 +8,11 @@ import com.example.funding.model.Subcategory;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
+@Validated
 public interface CategoryService {
     /**
      * 모든 카테고리 조회
@@ -32,5 +34,7 @@ public interface CategoryService {
      * @author 장민규
      * @since 2025-09-11
      */
-    ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(@NotNull @Positive Long ctgrId);
+    ResponseEntity<ResponseDto<List<CategorySuccess>>> getCategorySuccessByCategory(@NotNull(message = "ctgrId는 필수입니다. 현재: ${validatedValue}")
+                                                                                    @Positive(message = "ctgrId는 양수여야 합니다. 현재: ${validatedValue}")
+                                                                                    Long ctgrId);
 }

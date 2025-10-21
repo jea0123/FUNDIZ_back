@@ -148,7 +148,7 @@ public class UserController {
      */
     @PostMapping("/like/{projectId}")
     public ResponseEntity<ResponseDto<Long>> likeProject(@PathVariable Long projectId,
-                                                      @AuthenticationPrincipal CustomUserPrincipal principal
+                                                         @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
         return userService.likeProject(principal.userId(), projectId);
     }
@@ -167,7 +167,7 @@ public class UserController {
      */
     @DeleteMapping("/dislike/{projectId}")
     public ResponseEntity<ResponseDto<Long>> dislikeProject(@PathVariable Long projectId,
-                                                         @AuthenticationPrincipal CustomUserPrincipal principal
+                                                            @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
         return userService.dislikeProject(principal.userId(), projectId);
     }
@@ -185,7 +185,7 @@ public class UserController {
      */
     @GetMapping("/checkLike/{projectId}")
     public ResponseEntity<ResponseDto<Boolean>> isProjectLiked(@PathVariable Long projectId,
-                                                              @AuthenticationPrincipal CustomUserPrincipal principal
+                                                               @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
         return userService.checkLikedProject(principal.userId(), projectId);
     }
@@ -204,7 +204,7 @@ public class UserController {
      */
     @PostMapping("/follow/{creatorId}")
     public ResponseEntity<ResponseDto<String>> followCreator(@PathVariable Long creatorId,
-                                                            @AuthenticationPrincipal CustomUserPrincipal principal
+                                                             @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
         return userService.followCreator(principal.userId(), creatorId);
     }
@@ -223,7 +223,7 @@ public class UserController {
      */
     @DeleteMapping("/unfollow/{creatorId}")
     public ResponseEntity<ResponseDto<String>> unfollowCreator(@PathVariable Long creatorId,
-                                                              @AuthenticationPrincipal CustomUserPrincipal principal
+                                                               @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
         return userService.unfollowCreator(principal.userId(), creatorId);
     }
@@ -241,8 +241,13 @@ public class UserController {
      */
     @GetMapping("/checkFollow/{creatorId}")
     public ResponseEntity<ResponseDto<Boolean>> isFollowingCreator(@PathVariable Long creatorId,
-                                                                 @AuthenticationPrincipal CustomUserPrincipal principal
+                                                                   @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
         return userService.isFollowingCreator(principal.userId(), creatorId);
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<ResponseDto<UserSummaryDto>> getUserSummary(@AuthenticationPrincipal CustomUserPrincipal principal) {
+        return userService.getUserSummary(principal.userId());
     }
 }

@@ -13,7 +13,6 @@ import com.example.funding.exception.conflict.DuplicatedLikedProjectException;
 import com.example.funding.exception.notfound.*;
 import org.springframework.http.ResponseEntity;
 
-import java.io.IOException;
 import java.util.List;
 
 public interface UserService {
@@ -131,4 +130,6 @@ public interface UserService {
      * @since 2025-10-15
      */
     ResponseEntity<ResponseDto<Boolean>> isFollowingCreator(Long userId, Long creatorId);
+
+    ResponseEntity<ResponseDto<UserSummaryDto>> getUserSummary(Long userId);
 }

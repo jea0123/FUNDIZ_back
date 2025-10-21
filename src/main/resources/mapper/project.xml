@@ -66,7 +66,7 @@
     </select>
 
     <select id="findFeaturedJoinedWithRecent" parameterType="map" resultType="featuredProjectDto">
-        SELECT projectId, title, creatorId, creatorName, thumbnail, endDate, percentNow, goalAmount, score
+        SELECT projectId, title, creatorId, creatorName, thumbnail, endDate, percentNow, goalAmount, currAmount, score
         FROM (
         SELECT
         pr.PROJECTID AS projectId,
@@ -81,6 +81,8 @@
         ELSE 0
         END AS percentNow,
         NVL(pr.GOALAMOUNT,0) AS goalAmount,
+
+        NVL(pr.CURRAMOUNT,0) AS currAmount,
 
         (
         (CASE WHEN NVL(pr.GOALAMOUNT,0) > 0

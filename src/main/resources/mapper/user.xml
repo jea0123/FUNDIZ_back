@@ -107,7 +107,8 @@
         WHERE USERID = #{userId}
     </select>
 
-    <select id="selectUsersByIds" parameterType="list" resultType="com.example.funding.dto.response.creator.ReviewListDto$UserInfo">
+    <select id="selectUsersByIds" parameterType="list"
+            resultType="com.example.funding.dto.response.creator.ReviewListDto$UserInfo">
         SELECT
         u.userId AS userId,
         u.nickname AS nickname,
@@ -117,5 +118,25 @@
         <foreach collection="list" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
+    </select>
+
+    <select id="findUserSummary" resultType="userSummaryDto">
+        SELECT
+        u.userId,
+        (SELECT COUNT(DISTINCT b.backingId)
+        FROM backing b
+        WHERE b.userId = u.userId) AS backingCount,
+        (SELECT COUNT(DISTINCT l.projectId)
+        FROM liked l
+        WHERE l.userId = u.userId) AS likedCount,
+        (SELECT COUNT(DISTINCT f.creatorId)
+        FROM follow f
+        WHERE f.userId = u.userId) AS followCreatorCount,
+        (SELECT COUNT(*)
+        FROM notification n
+        WHERE n.userId = u.userId
+        AND n.isRead = 'N') AS notificationCount
+        FROM users u
+        WHERE u.userId = #{userId}
     </select>
 </mapper>

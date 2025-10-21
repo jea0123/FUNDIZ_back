@@ -301,4 +301,12 @@ public class UserServiceImpl implements UserService {
             return ResponseEntity.ok(ResponseDto.success(200, "팔로우하지 않은 크리에이터입니다.", false));
         }
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<UserSummaryDto>> getUserSummary(Long userId) {
+        loaders.user(userId);
+        UserSummaryDto dto = userMapper.findUserSummary(userId);
+        return ResponseEntity.ok(ResponseDto.success(200, "유저 요약 정보 조회 성공", dto));
+    }
 }

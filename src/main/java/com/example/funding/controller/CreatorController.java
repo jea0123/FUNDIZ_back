@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -60,9 +59,9 @@ public class CreatorController {
      * @since 2025-10-12
      */
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseDto<String>> registerCreator(@Valid @ModelAttribute CreatorRegisterRequestDto dto
-//                                                               @AuthenticationPrincipal CustomUserPrincipal principal
-    ) throws IOException {
+    public ResponseEntity<ResponseDto<String>> registerCreator(@Valid @ModelAttribute CreatorRegisterRequestDto dto,
+                                                               @AuthenticationPrincipal CustomUserPrincipal principal
+    ) throws Exception {
         MultipartFile file = dto.getProfileImg();
         if (file != null && file.isEmpty()) {
             file = null;
@@ -70,9 +69,7 @@ public class CreatorController {
         CreatorType type = dto.getCreatorType() != null ? dto.getCreatorType() : CreatorType.GENERAL;
         dto.setProfileImg(file);
         dto.setCreatorType(type);
-//        Long userId = principal.userId();
-        Long userId = 400L; // TODO: 임시
-        return creatorService.registerCreator(dto, userId);
+        return creatorService.registerCreator(dto, principal.userId());
     }
 
     /**
@@ -102,7 +99,7 @@ public class CreatorController {
     @PostMapping(value = "/update/{creatorId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseDto<String>> updateCreatorInfo(@RequestAttribute Long creatorId,
                                                                  @ModelAttribute CreatorUpdateRequestDto dto,
-                                                                 @RequestParam(required = false) MultipartFile profileImg) throws IOException {
+                                                                 @RequestParam(required = false) MultipartFile profileImg) throws Exception {
         creatorId = 1L;
 
         if (profileImg != null && !profileImg.isEmpty()) {
@@ -165,7 +162,7 @@ public class CreatorController {
      */
     @PostMapping("/project/new")
     public ResponseEntity<ResponseDto<Long>> createProject(ProjectCreateRequestDto dto,
-                                                           @RequestAttribute Long creatorId) throws IOException {
+                                                           @RequestAttribute Long creatorId) throws Exception {
 
         String thumbnailUrl = null;
         if (dto.getThumbnail() != null && !dto.getThumbnail().isEmpty()) {
@@ -193,7 +190,7 @@ public class CreatorController {
     @PostMapping("/project/{projectId}")
     public ResponseEntity<ResponseDto<String>> updateProject(@PathVariable Long projectId,
                                                              ProjectCreateRequestDto dto,
-                                                             @RequestAttribute Long creatorId) throws IOException {
+                                                             @RequestAttribute Long creatorId) throws Exception {
         if (dto.getProjectId() != null && !dto.getProjectId().equals(projectId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 프로젝트 ID 입니다.");
         }

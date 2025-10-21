@@ -22,7 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -91,7 +90,7 @@ public class UserController {
     @PostMapping("/profileImg")
     public ResponseEntity<ResponseDto<String>> updateProfileImg(@Valid @ModelAttribute UserProfileImgDto dto,
                                                                 @AuthenticationPrincipal CustomUserPrincipal principal
-    ) throws IOException {
+    ) throws Exception {
         return userService.userProfileImg(principal.userId(), dto);
     }
 

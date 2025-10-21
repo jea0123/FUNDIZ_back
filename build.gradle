@@ -52,6 +52,7 @@ dependencies {
         exclude group: "com.oracle.database.xml", module: "xdb"
         exclude group: "com.oracle.database.nls", module: "orai18n"
     }
+    implementation "com.oracle.oci.sdk:oci-java-sdk-objectstorage:3.44.0"
 }
 
 tasks.named('test') {

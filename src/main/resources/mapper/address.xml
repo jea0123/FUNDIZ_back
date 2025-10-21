@@ -23,14 +23,20 @@
         <selectKey keyProperty="addrId" resultType="Long" order="BEFORE">
             SELECT ADDRESS_SEQ.NEXTVAL FROM DUAL
         </selectKey>
-
         INSERT INTO ADDRESS (
         ADDRID, USERID, ADDRNAME, RECIPIENT, POSTALCODE, ROADADDR,
         DETAILADDR, RECIPIENTPHONE, ISDEFAULT
         ) VALUES (
         #{addrId}, #{userId}, #{addrName}, #{recipient}, #{postalCode}, #{roadAddr},
-        #{detailAddr}, #{recipientPhone}, #{isDefault}
+        #{detailAddr}, #{recipientPhone},
+        case
+            when(select count(*) from address where userId = #{userId}) = 0
+            then 'Y'
+            ELSE 'N'
+        END
         )
+        from dual
+        where (select count(*) from address where userId = #{userId}) &lt;= 5
     </insert>
 
     <update id="resetDefaultAddr">

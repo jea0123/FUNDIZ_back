@@ -46,7 +46,9 @@ public interface BackingMapper {
 
     List<MyPageBackingSaveDto> getBackingLists(@Param("userId") Long userId);
 
-    List<MyPageBackingDetailSaveDto> getBackingDetails(@Param("userId") Long userId);
+    List<MyPageBackingDetailSaveDto> getBackingDetails(@Param("backingId") Long userId);
 
     void updateBackingStatus(Long backingId);
+
+    MyPageBackingDetailSaveDto getBackingDetailByBackingId(Long backingId);
 }

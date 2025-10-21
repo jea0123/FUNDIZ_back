@@ -25,7 +25,6 @@ import com.example.funding.model.Qna;
 import com.example.funding.model.User;
 import com.example.funding.service.UserService;
 import com.example.funding.validator.Loaders;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -33,9 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
-import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -149,10 +146,10 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(Long userId) {
+    public ResponseEntity<ResponseDto<List<RecentViewProject>>> getRecentViewProjects(Long userId, int limit) {
         loaders.user(userId);
 
-        List<RecentViewProject> recentViewProjects = userMapper.getRecentViewProjects(userId);
+        List<RecentViewProject> recentViewProjects = userMapper.getRecentViewProjects(userId, limit);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "최근 본 프로젝트 조회 성공", recentViewProjects));
     }
 
@@ -203,7 +200,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<ResponseDto<String>> userProfileImg(Long userId, UserProfileImgDto dto) throws IOException {
+    public ResponseEntity<ResponseDto<String>> userProfileImg(Long userId, UserProfileImgDto dto) throws Exception {
         loaders.user(userId);
         String profileImgUrl = fileUploader.upload(dto.getProfileImg());
         userMapper.updateProfile(userId, profileImgUrl);
@@ -303,5 +300,13 @@ public class UserServiceImpl implements UserService {
         } else {
             return ResponseEntity.ok(ResponseDto.success(200, "팔로우하지 않은 크리에이터입니다.", false));
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<UserSummaryDto>> getUserSummary(Long userId) {
+        loaders.user(userId);
+        UserSummaryDto dto = userMapper.findUserSummary(userId);
+        return ResponseEntity.ok(ResponseDto.success(200, "유저 요약 정보 조회 성공", dto));
     }
 }

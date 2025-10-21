@@ -3,6 +3,7 @@ package com.example.funding.mapper;
 import com.example.funding.dto.response.creator.ReviewListDto;
 import com.example.funding.dto.response.user.MyPageLikedDto;
 import com.example.funding.dto.response.user.RecentViewProject;
+import com.example.funding.dto.response.user.UserSummaryDto;
 import com.example.funding.model.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -26,7 +27,7 @@ public interface UserMapper {
 
     void upsertRecentView(@Param("userId") Long userId, @Param("projectId") Long projectId);
 
-    List<RecentViewProject> getRecentViewProjects(@Param("userId") Long userId);
+    List<RecentViewProject> getRecentViewProjects(@Param("userId") Long userId, @Param("limit") int limit);
 
     void updateNickname(@Param("userId") Long userId, @Param("nickname") String nickname);
 
@@ -47,4 +48,6 @@ public interface UserMapper {
     LocalDateTime getLastLoginTime(@Param("userId") Long userId);
 
     List<ReviewListDto.UserInfo> selectUsersByIds(@Param("list") List<Long> userIds);
+
+    UserSummaryDto findUserSummary(@Param("userId") Long userId);
 }

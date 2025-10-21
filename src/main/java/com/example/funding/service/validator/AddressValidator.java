@@ -25,7 +25,7 @@ public class AddressValidator {
             throw new IllegalArgumentException("우편번호는 5자리 숫자여야 합니다.");
 
         if (!PHONE_PATTERN.matcher(dto.getRecipientPhone()).matches())
-            throw new IllegalArgumentException("전화번호 형식이 올바르지 않습니다. 예: 010-1234-5678");
+            throw new IllegalArgumentException("전화번호 형식이 올바르지 않습니다. 예: 010-1234-5678 / 02-123-4567");
 
         if (dto.getAddrName().length() > MAX_ADDR_NAME_LEN)
             throw new IllegalArgumentException("배송지 이름은 " + MAX_ADDR_NAME_LEN + "자 이내로 입력해주세요.");

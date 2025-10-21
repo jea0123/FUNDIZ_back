@@ -15,7 +15,6 @@ import java.util.List;
 public class MyPageBackingDetailDto {
     //후원
     private Long backingId;
-    private Long userId;
     private Long amount;
     private LocalDateTime createdAt;
     private String backingStatus;

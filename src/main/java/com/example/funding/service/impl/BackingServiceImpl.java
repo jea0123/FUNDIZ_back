@@ -305,51 +305,42 @@ public class BackingServiceImpl implements BackingService {
         return ResponseEntity.ok(ResponseDto.success(200, "후원내역 조회성공", result));
     }
 
+
+
     @Override
-    public ResponseEntity<ResponseDto<List<MyPageBackingDetailDto>>> getMyPageBackingDetail(Long userId) {
-        loaders.user(userId);
-        List<MyPageBackingDetailSaveDto> backingDetils = backingMapper.getBackingDetails(userId);
+    public ResponseEntity<ResponseDto<MyPageBackingDetailDto>> getMyPageBackingDetail(Long backingId) {
+        List<MyPageBacking_RewardDto> rewards = rewardMapper.getMyPageDetailRewardDetail(backingId);
+        List<MyPageBackingDetailSaveDto> backingDetailSave = backingMapper.getBackingDetails(backingId);
 
-        Map<Long, MyPageBackingDetailDto> grouped = new LinkedHashMap<>();
-
-        for (MyPageBackingDetailSaveDto list : backingDetils) {
-            MyPageBackingDetailDto backingDetail = grouped.computeIfAbsent(list.getBackingId(), id -> {
-                MyPageBackingDetailDto newDetail = new MyPageBackingDetailDto();
-                newDetail.setBackingId(list.getBackingId());
-                newDetail.setUserId(list.getUserId());
-                newDetail.setAmount(list.getAmount());
-                newDetail.setCreatedAt(list.getCreatedAt());
-                newDetail.setBackingStatus(list.getBackingStatus());
-                newDetail.setMethod(list.getMethod());
-                newDetail.setCardCompany(list.getCardCompany());
-                newDetail.setShippingStatus(list.getShippingStatus());
-                newDetail.setTrackingNum(list.getTrackingNum());
-                newDetail.setShippedAt(list.getShippedAt());
-                newDetail.setDeliveredAt(list.getDeliveredAt());
-                newDetail.setTitle(list.getTitle());
-                newDetail.setThumbnail(list.getThumbnail());
-                newDetail.setAddrName(list.getAddrName());
-                newDetail.setRecipient(list.getRecipient());
-                newDetail.setPostalCode(list.getPostalCode());
-                newDetail.setRoadAddr(list.getRoadAddr());
-                newDetail.setDetailAddr(list.getDetailAddr());
-                newDetail.setRecipientPhone(list.getRecipientPhone());
-                newDetail.setCreatorName(list.getCreatorName());
-                return newDetail;
-            });
-
-            MyPageBacking_RewardDto rewards = new MyPageBacking_RewardDto();
-            rewards.setRewardId(list.getRewardId());
-            rewards.setProjectId(list.getProjectId());
-            rewards.setRewardName(list.getRewardName());
-            rewards.setPrice(list.getPrice());
-            rewards.setDeliveryDate(list.getDeliveryDate());
-            rewards.setQuantity(list.getQuantity());
-            backingDetail.getRewards().add(rewards);
+        if (backingDetailSave == null || backingDetailSave.isEmpty()) {
+            throw new BackingNotFoundException();
         }
 
-        List<MyPageBackingDetailDto> result = new ArrayList<>(grouped.values());
+        MyPageBackingDetailSaveDto base = backingDetailSave.getFirst();
 
-        return ResponseEntity.ok(ResponseDto.success(200, "후원 내역 상세 조회 성공", result));
+        MyPageBackingDetailDto backingDetailDto = MyPageBackingDetailDto.builder()
+                .backingId(backingId)
+                .amount(base.getAmount())
+                .createdAt(base.getCreatedAt())
+                .backingStatus(base.getBackingStatus())
+                .rewards(rewards)
+                .method(base.getMethod())
+                .cardCompany(base.getCardCompany())
+                .shippingStatus(base.getShippingStatus())
+                .trackingNum(base.getTrackingNum())
+                .shippedAt(base.getShippedAt())
+                .deliveredAt(base.getDeliveredAt())
+                .title(base.getTitle())
+                .thumbnail(base.getThumbnail())
+                .addrName(base.getAddrName())
+                .recipient(base.getRecipient())
+                .postalCode(base.getPostalCode())
+                .roadAddr(base.getRoadAddr())
+                .detailAddr(base.getDetailAddr())
+                .recipientPhone(base.getRecipientPhone())
+                .creatorName(base.getCreatorName())
+                .build();
+
+        return ResponseEntity.ok(ResponseDto.success(200, "후원 내역 상세 조회 성공", backingDetailDto));
     }
 }

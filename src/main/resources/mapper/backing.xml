@@ -454,10 +454,9 @@
         JOIN creator c ON c.creatorId = p.creatorId
         WHERE b.userId = #{userId}
     </select>
-    <select id="getBackingDetails" resultType = "com.example.funding.dto.response.backing.userList_detail.MyPageBackingDetailSaveDto">
+    <select id="getBackingDetails" parameterType="long" resultType = "com.example.funding.dto.response.backing.userList_detail.MyPageBackingDetailSaveDto">
         SELECT
         b.backingId,
-        b.userId,
         b.amount,
         b.createdAt,
         b.backingStatus,
@@ -485,11 +484,11 @@
         JOIN backingDetail bd ON b.backingId = bd.backingId
         JOIN reward r ON r.rewardId = bd.rewardId
         JOIN project p ON p.projectId = r.projectId
-        JOIN shipping s ON s.backingId = b.backingId
-        JOIN address a ON a.addrId = s.addrId
-        JOIN payment py ON py.backingId = b.backingId
-        JOIN creator c ON c.creatorId = p.creatorId
-        WHERE b.userId = #{userId}
+        LEFT JOIN shipping s ON s.backingId = b.backingId
+        LEFT JOIN address a ON a.addrId = s.addrId
+        LEFT JOIN payment py ON py.backingId = b.backingId
+        LEFT JOIN creator c ON c.creatorId = p.creatorId
+        WHERE b.backingId = #{backingId}
     </select>
 
     <update id="updateBackingStatus" parameterType="long">

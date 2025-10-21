@@ -62,8 +62,8 @@ public class BackingController {
         return backingService.getMyPageBackingList(userId);
     }
 
-    @GetMapping("/myPageBackingDetail/{userId}")
-    public ResponseEntity<ResponseDto<List<MyPageBackingDetailDto>>>geMyPageBackingDetail(@PathVariable Long userId) {
-        return backingService.getMyPageBackingDetail(userId);
+    @GetMapping("/myPageBackingDetail/{backingId}")
+    public ResponseEntity<ResponseDto<MyPageBackingDetailDto>>geMyPageBackingDetail(@PathVariable Long backingId) {
+        return backingService.getMyPageBackingDetail(backingId);
     }
 }

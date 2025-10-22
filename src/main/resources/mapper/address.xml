@@ -16,7 +16,9 @@
 
         FROM address a
         WHERE a.userId=#{userId}
-        Order BY addrId DESC
+        Order BY
+            CASE WHEN a.isDefault = 'Y' THEN 0 ELSE 1 END,
+            a.addrId DESC
     </select>
 
     <insert id="addAddr" parameterType="com.example.funding.dto.request.address.AddrAddRequestDto">

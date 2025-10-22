@@ -13,7 +13,6 @@ public class ProjectValidationRules {
     // 기본 필드
     public static final int MIN_TITLE_LEN = 2;
     public static final int MAX_TITLE_LEN = 255;
-    public static final int MIN_CONTENT_LEN = 30;
     public static final int MAX_CONTENT_LEN = 3000;
     public static final int MIN_GOAL_AMOUNT = 10_000;
     public static final int MAX_GOAL_AMOUNT = 2_000_000_000;

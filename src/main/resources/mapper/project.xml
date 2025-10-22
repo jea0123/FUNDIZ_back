@@ -232,7 +232,7 @@
                 AND sc.SUBCTGRID = #{dto.subctgrId}
             </if>
             <if test="dto.activeOnly != null and dto.activeOnly">
-                AND p.ENDDATE <![CDATA[ >= ]]> SYSDATE
+                AND p.ENDDATE <![CDATA[ > ]]> SYSDATE
             </if>
         </where>
     </sql>

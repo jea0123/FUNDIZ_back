@@ -26,7 +26,7 @@ public interface BackingService {
 
     ResponseEntity<ResponseDto<List<MyPageBackingListDto>>> getMyPageBackingList(Long userId);
 
-    ResponseEntity<ResponseDto<MyPageBackingDetailDto>> getMyPageBackingDetail(Long backingId);
+    ResponseEntity<ResponseDto<MyPageBackingDetailDto>> getMyPageBackingDetail(Long userId, Long backingId);
 
     ResponseEntity<ResponseDto<String>> cancelBacking(Long userId, Long backingId);
 }

@@ -59,7 +59,7 @@ public class InquiryController {
     }
 
     /**
-     * <p>1:1 문의 등록</p>
+     * <p>1:1 문의 등록(후원자)</p>
      *
      * @param principal 인증된 사용자 정보
      * @param iqrDto    IqrAddRequestDto
@@ -74,7 +74,7 @@ public class InquiryController {
 
 
     /**
-     * <p>문의내역 답변 조회</p>
+     * <p>문의내역 답변 조회(후원자, 관리자)</p>
      *
      * @param inqId         문의내역 ID
      * @param lastCreatedAt 마지막 항목의 생성일시
@@ -93,7 +93,7 @@ public class InquiryController {
     }
 
     /**
-     * <p>문의내역 답변 등록</p>
+     * <p>문의내역 답변 등록(관리자)</p>
      *
      * @param inqId 문의내역 ID
      * @param dto   IqrReplyCreateRequestDto

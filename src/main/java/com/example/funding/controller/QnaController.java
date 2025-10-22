@@ -25,7 +25,7 @@ public class QnaController {
     private final ReplyService replyService;
 
     /**
-     * <p>Q&A 답변 조회</p>
+     * <p>Q&A 답변 조회(필요없음)</p>
      *
      * @param qnaId         Q&A ID
      * @param lastCreatedAt 마지막 항목의 생성일시
@@ -44,7 +44,7 @@ public class QnaController {
     }
 
     /**
-     * <p>Q&A 답변 등록</p>
+     * <p>Q&A 답변 등록(관리자)</p>
      *
      * @param qnaId 커뮤니티 ID
      * @param dto   QnaReplyCreateRequestDto

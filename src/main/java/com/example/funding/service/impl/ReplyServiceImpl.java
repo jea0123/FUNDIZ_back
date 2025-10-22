@@ -19,12 +19,10 @@ import com.example.funding.model.Qna;
 import com.example.funding.model.Reply;
 import com.example.funding.service.ReplyService;
 import com.example.funding.validator.Loaders;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -165,40 +163,6 @@ public class ReplyServiceImpl implements ReplyService {
         notificationPublisher.publish(existingInquiry.getUserId(), NotificationType.INQUIRY_ANSWERED, existingInquiry.getTitle(), inqId);
         return ResponseEntity.ok(ResponseDto.success(200, "댓글 등록 성공", null));
     }
-
-    /**
-     * <p>Q&A 답변 조회</p>
-     *
-     * @param qnaId         Q&A ID
-     * @param lastCreatedAt 마지막 항목의 생성일시
-     * @param lastId        마지막 항목의 id
-     * @param size          한 번에 가져올 항목 수
-     * @return 성공 시 200 OK
-     * @author 이동혁
-     * @since 2025-10-14
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<CursorPage<QnaReplyDto>>> getQnaReplyList(Long qnaId, LocalDateTime lastCreatedAt, Long lastId, int size) {
-        loaders.qna(qnaId);
-
-        int limitPlusOne = Math.max(1, size) + 1;
-        List<QnaReplyDto> replyList = replyMapper.getQnaReplyList(qnaId, lastCreatedAt, lastId, limitPlusOne);
-
-        boolean hasMore = replyList.size() > size;
-        if (hasMore) {
-            replyList = replyList.subList(0, size);
-        }
-
-        Cursor next = null;
-        if (hasMore && !replyList.isEmpty()) {
-            QnaReplyDto last = replyList.getLast();
-            next = new Cursor(last.getCreatedAt(), last.getQnaId());
-        }
-
-        return ResponseEntity.ok(ResponseDto.success(200, "댓글 목록 조회 성공", CursorPage.of(replyList, next)));
-    }
-
 
     /**
      * <p>Q&A 답변 등록</p>

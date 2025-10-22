@@ -1,4 +1,4 @@
-package com.example.funding.dto.response.backing.userList_detail;
+package com.example.funding.dto.response.backing;
 
 import lombok.*;
 

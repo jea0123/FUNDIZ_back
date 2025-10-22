@@ -10,8 +10,7 @@ import java.util.List;
 
 @Mapper
 public interface ShippingMapper {
-    List<CreatorShippingBackerList> creatorShippingBackerList(@Param("creatorId") Long creatorId,
-                                                              @Param("projectId")Long projectId);
+    List<CreatorShippingBackerList> creatorShippingBackerList(@Param("creatorId") Long creatorId, @Param("projectId")Long projectId);
 
     int addShipping(Shipping shipping);
 

@@ -118,20 +118,7 @@
         WHERE REWARDID = #{rewardId}
     </select>
 
-    <select id="getMyPageDetailRewardList" resultType = "com.example.funding.dto.response.backing.userList_detail.MyPageBacking_RewardDto">
-        select
-            p.projectId,
-            r.rewardName,
-            b.backingId,
-            b.userId
-        from reward r
-        JOIN project p ON r.projectId = p.projectId
-        JOIN backingDetail bd ON bd.rewardId = r.rewardId
-        JOIN backing b ON b.backingId = bd.backingId
-        where b.backingId = #{backingId}
-    </select>
-
-    <select id="getMyPageDetailRewardDetail" resultType = "com.example.funding.dto.response.backing.userList_detail.MyPageBacking_RewardDto">
+    <select id="getMyPageDetailRewardDetail" resultType = "com.example.funding.dto.response.backing.MyPageBacking_RewardDto">
         select
         p.projectId,
         r.rewardName,

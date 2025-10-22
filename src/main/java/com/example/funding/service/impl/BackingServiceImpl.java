@@ -5,11 +5,8 @@ import com.example.funding.dto.request.backing.BackingRequestDto;
 import com.example.funding.dto.request.backing.BackingRequestUpdateDto;
 import com.example.funding.dto.request.reward.RewardBackingRequestDto;
 import com.example.funding.dto.response.address.AddressResponseDto;
-import com.example.funding.dto.response.backing.BackingResponseDto;
-import com.example.funding.dto.response.backing.BackingRewardDto;
-import com.example.funding.dto.response.backing.userList_detail.*;
+import com.example.funding.dto.response.backing.*;
 import com.example.funding.dto.response.payment.BackingPagePaymentDto;
-import com.example.funding.dto.response.user.BackingDto;
 import com.example.funding.enums.NotificationType;
 import com.example.funding.exception.notfound.BackingNotFoundException;
 import com.example.funding.exception.notfound.ProjectNotFoundException;
@@ -18,14 +15,11 @@ import com.example.funding.mapper.*;
 import com.example.funding.model.*;
 import com.example.funding.service.BackingService;
 import com.example.funding.validator.Loaders;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -226,36 +220,6 @@ public class BackingServiceImpl implements BackingService {
      * @author by: 이윤기
      * @since 2025-09-15
      */
-    @Override
-    @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<List<BackingDto>>> getBackingList(Long userId) {
-        loaders.user(userId);
-        List<BackingDto> backingList = backingMapper.getBackingListUserId(userId);
-
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "후원한 프로젝트 리스트 조회 성공", backingList));
-    }
-
-    /**
-     * <p>로그인 사용자 후원 리스트 상세 Backing 통합</p>
-     *
-     * @param userId 사용자
-     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
-     * @author by: 이윤기
-     * @since 2025-09-05
-     */
-
-    @Override
-    @Transactional(readOnly = true)
-    public ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(Long userId, Long projectId, Long rewardId, Long backingId) {
-        loaders.user(userId);
-        loaders.project(projectId);
-        loaders.reward(rewardId);
-        loaders.backing(backingId);
-
-        BackingDto backingDetailDto = backingMapper.getBackingProjectAndUserId(userId, projectId, rewardId, backingId);
-
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.success(200, "후원한 프로젝트 리스트 상세 조회성공", backingDetailDto));
-    }
 
     @Override
     public ResponseEntity<ResponseDto<String>> updateBacking(BackingRequestUpdateDto updateDto, Long backingId, Long userId) {

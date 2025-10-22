@@ -13,8 +13,6 @@ public interface RewardService {
 
     void replaceRewards(Long projectId, List<RewardCreateRequestDto> rewardList, LocalDateTime endDate);
 
-    ResponseEntity<ResponseDto<String>> deleteReward(Long projectId, Long rewardId);
-
     ResponseEntity<ResponseDto<List<Reward>>> getRewardListManage(Long projectId, Long creatorId);
 
     ResponseEntity<ResponseDto<String>> addReward(Long projectId, Long creatorId, RewardCreateRequestDto dto);

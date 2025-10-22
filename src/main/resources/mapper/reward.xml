@@ -70,12 +70,6 @@
         )
     </insert>
 
-    <delete id="deleteReward">
-        DELETE FROM REWARD
-        WHERE PROJECTID = #{projectId}
-          AND REWARDID = #{rewardId}
-    </delete>
-
     <delete id="deleteRewards">
         DELETE FROM REWARD
         WHERE PROJECTID = #{projectId}

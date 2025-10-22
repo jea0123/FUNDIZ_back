@@ -1,11 +1,13 @@
 package com.example.funding.controller;
 
 import com.example.funding.common.CursorPage;
+import com.example.funding.common.CustomUserPrincipal;
 import com.example.funding.common.PageResult;
 import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.PagerRequest;
 import com.example.funding.dto.request.project.CommunityCreateRequestDto;
+import com.example.funding.dto.request.project.QnaAddRequestDto;
 import com.example.funding.dto.request.project.ReplyCreateRequestDto;
 import com.example.funding.dto.request.project.SearchProjectDto;
 import com.example.funding.dto.response.project.*;
@@ -14,11 +16,13 @@ import com.example.funding.exception.notfound.ProjectNotFoundException;
 import com.example.funding.exception.notfound.RecentPaidProjectNotFoundException;
 import com.example.funding.service.CommunityService;
 import com.example.funding.service.ProjectService;
+import com.example.funding.service.QnaService;
 import com.example.funding.service.ReplyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -32,6 +36,7 @@ public class ProjectController {
     private final ProjectService projectService;
     private final CommunityService communityService;
     private final ReplyService replyService;
+    private final QnaService qnaService;
 
     /**
      * <p>프로젝트 상세 페이지 조회</p>
@@ -133,16 +138,16 @@ public class ProjectController {
      *
      * @param projectId 프로젝트 ID
      * @param dto       CommunityCreateRequestDto
+     * @param principal 사용자 ID
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-10-12
      */
-    @PostMapping("{projectId}/community/new")
+    @PostMapping("/{projectId}/community/new")
     public ResponseEntity<ResponseDto<String>> createCommunity(@PathVariable Long projectId,
-                                                               @RequestBody CommunityCreateRequestDto dto) {
-        //TODO: 임시 id
-        Long userId = 22L;
-        return communityService.createCommunity(projectId, dto, userId);
+                                                               @RequestBody CommunityCreateRequestDto dto,
+                                                               @AuthenticationPrincipal CustomUserPrincipal principal) {
+        return communityService.createCommunity(projectId, dto, principal.userId());
     }
 
     /**
@@ -169,16 +174,16 @@ public class ProjectController {
      *
      * @param cmId 커뮤니티 ID
      * @param dto  ReplyCreateRequestDto
+     * @param principal 사용자 ID
      * @return 성공 시 200 OK
      * @author 조은애
      * @since 2025-10-13
      */
     @PostMapping("/community/{cmId}/reply")
     public ResponseEntity<ResponseDto<ReplyDto>> createCommunityReply(@PathVariable Long cmId,
-                                                                      @RequestBody ReplyCreateRequestDto dto) {
-        //TODO: 임시 id
-        Long userId = 12L;
-        return replyService.createCommunityReply(cmId, dto, userId);
+                                                                      @RequestBody ReplyCreateRequestDto dto,
+                                                                      @AuthenticationPrincipal CustomUserPrincipal principal) {
+        return replyService.createCommunityReply(cmId, dto, principal.userId());
     }
 
     /**
@@ -203,8 +208,42 @@ public class ProjectController {
      * @author 조은애
      * @since 2025-10-20
      */
-    @GetMapping("{projectId}/counts")
+    @GetMapping("/{projectId}/counts")
     public ResponseEntity<ResponseDto<ProjectCountsDto>> getCounts(@PathVariable Long projectId) {
         return projectService.getCounts(projectId);
+    }
+
+    /**
+     * <p>QnA 내역 목록 조회(프로젝트 상세 페이지 기준)</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param lastCreatedAt 마지막 항목의 생성일시
+     * @param lastId 마지막 항목의 cmId
+     * @param size 한 번에 가져올 항목 수
+     * @return 성공 시 200 OK
+     * @author 이동혁
+     * @since 2025-10-07
+     */
+    @GetMapping("/{projectId}/qna")
+    public ResponseEntity<ResponseDto<CursorPage<QnaDto>>> getQnaListOfProject(@PathVariable("projectId") Long projectId,
+                                                                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastCreatedAt,
+                                                                               @RequestParam(required = false) Long lastId,
+                                                                               @RequestParam(defaultValue = "10") int size) {
+        return qnaService.getQnaListOfProject(projectId, lastCreatedAt, lastId, size);
+    }
+
+    /**
+     * <p>QnA 질문 등록(프로젝트 상세 페이지 내)</p>
+     *
+     * @param projectId 프로젝트 ID
+     * @param principal 사용자 ID
+     * @param qnaDto QnaAddRequestDto
+     * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
+     * @author 이동혁
+     * @since 2025-10-08
+     */
+    @PostMapping("/{projectId}/qna/add")
+    public ResponseEntity<ResponseDto<String>> addQuestion(@PathVariable Long projectId, @AuthenticationPrincipal CustomUserPrincipal principal, @RequestBody QnaAddRequestDto qnaDto){
+        return qnaService.addQuestion(projectId, principal.userId(), qnaDto);
     }
 }

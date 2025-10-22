@@ -18,7 +18,6 @@
         WHERE q.USERID = #{userId} order by q.QNAID desc
         ) sub  WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow})
         WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
-
     </select>
 
     <select id="qnaTotalOfUser" resultType="Integer">

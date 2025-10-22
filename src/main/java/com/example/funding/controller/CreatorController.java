@@ -161,7 +161,6 @@ public class CreatorController {
     @PostMapping("/project/new")
     public ResponseEntity<ResponseDto<Long>> createProject(ProjectCreateRequestDto dto,
                                                            @AuthenticationPrincipal CustomUserPrincipal principal) throws Exception {
-
         String thumbnailUrl = null;
         if (dto.getThumbnail() != null && !dto.getThumbnail().isEmpty()) {
             thumbnailUrl = fileUploader.upload(dto.getThumbnail());

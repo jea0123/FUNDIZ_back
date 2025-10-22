@@ -54,7 +54,9 @@ public class UserController {
     @PostMapping("/recentView/{projectId}")
     public ResponseEntity<ResponseDto<?>> addRecentViewProject(@PathVariable Long projectId,
                                                                @AuthenticationPrincipal CustomUserPrincipal principal) {
-        return userService.addRecentViewProject(principal.userId(), projectId);
+        Long userId = principal != null ? principal.userId() : null;
+        if (userId == null) return ResponseEntity.ok(ResponseDto.success(200, "비회원 최근 본 프로젝트 추가 성공", null));
+        return userService.addRecentViewProject(userId, projectId);
     }
 
     /**
@@ -108,7 +110,7 @@ public class UserController {
     /**
      * <p>사용자 Q&A 목록</p>
      *
-     * @param req    요청 pager
+     * @param req 요청 pager
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND
      * @author by: 이윤기
      * @since 2025-09-05
@@ -172,7 +174,9 @@ public class UserController {
     public ResponseEntity<ResponseDto<Boolean>> isProjectLiked(@PathVariable Long projectId,
                                                                @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
-        return userService.checkLikedProject(principal.userId(), projectId);
+        Long userId = principal != null ? principal.userId() : null;
+        if (userId == null) return ResponseEntity.ok(ResponseDto.success(200, "비회원 프로젝트 좋아요 여부 조회 성공", false));
+        return userService.checkLikedProject(userId, projectId);
     }
 
     /**
@@ -228,7 +232,9 @@ public class UserController {
     public ResponseEntity<ResponseDto<Boolean>> isFollowingCreator(@PathVariable Long creatorId,
                                                                    @AuthenticationPrincipal CustomUserPrincipal principal
     ) {
-        return userService.isFollowingCreator(principal.userId(), creatorId);
+        Long userId = principal != null ? principal.userId() : null;
+        if (userId == null) return ResponseEntity.ok(ResponseDto.success(200, "비회원 크리에이터 팔로우 여부 조회 성공", false));
+        return userService.isFollowingCreator(userId, creatorId);
     }
 
     /**

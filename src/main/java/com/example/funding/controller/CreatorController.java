@@ -60,7 +60,7 @@ public class CreatorController {
      */
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseDto<Long>> registerCreator(@Valid @ModelAttribute CreatorRegisterRequestDto dto,
-                                                               @AuthenticationPrincipal CustomUserPrincipal principal
+                                                             @AuthenticationPrincipal CustomUserPrincipal principal
     ) throws Exception {
         MultipartFile file = dto.getProfileImg();
         if (file != null && file.isEmpty()) {
@@ -152,7 +152,7 @@ public class CreatorController {
     /**
      * <p>프로젝트 생성</p>
      *
-     * @param dto ProjectCreateRequestDto
+     * @param dto       ProjectCreateRequestDto
      * @param principal 창작자 ID
      * @return 성공 시 200 OK
      * @author 조은애
@@ -398,7 +398,8 @@ public class CreatorController {
     @GetMapping("/summary/{creatorId}")
     public ResponseEntity<ResponseDto<CreatorSummaryDto>> getCreatorSummary(@NotNull @Positive @PathVariable Long creatorId,
                                                                             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        return creatorService.getCreatorSummary(creatorId, principal.userId());
+        Long userId = principal != null ? principal.userId() : null;
+        return creatorService.getCreatorSummary(creatorId, userId);
     }
 
     /**

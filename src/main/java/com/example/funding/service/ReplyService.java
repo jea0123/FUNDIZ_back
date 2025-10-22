@@ -23,5 +23,4 @@ public interface ReplyService {
 
     ResponseEntity<ResponseDto<QnaReplyDto>> createQnaReply(Long qnaId, Long creatorId, QnaReplyCreateRequestDto dto);
 
-    ResponseEntity<ResponseDto<CursorPage<QnaReplyDto>>> getQnaReplyList(Long qnaId, LocalDateTime lastCreatedAt, Long lastId, int size);
 }

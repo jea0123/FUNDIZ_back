@@ -6,7 +6,6 @@ import com.example.funding.common.Pager;
 import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.PagerRequest;
 import com.example.funding.dto.request.cs.RpAddRequestDto;
-import com.example.funding.model.Notice;
 import com.example.funding.model.Report;
 import com.example.funding.service.ReportService;
 import jakarta.validation.Valid;

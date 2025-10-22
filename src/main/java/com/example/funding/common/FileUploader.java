@@ -27,7 +27,9 @@ public class FileUploader {
         String original = file.getOriginalFilename();
         String ext = (original != null && original.lastIndexOf('.') > -1)
                 ? original.substring(original.lastIndexOf('.')) : "";
-        String objectName = UUID.randomUUID() + ext;
+        String baseName = (original != null && original.lastIndexOf('.') > -1)
+                ? original.substring(0, original.lastIndexOf('.')) : original;
+        String objectName = baseName + "_" + UUID.randomUUID() + ext;
         String encoded = URLEncoder.encode(objectName, StandardCharsets.UTF_8);
         String contentType = file.getContentType() != null ? file.getContentType() : "application/octet-stream";
 

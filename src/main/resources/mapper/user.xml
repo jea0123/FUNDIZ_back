@@ -52,6 +52,7 @@
         FROM (
         SELECT
         pr.projectId,
+        pr.creatorId,
         NVL2(TRIM(c.creatorName), c.creatorName, 'Unknown Creator') AS creatorName,
         pr.Title,
         pr.Thumbnail,

@@ -151,8 +151,8 @@ public class ProjectInputValidator {
 
         if (forCreate || content != null) {
             String c = nvl(content).trim();
-            if (c.length() < MIN_CONTENT_LEN || c.length() > MAX_CONTENT_LEN) {
-                errors.add("본문은 " + MIN_CONTENT_LEN + "~" + MAX_CONTENT_LEN + "자 이내로 입력해주세요.");
+            if (c.length() > MAX_CONTENT_LEN) {
+                errors.add("본문은 " + MAX_CONTENT_LEN + "자 이내로 입력해주세요.");
                 return;
             }
         }

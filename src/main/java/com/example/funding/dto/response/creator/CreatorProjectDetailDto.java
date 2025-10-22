@@ -26,7 +26,9 @@ public class CreatorProjectDetailDto {
     private String thumbnail;
     private String businessDoc;
 
+    private Long subctgrId;
     private String subctgrName;
+    private Long ctgrId;
     private String ctgrName;
 
     private String creatorName;

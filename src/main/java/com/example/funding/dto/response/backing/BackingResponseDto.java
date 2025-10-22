@@ -2,6 +2,7 @@ package com.example.funding.dto.response.backing;
 
 import com.example.funding.dto.response.address.AddressResponseDto;
 import com.example.funding.dto.response.payment.BackingPagePaymentDto;
+import com.example.funding.model.PaymentInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,5 +39,5 @@ public class BackingResponseDto {
 
     private List<BackingRewardDto> rewardsList;
 
-    private List<BackingPagePaymentDto> backingPagePaymentList;
+    private List<PaymentInfo> backingPagePaymentList;
 }

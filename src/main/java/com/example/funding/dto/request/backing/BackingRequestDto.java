@@ -15,6 +15,7 @@ public class BackingRequestDto {
     private Long backingId;
     private Backing backing;
     private BackingDetail backingDetail;
+    private PaymentInfo paymentInfo;
     private Payment payment;
     private Address address;
     private Shipping shipping;

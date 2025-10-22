@@ -52,7 +52,7 @@ public class ReportController {
     }
 
     /**
-     * <p>신고 등록</p>
+     * <p>신고 등록(후원자)</p>
      *
      * @param principal 인증된 사용자 정보
      * @param rpDto RpAddRequestDto
@@ -66,7 +66,7 @@ public class ReportController {
     }
 
     /**
-     * <p>신고내역 상세 페이지 조회</p>
+     * <p>신고내역 상세 페이지 조회(관리자)</p>
      *
      * @param reportId 프로젝트 ID
      * @return 성공 시 200 OK, 실패 시 404 NOT FOUND

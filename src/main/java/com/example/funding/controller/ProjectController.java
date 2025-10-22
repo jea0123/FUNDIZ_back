@@ -214,7 +214,7 @@ public class ProjectController {
     }
 
     /**
-     * <p>QnA 내역 목록 조회(프로젝트 상세 페이지 기준)</p>
+     * <p>QnA 내역 목록 조회(프로젝트 상세 페이지 기준)(필요X)</p>
      *
      * @param projectId 프로젝트 ID
      * @param lastCreatedAt 마지막 항목의 생성일시
@@ -233,7 +233,7 @@ public class ProjectController {
     }
 
     /**
-     * <p>QnA 질문 등록(프로젝트 상세 페이지 내)</p>
+     * <p>QnA 질문 등록(프로젝트 상세 페이지 내)(필요O)</p>
      *
      * @param projectId 프로젝트 ID
      * @param principal 사용자 ID

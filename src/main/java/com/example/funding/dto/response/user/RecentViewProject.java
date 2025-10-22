@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 public class RecentViewProject {
     private Long projectId;
+    private Long creatorId;
     private String creatorName;
     private String title;
     private String thumbnail;

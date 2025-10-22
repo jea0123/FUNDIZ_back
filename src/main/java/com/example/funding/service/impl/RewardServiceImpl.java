@@ -112,28 +112,6 @@ public class RewardServiceImpl implements RewardService {
     }
 
     /**
-     * <p>리워드 삭제</p>
-     *
-     * @param projectId 프로젝트 ID
-     * @param rewardId  리워드 ID
-     * @return 성공 시 200 OK
-     * @author 조은애
-     * @since 2025-09-11
-     */
-    @Override
-    public ResponseEntity<ResponseDto<String>> deleteReward(Long projectId, Long rewardId) {
-        // TODO: 리워드 삭제 시, 해당 리워드를 선택한 서포터가 있을 경우 예외 처리 필요
-        // TODO: 크리에이터 권한 검사 추가 필요
-        loaders.project(projectId);
-        loaders.reward(rewardId);
-        // Guard
-        transitionGuard.requireDraft(projectId);
-
-        rewardMapper.deleteReward(projectId, rewardId);
-        return ResponseEntity.ok(ResponseDto.success(200, "리워드 삭제 성공", null));
-    }
-
-    /**
      * <p>리워드 목록 조회</p>
      *
      * @param projectId 프로젝트 Id

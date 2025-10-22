@@ -317,7 +317,7 @@ public class BackingServiceImpl implements BackingService {
 
 
     @Override
-    public ResponseEntity<ResponseDto<MyPageBackingDetailDto>> getMyPageBackingDetail(Long backingId) {
+    public ResponseEntity<ResponseDto<MyPageBackingDetailDto>> getMyPageBackingDetail(Long userId, Long backingId) {
         List<MyPageBacking_RewardDto> rewards = rewardMapper.getMyPageDetailRewardDetail(backingId);
         List<MyPageBackingDetailSaveDto> backingDetailSave = backingMapper.getBackingDetails(backingId);
 

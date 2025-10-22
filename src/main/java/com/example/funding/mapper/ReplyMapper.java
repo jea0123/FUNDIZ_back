@@ -1,7 +1,6 @@
 package com.example.funding.mapper;
 
 import com.example.funding.dto.response.cs.InquiryReplyDto;
-import com.example.funding.dto.response.cs.QnaReplyDto;
 import com.example.funding.dto.response.project.ReplyDto;
 import com.example.funding.model.Reply;
 import org.apache.ibatis.annotations.Mapper;
@@ -25,11 +24,6 @@ public interface ReplyMapper {
                                               @Param("size") int limitPlusOne);
 
     void createInquiryReply(Reply reply);
-
-    List<QnaReplyDto> getQnaReplyList(@Param("qnaId") Long qnaId,
-                                      @Param("lastCreatedAt") LocalDateTime lastCreatedAt,
-                                      @Param("lastId") Long lastId,
-                                      @Param("size") int limitPlusOne);
 
     void createQnaReply(Reply reply);
 }

@@ -5,9 +5,8 @@ import com.example.funding.dto.ResponseDto;
 import com.example.funding.dto.request.backing.BackingRequestDto;
 import com.example.funding.dto.request.backing.BackingRequestUpdateDto;
 import com.example.funding.dto.response.backing.BackingResponseDto;
-import com.example.funding.dto.response.backing.userList_detail.MyPageBackingDetailDto;
-import com.example.funding.dto.response.backing.userList_detail.MyPageBackingListDto;
-import com.example.funding.dto.response.user.BackingDto;
+import com.example.funding.dto.response.backing.MyPageBackingDetailDto;
+import com.example.funding.dto.response.backing.MyPageBackingListDto;
 import com.example.funding.service.BackingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,19 +46,6 @@ public class BackingController {
                                                              @PathVariable Long backingId,
                                                              @AuthenticationPrincipal CustomUserPrincipal principal) {
         return backingService.updateBacking(requestDto, backingId, principal.userId());
-    }
-
-    @GetMapping("/page")
-    public ResponseEntity<ResponseDto<List<BackingDto>>> getBackingList(@AuthenticationPrincipal CustomUserPrincipal principal) {
-        return backingService.getBackingList(principal.userId());
-    }
-
-    @GetMapping("/page/project/{projectId}/reward/{rewardId}/backing/{backingId}")
-    public ResponseEntity<ResponseDto<BackingDto>> getBackingDetail(@AuthenticationPrincipal CustomUserPrincipal principal,
-                                                                    @PathVariable Long projectId,
-                                                                    @PathVariable Long rewardId,
-                                                                    @PathVariable Long backingId) {
-        return backingService.getBackingDetail(principal.userId(), projectId, rewardId, backingId);
     }
 
     @GetMapping("/myPageBackingList")

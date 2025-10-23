@@ -184,7 +184,7 @@
 
     <select id = "getBackerCnt" parameterType="long" resultType="long">
         SELECT
-            sum(backerCnt)
+            NVL(sum(backerCnt),0)
         FROM
             project
         WHERE

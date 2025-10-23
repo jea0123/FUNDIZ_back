@@ -16,6 +16,7 @@ public class CreatorProjectListDto {
     private LocalDateTime endDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String thumbnail;
     private String projectStatus;
     private Integer backerCnt;
     private Integer likeCnt;

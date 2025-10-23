@@ -156,6 +156,7 @@
                     p.ENDDATE,
                     p.CREATEDAT,
                     p.UPDATEDAT,
+                    p.THUMBNAIL,
                     p.PROJECTSTATUS,
                     p.BACKERCNT,
                     p.LIKECNT,
@@ -232,6 +233,7 @@
                     p.GOALAMOUNT AS goalAmount,
                     p.STARTDATE AS startDate,
                     p.ENDDATE AS endDate,
+                    p.THUMBNAIL AS thumbnail,
                     p.PROJECTSTATUS AS projectStatus,
                     p.REQUESTEDAT AS requestedAt
                 FROM PROJECT p
@@ -239,7 +241,7 @@
                 JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
                 JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
                 <include refid="verifyFilterWhere" />
-                ORDER BY p.REQUESTEDAT DESC, p.PROJECTID DESC
+                ORDER BY p.REQUESTEDAT ASC, p.PROJECTID ASC
                 ) T
             WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
             )

@@ -86,6 +86,7 @@
         p.ENDDATE,
         p.CREATEDAT,
         p.UPDATEDAT,
+        p.THUMBNAIL,
         p.PROJECTSTATUS,
         p.BACKERCNT,
         p.LIKECNT,

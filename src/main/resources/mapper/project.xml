@@ -317,7 +317,7 @@
         SELECT *
         FROM PROJECT
         WHERE PROJECTSTATUS = 'OPEN'
-        AND (ENDDATE + 1) <![CDATA[ < ]]> TRUNC(SYSDATE)
+        AND ENDDATE <![CDATA[ < ]]> TRUNC(SYSDATE)
         AND CURRAMOUNT <![CDATA[ >= ]]> GOALAMOUNT
     </select>
 
@@ -326,7 +326,7 @@
         SET PROJECTSTATUS = 'SUCCESS',
         UPDATEDAT = SYSDATE
         WHERE PROJECTSTATUS = 'OPEN'
-        AND (ENDDATE + 1) <![CDATA[ < ]]> TRUNC(SYSDATE)
+        AND ENDDATE <![CDATA[ < ]]> TRUNC(SYSDATE)
         AND CURRAMOUNT <![CDATA[ >= ]]> GOALAMOUNT
     </update>
 
@@ -334,7 +334,7 @@
         SELECT *
         FROM PROJECT
         WHERE PROJECTSTATUS = 'OPEN'
-        AND (ENDDATE + 1) <![CDATA[ < ]]> TRUNC(SYSDATE)
+        AND ENDDATE <![CDATA[ < ]]> TRUNC(SYSDATE)
         AND CURRAMOUNT <![CDATA[ < ]]> GOALAMOUNT
     </select>
 
@@ -343,7 +343,7 @@
         SET PROJECTSTATUS = 'FAILED',
         UPDATEDAT = SYSDATE
         WHERE PROJECTSTATUS = 'OPEN'
-        AND (ENDDATE + 1) <![CDATA[ < ]]> TRUNC(SYSDATE)
+        AND ENDDATE <![CDATA[ < ]]> TRUNC(SYSDATE)
         AND CURRAMOUNT <![CDATA[ < ]]> GOALAMOUNT
     </update>
 

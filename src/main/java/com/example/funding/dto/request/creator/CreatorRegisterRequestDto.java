@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Setter
 public class CreatorRegisterRequestDto {
     @NotBlank(message = "창작자 이름은 필수입니다.")
-    @Size(min = 2, max = 10, message = "창작자 이름은 2자 이상 10자 이하여야 합니다.")
+    @Size(min = 2, max = 30, message = "창작자 이름은 2자 이상 30자 이하여야 합니다.")
     private String creatorName;
     @NotNull(message = "창작자 타입은 필수입니다.")
     private CreatorType creatorType;

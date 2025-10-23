@@ -12,21 +12,17 @@ import com.example.funding.dto.response.project.RecentTop10ProjectDto;
 import com.example.funding.dto.row.CountsAgg;
 import com.example.funding.dto.row.ProjectRow;
 import com.example.funding.exception.badrequest.InvalidSortException;
-import com.example.funding.exception.notfound.FeaturedProjectNotFoundException;
 import com.example.funding.exception.notfound.ProjectNotFoundException;
-import com.example.funding.exception.notfound.RecentPaidProjectNotFoundException;
 import com.example.funding.mapper.*;
 import com.example.funding.model.News;
 import com.example.funding.model.Reward;
 import com.example.funding.model.Tag;
 import com.example.funding.service.ProjectService;
 import com.example.funding.validator.Loaders;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -114,7 +110,7 @@ public class ProjectServiceImpl implements ProjectService {
 //        Date since = Date.from(Instant.now().minus(24, ChronoUnit.HOURS));
         LocalDate since = LocalDate.now().minusDays(800);
         int startDays = 8760;  // 프로젝트 시작일 최근 30일
-        int limit = 10;
+        int limit = 8;
 
         List<RecentTop10ProjectDto> ranked = projectMapper.findRecentTopProjectsJoined(since, startDays, limit);
 

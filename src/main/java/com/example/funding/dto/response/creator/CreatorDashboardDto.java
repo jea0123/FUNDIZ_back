@@ -20,6 +20,7 @@ public class CreatorDashboardDto {
     //내프로젝트 성공률 (파이차트 계산용)
     private Double totalProjectCnt; // 전체 프로젝트 개수
     private Double projectFailedCnt; // 실패한 프로젝트 개수
+    private Double projectSuccessCnt; // 성공한 프로젝트 개수
     private Double projectFailedPercentage; // 실패한 프로젝트 퍼센트
     private Double projectSuccessPercentage; // 성공한 프로젝트 퍼센트
 

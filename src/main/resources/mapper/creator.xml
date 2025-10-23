@@ -287,11 +287,12 @@
         WHERE CREATORID = #{creatorId}
     </select>
 
-    <select id="creatorDashboardDto" parameterType="long"
+    <select id="creatorDashboard" parameterType="long"
             resultType="com.example.funding.dto.response.creator.CreatorDashboardDto">
         SELECT
         NVL(count(*),0) AS totalProjectCnt,
-        NVL(count(CASE WHEN projectStatus = 'FAILED' THEN creatorId END),0) AS projectFailedCnt
+        NVL(count(CASE WHEN projectStatus = 'FAILED' THEN creatorId END),0) AS projectFailedCnt,
+        NVL(count(CASE WHEN projectStatus = 'SUCCESS' THEN creatorId END),0) AS projectSuccessCnt
         FROM
         project
         WHERE CREATORID = #{creatorId}

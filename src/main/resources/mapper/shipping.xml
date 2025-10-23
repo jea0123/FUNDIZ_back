@@ -108,4 +108,10 @@
         set shippingStatus = 'CANCELED'
         where backingId = #{backingId}
     </update>
+
+    <select id="findByBackingId">
+        select *
+        FROM Shipping
+        where shippingId = #{shippingId}
+    </select>
 </mapper>

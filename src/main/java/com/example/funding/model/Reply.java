@@ -21,6 +21,5 @@ public class Reply {
     private String content;
     private Character isSecret;
     private LocalDateTime createdAt;
-    private LocalDateTime deletedAt;
     private String code;
 }

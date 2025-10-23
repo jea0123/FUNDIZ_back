@@ -3,13 +3,15 @@
 <mapper namespace="com.example.funding.mapper.NotificationMapper">
 
     <select id="getNotificationsByUserId" resultType="notification">
-        SELECT * FROM notification
+        SELECT notificationId, userId, targetid, type, message, isread, createdat
+        FROM notification
         WHERE USERID = #{userId}
         ORDER BY CREATEDAT DESC
     </select>
 
     <select id="getNotificationById" resultType="notification">
-        SELECT * FROM notification
+        SELECT notificationId, userId, targetid, type, message, isread, createdat
+        FROM notification
         WHERE NOTIFICATIONID = #{notificationId}
     </select>
 

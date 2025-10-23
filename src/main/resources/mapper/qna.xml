@@ -35,25 +35,10 @@
         q.title,
         q.content,
         q.createdAt
-
-
-        <!--창작자 테이블-->
-        <!--c.creatorName,-->
-
-        <!-- 프로젝트 테이블-->
-        <!--p.title AS projectTitle,-->
-        <!--유저 테이블-->
-        <!--u.nickName-->
-
         FROM qna q
-        <!-- 테이블 조인 -->
-        <!--JOIN creator c ON q.creatorId = c.creatorId
-        JOIN users u ON q.userId = u.userId
-        JOIN project p ON p.projectId = q.projectId-->
         WHERE userId=#{userId}
         AND projectId =#{projectId}
         ORDER BY createdAt
-
     </select>
 
     <sql id="foldedQuery">
@@ -139,7 +124,8 @@
     </select>
 
     <select id="findById" resultType="qna">
-        SELECT * FROM QNA
+        SELECT qnaid, projectid, userid, creatorid, title, content, createdat
+        FROM QNA
         WHERE QNAID = #{qnaId}
     </select>
 

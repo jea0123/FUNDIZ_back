@@ -15,15 +15,15 @@
     </update>
 
     <select id="getUserById" parameterType="long" resultType="com.example.funding.model.User">
-        SELECT userId, email, pwd, nickname, profileImg, isSuspended, joinedAt, lastLoginAt, followCnt, reason,
-        suspendedAt, releasedAt, isCreator, role
+        SELECT userId, email, pwd, nickname, profileImg, joinedAt, lastLoginAt, followCnt, isSuspended, reason, suspendedAt,
+        releasedAt, isCreator, role
         FROM users
         WHERE userId=#{userId, jdbcType=NUMERIC}
     </select>
 
     <select id="findByEmail" parameterType="String" resultType="user">
-        SELECT userId, email, pwd, nickname, profileImg, isSuspended, joinedAt, lastLoginAt, followCnt, reason,
-        suspendedAt, releasedAt, isCreator, role
+        SELECT userId, email, pwd, nickname, profileImg, joinedAt, lastLoginAt, followCnt, isSuspended, reason, suspendedAt,
+        releasedAt, isCreator, role
         FROM USERS WHERE EMAIL = #{email}
     </select>
 

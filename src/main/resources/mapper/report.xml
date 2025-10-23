@@ -14,7 +14,8 @@
     <select id="reportList" resultType="report">
         SELECT * FROM
         (SELECT sub.*, ROWNUM rnum FROM (
-        SELECT * FROM report order by REPORTID desc
+        SELECT reportid, userid, reporttype, target, reason, reportdate, reportstatus
+        FROM report order by REPORTID desc
         ) sub WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow})
         WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
@@ -22,18 +23,21 @@
     <select id="myReportList" resultType="report">
         SELECT * FROM
         (SELECT sub.*, ROWNUM rnum FROM (
-        SELECT * FROM report WHERE USERID = #{userId} order by REPORTID desc
+        SELECT reportid, userid, reporttype, target, reason, reportdate, reportstatus
+        FROM report WHERE USERID = #{userId} order by REPORTID desc
         ) sub WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow})
         WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
 
     <select id="reportDetail" resultType="report">
-        SELECT * FROM report
+        SELECT reportid, userid, reporttype, target, reason, reportdate, reportstatus
+        FROM report
         WHERE REPORTID = #{reportId}
     </select>
 
     <select id="item" resultType="report">
-        SELECT * FROM report
+        SELECT reportid, userid, reporttype, target, reason, reportdate, reportstatus
+        FROM report
         WHERE REPORTID = #{reportId}
     </select>
 

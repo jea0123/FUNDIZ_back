@@ -18,7 +18,9 @@
     </select>
 
     <select id="findByIds" resultType="project">
-        SELECT *
+        SELECT projectId, creatorId, subctgrId, title, goalAmount, currAmount, startDate, endDate, content, contentBlocks,
+        thumbnail, businessDoc, TRUNC(createdAt), TRUNC(updatedat), projectStatus, backerCnt, likeCnt, viewCnt,
+        requestedAt, rejectedReason
         FROM project
         WHERE projectId IN
         <foreach collection="ids" item="id" open="(" separator="," close=")">

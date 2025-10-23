@@ -9,14 +9,14 @@
             r.REWARDNAME,
             r.PRICE,
             r.REWARDCONTENT,
-            r.DELIVERYDATE,
             r.REWARDCNT,
-            r.CREATEDAT,
-            r.ISPOSTING,
             CASE
-                WHEN r.REWARDCNT IS NULL THEN NULL
-                ELSE GREATEST(r.REWARDCNT - NVL(s.qty, 0), 0)
-            END AS REMAIN
+            WHEN r.REWARDCNT IS NULL THEN NULL
+            ELSE GREATEST(r.REWARDCNT - NVL(s.qty, 0), 0)
+            END AS REMAIN,
+            r.ISPOSTING,
+            r.DELIVERYDATE,
+            r.CREATEDAT
         FROM reward r
         LEFT JOIN (
             SELECT
@@ -31,12 +31,13 @@
     </select>
 
     <select id="findByProjectId" resultType="reward">
-        SELECT * FROM REWARD
+        SELECT rewardid, projectid, rewardname, price, rewardcontent, rewardcnt, remain, isposting, deliverydate, createdAt
+        FROM REWARD
         WHERE PROJECTID = #{projectId}
     </select>
 
     <select id="findProjectIdsByRewardIds" resultType="reward">
-        SELECT *
+        SELECT rewardid, projectid, rewardname, price, rewardcontent, rewardcnt, remain, isposting, deliverydate, createdAt
         FROM reward
         WHERE rewardId IN
         <foreach collection="ids" item="id" open="(" separator="," close=")">
@@ -77,19 +78,19 @@
 
     <select id="getRewardListManage" resultType="reward">
         SELECT
-            r.REWARDID,
-            r.PROJECTID,
-            r.REWARDNAME,
-            r.PRICE,
-            r.REWARDCONTENT,
-            r.DELIVERYDATE,
-            r.REWARDCNT,
-            r.CREATEDAT,
-            r.ISPOSTING,
-            CASE
-                WHEN r.REWARDCNT IS NULL THEN NULL
-                ELSE GREATEST(r.REWARDCNT - NVL(s.qty, 0), 0)
-            END AS REMAIN
+        r.REWARDID,
+        r.PROJECTID,
+        r.REWARDNAME,
+        r.PRICE,
+        r.REWARDCONTENT,
+        r.REWARDCNT,
+        CASE
+        WHEN r.REWARDCNT IS NULL THEN NULL
+        ELSE GREATEST(r.REWARDCNT - NVL(s.qty, 0), 0)
+        END AS REMAIN,
+        r.ISPOSTING,
+        r.DELIVERYDATE,
+        r.CREATEDAT
         FROM reward r
         LEFT JOIN (
             SELECT
@@ -114,7 +115,8 @@
     </select>
 
     <select id="findById" resultType="reward">
-        SELECT * FROM REWARD
+        SELECT rewardid, projectid, rewardname, price, rewardcontent, rewardcnt, remain, isposting, deliverydate, createdAt
+        FROM REWARD
         WHERE REWARDID = #{rewardId}
     </select>
 

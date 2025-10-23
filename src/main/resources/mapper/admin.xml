@@ -310,13 +310,17 @@
     <select id="userList" resultType="user">
         SELECT * FROM
         (SELECT sub.*, ROWNUM rnum FROM (
-        SELECT * FROM users order by USERID desc
+        SELECT userId, email, pwd, nickname, profileImg, joinedAt, lastLoginAt, followCnt, isSuspended, reason, suspendedAt,
+        releasedAt, isCreator, role
+        FROM users order by USERID desc
         ) sub WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow})
         WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
 
     <select id="userDetail" resultType="user">
-        SELECT * FROM users
+        SELECT userId, email, pwd, nickname, profileImg, joinedAt, lastLoginAt, followCnt, isSuspended, reason, suspendedAt,
+        releasedAt, isCreator, role
+        FROM users
         WHERE USERID = #{userId}
     </select>
 
@@ -346,7 +350,8 @@
     </insert>
 
     <select id="getAdminByAdminId" resultType="admin">
-        SELECT * FROM ADMIN
+        SELECT adid, adminid, adminpwd, author, role
+        FROM ADMIN
         WHERE ADMINID = #{adminId}
     </select>
 

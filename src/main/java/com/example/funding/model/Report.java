@@ -14,9 +14,9 @@ import java.time.LocalDateTime;
 public class Report {
     private Long reportId;
     private Long userId;
+    private String reportType;
     private Long target;
     private String reason;
     private LocalDateTime reportDate;
     private String reportStatus;
-    private String reportType;
 }

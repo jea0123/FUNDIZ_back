@@ -22,12 +22,12 @@ public class Project {
     private String contentBlocks;
     private String thumbnail;
     private String businessDoc;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private String projectStatus;
     private Integer backerCnt;
     private Integer likeCnt;
     private Integer viewCnt;
     private LocalDateTime requestedAt;
     private String rejectedReason;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

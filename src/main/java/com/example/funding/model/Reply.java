@@ -14,13 +14,12 @@ import java.time.LocalDateTime;
 public class Reply {
     private Long replyId;
     private Long userId;
+    private Long creatorId;
     private Long qnaId;
     private Long cmId;
     private Long inqId;
     private String content;
     private Character isSecret;
     private LocalDateTime createdAt;
-    private LocalDateTime deletedAt;
     private String code;
-    private Long creatorId;
 }

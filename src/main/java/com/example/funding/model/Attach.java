@@ -11,6 +11,10 @@ import lombok.Setter;
 @Builder
 public class Attach {
     private Long attachId;
+    private Long inqId;
+    private Long reportId;
+    private Long noticeId;
+    private Long cmId;
     private String fileName;
     private String filePath;
     private String fileType;

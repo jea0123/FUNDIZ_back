@@ -3,7 +3,8 @@
 <mapper namespace="com.example.funding.mapper.ReplyMapper">
 
     <select id="getReplyListById" resultType="reply">
-        SELECT * FROM REPLY
+        SELECT replyid, userid, creatorid, qnaid, cmid, inqid, content, issecret, createdat, code
+        FROM REPLY
         WHERE CMID = #{cmId}
         AND TRIM(CODE) = #{code}
     </select>

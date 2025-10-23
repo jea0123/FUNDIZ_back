@@ -9,7 +9,8 @@
     <select id="noticeList" resultType="notice">
         SELECT * FROM
         (SELECT sub.*, ROWNUM rnum FROM (
-        SELECT * FROM notice order by NOTICEID desc
+        SELECT noticeid, adid, title, content, viewcnt, createdat
+        FROM notice order by NOTICEID desc
         ) sub WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow})
         WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
@@ -21,12 +22,14 @@
     </update>
 
     <select id="noticeDetail" resultType="notice">
-        SELECT * FROM notice
+        SELECT noticeid, adid, title, content, viewcnt, createdat
+        FROM notice
         WHERE NOTICEID = #{noticeId}
     </select>
 
     <select id="item" resultType="notice">
-        SELECT * FROM notice
+        SELECT noticeid, adid, title, content, viewcnt, createdat
+        FROM notice
         WHERE NOTICEID=#{noticeId}
     </select>
 

@@ -14,10 +14,10 @@ public class Address {
     private Long userId;
     private String addrName;
     private String recipient;
+    private String recipientPhone;
     private String postalCode;
     private String roadAddr;
     private String detailAddr;
-    private String recipientPhone;
     private Character isDefault;
 }
 

@@ -3,7 +3,7 @@
 <mapper namespace="com.example.funding.mapper.NewsMapper">
 
     <select id="getNewsList" resultType="news">
-        SELECT *
+        SELECT newsid, projectid, content, createdat
         FROM NEWS
         WHERE PROJECTID = #{projectId}
         ORDER BY CREATEDAT DESC

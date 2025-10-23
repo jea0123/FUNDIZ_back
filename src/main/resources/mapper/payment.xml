@@ -3,23 +3,12 @@
 <mapper namespace="com.example.funding.mapper.PaymentMapper">
 
     <select id="findRecentSuccessful" resultType="payment">
-        SELECT *
+        SELECT paymentid, backingid, orderid, method, status, amount, cardcompany, createdat
         FROM PAYMENT
         WHERE STATUS IN ('PAID')
         AND CREATEDAT >= #{since}
     </select>
 
-<!--    <select id="backingPagePayment" resultType="com.example.funding.dto.response.payment.BackingPagePaymentDto">-->
-<!--        select-->
-<!--            p.orderId,-->
-<!--            p.method,-->
-<!--            p.amount,-->
-<!--            p.cardCompany-->
-<!--        From Payment p-->
-<!--        JOIN backing b ON b.backingId = p.backingId-->
-<!--        JOIN users u ON u.userId = b.userId-->
-<!--        WHERE u.userId = #{userId}-->
-<!--    </select>-->
     <select id="backingPagePayment" resultType="com.example.funding.dto.response.payment.BackingPagePaymentDto">
         select
         p.orderId,
@@ -58,7 +47,8 @@
     <select id="findUserMethod" resultType="com.example.funding.model.Payment">
         SELECT *
         FROM (
-        SELECT p.*
+        SELECT p.paymentid, p.backingid, p.orderid, p.method, p.status, p.amount, p.cardcompany, p.createdat
+
         FROM payment p
         JOIN backing b ON p.backingId = b.backingId
         WHERE b.userId = #{userId}
@@ -70,7 +60,8 @@
     </select>
 
     <select id="findUserPayment" parameterType="map" resultType="com.example.funding.model.Payment">
-        SELECT * FROM payment
+        SELECT paymentid, backingid, orderid, method, status, amount, cardcompany, createdat
+        FROM payment
         WHERE userId = #{userId}
         AND method = #{method}
         AND cardCompany = #{cardCompany}

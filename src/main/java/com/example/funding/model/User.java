@@ -18,10 +18,10 @@ public class User {
     private String pwd;
     private String nickname;
     private String profileImg;
-    private Character isSuspended;
     private LocalDateTime joinedAt;
     private LocalDateTime lastLoginAt;
     private Integer followCnt;
+    private Character isSuspended;
     private String reason;
     private LocalDateTime suspendedAt;
     private LocalDateTime releasedAt;

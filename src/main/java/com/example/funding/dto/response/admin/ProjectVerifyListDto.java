@@ -18,6 +18,7 @@ public class ProjectVerifyListDto {
     private Integer goalAmount;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+    private String thumbnail;
     private String projectStatus;
     private LocalDateTime requestedAt;
 }

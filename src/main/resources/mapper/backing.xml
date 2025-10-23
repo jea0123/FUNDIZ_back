@@ -188,7 +188,7 @@
         FROM
             project
         WHERE
-            CREATORID = #{creatorId}
+        creatorId = #{creatorId}
     </select>
     <!-- 후원날짜가 다를 경우도있기때문에 중복으로 나올 수도 있음 -->
     <select id ="getCBackerList" parameterType = "long" resultType="com.example.funding.dto.response.backing.BackingCreatorBackerList">

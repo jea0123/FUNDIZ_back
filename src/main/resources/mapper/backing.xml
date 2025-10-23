@@ -300,9 +300,12 @@
 
     <update id="updateBackingStatus" parameterType="long">
         update backing
-        set backingStatus = 'REFUNDED'
+        set backingStatus = case backingStatus
+        WHEN 'COMPLETED' THEN 'REFUNDED'
+        WHEN 'PENDING' THEN 'CANCELED'
+        ELSE backingStatus
+        END
         where backingId = #{backingId}
-        AND backingStatus = 'COMPLETED'
     </update>
 
     <select id="findBackingIdByUserId" parameterType="long" resultType="long">

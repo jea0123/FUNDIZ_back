@@ -41,7 +41,7 @@ public interface CreatorMapper {
 
     List<CreatorDashboardRankDto> getProjectRankDate(Long creatorId);
 
-    CreatorDashboardDto creatorDashboardDto(Long creatorId);
+    CreatorDashboardDto creatorDashboard(Long creatorId);
 
     int updateCreatorInfo(CreatorUpdateRequestDto dto);
 

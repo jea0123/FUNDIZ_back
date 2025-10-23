@@ -307,6 +307,12 @@
         AND backingStatus = 'COMPLETED'
     </update>
 
-
+    <select id="findBackingIdByUserId" parameterType="long" resultType="long">
+        SELECT b.backingId
+        FROM backing b
+        WHERE b.userId = #{userId}
+        ORDER BY b.createdAt DESC
+        OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY
+    </select>
 </mapper>
 

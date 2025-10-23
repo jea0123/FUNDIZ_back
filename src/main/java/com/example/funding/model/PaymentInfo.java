@@ -1,17 +1,16 @@
 package com.example.funding.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @Builder
+@NoArgsConstructor
 public class PaymentInfo {
-    private Long userPaymentId;
+    private Long payInfoId;
     private Long userId;
     private String cardCompany;
     private String method;
+    private String cardNum;
 }

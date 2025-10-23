@@ -18,8 +18,10 @@ import com.example.funding.exception.badrequest.AlreadyCreatorException;
 import com.example.funding.exception.badrequest.InvalidParamException;
 import com.example.funding.exception.badrequest.InvalidStatusException;
 import com.example.funding.mapper.*;
+import com.example.funding.model.Backing;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
+import com.example.funding.model.Shipping;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.RewardService;
 import com.example.funding.service.validator.ProjectInputValidator;
@@ -396,16 +398,31 @@ public class CreatorServiceImpl implements CreatorService {
         Long totalBackingCnt = backingMapper.getBackerCnt(creatorId);
         Long totalVerifyingCnt = projectMapper.getVerifyingCnt(creatorId);
 
-        CreatorDashboardDto dashboardPie = creatorMapper.creatorDashboardDto(creatorId);
-        double totalProjectCnt = dashboardPie.getTotalProjectCnt();
+        CreatorDashboardDto dashboardPie = creatorMapper.creatorDashboard(creatorId);
         double failedProjectCnt = dashboardPie.getProjectFailedCnt();
+        double successProjectCnt = dashboardPie.getProjectSuccessCnt();
+        double totalProjectCnt = failedProjectCnt + successProjectCnt;
 
-        //달성률 계산 (실패)
-        double failedProject = (failedProjectCnt / totalProjectCnt) * 100;
-        failedProject = Math.round(failedProject * 100.0) / 100.0;
+        double failedProject = 0.0;
+        double successProject= 0.0;
 
-        //달성률 계산(성공)
-        double successProject = 100.0 - failedProject;
+
+        if(totalProjectCnt != 0){
+            //달성률 계산 (실패)
+            failedProject = (failedProjectCnt / totalProjectCnt) * 100;
+            failedProject = Math.round(failedProject * 100.0) / 100.0;
+
+            //달성률 계산(성공)
+            successProject = 100.0 - failedProject;
+        }
+        else if(totalBackingCnt == 0){
+            failedProject = 0.0;
+
+            //달성률 계산(성공)
+            successProject = 0.0;
+        }
+
+
 
         List<CreatorDashboardRankDto> DashboardRank = creatorMapper.getProjectRankDate(creatorId);
 
@@ -613,7 +630,10 @@ public class CreatorServiceImpl implements CreatorService {
             }
         }
         // 기존 상태 가져오기
-        //Shipping current = shippingMapper.findByBackingId(shippingStatusDto.getBackingId());
+        Backing backing = shippingMapper.findByBackingId(shippingStatusDto.getBackingId());
+
+        //projectMapper.decreaseProjectCurrAmount(projectId, backing.getAmount());
+
         //String currentStatus = current.getShippingStatus();
         //검증
         //shippingValidator.validateTransition(currentStatus, shippingStatusDto);

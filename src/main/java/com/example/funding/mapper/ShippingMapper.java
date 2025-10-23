@@ -2,6 +2,7 @@ package com.example.funding.mapper;
 
 import com.example.funding.dto.request.shipping.ShippingStatusDto;
 import com.example.funding.dto.response.shipping.CreatorShippingBackerList;
+import com.example.funding.model.Backing;
 import com.example.funding.model.Shipping;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -19,4 +20,6 @@ public interface ShippingMapper {
                              @Param("shipping")ShippingStatusDto shippingStatusDto);
 
     void updateBackingToShippingStatus(Long backingId);
+
+    Backing findByBackingId(Long backingId);
 }

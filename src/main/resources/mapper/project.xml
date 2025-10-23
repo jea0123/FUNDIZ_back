@@ -393,6 +393,7 @@
         JOIN shipping s ON b.backingId = s.backingId
         where c.creatorId = #{creatorId}
         AND (p.projectStatus = 'OPEN' OR p.projectStatus = 'UPCOMING')
+        AND b.backingStatus = 'COMPLETED' OR b.backingStatus =  'PENDING'
         group by p.projectId, p.creatorId, p.title, p.backerCnt
     </select>
 

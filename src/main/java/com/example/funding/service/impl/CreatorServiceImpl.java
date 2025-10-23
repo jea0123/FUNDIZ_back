@@ -21,7 +21,6 @@ import com.example.funding.mapper.*;
 import com.example.funding.model.Backing;
 import com.example.funding.model.Creator;
 import com.example.funding.model.Project;
-import com.example.funding.model.Shipping;
 import com.example.funding.service.CreatorService;
 import com.example.funding.service.RewardService;
 import com.example.funding.service.validator.ProjectInputValidator;
@@ -615,10 +614,7 @@ public class CreatorServiceImpl implements CreatorService {
     @Override
     public ResponseEntity<ResponseDto<String>> updateCreatorInfo(Long creatorId, CreatorUpdateRequestDto dto) {
         loaders.creator(creatorId);
-        int result = creatorMapper.updateCreatorInfo(dto);
-        if (result == 0) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDto.fail(404, "창작자 정보 수정 실패"));
-        }
+        creatorMapper.updateCreatorInfo(dto);
         return ResponseEntity.ok(ResponseDto.success(200, "창작자 정보 수정 완료", "창작자 정보 수정 "));
     }
 

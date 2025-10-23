@@ -43,7 +43,7 @@ public interface CreatorMapper {
 
     CreatorDashboardDto creatorDashboard(Long creatorId);
 
-    int updateCreatorInfo(CreatorUpdateRequestDto dto);
+    void updateCreatorInfo(CreatorUpdateRequestDto dto);
 
     Creator creatorInfo(Long creatorId);
 

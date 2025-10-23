@@ -103,7 +103,7 @@
     </select>
 
     <select id="getCommunityById" resultType="community">
-        SELECT *
+        SELECT cmid, userid, projectid, cmcontent, rating, createdat, code
         FROM COMMUNITY
         WHERE CMID = #{cmId}
     </select>

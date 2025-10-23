@@ -15,7 +15,8 @@
     </insert>
 
     <select id="creatorInfo" parameterType="Long" resultType="creator">
-        SELECT * FROM creator
+        SELECT creatorid, userid, creatorname, profileimg, bio, email, phone, bank, account, businessnum, followercnt, creatortype
+        FROM creator
         WHERE creatorId = #{creatorId}
     </select>
 
@@ -34,7 +35,7 @@
     </update>
 
     <select id="findByIds" resultType="creator">
-        SELECT *
+        SELECT creatorid, userid, creatorname, profileimg, bio, email, phone, bank, account, businessnum, followercnt, creatortype
         FROM creator
         WHERE creatorId IN
         <foreach collection="ids" item="id" open="(" separator="," close=")">
@@ -43,7 +44,7 @@
     </select>
 
     <select id="findById" parameterType="Long" resultType="creator">
-        SELECT *
+        SELECT creatorid, userid, creatorname, profileimg, bio, email, phone, bank, account, businessnum, followercnt, creatortype
         FROM creator
         WHERE creatorId = #{creatorId}
     </select>

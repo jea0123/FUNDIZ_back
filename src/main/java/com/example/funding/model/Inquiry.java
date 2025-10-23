@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 public class Inquiry {
     private Long inqId;
     private Long userId;
-    private Long adId;
     private String title;
     private String content;
     private LocalDateTime createdAt;

@@ -14,7 +14,8 @@
     <select id="inquiryList" resultType="inquiry">
         SELECT * FROM
         (SELECT sub.*, ROWNUM rnum FROM (
-        SELECT * FROM inquiry order by INQID desc
+        SELECT inqid, userid, title, content, createdat, iscanceled, ctgr, isanswer
+        FROM inquiry order by INQID desc
         ) sub WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow})
         WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
@@ -22,18 +23,21 @@
     <select id="myInquiryList" resultType="inquiry">
         SELECT * FROM
         (SELECT sub.*, ROWNUM rnum FROM (
-        SELECT * FROM inquiry WHERE USERID = #{userId} order by INQID desc
+        SELECT inqid, userid, title, content, createdat, iscanceled, ctgr, isanswer
+        FROM inquiry WHERE USERID = #{userId} order by INQID desc
         ) sub WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow})
         WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
     </select>
 
     <select id="inquiryDetail" resultType="inquiry">
-        SELECT * FROM inquiry
+        SELECT inqid, userid, title, content, createdat, iscanceled, ctgr, isanswer
+        FROM inquiry
         WHERE INQID = #{inqId}
     </select>
 
     <select id="findById" resultType="inquiry">
-        SELECT * FROM inquiry
+        SELECT inqid, userid, title, content, createdat, iscanceled, ctgr, isanswer
+        FROM inquiry
         WHERE INQID=#{inqId}
     </select>
 

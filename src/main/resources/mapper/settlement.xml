@@ -3,7 +3,7 @@
 <mapper namespace="com.example.funding.mapper.SettlementMapper">
 
     <select id="getByProjectId" resultType="settlement">
-        SELECT *
+        SELECT settlementid, projectId, creatorId, totalamount, fee, settlementAmount, settlementDate, settlementStatus, refundAmount
         FROM settlement
         WHERE projectId = #{projectId}
     </select>
@@ -22,8 +22,7 @@
     </update>
 
     <select id="getByCreatorId" resultType="settlement">
-        SELECT
-        *
+        SELECT settlementid, projectId, creatorId, totalamount, fee, settlementAmount, settlementDate, settlementStatus, refundAmount
         FROM settlement
         WHERE creatorId = #{creatorId}
     </select>

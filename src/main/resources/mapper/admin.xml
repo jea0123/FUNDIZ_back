@@ -127,6 +127,7 @@
                     #{st}
                 </foreach>
             </if>
+            AND p.PROJECTSTATUS <![CDATA[ <> ]]> 'DRAFT'
             <if test="dto.fromDate != null">
                 AND p.UPDATEDAT <![CDATA[ >= ]]> #{dto.fromDate}
             </if>

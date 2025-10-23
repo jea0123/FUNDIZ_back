@@ -52,7 +52,10 @@ public class BackingServiceImpl implements BackingService {
         List<AddressResponseDto> addressList = addressMapper.getAddressList(userId);
         List<Reward> rewardList = rewardMapper.getRewardListPublic(projectId);
         Creator creator = creatorMapper.findById(project.getCreatorId());
-        List<BackingPagePaymentDto> backingPagePayment = paymentMapper.backingPagePayment(userId);
+        //List<BackingPagePaymentDto> backingPagePayment = paymentMapper.backingPagePayment(userId);
+
+        // paymentInfo 로교체
+        List<PaymentInfo> paymentInfo = paymentMapper.getPaymentInfo(userId);
 
         List<BackingRewardDto> rewards = rewardList.stream()
                 .map(r -> BackingRewardDto.builder()
@@ -74,7 +77,7 @@ public class BackingServiceImpl implements BackingService {
                 .thumbnail(project.getThumbnail())
                 .currAmount(project.getCurrAmount())
                 .goalAmount(project.getGoalAmount())
-                .backingPagePaymentList(backingPagePayment)
+                .backingPagePaymentList(paymentInfo)
                 .build();
 
         return ResponseEntity.ok(ResponseDto.success(200, "후원페이지 출력 성공", backingResponse));
@@ -88,16 +91,18 @@ public class BackingServiceImpl implements BackingService {
         requestDto.getRewards().forEach(reward -> {
             Reward existingReward = loaders.reward(reward.getRewardId());
             Integer remain = existingReward.getRemain();
-            System.out.println("remain 은뭘까요????????????????? " + remain);
 
             if (remain != null && remain < reward.getQuantity()) {
                 throw new IllegalArgumentException("리워드의 남은 수량이 부족합니다. 리워드 ID: " + reward.getRewardId());
             }
         });
+
         Backing backing = requestDto.getBacking();
-        Payment payment = requestDto.getPayment();
+        PaymentInfo paymentInfo = requestDto.getPaymentInfo();
+
         Address address = requestDto.getAddress();
         List<RewardBackingRequestDto> rewards = requestDto.getRewards();
+
 
         //backing
         backing.setUserId(userId);
@@ -142,20 +147,33 @@ public class BackingServiceImpl implements BackingService {
             //출력용
             rewards.forEach(r -> System.out.println("  - rewardId: " + r.getRewardId() + ", qty: " + r.getQuantity()));
         }
-
-        //payment
-        Payment findPayment = paymentMapper.findUserMethod(userId, payment.getMethod(), payment.getCardCompany());
-        System.out.println(" findPayment 확인용 - findPayment: " + findPayment);
-        if (findPayment != null) {
-            findPayment.setBackingId(backingId);
-            findPayment.setAmount(backing.getAmount());
-            paymentMapper.updateBackingPayment(findPayment);
-        } else {
+        // paymentInfo 로교체
+        if(paymentInfo != null){
+            Payment payment = new Payment();
             String orderId = "ORD-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-            payment.setOrderId(orderId);
+
             payment.setBackingId(backingId);
+            payment.setOrderId(orderId);
+            payment.setMethod(paymentInfo.getMethod());
+            payment.setCardCompany(paymentInfo.getCardCompany());
+            payment.setAmount(backing.getAmount());
+            payment.setCreatedAt(LocalDateTime.now());
             paymentMapper.addPayment(payment);
         }
+
+//        //payment
+//        Payment findPayment = paymentMapper.findUserMethod(userId, payment.getMethod(), payment.getCardCompany());
+//        paymentMapper.savePaymentInfo(userId, payment.getMethod(), payment.getCardCompany());
+//        if (findPayment != null) {
+//            findPayment.setBackingId(backingId);
+//            findPayment.setAmount(backing.getAmount());
+//            paymentMapper.updateBackingPayment(findPayment);
+//        } else {
+//            String orderId = "ORD-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+//            payment.setOrderId(orderId);
+//            payment.setBackingId(backingId);
+//            paymentMapper.addPayment(payment);
+//        }
 
         //TODO: address새로 생성시 로직추가 ,address 선택시 해당 address 만 연결
         // 신규 주소 직접 입력한 경우

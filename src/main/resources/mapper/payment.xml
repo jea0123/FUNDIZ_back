@@ -9,13 +9,24 @@
         AND CREATEDAT >= #{since}
     </select>
 
+<!--    <select id="backingPagePayment" resultType="com.example.funding.dto.response.payment.BackingPagePaymentDto">-->
+<!--        select-->
+<!--            p.orderId,-->
+<!--            p.method,-->
+<!--            p.amount,-->
+<!--            p.cardCompany-->
+<!--        From Payment p-->
+<!--        JOIN backing b ON b.backingId = p.backingId-->
+<!--        JOIN users u ON u.userId = b.userId-->
+<!--        WHERE u.userId = #{userId}-->
+<!--    </select>-->
     <select id="backingPagePayment" resultType="com.example.funding.dto.response.payment.BackingPagePaymentDto">
         select
-            p.orderId,
-            p.method,
-            p.amount,
-            p.cardCompany
-        From Payment p
+        p.orderId,
+        p.method,
+        p.amount,
+        p.cardCompany
+        From PaymentInfo pI
         JOIN backing b ON b.backingId = p.backingId
         JOIN users u ON u.userId = b.userId
         WHERE u.userId = #{userId}
@@ -27,16 +38,16 @@
         </selectKey>
         INSERT INTO payment (
         paymentId,
-        orderId,
         backingId,
+        orderId,
         method,
         amount,
         status,
         cardCompany
         ) VALUES (
         #{paymentId},
-        #{orderId},
         #{backingId},
+        #{orderId},
         #{method},
         #{amount},
         #{status},
@@ -74,22 +85,50 @@
         WHERE paymentId = #{paymentId}
     </update>
 
-    <insert id = "savePaymentInfo" parameterType="com.example.funding.model.PaymentInfo">
-        <selectKey keyProperty="userPaymentId" resultType="long" order="BEFORE">
-            SELECT PAYMENTINFO_SEQ.NEXTVAL FROM DUAL
+    <insert id="addCard" parameterType="com.example.funding.dto.request.payment.AddCardDto">
+        <selectKey keyProperty="payInfoId" resultType="long" order="BEFORE">
+            SELECT PAYMENT_SEQ.NEXTVAL FROM DUAL
         </selectKey>
-        insert Into paymentInfo(
-            userPaymentId,
-            userId,
-            cardCompany,
-            method
+        INSERT INTO paymentInfo (
+        payInfoId,
+        userId,
+        cardCompany,
+        method,
+        cardNum
         ) VALUES (
-        #{userPaymentId},
+        #{payInfoId},
         #{userId},
         #{cardCompany},
-        #{method}
+        #{method},
+        #{cardNum}
         )
     </insert>
 
+    <select id = "getCardList" resultType="com.example.funding.dto.response.payment.CardListDto">
+        select
+            payInfoId,
+            cardCompany,
+            method,
+            cardNum
+        from
+            paymentInfo
+        WHERE
+            userId = #{userId}
+    </select>
 
+    <delete id="deleteCard" parameterType="long">
+        DELETE FROM paymentInfo
+        where payInfoId = #{payInfoId}
+    </delete>
+
+    <select id="getPaymentInfo" parameterType="long" resultType="com.example.funding.model.PaymentInfo">
+        SELECT
+        payInfoId,
+        cardCompany,
+        method,
+        cardNum
+        FROM PaymentInfo
+        WHERE
+        userId = #{userId}
+    </select>
 </mapper>

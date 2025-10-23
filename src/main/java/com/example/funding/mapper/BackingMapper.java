@@ -17,7 +17,6 @@ import java.util.List;
 
 @Mapper
 public interface BackingMapper {
-
     void addBacking(Backing backing);
 
     void addBackingDetail(BackingDetail backingDetail);
@@ -33,6 +32,8 @@ public interface BackingMapper {
     List<MonthCountDto> monthCount(Long creatorId);
 
     Backing findById(Long backingId);
+
+    Long findBackingIdByUserId(Long userId);
 
     List<MyPageBackingSaveDto> getBackingLists(@Param("userId") Long userId);
 

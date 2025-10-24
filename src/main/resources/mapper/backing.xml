@@ -98,12 +98,14 @@
         INSERT INTO backing (
         backingId,
         userId,
+        payInfoId,
         amount,
         createdAt,
         backingStatus
         ) VALUES (
         #{backingId},
         #{userId},
+        #{payInfoId},
         #{amount},
         #{createdAt, jdbcType=DATE},
         #{backingStatus}

@@ -13,9 +13,9 @@ public class FeaturedProjectDto {
     private Long creatorId;
     private String creatorName;
     private String thumbnail;
+    private LocalDateTime startDate;
     private LocalDateTime endDate;
     private Integer percentNow;
     private Integer currAmount;
-
     private Double score;
 }

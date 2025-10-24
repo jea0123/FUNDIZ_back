@@ -68,7 +68,7 @@
     </select>
 
     <select id="findFeaturedJoinedWithRecent" parameterType="map" resultType="featuredProjectDto">
-        SELECT projectId, title, creatorId, creatorName, thumbnail, endDate, percentNow, goalAmount, currAmount, score
+        SELECT projectId, title, creatorId, creatorName, thumbnail, startDate, endDate, percentNow, goalAmount, currAmount, score
         FROM (
         SELECT
         pr.PROJECTID AS projectId,
@@ -76,6 +76,7 @@
         pr.Title AS title,
         NVL2(TRIM(c.CREATORNAME), c.CREATORNAME, 'Unknown Creator') AS creatorName,
         pr.Thumbnail AS thumbnail,
+        pr.STARTDATE AS startDate,
         pr.ENDDATE AS endDate,
 
         CASE WHEN NVL(pr.GOALAMOUNT,0) > 0
@@ -249,6 +250,7 @@
         p.TITLE AS title,
         c.CREATORNAME AS creatorName,
         p.THUMBNAIL AS thumbnail,
+        p.STARTDATE AS startDate,
         p.ENDDATE AS endDate,
         p.CURRAMOUNT AS currAmount,
 
@@ -298,6 +300,67 @@
         JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
         JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
         <include refid="searchFilterWhere"/>
+    </select>
+
+    <select id="searchUpcomingProjects" resultType="featuredProjectDto">
+        SELECT *
+        FROM (
+        SELECT T.*, ROWNUM rnum
+        FROM (
+        SELECT
+        p.PROJECTID     AS projectId,
+        p.TITLE         AS title,
+        c.CREATORNAME   AS creatorName,
+        p.THUMBNAIL     AS thumbnail,
+        p.STARTDATE     AS startDate,
+        p.ENDDATE       AS endDate,
+        p.CURRAMOUNT    AS currAmount,
+        NVL(p.GOALAMOUNT,0) AS goalAmount,
+
+        /* 진행률(%) */
+        CASE WHEN NVL(p.GOALAMOUNT,0) > 0
+        THEN ROUND(NVL(p.CURRAMOUNT,0) / NULLIF(p.GOALAMOUNT,0) * 100)
+        ELSE 0 END AS percentNow
+
+        FROM PROJECT p
+        JOIN CREATOR c ON c.CREATORID = p.CREATORID
+        JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
+        JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
+        <include refid="searchFilterWhere"/>
+
+        AND p.PROJECTSTATUS = 'UPCOMING'
+
+        <choose>
+            <when test="dto.sort == 'liked'">
+                ORDER BY p.LIKECNT DESC, P.PROJECTID DESC
+            </when>
+            <when test="dto.sort == 'recent'">
+                ORDER BY p.PROJECTID DESC
+            </when>
+            <when test="dto.sort == 'amount'">
+                ORDER BY p.CURRAMOUNT DESC, P.PROJECTID DESC
+            </when>
+            <when test="dto.sort == 'deadline'">
+                ORDER BY p.STARTDATE ASC, P.PROJECTID DESC
+            </when>
+            <otherwise>
+                ORDER BY p.PROJECTID DESC
+            </otherwise>
+        </choose>
+        ) T
+        WHERE ROWNUM <![CDATA[ <= ]]> #{pager.endRow}
+        )
+        WHERE rnum <![CDATA[ >= ]]> #{pager.startRow}
+    </select>
+
+    <select id="countSearchUpcomingProjects" resultType="int">
+        SELECT COUNT(*)
+        FROM PROJECT p
+        JOIN CREATOR c ON c.CREATORID = p.CREATORID
+        JOIN SUBCATEGORY sc ON sc.SUBCTGRID = p.SUBCTGRID
+        JOIN CATEGORY cg ON cg.CTGRID = sc.CTGRID
+        <include refid="searchFilterWhere"/>
+        AND p.PROJECTSTATUS = 'UPCOMING'
     </select>
 
     <select id="getProjectToOpen" resultType="map">

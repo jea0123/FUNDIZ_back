@@ -17,7 +17,7 @@ import java.util.Collection;
  * @since 2025-08-26
  */
 public record CustomUserPrincipal(Long userId, Long creatorId, String email,
-                                  Collection<? extends GrantedAuthority> authorities) implements UserDetails {
+                                  Collection<? extends GrantedAuthority> authorities, String role) implements UserDetails {
 
     @Override
     public String getUsername() {

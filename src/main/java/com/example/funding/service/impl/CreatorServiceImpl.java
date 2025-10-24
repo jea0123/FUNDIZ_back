@@ -614,6 +614,7 @@ public class CreatorServiceImpl implements CreatorService {
     @Override
     public ResponseEntity<ResponseDto<String>> updateCreatorInfo(Long creatorId, CreatorUpdateRequestDto dto) {
         loaders.creator(creatorId);
+        dto.setCreatorId(creatorId);
         creatorMapper.updateCreatorInfo(dto);
         return ResponseEntity.ok(ResponseDto.success(200, "창작자 정보 수정 완료", "창작자 정보 수정 "));
     }

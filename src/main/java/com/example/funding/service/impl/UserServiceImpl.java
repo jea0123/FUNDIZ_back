@@ -12,6 +12,7 @@ import com.example.funding.dto.response.user.*;
 import com.example.funding.enums.NotificationType;
 import com.example.funding.exception.conflict.DuplicatedFollowCreatorException;
 import com.example.funding.exception.conflict.DuplicatedLikedProjectException;
+import com.example.funding.exception.conflict.DuplicatedNicknameException;
 import com.example.funding.exception.conflict.DuplicatedPasswordException;
 import com.example.funding.exception.forbidden.InCorrectPasswordException;
 import com.example.funding.exception.notfound.FollowingCreatorNotFoundException;
@@ -195,6 +196,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<ResponseDto<String>> userNickname(Long userId, UserNicknameDto dto) {
         loaders.user(userId);
+        if( userMapper.findByNickname(dto.getNickname()) != null) throw new DuplicatedNicknameException();
         userMapper.updateNickname(userId, dto.getNickname());
         return ResponseEntity.ok(ResponseDto.success(200, "닉네임 변경 성공", dto.getNickname()));
     }

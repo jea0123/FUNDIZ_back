@@ -83,7 +83,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             auths.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
             if("ADMIN".equalsIgnoreCase(role)) {
                 //관리자는 여기서 끝
-                CustomUserPrincipal principal = new CustomUserPrincipal(null, null, claims.getSubject(), auths);
+                CustomUserPrincipal principal = new CustomUserPrincipal(Long.MAX_VALUE, Long.MAX_VALUE, claims.getSubject(), auths, "ADMIN");
                 Authentication auth =
                         new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(auth);
@@ -104,7 +104,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            CustomUserPrincipal principal = new CustomUserPrincipal(userId, creatorId, email, auths);
+            CustomUserPrincipal principal = new CustomUserPrincipal(userId, creatorId, email, auths, "USER");
             Authentication auth =
                     new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);

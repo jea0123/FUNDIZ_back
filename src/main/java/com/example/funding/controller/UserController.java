@@ -48,6 +48,15 @@ public class UserController {
      */
     @GetMapping("/loginUser")
     public ResponseEntity<ResponseDto<LoginUserDto>> getLoginUser(@AuthenticationPrincipal CustomUserPrincipal principal) {
+        if ("ADMIN".equalsIgnoreCase(principal.role())) {
+            LoginUserDto admin = LoginUserDto.builder()
+                    .userId(null)
+                    .email(principal.email())
+                    .nickname("관리자")
+                    .role("ADMIN")
+                    .build();
+            return ResponseEntity.ok(ResponseDto.success(200, "관리자 로그인 사용자 정보 조회 성공", admin));
+        }
         return userService.getLoginUser(principal.userId());
     }
 

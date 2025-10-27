@@ -35,7 +35,9 @@
             p.projectId,
             p.title,
 
-            b.backingId
+            b.backingId,
+            b.createdAt
+
 
         FROM project p
         JOIN creator c ON p.creatorId = c.creatorId

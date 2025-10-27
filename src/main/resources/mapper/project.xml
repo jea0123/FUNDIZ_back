@@ -419,7 +419,7 @@
     </select>
 
     <select id="getVerifyingCnt" parameterType="long" resultType="long">
-        SELECT NVL(SUM(backerCnt),0)
+        SELECT NVL(count(projectId),0)
         FROM project
         WHERE creatorId = #{creatorId}
         AND projectStatus IN ('VERIFYING')

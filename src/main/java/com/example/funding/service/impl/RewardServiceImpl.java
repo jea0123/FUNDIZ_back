@@ -64,8 +64,8 @@ public class RewardServiceImpl implements RewardService {
                     .rewardName(dto.getRewardName().trim())
                     .price(dto.getPrice())
                     .rewardContent(dto.getRewardContent().trim())
-                    .deliveryDate(dto.getDeliveryDate())
                     .rewardCnt(dto.getRewardCnt())
+                    .deliveryDate(dto.getDeliveryDate())
                     .isPosting(dto.getIsPosting())
                     .build();
 

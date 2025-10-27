@@ -46,7 +46,7 @@ public class ProjectController {
      * @author 조은애
      * @since 2025-08-31
      */
-    @GetMapping("/{projectId}")
+    @GetMapping("/{projectId:\\d+}")
     public ResponseEntity<ResponseDto<ProjectDetailDto>> getProjectDetail(@PathVariable Long projectId) {
         return projectService.getProjectDetail(projectId);
     }
@@ -93,6 +93,12 @@ public class ProjectController {
     public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> searchProject(SearchProjectDto dto, @Valid PagerRequest req) {
         Pager pager = Pager.ofRequest(req.getPage(), req.getSize(), req.getPerGroup());
         return projectService.searchProject(dto, pager);
+    }
+
+    @GetMapping("/search/upcoming")
+    public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> searchUpcomingProjects(SearchProjectDto dto, @Valid PagerRequest req) {
+        Pager pager = Pager.ofRequest(req.getPage(), req.getSize(), req.getPerGroup());
+        return projectService.searchUpcomingProjects(dto, pager);
     }
 
     /**

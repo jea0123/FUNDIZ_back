@@ -71,6 +71,17 @@ public interface ProjectService {
     ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> searchProject(SearchProjectDto dto, Pager pager);
 
     /**
+     * <p>검색 기능 - 곧 시작할 프로젝트</p>
+     *
+     * @param dto   SearchProjectDto
+     * @param pager pager
+     * @return 프로젝트 검색 결과 페이지
+     * @author 장민규
+     * @since 2025-10-25
+     */
+    ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> searchUpcomingProjects(SearchProjectDto dto, Pager pager);
+
+    /**
      * <p>특정 프로젝트의 좋아요 수 조회</p>
      *
      * @param projectId 프로젝트 ID

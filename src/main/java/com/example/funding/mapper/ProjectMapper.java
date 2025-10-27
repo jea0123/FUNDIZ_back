@@ -40,6 +40,10 @@ public interface ProjectMapper {
 
     int countSearchProjects(@Param("dto") SearchProjectDto dto);
 
+    List<FeaturedProjectDto> searchUpcomingProjects(@Param("dto") SearchProjectDto dto, @Param("pager") Pager pager);
+
+    int countSearchUpcomingProjects(@Param("dto") SearchProjectDto dto);
+
     int updateProjectsToOpen();
 
     int updateProjectsToSuccess();

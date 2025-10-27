@@ -157,6 +157,21 @@ public class ProjectServiceImpl implements ProjectService {
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 검색 성공", result));
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseDto<PageResult<FeaturedProjectDto>>> searchUpcomingProjects(SearchProjectDto dto, Pager pager) {
+        requireIn(dto.getSort(), List.of("recent", "liked", "amount", "deadline", "percent", "view"), InvalidSortException::new);
+        int total = projectMapper.countSearchUpcomingProjects(dto);
+
+        List<FeaturedProjectDto> items = Collections.emptyList();
+        if (total > 0) {
+            items = projectMapper.searchUpcomingProjects(dto, pager);
+        }
+        PageResult<FeaturedProjectDto> result = PageResult.of(items, pager, total);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 검색 성공", result));
+    }
+
     /**
      * 프로젝트 좋아요 수 조회
      */

@@ -44,5 +44,6 @@ public class CreatorShippingBackerList {
     private String title;
 
     private Long backingId;
+    private LocalDateTime createdAt;
 
 }

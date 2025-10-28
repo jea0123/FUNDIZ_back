@@ -227,4 +227,13 @@ public class ReplyServiceImpl implements ReplyService {
         return ResponseEntity.ok(ResponseDto.success(200, "댓글 등록 성공", null));
     }
 
+    @Override
+    public ResponseEntity<ResponseDto<String>> deleteReply(Long replyId, Long userId) {
+        loaders.user(userId);
+
+        replyMapper.deleteReply(replyId);
+
+        return ResponseEntity.ok(ResponseDto.success(200, "댓글 삭제 성공", null));
+    }
+
 }

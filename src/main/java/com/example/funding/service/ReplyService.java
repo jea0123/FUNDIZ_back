@@ -25,4 +25,5 @@ public interface ReplyService {
 
     ResponseEntity<ResponseDto<QnaReplyDto>> createQnaReply(Long qnaId, Long creatorId, QnaReplyCreateRequestDto dto);
 
+    ResponseEntity<ResponseDto<String>> deleteReply(Long replyId, Long userId);
 }

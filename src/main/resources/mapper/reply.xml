@@ -112,4 +112,9 @@
         INSERT INTO REPLY (REPLYID, QNAID, CONTENT, CODE, CREATORID)
         VALUES (#{replyId}, #{qnaId}, #{content}, #{code}, #{creatorId})
     </insert>
+
+    <delete id="deleteReply">
+        DELETE FROM REPLY
+        WHERE REPLYID = #{replyId}
+    </delete>
 </mapper>

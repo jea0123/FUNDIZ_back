@@ -32,6 +32,8 @@ public interface ReplyMapper {
     void createInquiryReply(Reply reply);
 
     void createQnaReply(Reply reply);
+
+    void deleteReply(@Param("replyId") Long replyId);
 }
 
 

@@ -131,7 +131,6 @@ public class CreatorServiceImpl implements CreatorService {
     public ResponseEntity<ResponseDto<CreatorProjectDetailDto>> getProjectDetail(Long projectId, Long creatorId) {
         loaders.creator(creatorId);
         loaders.project(projectId);
-        // Guard: 소유자
         transitionGuard.ensureProjectOwner(projectId, creatorId);
 
         CreatorProjectDetailDto dto = creatorMapper.getProjectDetail(projectId, creatorId);
@@ -154,13 +153,12 @@ public class CreatorServiceImpl implements CreatorService {
     public ResponseEntity<ResponseDto<Long>> createProject(ProjectCreateRequestDto dto, Long creatorId) {
         loaders.creator(creatorId);
         // Guard
-//        transitionGuard.assertCanCreate(creatorId);
-
+        transitionGuard.assertCanCreate(creatorId);
         // Validator
-//        List<String> errors = inputValidator.validateProjectCreate(dto);
-//        if (!errors.isEmpty()) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.join("; ", errors));
-//        }
+        List<String> errors = inputValidator.validateProjectCreate(dto);
+        if (!errors.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.join("; ", errors));
+        }
 
         // 프로젝트 생성
         Project project = Project.builder()

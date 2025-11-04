@@ -122,8 +122,6 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<ResponseDto<PageResult<AdminProjectListDto>>> getProjectList(SearchAdminProjectDto dto, Pager pager) {
-        // TODO: 검증 변경 (단일 -> 리스트 검증)
-//        requireInEnum(dto.getProjectStatus(), ProjectStatus.class, InvalidStatusException::new);
         List<ProjectStatus> st = dto.getProjectStatus();
         if (st != null && st.stream().anyMatch(Objects::isNull)) {
             throw new InvalidStatusException();

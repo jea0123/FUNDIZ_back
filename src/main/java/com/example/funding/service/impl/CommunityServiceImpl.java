@@ -77,7 +77,6 @@ public class CommunityServiceImpl implements CommunityService {
         loaders.user(userId);
         loaders.project(projectId);
         requireHasText(dto.getCmContent(), ContentRequiredException::new);
-        //TODO: guard, validator
 
         Community community = Community.builder().projectId(projectId).userId(userId).cmContent(dto.getCmContent()).build();
 

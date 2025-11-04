@@ -2,6 +2,7 @@ package com.example.funding.common;
 
 import com.example.funding.enums.NotificationType;
 import com.example.funding.handler.NotificationPublisher;
+import com.example.funding.mapper.BackingMapper;
 import com.example.funding.mapper.CreatorMapper;
 import com.example.funding.mapper.ProjectMapper;
 import com.example.funding.mapper.SettlementMapper;
@@ -26,6 +27,7 @@ public class Scheduler {
     private final ProjectMapper projectMapper;
     private final SettlementMapper settlementMapper;
     private final CreatorMapper creatorMapper;
+    private final BackingMapper backingMapper;
 
     private final NotificationPublisher notificationPublisher;
 
@@ -52,6 +54,10 @@ public class Scheduler {
             Creator creator = creatorMapper.findById((Long) project.get("creatorId"));
             notificationPublisher.publish(creator.getUserId(), NotificationType.FUNDING_FAILURE, (String) project.get("title"), (Long) project.get("projectId"));
         }
+
+        // 프로젝트 상태에 따라 backingStatus 변경 기능 추가
+        backingMapper.updateBackingStatusCompleted();
+        backingMapper.updateBackingStatusCancelled();
 
         log.info("[ProjectStatusScheduler] OPEN={}, SUCCESS={}, FAILED={}", opened, success, failed);
     }

@@ -2,9 +2,7 @@ package com.example.funding.mapper;
 
 import com.example.funding.dto.request.backing.BackingRequestUpdateDto;
 import com.example.funding.dto.response.backing.BackingCreatorBackerList;
-import com.example.funding.dto.response.backing.MyPageBackingDetailDto;
 import com.example.funding.dto.response.backing.MyPageBackingDetailSaveDto;
-import com.example.funding.dto.response.backing.MyPageBackingListDto;
 import com.example.funding.dto.response.backing.MyPageBackingSaveDto;
 import com.example.funding.dto.response.creator.DailyCountDto;
 import com.example.funding.dto.response.creator.MonthCountDto;
@@ -41,4 +39,7 @@ public interface BackingMapper {
 
     void updateBackingStatus(Long backingId);
 
+    void updateBackingStatusCompleted();
+
+    void updateBackingStatusCancelled();
 }

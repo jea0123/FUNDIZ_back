@@ -317,5 +317,32 @@
         ORDER BY b.createdAt DESC
         OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY
     </select>
+
+    <update id="updateBackingStatusCompleted">
+        UPDATE BACKING b
+        SET b.backingStatus ='COMPLETED'
+        WHERE EXISTS (
+            <!-- 연산을 최소화 하기위해 1 사용 -->
+            SELECT 1
+            FROM backingDetail bd
+            JOIN reward r ON bd.rewardId = r.rewardId
+            JOIN project p ON p.projectId = r.projectId
+            WHERE p.projectStatus = 'SUCCESS'
+            AND bd.backingId = b.backingId
+            )
+    </update>
+
+    <update id  ="updateBackingStatusCancelled">
+        UPDATE BACKING b
+        SET b.backingStatus = 'CANCELED'
+        WHERE b.backingId IN(
+            SELECT 1
+            FROM backingDetail bd
+            JOIN reward r ON bd.rewardId = r.rewardId
+            JOIN project p ON p.projectId = r.projectId
+            WHERE p.projectStatus = 'CANCELED'
+            AND bd.backingId = b.backingId
+            )
+    </update>
 </mapper>
 

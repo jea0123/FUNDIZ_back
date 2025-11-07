@@ -169,8 +169,6 @@ public class AdminServiceImpl implements AdminService {
     public ResponseEntity<ResponseDto<String>> updateProject(AdminProjectUpdateDto dto) {
         Project existing = loaders.project(dto.getProjectId());
 
-        //TODO: 목표금액, 종료일 무결성 체크
-
         Project project = Project.builder()
                 .projectId(existing.getProjectId())
                 .subctgrId(dto.getSubctgrId())

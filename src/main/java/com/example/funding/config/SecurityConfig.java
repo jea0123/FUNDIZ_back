@@ -65,7 +65,6 @@ public class SecurityConfig implements WebMvcConfigurer {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() //TODO: HttpMethod.OPTIONS 임시 추가
                         .requestMatchers("/**").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated()

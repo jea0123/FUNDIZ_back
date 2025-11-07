@@ -88,7 +88,6 @@ public class ReplyServiceImpl implements ReplyService {
 
         String content = (dto.getContent() == null ? "" : dto.getContent().trim());
         requireHasText(content, ContentRequiredException::new);
-        //TODO: 문자 길이 체크
 
         Reply reply = Reply.builder()
                 .cmId(cmId)
@@ -151,7 +150,6 @@ public class ReplyServiceImpl implements ReplyService {
 
         String content = (dto.getContent() == null ? "" : dto.getContent().trim());
         requireHasText(content, ContentRequiredException::new);
-        //TODO: 문자 길이 체크
 
         Reply reply = Reply.builder()
                 .inqId(inqId)
@@ -213,7 +211,6 @@ public class ReplyServiceImpl implements ReplyService {
 
         String content = (dto.getContent() == null ? "" : dto.getContent().trim());
         requireHasText(content, ContentRequiredException::new);
-        //TODO: 문자 길이 체크
 
         Reply reply = Reply.builder()
                 .qnaId(qnaId)

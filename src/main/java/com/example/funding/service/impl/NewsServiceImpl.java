@@ -45,7 +45,6 @@ public class NewsServiceImpl implements NewsService {
         auth.mustBeOwner(creatorId, existing.getCreatorId());
         requireHasText(dto.getContent(), ContentRequiredException::new);
 
-        //TODO: guard, validator
         News news = News.builder()
                 .projectId(projectId)
                 .content(dto.getContent())

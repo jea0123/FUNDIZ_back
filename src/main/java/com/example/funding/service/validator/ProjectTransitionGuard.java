@@ -39,7 +39,6 @@ public class ProjectTransitionGuard {
         List<String> errors = new ArrayList<>();
         entityValidator.validateCategoryFromDb(p.getSubctgrId(), true, errors);
         entityValidator.validateBasicsFromDb(p, errors);
-        // TODO: 대표이미지 검증 추가
         entityValidator.validateTagsFromDb(projectId, errors);
         entityValidator.validateRewardsFromDb(projectId, p.getEndDate(), errors);
 

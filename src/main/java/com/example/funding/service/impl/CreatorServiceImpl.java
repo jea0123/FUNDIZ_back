@@ -209,18 +209,13 @@ public class CreatorServiceImpl implements CreatorService {
         loaders.creator(creatorId);
         Project existing = loaders.project(dto.getProjectId());
         auth.mustBeOwner(creatorId, existing.getCreatorId());
-//        Project existing = projectMapper.findById(dto.getProjectId());
-//        if (existing == null) throw new ProjectNotFoundException();
-//        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
-//        if (!existing.getCreatorId().equals(creatorId)) throw new AccessDeniedException();
-//
-//        // Guard
-//        transitionGuard.assertCanUpdate(dto.getProjectId(), creatorId);
-//        // Validator
-//        List<String> errors = inputValidator.validateProjectUpdate(dto);
-//        if (!errors.isEmpty()) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.join("; ", errors));
-//        }
+        // Guard
+        transitionGuard.assertCanUpdate(dto.getProjectId(), creatorId);
+        // Validator
+        List<String> errors = inputValidator.validateProjectUpdate(dto);
+        if (!errors.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.join("; ", errors));
+        }
 
         Project project = Project.builder()
                 .creatorId(creatorId)
@@ -265,16 +260,11 @@ public class CreatorServiceImpl implements CreatorService {
         loaders.creator(creatorId);
         Project existing = loaders.project(projectId);
         auth.mustBeOwner(creatorId, existing.getCreatorId());
-//        Project existing = projectMapper.findById(projectId);
-//        if (existing == null) throw new ProjectNotFoundException();
-//        if (creatorMapper.findById(creatorId) == null) throw new CreatorNotFoundException();
-//        if (!existing.getCreatorId().equals(creatorId)) throw new AccessDeniedException();
-//        // Guard
-//        transitionGuard.assertCanDelete(projectId, creatorId);
+        // Guard
+        transitionGuard.assertCanDelete(projectId, creatorId);
 
         rewardMapper.deleteRewards(projectId);
         tagMapper.deleteTags(projectId);
-
         creatorMapper.deleteProject(projectId);
 
         return ResponseEntity.ok(ResponseDto.success(200, "프로젝트 삭제 성공", null));
